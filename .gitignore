@@ -1,0 +1,26 @@
+# Dart
+.dart_tool/
+.packages
+build/
+*.dart.js
+*.js_
+*.js.deps
+*.js.map
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test reports
+test/acid/reports/*.html
+*.html
+
+# Local settings
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
