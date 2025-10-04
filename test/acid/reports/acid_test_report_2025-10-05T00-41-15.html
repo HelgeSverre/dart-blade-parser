@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blade Parser Acid Test Report</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+    }
+
+    header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+
+    header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+
+    .timestamp {
+        opacity: 0.9;
+        font-size: 0.9em;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 40px;
+        background: #f8f9fa;
+    }
+
+    .card {
+        background: white;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .card-title {
+        font-size: 0.85em;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .card-value {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .card-subtitle {
+        font-size: 0.9em;
+        color: #95a5a6;
+        margin-top: 8px;
+    }
+
+    .success { color: #28a745; }
+    .danger { color: #dc3545; }
+    .warning { color: #ffc107; }
+    .info { color: #17a2b8; }
+
+    section {
+        padding: 40px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    section:last-child {
+        border-bottom: none;
+    }
+
+    h2 {
+        font-size: 1.8em;
+        margin-bottom: 24px;
+        color: #2c3e50;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #667eea;
+        display: inline-block;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    th, td {
+        padding: 16px;
+        text-align: left;
+    }
+
+    th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 0.5px;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #e9ecef;
+        transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.85em;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge-danger {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .badge-warning {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .progress {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        transition: width 0.3s;
+    }
+
+    .progress-bar-success { background: #28a745; }
+    .progress-bar-danger { background: #dc3545; }
+    .progress-bar-warning { background: #ffc107; }
+
+    .coverage-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .coverage-item {
+        background: white;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .coverage-item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .coverage-item-count {
+        font-size: 1.5em;
+        color: #667eea;
+    }
+
+    .failure-details {
+        background: #fff5f5;
+        border-left: 4px solid #dc3545;
+        padding: 16px;
+        margin: 16px 0;
+        border-radius: 4px;
+    }
+
+    .failure-title {
+        font-weight: 600;
+        color: #721c24;
+        margin-bottom: 8px;
+    }
+
+    .failure-reason {
+        color: #856404;
+        font-size: 0.9em;
+        margin-bottom: 8px;
+    }
+
+    .error-list {
+        background: white;
+        padding: 12px;
+        border-radius: 4px;
+        margin-top: 8px;
+        font-size: 0.9em;
+    }
+
+    .error-list-item {
+        margin: 4px 0;
+        padding-left: 16px;
+        position: relative;
+    }
+
+    .error-list-item:before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #dc3545;
+    }
+
+    @media (max-width: 768px) {
+        .cards {
+            grid-template-columns: 1fr;
+        }
+
+        header h1 {
+            font-size: 1.8em;
+        }
+
+        section {
+            padding: 24px;
+        }
+    }
+
+    @media print {
+        body {
+            background: white;
+            padding: 0;
+        }
+
+        .container {
+            box-shadow: none;
+        }
+
+        .card:hover {
+            transform: none;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Blade Parser Acid Test Report</h1>
+            <p class="timestamp">Generated: 2025-10-05T00:41:15.974656</p>
+        </header>
+
+        <div class="cards">
+    <div class="card">
+        <div class="card-title">Total Fixtures</div>
+        <div class="card-value">104</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Pass Rate</div>
+        <div class="card-value warning">87.5%</div>
+        <div class="card-subtitle">91 passed, 13 failed</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Total Time</div>
+        <div class="card-value info">51.9ms</div>
+        <div class="card-subtitle">Avg: 499μs/file</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Coverage</div>
+        <div class="card-value info">83</div>
+        <div class="card-subtitle">Token types used</div>
+    </div>
+</div>
+
+        <section>
+    <h2>📂 Results by Category</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Total</th>
+                <th>Passed</th>
+                <th>Pass Rate</th>
+                <th>Progress</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+    <td><strong>alpine</strong></td>
+    <td>2</td>
+    <td>2</td>
+    <td><span class="badge badge-success">100.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: 100.0%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>components</strong></td>
+    <td>2</td>
+    <td>2</td>
+    <td><span class="badge badge-success">100.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: 100.0%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>edge_cases</strong></td>
+    <td>7</td>
+    <td>7</td>
+    <td><span class="badge badge-success">100.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: 100.0%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>invalid</strong></td>
+    <td>5</td>
+    <td>2</td>
+    <td><span class="badge badge-danger">40.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-danger" style="width: 40.0%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>large</strong></td>
+    <td>1</td>
+    <td>1</td>
+    <td><span class="badge badge-success">100.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: 100.0%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>livewire</strong></td>
+    <td>2</td>
+    <td>2</td>
+    <td><span class="badge badge-success">100.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: 100.0%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>medium</strong></td>
+    <td>2</td>
+    <td>2</td>
+    <td><span class="badge badge-success">100.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: 100.0%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>small</strong></td>
+    <td>2</td>
+    <td>2</td>
+    <td><span class="badge badge-success">100.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: 100.0%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>synthetic</strong></td>
+    <td>73</td>
+    <td>63</td>
+    <td><span class="badge badge-warning">86.3%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-warning" style="width: 86.3013698630137%"></div>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td><strong>valid</strong></td>
+    <td>8</td>
+    <td>8</td>
+    <td><span class="badge badge-success">100.0%</span></td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: 100.0%"></div>
+        </div>
+    </td>
+</tr>
+
+        </tbody>
+    </table>
+</section>
+
+        <section>
+    <h2>📊 Coverage Analysis</h2>
+    <p>Token types covered: <strong>83/~200</strong> (41.5%)</p>
+    <p>Directives covered: <strong>65/~75</strong> (86.7%)</p>
+
+    <h3 style="margin-top: 32px; margin-bottom: 16px;">Most Used Tokens</h3>
+    <div class="coverage-grid">
+        <div class="coverage-item">
+    <div class="coverage-item-name">text</div>
+    <div class="coverage-item-count">104</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">eof</div>
+    <div class="coverage-item-count">104</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">echoOpen</div>
+    <div class="coverage-item-count">78</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">expression</div>
+    <div class="coverage-item-count">76</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">echoClose</div>
+    <div class="coverage-item-count">76</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">bladeComment</div>
+    <div class="coverage-item-count">55</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">identifier</div>
+    <div class="coverage-item-count">38</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveIf</div>
+    <div class="coverage-item-count">37</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveEndif</div>
+    <div class="coverage-item-count">36</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveForeach</div>
+    <div class="coverage-item-count">34</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveEndforeach</div>
+    <div class="coverage-item-count">33</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveElse</div>
+    <div class="coverage-item-count">21</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">componentTagOpen</div>
+    <div class="coverage-item-count">20</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">alpineShorthandBind</div>
+    <div class="coverage-item-count">16</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directivePhp</div>
+    <div class="coverage-item-count">12</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveEndphp</div>
+    <div class="coverage-item-count">12</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveExtends</div>
+    <div class="coverage-item-count">9</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">componentSelfClose</div>
+    <div class="coverage-item-count">9</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveEndsection</div>
+    <div class="coverage-item-count">9</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">directiveSection</div>
+    <div class="coverage-item-count">9</div>
+</div>
+
+    </div>
+
+    <h3 style="margin-top: 32px; margin-bottom: 16px;">Most Used Directives</h3>
+    <div class="coverage-grid">
+        <div class="coverage-item">
+    <div class="coverage-item-name">@if</div>
+    <div class="coverage-item-count">37</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@endif</div>
+    <div class="coverage-item-count">36</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@foreach</div>
+    <div class="coverage-item-count">34</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@endforeach</div>
+    <div class="coverage-item-count">33</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@else</div>
+    <div class="coverage-item-count">21</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@php</div>
+    <div class="coverage-item-count">12</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@endphp</div>
+    <div class="coverage-item-count">12</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@elseif</div>
+    <div class="coverage-item-count">9</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@extends</div>
+    <div class="coverage-item-count">9</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@section</div>
+    <div class="coverage-item-count">9</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@endsection</div>
+    <div class="coverage-item-count">9</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@error</div>
+    <div class="coverage-item-count">8</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@empty</div>
+    <div class="coverage-item-count">8</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@enderror</div>
+    <div class="coverage-item-count">8</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@props</div>
+    <div class="coverage-item-count">7</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@csrf</div>
+    <div class="coverage-item-count">6</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@forelse</div>
+    <div class="coverage-item-count">6</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@endforelse</div>
+    <div class="coverage-item-count">6</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@push</div>
+    <div class="coverage-item-count">6</div>
+</div>
+
+<div class="coverage-item">
+    <div class="coverage-item-name">@endpush</div>
+    <div class="coverage-item-count">6</div>
+</div>
+
+    </div>
+</section>
+
+        <section>
+    <h2>❌ Failures (13)</h2>
+    <div class="failure-details">
+    <div class="failure-title">❌ invalid/invalid_component.blade.php</div>
+    
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ invalid/unclosed_foreach.blade.php</div>
+    
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ invalid/unclosed_if.blade.php</div>
+    
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/01-blade-directives/components/02-component-props.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (1):</strong>
+        <div class="error-list-item">Unclosed echo statement</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/01-blade-directives/loops/01-foreach-basic.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (1):</strong>
+        <div class="error-list-item">Unclosed @foreach directive</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/01-blade-directives/loops/02-foreach-loop-variable.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (1):</strong>
+        <div class="error-list-item">Unclosed @foreach directive</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/01-blade-directives/loops/04-for.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (1):</strong>
+        <div class="error-list-item">Unclosed @for directive</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/01-blade-directives/loops/05-while.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (1):</strong>
+        <div class="error-list-item">Unclosed @while directive</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/04-combinations/level-3-complex/01-dashboard-page.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (2):</strong>
+        <div class="error-list-item">Unclosed @if directive starting at line 10</div>
+<div class="error-list-item">Unclosed @foreach directive</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/04-combinations/level-4-comprehensive/01-admin-panel.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (1):</strong>
+        <div class="error-list-item">Unclosed @foreach directive</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (2):</strong>
+        <div class="error-list-item">Unclosed @if directive starting at line 12</div>
+<div class="error-list-item">Unclosed @foreach directive</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/05-edge-cases/malformed/01-unclosed-if.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (1):</strong>
+        <div class="error-list-item">Unclosed @if directive starting at line 15</div>
+        
+    </div>
+    
+</div>
+
+<div class="failure-details">
+    <div class="failure-title">❌ synthetic/05-edge-cases/malformed/02-unclosed-foreach.blade.php</div>
+    
+        <div class="error-list">
+        <strong>Errors (1):</strong>
+        <div class="error-list-item">Unclosed @foreach directive</div>
+        
+    </div>
+    
+</div>
+
+</section>
+
+        <section>
+    <h2>📋 Detailed Results</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Fixture</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Tokens</th>
+                <th>Nodes</th>
+                <th>Depth</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+    <td>alpine/01-billing.blade.php</td>
+    <td>alpine</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>97</td>
+    <td>62</td>
+    <td>5</td>
+    <td>5.49ms</td>
+</tr>
+
+<tr>
+    <td>alpine/02-faq.blade.php</td>
+    <td>alpine</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>37</td>
+    <td>24</td>
+    <td>4</td>
+    <td>958μs</td>
+</tr>
+
+<tr>
+    <td>components/01-form.blade.php</td>
+    <td>components</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>31</td>
+    <td>18</td>
+    <td>3</td>
+    <td>143μs</td>
+</tr>
+
+<tr>
+    <td>components/02-billing.blade.php</td>
+    <td>components</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>125</td>
+    <td>87</td>
+    <td>3</td>
+    <td>973μs</td>
+</tr>
+
+<tr>
+    <td>edge_cases/alpine_shorthand.blade.php</td>
+    <td>edge_cases</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>17</td>
+    <td>13</td>
+    <td>3</td>
+    <td>65μs</td>
+</tr>
+
+<tr>
+    <td>edge_cases/blade_comments.blade.php</td>
+    <td>edge_cases</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>6</td>
+    <td>4</td>
+    <td>2</td>
+    <td>223μs</td>
+</tr>
+
+<tr>
+    <td>edge_cases/crlf_line_endings.blade.php</td>
+    <td>edge_cases</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>6</td>
+    <td>5</td>
+    <td>3</td>
+    <td>17μs</td>
+</tr>
+
+<tr>
+    <td>edge_cases/email_addresses.blade.php</td>
+    <td>edge_cases</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>7</td>
+    <td>5</td>
+    <td>2</td>
+    <td>32μs</td>
+</tr>
+
+<tr>
+    <td>edge_cases/ternary_or.blade.php</td>
+    <td>edge_cases</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>11</td>
+    <td>7</td>
+    <td>2</td>
+    <td>19μs</td>
+</tr>
+
+<tr>
+    <td>edge_cases/utf8_content.blade.php</td>
+    <td>edge_cases</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>7</td>
+    <td>5</td>
+    <td>2</td>
+    <td>101μs</td>
+</tr>
+
+<tr>
+    <td>edge_cases/verbatim_blocks.blade.php</td>
+    <td>edge_cases</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>3</td>
+    <td>2</td>
+    <td>2</td>
+    <td>85μs</td>
+</tr>
+
+<tr>
+    <td>invalid/invalid_component.blade.php</td>
+    <td>invalid</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>5</td>
+    <td>3</td>
+    <td>2</td>
+    <td>14μs</td>
+</tr>
+
+<tr>
+    <td>invalid/malformed_echo.blade.php</td>
+    <td>invalid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>4</td>
+    <td>3</td>
+    <td>2</td>
+    <td>99μs</td>
+</tr>
+
+<tr>
+    <td>invalid/multiple_errors.blade.php</td>
+    <td>invalid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>8</td>
+    <td>6</td>
+    <td>3</td>
+    <td>28μs</td>
+</tr>
+
+<tr>
+    <td>invalid/unclosed_foreach.blade.php</td>
+    <td>invalid</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>9</td>
+    <td>6</td>
+    <td>3</td>
+    <td>21μs</td>
+</tr>
+
+<tr>
+    <td>invalid/unclosed_if.blade.php</td>
+    <td>invalid</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>6</td>
+    <td>5</td>
+    <td>3</td>
+    <td>17μs</td>
+</tr>
+
+<tr>
+    <td>large/01-pagination.blade.php</td>
+    <td>large</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>247</td>
+    <td>154</td>
+    <td>8</td>
+    <td>721μs</td>
+</tr>
+
+<tr>
+    <td>livewire/01-layout.blade.php</td>
+    <td>livewire</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>78</td>
+    <td>44</td>
+    <td>2</td>
+    <td>211μs</td>
+</tr>
+
+<tr>
+    <td>livewire/02-examples.blade.php</td>
+    <td>livewire</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>34</td>
+    <td>24</td>
+    <td>4</td>
+    <td>127μs</td>
+</tr>
+
+<tr>
+    <td>medium/01-tooltip.blade.php</td>
+    <td>medium</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>21</td>
+    <td>12</td>
+    <td>2</td>
+    <td>52μs</td>
+</tr>
+
+<tr>
+    <td>medium/02-select-button.blade.php</td>
+    <td>medium</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>21</td>
+    <td>13</td>
+    <td>2</td>
+    <td>110μs</td>
+</tr>
+
+<tr>
+    <td>small/01-checkbox.blade.php</td>
+    <td>small</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+    <td>6μs</td>
+</tr>
+
+<tr>
+    <td>small/02-footer.blade.php</td>
+    <td>small</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>15</td>
+    <td>9</td>
+    <td>2</td>
+    <td>37μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/auth/01-auth-guest.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>63</td>
+    <td>44</td>
+    <td>2</td>
+    <td>195μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/auth/02-can-cannot.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>86</td>
+    <td>53</td>
+    <td>2</td>
+    <td>262μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/components/01-component-basic.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>65</td>
+    <td>36</td>
+    <td>3</td>
+    <td>211μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/components/02-component-props.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>18</td>
+    <td>10</td>
+    <td>2</td>
+    <td>120μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/components/03-component-slots.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>82</td>
+    <td>52</td>
+    <td>3</td>
+    <td>272μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/components/04-component-attributes.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>85</td>
+    <td>48</td>
+    <td>3</td>
+    <td>284μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/components/05-dynamic-component.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>103</td>
+    <td>56</td>
+    <td>3</td>
+    <td>277μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/control-structures/01-if-basic.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>45</td>
+    <td>32</td>
+    <td>3</td>
+    <td>110μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/control-structures/02-unless.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>52</td>
+    <td>34</td>
+    <td>2</td>
+    <td>121μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/control-structures/03-switch-case.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>59</td>
+    <td>38</td>
+    <td>2</td>
+    <td>132μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/control-structures/04-isset-empty.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>68</td>
+    <td>45</td>
+    <td>3</td>
+    <td>157μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/control-structures/05-if-nested.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>79</td>
+    <td>52</td>
+    <td>6</td>
+    <td>271μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/forms/01-csrf-method.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>62</td>
+    <td>42</td>
+    <td>2</td>
+    <td>142μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/includes/01-include-basic.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>37</td>
+    <td>24</td>
+    <td>2</td>
+    <td>104μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/includes/02-include-if-when-unless.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>55</td>
+    <td>31</td>
+    <td>2</td>
+    <td>149μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/includes/03-include-first.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>32</td>
+    <td>21</td>
+    <td>3</td>
+    <td>137μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/includes/04-each.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>43</td>
+    <td>29</td>
+    <td>2</td>
+    <td>112μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/loops/01-foreach-basic.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>91</td>
+    <td>60</td>
+    <td>5</td>
+    <td>301μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/loops/02-foreach-loop-variable.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>113</td>
+    <td>77</td>
+    <td>5</td>
+    <td>190μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/loops/03-forelse.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>102</td>
+    <td>69</td>
+    <td>3</td>
+    <td>183μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/loops/04-for.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>111</td>
+    <td>76</td>
+    <td>5</td>
+    <td>307μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/loops/05-while.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>79</td>
+    <td>54</td>
+    <td>5</td>
+    <td>243μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/loops/06-loop-control.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>141</td>
+    <td>90</td>
+    <td>6</td>
+    <td>321μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/stacks/01-push-prepend-stack.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>47</td>
+    <td>32</td>
+    <td>2</td>
+    <td>107μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/stacks/02-once.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>43</td>
+    <td>28</td>
+    <td>3</td>
+    <td>83μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/template-inheritance/01-extends-sections.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>141</td>
+    <td>99</td>
+    <td>3</td>
+    <td>387μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/template-inheritance/02-yield-parent.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>150</td>
+    <td>111</td>
+    <td>3</td>
+    <td>294μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/01-blade-directives/template-inheritance/03-section-show.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>263</td>
+    <td>185</td>
+    <td>3</td>
+    <td>626μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/02-livewire/actions/01-wire-click.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>64</td>
+    <td>42</td>
+    <td>2</td>
+    <td>155μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/02-livewire/actions/02-wire-submit.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>80</td>
+    <td>57</td>
+    <td>2</td>
+    <td>224μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/02-livewire/actions/03-wire-keydown.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>53</td>
+    <td>39</td>
+    <td>3</td>
+    <td>140μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/02-livewire/actions/04-event-modifiers.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>53</td>
+    <td>41</td>
+    <td>2</td>
+    <td>161μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/02-livewire/data-binding/01-wire-model-basic.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>56</td>
+    <td>43</td>
+    <td>2</td>
+    <td>114μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/02-livewire/data-binding/02-wire-model-live.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>48</td>
+    <td>36</td>
+    <td>2</td>
+    <td>92μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/02-livewire/data-binding/03-wire-model-debounce.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>30</td>
+    <td>24</td>
+    <td>2</td>
+    <td>140μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/02-livewire/data-binding/04-wire-model-modifiers.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>49</td>
+    <td>39</td>
+    <td>2</td>
+    <td>220μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/03-alpine/data-reactivity/01-x-data-basic.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>24</td>
+    <td>19</td>
+    <td>2</td>
+    <td>111μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/03-alpine/data-reactivity/02-x-init.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>27</td>
+    <td>25</td>
+    <td>2</td>
+    <td>153μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/03-alpine/data-reactivity/03-x-effect.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>35</td>
+    <td>33</td>
+    <td>2</td>
+    <td>192μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/03-alpine/data-reactivity/04-x-data-nested.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>61</td>
+    <td>54</td>
+    <td>2</td>
+    <td>360μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/03-alpine/data-reactivity/05-alpine-store.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>81</td>
+    <td>69</td>
+    <td>2</td>
+    <td>431μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/03-alpine/events/01-x-on-basic.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>41</td>
+    <td>27</td>
+    <td>2</td>
+    <td>78μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/03-alpine/events/02-x-on-modifiers.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>42</td>
+    <td>29</td>
+    <td>2</td>
+    <td>95μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/03-alpine/events/03-x-on-keyboard.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>37</td>
+    <td>24</td>
+    <td>2</td>
+    <td>97μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/01-if-echo.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>78</td>
+    <td>55</td>
+    <td>3</td>
+    <td>117μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/02-foreach-component.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>52</td>
+    <td>28</td>
+    <td>3</td>
+    <td>314μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/03-if-livewire-click.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>36</td>
+    <td>30</td>
+    <td>4</td>
+    <td>106μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/04-foreach-alpine-data.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>57</td>
+    <td>40</td>
+    <td>3</td>
+    <td>110μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/05-switch-wire-model.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>73</td>
+    <td>63</td>
+    <td>2</td>
+    <td>199μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/06-forelse-alpine-show.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>79</td>
+    <td>56</td>
+    <td>2</td>
+    <td>246μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/07-component-wire-loading.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>57</td>
+    <td>31</td>
+    <td>2</td>
+    <td>169μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/08-isset-alpine-if.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>105</td>
+    <td>73</td>
+    <td>2</td>
+    <td>236μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/09-include-wire-poll.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>39</td>
+    <td>29</td>
+    <td>2</td>
+    <td>95μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-1-simple/10-auth-alpine-bind.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>95</td>
+    <td>60</td>
+    <td>2</td>
+    <td>200μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>88</td>
+    <td>56</td>
+    <td>4</td>
+    <td>464μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>81</td>
+    <td>57</td>
+    <td>3</td>
+    <td>258μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>75</td>
+    <td>51</td>
+    <td>3</td>
+    <td>206μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>102</td>
+    <td>65</td>
+    <td>4</td>
+    <td>258μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>113</td>
+    <td>77</td>
+    <td>3</td>
+    <td>209μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>118</td>
+    <td>76</td>
+    <td>5</td>
+    <td>231μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>123</td>
+    <td>79</td>
+    <td>3</td>
+    <td>356μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>152</td>
+    <td>103</td>
+    <td>3</td>
+    <td>380μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-3-complex/01-dashboard-page.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>151</td>
+    <td>83</td>
+    <td>6</td>
+    <td>335μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-3-complex/02-data-table.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>195</td>
+    <td>141</td>
+    <td>3</td>
+    <td>549μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-3-complex/03-modal-form.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>226</td>
+    <td>154</td>
+    <td>3</td>
+    <td>654μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-4-comprehensive/01-admin-panel.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>414</td>
+    <td>229</td>
+    <td>4</td>
+    <td>921μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>630</td>
+    <td>401</td>
+    <td>6</td>
+    <td>1.31ms</td>
+</tr>
+
+<tr>
+    <td>synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>75</td>
+    <td>47</td>
+    <td>4</td>
+    <td>111μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>10</td>
+    <td>8</td>
+    <td>2</td>
+    <td>51μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/05-edge-cases/malformed/01-unclosed-if.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>50</td>
+    <td>35</td>
+    <td>4</td>
+    <td>131μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/05-edge-cases/malformed/02-unclosed-foreach.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-danger">❌ Fail</span></td>
+    <td>65</td>
+    <td>43</td>
+    <td>3</td>
+    <td>106μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/05-edge-cases/nesting/01-deep-nesting-if.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>81</td>
+    <td>62</td>
+    <td>12</td>
+    <td>150μs</td>
+</tr>
+
+<tr>
+    <td>synthetic/05-edge-cases/nesting/02-mixed-nesting.blade.php</td>
+    <td>synthetic</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>80</td>
+    <td>57</td>
+    <td>9</td>
+    <td>132μs</td>
+</tr>
+
+<tr>
+    <td>valid/alpine_js.blade.php</td>
+    <td>valid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>7</td>
+    <td>6</td>
+    <td>2</td>
+    <td>14μs</td>
+</tr>
+
+<tr>
+    <td>valid/components.blade.php</td>
+    <td>valid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>16</td>
+    <td>10</td>
+    <td>2</td>
+    <td>19μs</td>
+</tr>
+
+<tr>
+    <td>valid/control_structures.blade.php</td>
+    <td>valid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>30</td>
+    <td>21</td>
+    <td>4</td>
+    <td>40μs</td>
+</tr>
+
+<tr>
+    <td>valid/large_template.blade.php</td>
+    <td>valid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>50007</td>
+    <td>30004</td>
+    <td>2</td>
+    <td>24.61ms</td>
+</tr>
+
+<tr>
+    <td>valid/livewire.blade.php</td>
+    <td>valid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>5</td>
+    <td>5</td>
+    <td>2</td>
+    <td>21μs</td>
+</tr>
+
+<tr>
+    <td>valid/nested_directives.blade.php</td>
+    <td>valid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>82</td>
+    <td>62</td>
+    <td>22</td>
+    <td>132μs</td>
+</tr>
+
+<tr>
+    <td>valid/simple_echo.blade.php</td>
+    <td>valid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>10</td>
+    <td>6</td>
+    <td>2</td>
+    <td>38μs</td>
+</tr>
+
+<tr>
+    <td>valid/template_inheritance.blade.php</td>
+    <td>valid</td>
+    <td><span class="badge badge-success">✅ Pass</span></td>
+    <td>24</td>
+    <td>14</td>
+    <td>2</td>
+    <td>22μs</td>
+</tr>
+
+        </tbody>
+    </table>
+</section>
+
+    </div>
+</body>
+</html>
