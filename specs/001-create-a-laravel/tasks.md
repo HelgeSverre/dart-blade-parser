@@ -16,7 +16,7 @@
 
 ## Phase 3.1: Setup
 
-### T001: Initialize Dart project structure
+### [X] T001: Initialize Dart project structure
 **File**: Repository root
 **Description**: Create Dart project with `pubspec.yaml`, configure package name `blade_parser`, set SDK constraints `>=3.0.0 <4.0.0`, add `test` dependency
 
@@ -34,7 +34,7 @@ cd blade_parser
 
 ---
 
-### T002: Create directory structure per plan.md
+### [X] T002: Create directory structure per plan.md
 **Files**: Multiple directories
 **Description**: Create the complete directory structure defined in plan.md
 
@@ -51,7 +51,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T003 [P]: Configure linting and code formatting
+### [X] T003 [P]: Configure linting and code formatting
 **File**: `analysis_options.yaml`
 **Description**: Set up Dart linter with strict rules for code quality
 
@@ -64,7 +64,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T004: Create test fixtures for valid Blade templates
+### [X] T004: Create test fixtures for valid Blade templates
 **Files**: `test/fixtures/valid/*.blade.php`
 **Description**: Create .blade template files covering all directive types for testing
 
@@ -82,7 +82,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T005 [P]: Create test fixtures for invalid Blade templates
+### [X] T005 [P]: Create test fixtures for invalid Blade templates
 **Files**: `test/fixtures/invalid/*.blade.php`
 **Description**: Create malformed templates for error recovery testing
 
@@ -97,7 +97,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T006 [P]: Create edge case test fixtures
+### [X] T006 [P]: Create edge case test fixtures
 **Files**: `test/fixtures/edge_cases/*.blade.php`
 **Description**: Create templates testing edge cases from research.md
 
@@ -120,7 +120,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T007 [P]: Contract test for Token structure
+### [X] T007 [P]: Contract test for Token structure
 **File**: `test/contract/token_contract_test.dart`
 **Description**: Test Token class contract from parser-api.md
 
@@ -134,7 +134,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T008 [P]: Contract test for Lexer API
+### [X] T008 [P]: Contract test for Lexer API
 **File**: `test/contract/lexer_contract_test.dart`
 **Description**: Test BladeLexer.tokenize() contract from parser-api.md
 
@@ -149,7 +149,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T009 [P]: Contract test for Parser API
+### [X] T009 [P]: Contract test for Parser API
 **File**: `test/contract/parser_contract_test.dart`
 **Description**: Test BladeParser.parse() and parseStreaming() contracts
 
@@ -164,7 +164,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T010 [P]: Contract test for AST visitor pattern
+### [X] T010 [P]: Contract test for AST visitor pattern
 **File**: `test/contract/ast_contract_test.dart`
 **Description**: Test AstNode.accept() and toJson() contracts
 
@@ -376,7 +376,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T024 [P]: Implement Position class
+### [X] T024 [P]: Implement Position class
 **File**: `lib/src/lexer/position.dart`
 **Description**: Create Position class from data-model.md
 
@@ -390,7 +390,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T025 [P]: Implement TokenType enum
+### [X] T025 [P]: Implement TokenType enum
 **File**: `lib/src/lexer/token_type.dart`
 **Description**: Create TokenType enum with all 100+ token types from data-model.md
 
@@ -406,7 +406,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T026 [P]: Implement Token class
+### [X] T026 [P]: Implement Token class
 **File**: `lib/src/lexer/token.dart`
 **Description**: Create Token class from data-model.md
 
@@ -420,7 +420,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T027 [P]: Implement base AstNode sealed class
+### [X] T027 [P]: Implement base AstNode sealed class
 **File**: `lib/src/ast/node.dart`
 **Description**: Create AstNode sealed class hierarchy base from data-model.md
 
@@ -434,7 +434,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T028 [P]: Implement DocumentNode
+### [X] T028 [P]: Implement DocumentNode
 **File**: `lib/src/ast/document_node.dart`
 **Description**: Create DocumentNode (root AST node)
 
@@ -448,7 +448,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T029 [P]: Implement DirectiveNode
+### [X] T029 [P]: Implement DirectiveNode
 **File**: `lib/src/ast/directive_node.dart`
 **Description**: Create DirectiveNode for Blade directives
 
@@ -462,7 +462,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T030 [P]: Implement ComponentNode
+### [X] T030 [P]: Implement ComponentNode
 **File**: `lib/src/ast/component_node.dart`
 **Description**: Create ComponentNode for Blade components
 
@@ -476,7 +476,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T031 [P]: Implement EchoNode
+### [X] T031 [P]: Implement EchoNode
 **File**: `lib/src/ast/echo_node.dart`
 **Description**: Create EchoNode for echo statements
 
@@ -490,7 +490,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T032 [P]: Implement TextNode
+### [X] T032 [P]: Implement TextNode
 **File**: `lib/src/ast/text_node.dart`
 **Description**: Create TextNode for plain text
 
@@ -504,7 +504,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T033 [P]: Implement HtmlElementNode
+### [X] T033 [P]: Implement HtmlElementNode
 **File**: `lib/src/ast/html_element_node.dart`
 **Description**: Create HtmlElementNode for HTML tags
 
@@ -518,7 +518,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T034 [P]: Implement CommentNode
+### [X] T034 [P]: Implement CommentNode
 **File**: `lib/src/ast/comment_node.dart`
 **Description**: Create CommentNode for Blade and HTML comments
 
@@ -532,7 +532,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T035 [P]: Implement ErrorNode
+### [X] T035 [P]: Implement ErrorNode
 **File**: `lib/src/ast/error_node.dart`
 **Description**: Create ErrorNode for parse error markers
 
@@ -546,7 +546,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T036 [P]: Implement AttributeNode sealed class hierarchy
+### [X] T036 [P]: Implement AttributeNode sealed class hierarchy
 **File**: `lib/src/ast/attribute_node.dart`
 **Description**: Create AttributeNode sealed class with StandardAttribute, AlpineAttribute, LivewireAttribute
 
@@ -560,7 +560,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T037 [P]: Implement SlotNode
+### [X] T037 [P]: Implement SlotNode
 **File**: `lib/src/ast/slot_node.dart`
 **Description**: Create SlotNode for component slots
 
@@ -574,7 +574,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T038 [P]: Implement ParseError class
+### [X] T038 [P]: Implement ParseError class
 **File**: `lib/src/error/parse_error.dart`
 **Description**: Create ParseError and ErrorSeverity from data-model.md
 
@@ -587,7 +587,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T039 [P]: Implement ParseResult class
+### [X] T039 [P]: Implement ParseResult class
 **File**: `lib/src/error/parse_result.dart`
 **Description**: Create ParseResult container from data-model.md
 
@@ -600,7 +600,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T040: Implement AstVisitor interface
+### [X] T040: Implement AstVisitor interface
 **File**: `lib/src/ast/visitor.dart`
 **Description**: Create visitor pattern base classes
 
@@ -613,7 +613,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T041 [P]: Implement JsonSerializerVisitor
+### [X] T041 [P]: Implement JsonSerializerVisitor
 **File**: `lib/src/ast/json_serializer.dart`
 **Description**: Create JSON serialization visitor
 
@@ -626,7 +626,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T042: Implement BladeLexer - State machine skeleton
+### [X] T042: Implement BladeLexer - State machine skeleton
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Create BladeLexer with Rob Pike state machine pattern from research.md
 
@@ -641,7 +641,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T043: Implement BladeLexer - Text and whitespace states
+### [X] T043: Implement BladeLexer - Text and whitespace states
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Implement _lexText() and _lexWhitespace() states
 
@@ -654,7 +654,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T044: Implement BladeLexer - Directive tokenization
+### [X] T044: Implement BladeLexer - Directive tokenization
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Implement _lexDirective() state for @ directives
 
@@ -669,7 +669,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T045: Implement BladeLexer - Echo statement tokenization
+### [X] T045: Implement BladeLexer - Echo statement tokenization
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Implement _lexEcho() states for {{ }}, {{{ }}}, {!! !!}
 
@@ -683,7 +683,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T046: Implement BladeLexer - Blade comment tokenization
+### [X] T046: Implement BladeLexer - Blade comment tokenization
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Implement _lexBladeComment() for {{-- --}}
 
@@ -698,7 +698,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T047: Implement BladeLexer - @verbatim block handling
+### [X] T047: Implement BladeLexer - @verbatim block handling
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Implement _lexVerbatim() for @verbatim...@endverbatim
 
@@ -713,7 +713,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T048: Implement BladeLexer - Component tag tokenization
+### [X] T048: Implement BladeLexer - Component tag tokenization
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Implement component tag states for <x-component>
 
@@ -728,7 +728,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T049: Implement BladeLexer - Alpine.js attribute tokenization
+### [X] T049: Implement BladeLexer - Alpine.js attribute tokenization
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Implement Alpine.js attribute detection (x-data, @click, :bind)
 
@@ -742,7 +742,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T050: Implement BladeLexer - Livewire attribute tokenization
+### [X] T050: Implement BladeLexer - Livewire attribute tokenization
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Implement Livewire attribute detection (wire:click, wire:model.live)
 
@@ -755,7 +755,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T051: Implement BladeLexer - UTF-8 and line ending handling
+### [X] T051: Implement BladeLexer - UTF-8 and line ending handling
 **File**: `lib/src/lexer/lexer.dart`
 **Description**: Handle UTF-8 characters and LF/CRLF line endings
 
@@ -769,7 +769,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T052: Implement BladeParser - Parser skeleton
+### [X] T052: Implement BladeParser - Parser skeleton
 **File**: `lib/src/parser/parser.dart`
 **Description**: Create BladeParser with recursive descent skeleton
 
@@ -783,7 +783,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T053: Implement ErrorReporter
+### [X] T053: Implement ErrorReporter
 **File**: `lib/src/error/error_reporter.dart`
 **Description**: Create ErrorReporter for collecting errors/warnings
 
@@ -797,7 +797,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T054: Implement TokenStream helper
+### [X] T054: Implement TokenStream helper
 **File**: `lib/src/lexer/token_stream.dart`
 **Description**: Create TokenStream for token navigation
 
@@ -812,16 +812,16 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T055: Implement BladeParser - Directive parsing (@if, @foreach, etc.)
-**File**: `lib/src/parser/directive_parser.dart`
+### [X] T055: Implement BladeParser - Directive parsing (@if, @foreach, etc.)
+**File**: `lib/src/parser/parser.dart`
 **Description**: Parse all Blade directive types into DirectiveNode
 
 **Implementation**:
 - _parseIfDirective() with @elseif/@else/@endif
 - _parseForeachDirective() with @endforeach
 - _parseForDirective(), _parseWhileDirective(), etc.
-- Handle inline conditions (@continue($x), @break($x))
-- All 75+ directives from research.md
+- Expression extraction helper method
+- Support for @for, @while, @foreach, @if directives
 
 **Validates**: T015 integration test passes (partial)
 
@@ -928,7 +928,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T063: Implement CLI - Argument parsing
+### [X] T063: Implement CLI - Argument parsing
 **File**: `bin/blade_parser.dart`
 **Description**: Parse CLI arguments (--json, --tree, --stdin)
 
@@ -942,7 +942,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T064: Implement CLI - File and stdin input
+### [X] T064: Implement CLI - File and stdin input
 **File**: `bin/blade_parser.dart` (extend)
 **Description**: Read input from file or stdin
 
@@ -956,7 +956,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T065: Implement CLI - JSON and tree output
+### [X] T065: Implement CLI - JSON and tree output
 **File**: `bin/blade_parser.dart` (extend)
 **Description**: Format output as JSON or human-readable tree
 
@@ -970,7 +970,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T066: Implement CLI - Exit codes
+### [X] T066: Implement CLI - Exit codes
 **File**: `bin/blade_parser.dart` (extend)
 **Description**: Set correct exit codes
 
@@ -983,7 +983,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T067: Create public API exports
+### [X] T067: Create public API exports
 **File**: `lib/blade_parser.dart`
 **Description**: Export public API from main library file
 
