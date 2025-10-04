@@ -1,0 +1,41 @@
+@if($level1)
+    @if($level2)
+        @if($level3)
+            @if($level4)
+                @if($level5)
+                    @if($level6)
+                        @if($level7)
+                            @if($level8)
+                                @if($level9)
+                                    @if($level10)
+                                        @if($level11)
+                                            @if($level12)
+                                                @if($level13)
+                                                    @if($level14)
+                                                        @if($level15)
+                                                            @if($level16)
+                                                                @if($level17)
+                                                                    @if($level18)
+                                                                        @if($level19)
+                                                                            @if($level20)
+                                                                                <p>20 levels deep!</p>
+                                                                            @endif
+                                                                        @endif
+                                                                    @endif
+                                                                @endif
+                                                            @endif
+                                                        @endif
+                                                    @endif
+                                                @endif
+                                            @endif
+                                        @endif
+                                    @endif
+                                @endif
+                            @endif
+                        @endif
+                    @endif
+                @endif
+            @endif
+        @endif
+    @endif
+@endif
