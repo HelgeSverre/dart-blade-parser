@@ -1,50 +1,102 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Dart Blade Parser Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Parser-First Architecture
+- Core parsing logic must be framework-agnostic and independently testable
+- Separate lexer, tokenizer, and AST builder as distinct, composable modules
+- No UI/rendering concerns mixed with parsing logic
+- Parser must be self-contained with clear boundaries
+- Each module must have a single, well-defined responsibility
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Grammar Completeness
+- Support full Blade syntax: directives (@if, @foreach, @section, @yield, etc.)
+- Support Blade components with slots and attributes
+- Support Alpine.js attribute parsing (x-data, x-show, x-bind, etc.)
+- Provide clear, actionable error messages with line and column positioning
+- Every syntax feature must be documented with examples
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Test-First Development (NON-NEGOTIABLE)
+- TDD mandatory: Tests written → User approved → Tests fail → Then implement
+- Every syntax feature requires test fixtures before implementation
+- Test suite must include: valid Blade files, edge cases, malformed syntax
+- Red-Green-Refactor cycle strictly enforced
+- Performance benchmarks required for parsing operations
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Zero Dependencies Philosophy
+- Pure Dart implementation wherever possible
+- Any external dependencies must be explicitly justified in design docs
+- No platform-specific code (must support Flutter, Dart CLI, and web)
+- Dependencies must not leak into public API surface
+- Prefer standard library solutions over third-party packages
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Performance Standards
+- Parse minimum 1,000 lines per second for typical Blade templates
+- Memory usage under 100MB for typical template files
+- Support incremental/streaming parsing for large files
+- All performance-critical paths must be benchmarked
+- Performance regressions require justification and mitigation plan
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### VI. API Design & Interoperability
+- Expose parse tree as traversable, visitable AST
+- Support JSON serialization of AST for tooling integration
+- Public API must be stable and follow semantic versioning
+- CLI interface: stdin/args → stdout, errors → stderr
+- Support both programmatic API and CLI usage
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### VII. Tooling Ecosystem
+- Core parser is a library; formatters/linters are independent consumers
+- Each tool (formatter, linter, LSP) works standalone AND integrates with standard protocols
+- No formatter or linting logic in the parser core
+- Support Prettier plugin protocol via thin adapter layer
+- Tools must not require parser modifications
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Testing Requirements
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Contract Testing
+- Public API must have contract tests to prevent breaking changes
+- All exported functions and classes must be covered
+- Contract violations must fail CI/CD pipeline
+
+### Integration Testing
+- Complex nested Blade structures (components within loops within conditionals)
+- Alpine.js integration scenarios (Alpine directives within Blade)
+- Real-world Laravel Blade templates from popular packages
+- Cross-module integration (lexer → parser → AST builder)
+
+### Quality Gates
+- Fuzzing tests for malformed and adversarial input
+- Property-based testing for parser invariants
+- Test coverage minimum: 90% for core parsing logic
+- All tests must pass before merge
+
+## Documentation Standards
+
+- Every directive parser must include usage examples in dartdoc
+- Public API fully documented with dartdoc comments
+- README with quickstart guide and common use cases
+- Architecture decision records (ADRs) for major design choices
+- Performance characteristics documented for each major operation
+
+## Development Workflow
+
+### Feature Development
+- All features follow: `/specify` → `/plan` → `/tasks` → `/implement` workflow
+- Constitution compliance checked at planning phase
+- Breaking changes require major version bump and migration guide
+
+### Code Review
+- All PRs must verify constitutional compliance
+- Performance regression analysis required for parser changes
+- Test-first approach verified (tests committed before implementation)
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development practices and patterns. Amendments require:
+1. Documentation of rationale in constitution.md
+2. Impact analysis on existing features
+3. Migration plan for incompatible changes
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+All feature plans must reference this constitution for compliance verification. Complexity that violates principles must be justified in the Complexity Tracking section of plan.md.
+
+**Version**: 1.0.0 | **Ratified**: 2025-10-04 | **Last Amended**: 2025-10-04
