@@ -80,11 +80,49 @@ class BladeParser {
       case TokenType.directiveWhile:
         return _parseWhileDirective();
 
+      // Authentication directives
+      case TokenType.directiveAuth:
+        return _parseGenericDirective('auth', TokenType.directiveEndauth);
+      case TokenType.directiveGuest:
+        return _parseGenericDirective('guest', TokenType.directiveEndguest);
+
+      // Environment directives
+      case TokenType.directiveEnv:
+        return _parseGenericDirective('env', TokenType.directiveEndenv);
+      case TokenType.directiveProduction:
+        return _parseGenericDirective('production', TokenType.directiveEndproduction);
+
+      // Validation directives
+      case TokenType.directiveError:
+        return _parseGenericDirective('error', TokenType.directiveEnderror);
+
+      // Section directives
+      case TokenType.directiveSection:
+        return _parseGenericDirective('section', TokenType.directiveEndsection);
+
+      // Component directives
+      case TokenType.directiveComponent:
+        return _parseGenericDirective('component', TokenType.directiveEndcomponent);
+
+      // Other directives (inline, no closing tag)
+      case TokenType.directiveExtends:
+      case TokenType.directiveYield:
+      case TokenType.directiveInclude:
+      case TokenType.directiveContinue:
+      case TokenType.directiveBreak:
+        return _parseInlineDirective();
+
       // Echo statements
       case TokenType.echoOpen:
         return _parseEcho();
       case TokenType.rawEchoOpen:
         return _parseRawEcho();
+      case TokenType.legacyEchoOpen:
+        return _parseLegacyEcho();
+
+      // Components
+      case TokenType.componentTagOpen:
+        return _parseComponent();
 
       // Text and comments
       case TokenType.text:
@@ -106,18 +144,51 @@ class BladeParser {
     final expression = _extractExpression();
     final children = <AstNode>[];
 
+    // Parse the 'then' branch
     while (!_checkAny([TokenType.directiveEndif, TokenType.directiveElse, TokenType.directiveElseif, TokenType.eof])) {
       final node = _parseNode();
       if (node != null) children.add(node);
     }
 
-    // Handle @else or @elseif
-    if (_check(TokenType.directiveElse) || _check(TokenType.directiveElseif)) {
-      _advance();
+    // Handle @elseif chain
+    while (_check(TokenType.directiveElseif)) {
+      final elseifToken = _advance();
+      final elseifExpression = _extractExpression();
+      final elseifChildren = <AstNode>[];
+
+      while (!_checkAny([TokenType.directiveEndif, TokenType.directiveElse, TokenType.directiveElseif, TokenType.eof])) {
+        final node = _parseNode();
+        if (node != null) elseifChildren.add(node);
+      }
+
+      // Add elseif as a nested directive node
+      children.add(DirectiveNode(
+        startPosition: elseifToken.startPosition,
+        endPosition: _previous().endPosition,
+        name: 'elseif',
+        expression: elseifExpression,
+        children: elseifChildren,
+      ));
+    }
+
+    // Handle @else
+    if (_check(TokenType.directiveElse)) {
+      final elseToken = _advance();
+      final elseChildren = <AstNode>[];
+
       while (!_check(TokenType.directiveEndif) && !_check(TokenType.eof)) {
         final node = _parseNode();
-        if (node != null) children.add(node);
+        if (node != null) elseChildren.add(node);
       }
+
+      // Add else as a nested directive node
+      children.add(DirectiveNode(
+        startPosition: elseToken.startPosition,
+        endPosition: _previous().endPosition,
+        name: 'else',
+        expression: null,
+        children: elseChildren,
+      ));
     }
 
     if (!_check(TokenType.directiveEndif)) {
@@ -284,12 +355,220 @@ class BladeParser {
     );
   }
 
+  EchoNode _parseLegacyEcho() {
+    final openToken = _advance(); // {{{
+
+    String expression = '';
+    if (_check(TokenType.expression)) {
+      expression = _advance().value;
+    }
+
+    if (!_check(TokenType.legacyEchoClose)) {
+      _errors.add(ParseError(
+        message: 'Unclosed legacy echo statement',
+        position: openToken.startPosition,
+      ));
+    } else {
+      _advance(); // }}}
+    }
+
+    return EchoNode(
+      startPosition: openToken.startPosition,
+      endPosition: _previous().endPosition,
+      expression: expression.trim(),
+      isRaw: true, // Legacy echo is raw (not escaped)
+    );
+  }
+
   TextNode _parseText() {
     final token = _advance();
     return TextNode(
       startPosition: token.startPosition,
       endPosition: token.endPosition,
       content: token.value,
+    );
+  }
+
+  ComponentNode _parseComponent() {
+    final startToken = _advance(); // <x-component
+
+    // Extract component name from token value
+    // Token value is like "<x-alert" or "<x-button"
+    final componentName = startToken.value.substring(3); // Remove "<x-"
+
+    // Parse attributes - collect tokens until we hit > or />
+    final attributes = <String, AttributeNode>{};
+    while (_isAttributeToken(_peek().type)) {
+      final attrToken = _advance();
+      final attrName = attrToken.value;
+
+      // Check for attribute value in next token
+      String? attrValue;
+      if (_check(TokenType.attributeValue)) {
+        attrValue = _advance().value;
+      }
+
+      // Create appropriate attribute node based on token type
+      AttributeNode attrNode;
+
+      // Check token type first for proper classification
+      final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
+          attrToken.type == TokenType.alpineShorthandBind ||
+          attrToken.type == TokenType.alpineData ||
+          attrToken.type == TokenType.alpineInit ||
+          attrToken.type == TokenType.alpineShow ||
+          attrToken.type == TokenType.alpineIf ||
+          attrToken.type == TokenType.alpineFor ||
+          attrToken.type == TokenType.alpineModel ||
+          attrToken.type == TokenType.alpineText ||
+          attrToken.type == TokenType.alpineHtml ||
+          attrToken.type == TokenType.alpineBind ||
+          attrToken.type == TokenType.alpineOn ||
+          attrToken.type == TokenType.alpineTransition ||
+          attrToken.type == TokenType.alpineCloak ||
+          attrToken.type == TokenType.alpineIgnore ||
+          attrToken.type == TokenType.alpineRef ||
+          attrToken.type == TokenType.alpineTeleport;
+
+      final isLivewireToken = attrToken.type.toString().contains('livewire');
+
+      if (isAlpineToken || attrName.startsWith('x-') || attrName.startsWith('@') || attrName.startsWith(':')) {
+        // Extract directive from attribute name
+        final directive = attrName.startsWith('x-')
+            ? attrName.substring(2)
+            : attrName.startsWith('@')
+            ? attrName.substring(1)
+            : attrName.startsWith(':')
+            ? attrName.substring(1)
+            : attrName;
+
+        attrNode = AlpineAttribute(
+          name: attrName,
+          directive: directive,
+          value: attrValue,
+        );
+      } else if (isLivewireToken || attrName.startsWith('wire:')) {
+        // Extract action and modifiers from wire:action.modifier1.modifier2
+        final parts = attrName.substring(5).split('.');
+        final action = parts.first;
+        final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
+
+        attrNode = LivewireAttribute(
+          name: attrName,
+          action: action,
+          modifiers: modifiers,
+          value: attrValue,
+        );
+      } else {
+        attrNode = StandardAttribute(
+          name: attrName,
+          value: attrValue,
+        );
+      }
+
+      attributes[attrName] = attrNode;
+    }
+
+    // Check for self-closing
+    bool isSelfClosing = false;
+    if (_check(TokenType.componentSelfClose)) {
+      _advance(); // />
+      isSelfClosing = true;
+    }
+
+    // Parse children if not self-closing
+    final children = <AstNode>[];
+    final slots = <String, SlotNode>{};
+
+    if (!isSelfClosing) {
+      // Parse until closing tag
+      while (!_check(TokenType.componentTagClose) && !_check(TokenType.eof)) {
+        final node = _parseNode();
+        if (node != null) {
+          if (node is SlotNode) {
+            slots[node.name] = node;
+          } else {
+            children.add(node);
+          }
+        }
+      }
+
+      if (!_check(TokenType.componentTagClose)) {
+        _errors.add(ParseError(
+          message: 'Unclosed component <x-$componentName>',
+          position: startToken.startPosition,
+          hint: 'Add closing tag </x-$componentName>',
+        ));
+      } else {
+        _advance(); // </x-component>
+      }
+    }
+
+    // If children exist and no named slots, create default slot
+    if (children.isNotEmpty && slots.isEmpty) {
+      slots['default'] = SlotNode(
+        startPosition: children.first.startPosition,
+        endPosition: children.last.endPosition,
+        name: 'default',
+        children: children,
+      );
+    }
+
+    return ComponentNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      name: componentName,
+      attributes: attributes,
+      slots: slots,
+      isSelfClosing: isSelfClosing,
+      children: children,
+    );
+  }
+
+  /// Parse generic directive with opening/closing tags.
+  DirectiveNode _parseGenericDirective(String name, TokenType closingType) {
+    final startToken = _advance();
+    final expression = _extractExpression();
+    final children = <AstNode>[];
+
+    while (!_check(closingType) && !_check(TokenType.eof)) {
+      final node = _parseNode();
+      if (node != null) children.add(node);
+    }
+
+    if (!_check(closingType)) {
+      _errors.add(ParseError(
+        message: 'Unclosed @$name directive',
+        position: startToken.startPosition,
+        hint: 'Add @end$name to close the block',
+      ));
+    } else {
+      _advance();
+    }
+
+    return DirectiveNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      name: name,
+      expression: expression,
+      children: children,
+    );
+  }
+
+  /// Parse inline directive (no closing tag).
+  DirectiveNode _parseInlineDirective() {
+    final startToken = _advance();
+    final expression = _extractExpression();
+
+    // Get directive name from token type
+    final name = startToken.value.substring(1); // Remove '@'
+
+    return DirectiveNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      name: name,
+      expression: expression,
+      children: [],
     );
   }
 
@@ -334,4 +613,42 @@ class BladeParser {
   bool _check(TokenType type) => !_isAtEnd() && _peek().type == type;
 
   bool _checkAny(List<TokenType> types) => types.any(_check);
+
+  /// Check if token type represents an attribute (standard, Alpine, or Livewire)
+  bool _isAttributeToken(TokenType type) {
+    // Standard attributes
+    if (type == TokenType.identifier) return true;
+
+    // Alpine.js shorthand
+    if (type == TokenType.alpineShorthandBind || type == TokenType.alpineShorthandOn) return true;
+
+    // Alpine.js directives
+    if (type == TokenType.alpineData || type == TokenType.alpineInit ||
+        type == TokenType.alpineShow || type == TokenType.alpineIf ||
+        type == TokenType.alpineFor || type == TokenType.alpineModel ||
+        type == TokenType.alpineText || type == TokenType.alpineHtml ||
+        type == TokenType.alpineBind || type == TokenType.alpineOn ||
+        type == TokenType.alpineTransition || type == TokenType.alpineCloak ||
+        type == TokenType.alpineIgnore || type == TokenType.alpineRef ||
+        type == TokenType.alpineTeleport) return true;
+
+    // Livewire attributes
+    if (type == TokenType.livewireClick || type == TokenType.livewireSubmit ||
+        type == TokenType.livewireKeydown || type == TokenType.livewireKeyup ||
+        type == TokenType.livewireMouseenter || type == TokenType.livewireMouseleave ||
+        type == TokenType.livewireModel || type == TokenType.livewireModelLive ||
+        type == TokenType.livewireModelBlur || type == TokenType.livewireModelDebounce ||
+        type == TokenType.livewireModelLazy || type == TokenType.livewireModelDefer ||
+        type == TokenType.livewireLoading || type == TokenType.livewireTarget ||
+        type == TokenType.livewireLoadingClass || type == TokenType.livewireLoadingRemove ||
+        type == TokenType.livewireLoadingAttr || type == TokenType.livewirePoll ||
+        type == TokenType.livewirePollKeepAlive || type == TokenType.livewirePollVisible ||
+        type == TokenType.livewireIgnore || type == TokenType.livewireKey ||
+        type == TokenType.livewireId || type == TokenType.livewireInit ||
+        type == TokenType.livewireDirty || type == TokenType.livewireOffline ||
+        type == TokenType.livewireNavigate || type == TokenType.livewireTransition ||
+        type == TokenType.livewireStream) return true;
+
+    return false;
+  }
 }
