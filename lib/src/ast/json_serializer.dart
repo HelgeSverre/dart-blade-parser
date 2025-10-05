@@ -5,6 +5,9 @@ import 'visitor.dart';
 /// This is an alternative to calling toJson() directly on nodes.
 class JsonSerializerVisitor extends RecursiveAstVisitor<Map<String, dynamic>> {
   @override
+  Map<String, dynamic> get defaultValue => {};
+
+  @override
   Map<String, dynamic> visitDocument(DocumentNode node) {
     return {
       'type': 'document',
