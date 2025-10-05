@@ -204,6 +204,7 @@ enum TokenType {
   expression,
   stringLiteral,
   numberLiteral,
+  attributeValue, // Attribute value (without quotes)
 
   // Structural
   bladeComment, // {{-- --}}
