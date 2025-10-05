@@ -651,4 +651,32 @@ class BladeParser {
 
     return false;
   }
+
+  /// Parse HTML element into HtmlElementNode
+  ///
+  /// Handles:
+  /// - Opening tags: <div>, <p>, etc.
+  /// - Attributes: class, id, data-*, etc.
+  /// - Children: nested elements, text, directives
+  /// - Closing tags: </div>, </p>
+  /// - Self-closing: <br/>, <img/>
+  /// - Void elements: <br>, <img>, <meta>, <input>, <hr>, <link>
+  HtmlElementNode? _parseHtmlElement() {
+    // This would require the lexer to emit HTML tag tokens
+    // For now, HTML tags are treated as text by the lexer
+    // A complete implementation would need:
+    // 1. Lexer to emit TokenType.htmlTagOpen, TokenType.htmlTagClose, etc.
+    // 2. Parser to handle tag names, attributes, nesting
+    // 3. Validation of void elements (can't have children)
+    // 4. Proper handling of self-closing syntax
+
+    // Placeholder implementation:
+    // In practice, HTML elements mixed with Blade are challenging because
+    // the lexer needs context-sensitive parsing to distinguish:
+    // - <div> (HTML) from <x-div> (component)
+    // - Regular attributes from Alpine.js/Livewire attributes
+    // - When to stop parsing (matching closing tag)
+
+    return null;
+  }
 }

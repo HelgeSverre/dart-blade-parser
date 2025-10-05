@@ -13,3 +13,4 @@ export 'src/lexer/position.dart';
 export 'src/lexer/token.dart';
 export 'src/lexer/token_type.dart';
 export 'src/parser/parser.dart';
+export 'src/streaming/streaming_parser.dart';

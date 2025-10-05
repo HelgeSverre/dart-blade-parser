@@ -871,7 +871,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T059: Implement BladeParser - HTML element parsing
+### [X] T059: Implement BladeParser - HTML element parsing
 **File**: `lib/src/parser/parser.dart` (add method)
 **Description**: Parse HTML elements into HtmlElementNode
 
@@ -913,7 +913,7 @@ mkdir -p test/{fixtures/{valid,invalid,edge_cases},contract,integration,unit/{le
 
 ---
 
-### T062: Implement StreamingParser
+### [X] T062: Implement StreamingParser
 **File**: `lib/src/streaming/streaming_parser.dart`
 **Description**: Implement parseStreaming() for incremental parsing
 

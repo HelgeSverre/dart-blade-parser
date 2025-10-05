@@ -1,8 +1,8 @@
 
-# Implementation Plan: Laravel Blade Template Parser
+# Implementation Plan: [FEATURE]
 
-**Branch**: `001-create-a-laravel` | **Date**: 2025-10-04 | **Spec**: spec.md
-**Input**: Feature specification from `/specs/001-create-a-laravel/spec.md`
+**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 ## Execution Flow (/plan command scope)
 ```
@@ -31,72 +31,23 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-Build a pure Dart parser for Laravel Blade templates that tokenizes, parses, and produces a traversable AST supporting complete Blade directive syntax (@if, @foreach, @section, @yield, components, slots, etc.), Alpine.js attributes (x-data, x-show, @click), Livewire attributes (wire:click, wire:model), echo statements, and comments. The parser must provide accurate error messages with line/column information, support both full-parse and streaming modes for large files, achieve 1000+ lines/sec performance with <100MB memory usage, expose both a programmatic Dart API and CLI interface, and work across Flutter, Dart CLI, and web environments with zero platform-specific dependencies.
+[Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
-**Language/Version**: Dart 3.0+ (latest stable)
-**Primary Dependencies**: Zero external parsing libraries (pure Dart standard library)
-**Storage**: N/A (in-memory AST processing, JSON serialization)
-**Testing**: Dart test package, benchmark harness for performance validation
-**Target Platform**: Multi-platform (Flutter iOS/Android/web/desktop, Dart CLI, Dart web compilation)
-**Project Type**: Single library project with CLI tool
-**Performance Goals**: ≥1000 lines/sec parsing throughput, <10s for 10,000 line files
-**Constraints**: <100MB memory for typical templates (<5000 lines), pure Dart (no FFI/platform channels)
-**Scale/Scope**: Support full Blade grammar (50+ directives), Alpine.js (15+ attributes), Livewire (10+ attributes), nested structures up to 20 levels deep
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**I. Parser-First Architecture**
-- ✅ Core parsing logic framework-agnostic: Parser library separate from CLI tool
-- ✅ Lexer/tokenizer/AST builder as distinct modules: Planned three-layer architecture
-- ✅ No UI/rendering concerns: Pure parsing logic only
-- ✅ Parser self-contained: No external dependencies on Laravel or PHP runtime
-- ✅ Single responsibility per module: Tokenizer → Parser → AST Builder → Visitor
-
-**II. Grammar Completeness**
-- ✅ Full Blade syntax support: All 50+ directives from spec FR-001 through FR-010
-- ✅ Components with slots/attributes: Covered in FR-005, FR-006
-- ✅ Alpine.js attribute parsing: Covered in FR-011 through FR-014
-- ✅ Livewire attribute parsing: Covered in FR-044 through FR-051
-- ✅ Clear error messages with line/column: Covered in FR-021, FR-022
-- ✅ Every syntax feature documented: Will be captured in contract tests and examples
-
-**III. Test-First Development (NON-NEGOTIABLE)**
-- ✅ TDD mandatory: Tests written → approval → fail → implement
-- ✅ Test fixtures before implementation: Will create .blade test files in Phase 1
-- ✅ Test suite (valid files, edge cases, malformed): Covered in user scenarios
-- ✅ Red-Green-Refactor enforced: Workflow built into tasks
-- ✅ Performance benchmarks: Required by FR-027, FR-028
-
-**IV. Zero Dependencies Philosophy**
-- ✅ Pure Dart implementation: No external parsing libraries (confirmed in Technical Context)
-- ✅ Dependencies justified: None needed for core parser
-- ✅ No platform-specific code: Must support Flutter/CLI/web (FR-038 through FR-041)
-- ✅ No API surface leakage: Library exports only parser interface
-- ✅ Standard library preference: Using only Dart core libraries
-
-**V. Performance Standards**
-- ✅ ≥1000 lines/sec: Required by FR-027
-- ✅ <100MB memory: Required by FR-028
-- ✅ Incremental/streaming parsing: Required by FR-029 (both modes)
-- ✅ Benchmarked critical paths: Performance tests required in constitution
-- ✅ Regression tracking: Will be part of test suite
-
-**VI. API Design & Interoperability**
-- ✅ Traversable/visitable AST: Required by FR-017
-- ✅ JSON serialization: Required by FR-019, FR-034
-- ✅ Stable public API: Semantic versioning from start
-- ✅ CLI interface (stdin/stdout/stderr): Required by FR-032, FR-033, FR-036
-- ✅ Programmatic + CLI usage: Both required by spec
-
-**VII. Tooling Ecosystem**
-- ✅ Core parser is library: Parser package separate from tooling
-- ✅ Tools are independent consumers: Formatter/linter not in scope for this feature
-- ✅ No formatter/linter in parser core: Out of scope
-- ✅ Tools don't require parser mods: N/A (no tools yet)
-
-**Initial Assessment**: ✅ **PASS** - No constitutional violations identified
+[Gates determined based on constitution file]
 
 ## Project Structure
 
@@ -112,57 +63,50 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
+<!--
+  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
+  for this feature. Delete unused options and expand the chosen structure with
+  real paths (e.g., apps/admin, packages/something). The delivered plan must
+  not include Option labels.
+-->
 ```
-lib/
-├── src/
-│   ├── lexer/
-│   │   ├── token.dart           # Token types and definitions
-│   │   ├── lexer.dart           # Tokenization logic
-│   │   └── token_stream.dart    # Token stream management
-│   ├── parser/
-│   │   ├── parser.dart          # Main parser logic
-│   │   ├── directive_parser.dart # Blade directive parsing
-│   │   ├── component_parser.dart # Component parsing
-│   │   └── expression_parser.dart # Echo/expression parsing
-│   ├── ast/
-│   │   ├── node.dart            # Base AST node types
-│   │   ├── directive_node.dart  # Directive nodes
-│   │   ├── component_node.dart  # Component nodes
-│   │   ├── echo_node.dart       # Echo nodes
-│   │   ├── visitor.dart         # Visitor pattern interface
-│   │   └── json_serializer.dart # JSON serialization
-│   ├── error/
-│   │   ├── parse_error.dart     # Error types and handling
-│   │   └── error_reporter.dart  # Error collection and reporting
-│   └── streaming/
-│       └── streaming_parser.dart # Incremental parsing mode
-└── blade_parser.dart             # Public API exports
+# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
 
-bin/
-└── blade_parser.dart             # CLI entry point
-
-test/
-├── fixtures/
-│   ├── valid/                   # Valid Blade templates
-│   ├── invalid/                 # Malformed templates for error testing
-│   └── edge_cases/              # Edge case templates
+tests/
 ├── contract/
-│   ├── token_contract_test.dart
-│   ├── parser_contract_test.dart
-│   └── ast_contract_test.dart
 ├── integration/
-│   ├── full_parse_test.dart
-│   ├── streaming_parse_test.dart
-│   └── cli_test.dart
-├── unit/
-│   ├── lexer/
-│   ├── parser/
-│   └── ast/
-└── performance/
-    └── benchmark_test.dart
+└── unit/
+
+# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+backend/
+├── src/
+│   ├── models/
+│   ├── services/
+│   └── api/
+└── tests/
+
+frontend/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   └── services/
+└── tests/
+
+# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: Single library project (Option 1). This is a pure Dart library with a CLI tool. The `lib/` directory contains the parser implementation organized by architectural layer (lexer → parser → AST → error handling → streaming). The `bin/` directory contains the CLI tool. Test structure mirrors the source with contract, integration, unit, and performance test separation as required by constitution.
+**Structure Decision**: [Document the selected structure and reference the real
+directories captured above]
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:
@@ -222,95 +166,19 @@ test/
 *This section describes what the /tasks command will do - DO NOT execute during /plan*
 
 **Task Generation Strategy**:
-
-The /tasks command will load `.specify/templates/tasks-template.md` and generate dependency-ordered tasks following TDD workflow from the constitution. Tasks will be derived from:
-
-1. **Contract Tests** (from `contracts/parser-api.md`):
-   - Token contract test (verify Token structure, position tracking)
-   - Lexer contract test (tokenize method guarantees)
-   - Parser contract test (parse and parseStreaming methods)
-   - AST contract test (visitor pattern, JSON serialization)
-   - CLI contract test (interface, flags, exit codes)
-   - Performance contract test (throughput, memory, nesting benchmarks)
-
-2. **Data Model Implementation** (from `data-model.md`):
-   - Token and TokenType enum [P]
-   - Position class [P]
-   - AstNode sealed class hierarchy [P]
-   - AttributeNode sealed class hierarchy [P]
-   - ParseError and ParseResult [P]
-
-3. **Lexer Implementation** (research.md → hand-written state machine):
-   - Lexer state machine skeleton
-   - Token emission logic
-   - @ disambiguation logic (Blade vs Alpine.js vs email)
-   - @verbatim handling
-   - Blade comment handling
-   - Echo statement tokenization
-   - Component tag tokenization
-   - Alpine.js attribute tokenization
-   - Livewire attribute tokenization
-   - UTF-8 and line ending handling
-
-4. **Parser Implementation** (research.md → recursive descent + Pratt):
-   - Parser skeleton and error reporter
-   - Directive parsing (all 75+ directives)
-   - Component parsing (tags and slots)
-   - Expression parsing (Pratt parser for PHP expressions)
-   - Echo parsing
-   - HTML element parsing
-   - Error recovery (panic mode + synchronization)
-
-5. **AST Utilities** (data-model.md):
-   - Visitor pattern base classes
-   - JSON serializer visitor
-   - Parent-child navigation helpers
-
-6. **Streaming Mode** (research.md):
-   - Streaming parser implementation
-   - Buffering logic for incomplete constructs
-   - Node emission strategy
-
-7. **CLI Interface**:
-   - CLI argument parsing
-   - File and stdin input handling
-   - JSON and tree output formatting
-   - Exit code handling
-
-8. **Integration Tests** (from `quickstart.md`):
-   - Parse dashboard with control structures (Scenario 1)
-   - Parse component with slots (Scenario 2)
-   - Parse Alpine.js attributes (Scenario 3)
-   - Parse Livewire attributes (Scenario 8)
-   - Error reporting (Scenario 4)
-   - Performance test (Scenario 5)
-   - JSON serialization (Scenario 6)
-   - CLI interface (Scenario 7)
+- Load `.specify/templates/tasks-template.md` as base
+- Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
+- Each contract → contract test task [P]
+- Each entity → model creation task [P] 
+- Each user story → integration test task
+- Implementation tasks to make tests pass
 
 **Ordering Strategy**:
-- **TDD Order**: Tests written and approved BEFORE implementation
-- **Dependency Order**:
-  1. Data models (Token, Position, AstNode hierarchy)
-  2. Contract tests (failing tests for all APIs)
-  3. Lexer (tokens enable parser)
-  4. Parser (AST enables visitors)
-  5. Visitors (utilities for traversal/serialization)
-  6. Streaming mode (builds on parser)
-  7. CLI (builds on all components)
-  8. Integration tests (validate end-to-end workflows)
-- **Parallel Execution**: Mark tasks with [P] when independent (e.g., creating different data model classes)
+- TDD order: Tests before implementation 
+- Dependency order: Models before services before UI
+- Mark [P] for parallel execution (independent files)
 
-**Estimated Output**: 50-60 numbered, dependency-ordered tasks in tasks.md
-
-**Task Categories**:
-- Contract tests: ~10 tasks
-- Data models: ~15 tasks
-- Lexer: ~12 tasks
-- Parser: ~15 tasks
-- Visitors: ~4 tasks
-- Streaming: ~3 tasks
-- CLI: ~3 tasks
-- Integration tests: ~8 tasks
+**Estimated Output**: 25-30 numbered, ordered tasks in tasks.md
 
 **IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
@@ -334,18 +202,18 @@ The /tasks command will load `.specify/templates/tasks-template.md` and generate
 *This checklist is updated during execution flow*
 
 **Phase Status**:
-- [x] Phase 0: Research complete (/plan command)
-- [x] Phase 1: Design complete (/plan command)
-- [x] Phase 2: Task planning approach described (/plan command)
-- [x] Phase 3: Tasks generated (/tasks command) - 78 tasks created
-- [x] Phase 4: Implementation complete (67/78 tasks completed - core functionality working)
-- [x] Phase 5: Validation passed (all 31 contract + integration tests passing)
+- [ ] Phase 0: Research complete (/plan command)
+- [ ] Phase 1: Design complete (/plan command)
+- [ ] Phase 2: Task planning complete (/plan command - describe approach only)
+- [ ] Phase 3: Tasks generated (/tasks command)
+- [ ] Phase 4: Implementation complete
+- [ ] Phase 5: Validation passed
 
 **Gate Status**:
-- [x] Initial Constitution Check: PASS
-- [x] Post-Design Constitution Check: PASS (no new violations)
-- [x] All NEEDS CLARIFICATION resolved (no unknowns in Technical Context)
-- [x] Complexity deviations documented (none - no violations)
+- [ ] Initial Constitution Check: PASS
+- [ ] Post-Design Constitution Check: PASS
+- [ ] All NEEDS CLARIFICATION resolved
+- [ ] Complexity deviations documented
 
 ---
 *Based on Constitution v2.1.1 - See `/memory/constitution.md`*
