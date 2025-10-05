@@ -92,11 +92,17 @@ class BladeLexer {
       // In verbatim mode, only look for @endverbatim
       if (_inVerbatim) {
         if (ch == '@') {
-          final ahead = _peekWord();
-          if (ahead == 'endverbatim') {
+          // Check if next chars are "endverbatim"
+          final remainingLength = input.length - _position - 1;
+          if (remainingLength >= 11 && input.substring(_position + 1, _position + 12) == 'endverbatim') {
+            // Emit accumulated text before @endverbatim
             if (_position > _start) {
               _emitToken(TokenType.text, input.substring(_start, _position));
             }
+            // Reset _start for the directive itself
+            _start = _position;
+            _startLine = _line;
+            _startColumn = _column;
             return _LexerState.directiveOrComment;
           }
         }
@@ -106,6 +112,13 @@ class BladeLexer {
 
       // Check for @ directive
       if (ch == '@') {
+        // Check for @{{ (escaped echo - treat as literal text)
+        if (_peekNext() == '{' && _peekAhead(2) == '{') {
+          // This is an escaped echo, skip @ and continue as text
+          _advance();
+          continue;
+        }
+
         // Disambiguate: directive vs email vs Alpine.js @event
         if (_isDirectiveContext()) {
           if (_position > _start) {
@@ -124,13 +137,15 @@ class BladeLexer {
       }
 
       // Check for {{ echo
-      if (ch == '{' && _peekNext() == '{') {
-        // Check for @{{ (escaped echo - should be literal)
-        if (_position > 0 && input[_position - 1] == '@') {
-          _advance();
-          _advance();
-          continue;
+      // Check for {{{ legacy echo (must check before {{ regular echo)
+      if (ch == '{' && _peekNext() == '{' && _peekAhead(2) == '{') {
+        if (_position > _start) {
+          _emitToken(TokenType.text, input.substring(_start, _position));
         }
+        return _LexerState.legacyEcho;
+      }
+
+      if (ch == '{' && _peekNext() == '{') {
         if (_position > _start) {
           _emitToken(TokenType.text, input.substring(_start, _position));
         }
@@ -145,12 +160,36 @@ class BladeLexer {
         return _LexerState.rawEcho;
       }
 
-      // Check for {{{ legacy echo
-      if (ch == '{' && _peekNext() == '{' && _peekAhead(2) == '{') {
+      // Check for </x- component closing tag
+      if (ch == '<' && _peekNext() == '/' && _peekAhead(2) == 'x' && _peekAhead(3) == '-') {
         if (_position > _start) {
           _emitToken(TokenType.text, input.substring(_start, _position));
         }
-        return _LexerState.legacyEcho;
+        // Scan closing tag
+        _advance(); // <
+        _advance(); // /
+        _advance(); // x
+        _advance(); // -
+
+        final nameStart = _position;
+        while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == '.') {
+          _advance();
+        }
+
+        final componentName = input.substring(nameStart, _position);
+        _emitToken(TokenType.componentTagClose, '</x-$componentName');
+
+        // Skip to >
+        while (!_isAtEnd() && _peek() != '>') {
+          _advance();
+        }
+        if (_peek() == '>') {
+          _advance();
+          _emitToken(TokenType.text, '>');
+        }
+
+        _start = _position;
+        continue;
       }
 
       // Check for <x- component tag
@@ -184,10 +223,17 @@ class BladeLexer {
 
   /// Check if @ is in directive context (vs email or Alpine.js @event)
   bool _isDirectiveContext() {
-    // @ at start of line or after whitespace -> likely directive
+    // @ at start of input -> likely directive
     if (_position == 0) return true;
 
     final prev = _position > 0 ? input[_position - 1] : '\x00';
+
+    // @ preceded by alphanumeric or dot = likely email address or domain
+    if (_isAlphaNumeric(prev) || prev == '.') {
+      return false; // Email address like user@example.com
+    }
+
+    // @ at start of line or after whitespace -> likely directive
     if (prev == '\n' || prev == '\r' || prev == ' ' || prev == '\t') {
       return true;
     }
@@ -242,8 +288,11 @@ class BladeLexer {
       return _LexerState.text;
     }
 
-    // Check for expression after directive
-    String? expression;
+    // Emit directive token
+    final tokenType = _directiveNameToType(name);
+    _emitToken(tokenType, '@$name');
+
+    // Check for expression after directive and emit as separate token
     if (_peek() == '(') {
       final exprStart = _position;
       _advance(); // (
@@ -255,12 +304,9 @@ class BladeLexer {
         _advance();
       }
 
-      expression = input.substring(exprStart, _position);
+      final expression = input.substring(exprStart, _position);
+      _emitToken(TokenType.expression, expression);
     }
-
-    final tokenType = _directiveNameToType(name);
-    final value = expression != null ? '@$name$expression' : '@$name';
-    _emitToken(tokenType, value);
 
     return _LexerState.text;
   }
@@ -485,6 +531,12 @@ class BladeLexer {
   void _lexAttribute() {
     final attrStart = _position;
 
+    // Skip any unexpected characters (like dots in wire:loading.delay)
+    if (!_isAlphaNumeric(_peek()) && _peek() != '@' && _peek() != ':' && _peek() != '_') {
+      _advance(); // Skip the unexpected character
+      return;
+    }
+
     // Check for Alpine.js shorthand
     if (_peek() == '@') {
       _advance();
@@ -496,8 +548,8 @@ class BladeLexer {
       final event = input.substring(eventStart, _position);
       _emitToken(TokenType.alpineShorthandOn, '@$event');
 
-      // Skip ="value"
-      _skipAttributeValue();
+      // Lex attribute value
+      _lexAttributeValue();
       return;
     }
 
@@ -511,14 +563,14 @@ class BladeLexer {
       final attr = input.substring(bindStart, _position);
       _emitToken(TokenType.alpineShorthandBind, ':$attr');
 
-      // Skip ="value"
-      _skipAttributeValue();
+      // Lex attribute value
+      _lexAttributeValue();
       return;
     }
 
     // Scan attribute name
     final nameStart = _position;
-    while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == ':') {
+    while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == ':' || _peek() == '.') {
       _advance();
     }
 
@@ -538,19 +590,19 @@ class BladeLexer {
       _emitToken(TokenType.identifier, attrName);
     }
 
-    // Skip ="value"
-    _skipAttributeValue();
+    // Lex attribute value
+    _lexAttributeValue();
   }
 
-  /// Skip attribute value
-  void _skipAttributeValue() {
+  /// Lex attribute value and emit token
+  void _lexAttributeValue() {
     // Skip whitespace
     while (_peek() == ' ' || _peek() == '\t') {
       _advance();
     }
 
     // Check for =
-    if (_peek() != '=') return;
+    if (_peek() != '=') return; // Boolean attribute, no value
     _advance();
 
     // Skip whitespace
@@ -558,16 +610,30 @@ class BladeLexer {
       _advance();
     }
 
-    // Skip quoted value
+    // Capture quoted value
     final quote = _peek();
     if (quote == '"' || quote == "'") {
-      _advance();
+      _advance(); // Skip opening quote
+      final valueStart = _position;
+
+      // Handle escaped quotes within the string
       while (!_isAtEnd() && _peek() != quote) {
-        _advance();
+        if (_peek() == '\\' && _peekNext() == quote) {
+          _advance(); // Skip backslash
+          _advance(); // Skip escaped quote
+        } else {
+          _advance();
+        }
       }
+
+      final value = input.substring(valueStart, _position);
+
       if (_peek() == quote) {
-        _advance();
+        _advance(); // Skip closing quote
       }
+
+      // Emit the value without quotes (but includes backslashes for escaped quotes)
+      _emitToken(TokenType.attributeValue, value);
     }
   }
 
