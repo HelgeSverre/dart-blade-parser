@@ -54,7 +54,8 @@ class AcidRunner {
       if (token.type.name.startsWith('directive')) {
         final directiveName = token.type.name.substring('directive'.length);
         // Convert from camelCase to lowercase (e.g., 'directiveIf' -> 'if')
-        final name = directiveName[0].toLowerCase() + directiveName.substring(1);
+        final name =
+            directiveName[0].toLowerCase() + directiveName.substring(1);
         directivesUsed.add(name);
       }
     }

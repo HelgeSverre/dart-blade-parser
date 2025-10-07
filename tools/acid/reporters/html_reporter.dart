@@ -6,7 +6,8 @@ import '../models/fixture_info.dart';
 /// HTML reporter that generates a standalone HTML report.
 class HtmlReporter {
   /// Generate and save HTML report.
-  void generateReport(List<TestResult> results, CoverageReport coverage, String outputPath) {
+  void generateReport(
+      List<TestResult> results, CoverageReport coverage, String outputPath) {
     final html = _buildHtml(results, coverage);
     File(outputPath).writeAsStringSync(html);
   }
@@ -294,8 +295,11 @@ class HtmlReporter {
   }
 
   String _buildSummaryCards(CoverageReport coverage) {
-    final passRateClass = coverage.passRate >= 90 ? 'success' :
-                          coverage.passRate >= 70 ? 'warning' : 'danger';
+    final passRateClass = coverage.passRate >= 90
+        ? 'success'
+        : coverage.passRate >= 70
+            ? 'warning'
+            : 'danger';
 
     return '''
 <div class="summary">
@@ -372,8 +376,11 @@ class HtmlReporter {
       final total = categoryResults.length;
       final passRate = (passed / total) * 100;
 
-      final rowClass = passRate == 100 ? 'success' :
-                       passRate >= 50 ? 'warning' : 'danger';
+      final rowClass = passRate == 100
+          ? 'success'
+          : passRate >= 50
+              ? 'warning'
+              : 'danger';
 
       return '''
 <tr class="$rowClass">
@@ -472,12 +479,15 @@ class HtmlReporter {
     }
 
     final failureCards = failures.map((failure) {
-      final errorsList = failure.errors.take(5).map((error) =>
-        '<div class="error-list-item">${_escapeHtml(error.message)}</div>'
-      ).join('\n');
+      final errorsList = failure.errors
+          .take(5)
+          .map((error) =>
+              '<div class="error-list-item">${_escapeHtml(error.message)}</div>')
+          .join('\n');
 
-      final moreErrors = failure.errors.length > 5 ?
-        '<div class="error-list-item">... ${failure.errors.length - 5} more errors omitted</div>' : '';
+      final moreErrors = failure.errors.length > 5
+          ? '<div class="error-list-item">... ${failure.errors.length - 5} more errors omitted</div>'
+          : '';
 
       return '''
 <div class="failure-details">
