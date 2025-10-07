@@ -848,8 +848,12 @@ class BladeLexer {
         return TokenType.directiveEndunless;
       case 'isset':
         return TokenType.directiveIsset;
+      case 'endisset':
+        return TokenType.directiveEndisset;
       case 'empty':
         return TokenType.directiveEmpty;
+      case 'endempty':
+        return TokenType.directiveEndempty;
       case 'switch':
         return TokenType.directiveSwitch;
       case 'case':
@@ -1060,6 +1064,26 @@ class BladeLexer {
         return TokenType.directiveThis;
       case 'js':
         return TokenType.directiveJs;
+      case 'livewireStyles':
+        return TokenType.directiveLivewireStyles;
+      case 'livewireScripts':
+        return TokenType.directiveLivewireScripts;
+      case 'livewireScriptConfig':
+        return TokenType.directiveLivewireScriptConfig;
+      case 'script':
+        return TokenType.directiveScript;
+      case 'endscript':
+        return TokenType.directiveEndscript;
+      case 'assets':
+        return TokenType.directiveAssets;
+      case 'endassets':
+        return TokenType.directiveEndassets;
+
+      // Filament Directives
+      case 'filamentStyles':
+        return TokenType.directiveFilamentStyles;
+      case 'filamentScripts':
+        return TokenType.directiveFilamentScripts;
 
       default:
         return TokenType.identifier;

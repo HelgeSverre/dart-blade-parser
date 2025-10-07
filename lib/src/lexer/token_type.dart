@@ -12,7 +12,9 @@ enum TokenType {
   directiveDefault,
   directiveEndswitch,
   directiveIsset,
+  directiveEndisset,
   directiveEmpty,
+  directiveEndempty,
 
   // Blade Directives - Loops
   directiveFor,
@@ -130,6 +132,17 @@ enum TokenType {
   directiveEntangle,
   directiveThis,
   directiveJs,
+  directiveLivewireStyles,
+  directiveLivewireScripts,
+  directiveLivewireScriptConfig,
+  directiveScript,
+  directiveEndscript,
+  directiveAssets,
+  directiveEndassets,
+
+  // Filament Directives
+  directiveFilamentStyles,
+  directiveFilamentScripts,
 
   // Echo Statements
   echoOpen, // {{
