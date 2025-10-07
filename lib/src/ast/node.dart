@@ -335,12 +335,12 @@ final class HtmlElementNode extends AstNode {
     required this.startPosition,
     required this.endPosition,
     this.parent,
-    required this.tagName,
+    required String tagName,
     this.attributes = const {},
     this.isSelfClosing = false,
     this.isVoid = false,
     required this.children,
-  });
+  }) : tagName = tagName.toLowerCase();
 
   @override
   T accept<T>(AstVisitor<T> visitor) => visitor.visitHtmlElement(this);

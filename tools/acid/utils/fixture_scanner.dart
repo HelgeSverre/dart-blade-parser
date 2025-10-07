@@ -58,7 +58,8 @@ class FixtureScanner {
 
     return {
       'total': fixtures.length,
-      'byCategory': byCategory.map((cat, list) => MapEntry(cat.displayName, list.length)),
+      'byCategory':
+          byCategory.map((cat, list) => MapEntry(cat.displayName, list.length)),
       'totalSize': fixtures.fold<int>(0, (sum, f) => sum + f.sizeBytes),
       'totalLines': fixtures.fold<int>(0, (sum, f) => sum + f.lineCount),
     };

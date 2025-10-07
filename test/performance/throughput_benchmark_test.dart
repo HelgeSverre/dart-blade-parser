@@ -34,7 +34,8 @@ void main() {
 
       expect(result.ast, isNotNull);
       expect(stopwatch.elapsedMilliseconds, lessThan(1000),
-        reason: 'Should parse 1000 lines in under 1 second. Took: ${stopwatch.elapsedMilliseconds}ms');
+          reason:
+              'Should parse 1000 lines in under 1 second. Took: ${stopwatch.elapsedMilliseconds}ms');
 
       final linesPerSecond = 1000 / (stopwatch.elapsedMilliseconds / 1000);
       print('Throughput: ${linesPerSecond.toStringAsFixed(0)} lines/sec');
@@ -51,7 +52,8 @@ void main() {
       expect(result.ast, isNotNull);
 
       final linesPerSecond = 5000 / (stopwatch.elapsedMilliseconds / 1000);
-      print('Throughput (5000 lines): ${linesPerSecond.toStringAsFixed(0)} lines/sec');
+      print(
+          'Throughput (5000 lines): ${linesPerSecond.toStringAsFixed(0)} lines/sec');
 
       // Should still maintain ≥1000 lines/sec
       expect(linesPerSecond, greaterThanOrEqualTo(1000));
@@ -66,10 +68,12 @@ void main() {
 
       expect(result.ast, isNotNull);
       expect(stopwatch.elapsed.inSeconds, lessThan(10),
-        reason: 'Should parse 10k lines in under 10 seconds. Took: ${stopwatch.elapsed.inSeconds}s');
+          reason:
+              'Should parse 10k lines in under 10 seconds. Took: ${stopwatch.elapsed.inSeconds}s');
 
       final linesPerSecond = 10000 / (stopwatch.elapsedMilliseconds / 1000);
-      print('Throughput (10k lines): ${linesPerSecond.toStringAsFixed(0)} lines/sec');
+      print(
+          'Throughput (10k lines): ${linesPerSecond.toStringAsFixed(0)} lines/sec');
     });
 
     test('Measure tokens per second', () {
@@ -80,8 +84,10 @@ void main() {
       final tokens = lexer.tokenize();
       stopwatch.stop();
 
-      final tokensPerSecond = tokens.length / (stopwatch.elapsedMilliseconds / 1000);
-      print('Lexer throughput: ${tokensPerSecond.toStringAsFixed(0)} tokens/sec');
+      final tokensPerSecond =
+          tokens.length / (stopwatch.elapsedMilliseconds / 1000);
+      print(
+          'Lexer throughput: ${tokensPerSecond.toStringAsFixed(0)} tokens/sec');
 
       expect(tokensPerSecond, greaterThan(1000)); // Should be very fast
     });
@@ -109,7 +115,8 @@ void main() {
       expect(result.ast, isNotNull);
 
       final linesPerSecond = lineCount / (stopwatch.elapsedMilliseconds / 1000);
-      print('Complex template: ${linesPerSecond.toStringAsFixed(0)} lines/sec ($lineCount lines)');
+      print(
+          'Complex template: ${linesPerSecond.toStringAsFixed(0)} lines/sec ($lineCount lines)');
 
       expect(linesPerSecond, greaterThanOrEqualTo(1000));
     });

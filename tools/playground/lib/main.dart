@@ -112,7 +112,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             children: [
               const Text(
                 'Input',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.5),
               ),
               const Spacer(),
               PopupMenuButton<String>(
@@ -120,13 +123,20 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                 tooltip: 'Examples',
                 onSelected: _loadExample,
                 itemBuilder: (context) => [
-                  const PopupMenuItem(value: 'simple', child: Text('Simple Echo')),
-                  const PopupMenuItem(value: 'control', child: Text('Control Structures')),
-                  const PopupMenuItem(value: 'components', child: Text('Components & Slots')),
-                  const PopupMenuItem(value: 'alpine', child: Text('Alpine.js Attributes')),
-                  const PopupMenuItem(value: 'nested', child: Text('Nested Directives')),
-                  const PopupMenuItem(value: 'verbatim', child: Text('Verbatim Blocks')),
-                  const PopupMenuItem(value: 'errors', child: Text('Multiple Errors')),
+                  const PopupMenuItem(
+                      value: 'simple', child: Text('Simple Echo')),
+                  const PopupMenuItem(
+                      value: 'control', child: Text('Control Structures')),
+                  const PopupMenuItem(
+                      value: 'components', child: Text('Components & Slots')),
+                  const PopupMenuItem(
+                      value: 'alpine', child: Text('Alpine.js Attributes')),
+                  const PopupMenuItem(
+                      value: 'nested', child: Text('Nested Directives')),
+                  const PopupMenuItem(
+                      value: 'verbatim', child: Text('Verbatim Blocks')),
+                  const PopupMenuItem(
+                      value: 'errors', child: Text('Multiple Errors')),
                 ],
               ),
             ],
@@ -206,7 +216,9 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         hasErrors ? '${_result!.errors.length} errors' : 'Valid',
         style: const TextStyle(fontSize: 12),
       ),
-      backgroundColor: hasErrors ? Colors.red.withOpacity(0.2) : Colors.green.withOpacity(0.2),
+      backgroundColor: hasErrors
+          ? Colors.red.withOpacity(0.2)
+          : Colors.green.withOpacity(0.2),
     );
   }
 
@@ -282,7 +294,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       final error = _result!.errors[i];
       buffer.writeln('Error ${i + 1}:');
       buffer.writeln('  Message: ${error.message}');
-      buffer.writeln('  Location: line ${error.position.line}, column ${error.position.column}');
+      buffer.writeln(
+          '  Location: line ${error.position.line}, column ${error.position.column}');
       if (error.hint != null) {
         buffer.writeln('  Hint: ${error.hint}');
       }

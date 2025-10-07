@@ -28,26 +28,36 @@ class ConsoleReporter {
 
   void _printHeader() {
     print('');
-    print('$_bold$_cyan╔════════════════════════════════════════════════════════╗$_reset');
-    print('$_bold$_cyan║$_reset       🧪 $_bold${_cyan}BLADE PARSER ACID TEST RESULTS$_reset           $_bold$_cyan║$_reset');
-    print('$_bold$_cyan╚════════════════════════════════════════════════════════╝$_reset');
+    print(
+        '$_bold$_cyan╔════════════════════════════════════════════════════════╗$_reset');
+    print(
+        '$_bold$_cyan║$_reset       🧪 $_bold${_cyan}BLADE PARSER ACID TEST RESULTS$_reset           $_bold$_cyan║$_reset');
+    print(
+        '$_bold$_cyan╚════════════════════════════════════════════════════════╝$_reset');
     print('');
   }
 
   void _printSummary(CoverageReport coverage) {
-    final passRateColor = coverage.passRate >= 90 ? _green :
-                          coverage.passRate >= 70 ? _yellow : _red;
+    final passRateColor = coverage.passRate >= 90
+        ? _green
+        : coverage.passRate >= 70
+            ? _yellow
+            : _red;
 
     print('$_bold📊 SUMMARY$_reset');
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     print('  Total Fixtures:     ${_bold}${coverage.totalTests}$_reset');
-    print('  $_green✅ Passed:          ${_bold}${coverage.passedTests}$_reset  ($passRateColor${coverage.passRate.toStringAsFixed(1)}%$_reset)');
-    print('  $_red❌ Failed:          ${_bold}${coverage.failedTests}$_reset  (${(100 - coverage.passRate).toStringAsFixed(1)}%)');
+    print(
+        '  $_green✅ Passed:          ${_bold}${coverage.passedTests}$_reset  ($passRateColor${coverage.passRate.toStringAsFixed(1)}%$_reset)');
+    print(
+        '  $_red❌ Failed:          ${_bold}${coverage.failedTests}$_reset  (${(100 - coverage.passRate).toStringAsFixed(1)}%)');
     print('');
     print('  ⏱️  Total Time:       ${_formatTime(coverage.totalTimeMs)}');
     print('  📈 Avg Time:         ${_formatTime(coverage.avgTimeMs)}/file');
-    print('  🔢 Total Tokens:     ${_bold}${_formatNumber(coverage.totalTokens)}$_reset');
-    print('  🌳 Total Nodes:      ${_bold}${_formatNumber(coverage.totalNodes)}$_reset');
+    print(
+        '  🔢 Total Tokens:     ${_bold}${_formatNumber(coverage.totalTokens)}$_reset');
+    print(
+        '  🌳 Total Nodes:      ${_bold}${_formatNumber(coverage.totalNodes)}$_reset');
     print('');
   }
 
@@ -70,15 +80,22 @@ class ConsoleReporter {
       final total = categoryResults.length;
       final passRate = (passed / total) * 100;
 
-      final statusIcon = passRate == 100 ? '$_green✅$_reset' :
-                        passRate >= 50 ? '$_yellow⚠️$_reset' : '$_red❌$_reset';
+      final statusIcon = passRate == 100
+          ? '$_green✅$_reset'
+          : passRate >= 50
+              ? '$_yellow⚠️$_reset'
+              : '$_red❌$_reset';
 
-      final rateColor = passRate == 100 ? _green :
-                       passRate >= 50 ? _yellow : _red;
+      final rateColor = passRate == 100
+          ? _green
+          : passRate >= 50
+              ? _yellow
+              : _red;
 
       final categoryName = category.displayName.padRight(15);
 
-      print('  $statusIcon $categoryName ${passed.toString().padLeft(3)}/${total.toString().padLeft(3)}   ($rateColor${passRate.toStringAsFixed(1)}%$_reset)');
+      print(
+          '  $statusIcon $categoryName ${passed.toString().padLeft(3)}/${total.toString().padLeft(3)}   ($rateColor${passRate.toStringAsFixed(1)}%$_reset)');
     }
 
     print('');
@@ -88,14 +105,22 @@ class ConsoleReporter {
     print('$_bold📊 COVERAGE ANALYSIS$_reset');
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
-    final tokenColor = coverage.tokenCoveragePercent >= 50 ? _green :
-                      coverage.tokenCoveragePercent >= 25 ? _yellow : _red;
+    final tokenColor = coverage.tokenCoveragePercent >= 50
+        ? _green
+        : coverage.tokenCoveragePercent >= 25
+            ? _yellow
+            : _red;
 
-    final directiveColor = coverage.directiveCoveragePercent >= 50 ? _green :
-                          coverage.directiveCoveragePercent >= 25 ? _yellow : _red;
+    final directiveColor = coverage.directiveCoveragePercent >= 50
+        ? _green
+        : coverage.directiveCoveragePercent >= 25
+            ? _yellow
+            : _red;
 
-    print('  Token Types:      ${coverage.tokenTypesCovered}/~200 tested ($tokenColor${coverage.tokenCoveragePercent.toStringAsFixed(1)}%$_reset)');
-    print('  Directives:       ${coverage.directivesCovered}/~75  tested ($directiveColor${coverage.directiveCoveragePercent.toStringAsFixed(1)}%$_reset)');
+    print(
+        '  Token Types:      ${coverage.tokenTypesCovered}/~200 tested ($tokenColor${coverage.tokenCoveragePercent.toStringAsFixed(1)}%$_reset)');
+    print(
+        '  Directives:       ${coverage.directivesCovered}/~75  tested ($directiveColor${coverage.directiveCoveragePercent.toStringAsFixed(1)}%$_reset)');
     print('');
   }
 
@@ -172,7 +197,8 @@ class ConsoleReporter {
   }
 
   void _printFooter() {
-    print('${_gray}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$_reset');
+    print(
+        '${_gray}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$_reset');
     print('');
   }
 

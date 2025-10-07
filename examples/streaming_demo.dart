@@ -40,28 +40,30 @@ void main() async {
 
   // Split into chunks (simulating reading lines from a file)
   final lines = template.split('\n');
-  
-  print('📄 Template size: ${template.length} characters, ${lines.length} lines\n');
+
+  print(
+      '📄 Template size: ${template.length} characters, ${lines.length} lines\n');
   print('🔄 Starting streaming parse...\n');
   print('─' * 60);
 
   // Create stream controller to simulate file reading
   final controller = StreamController<String>();
-  
+
   // Start streaming parser
   final streamingParser = StreamingParser();
   final nodeStream = streamingParser.parseStreaming(controller.stream);
-  
+
   // Track what we've emitted
   var nodeCount = 0;
   var chunkCount = 0;
-  
+
   // Listen to emitted nodes
   final subscription = nodeStream.listen(
     (node) {
       nodeCount++;
       print('\n✨ Node emitted: ${_formatNode(node)}');
-      print('   Position: Line ${node.startPosition.line}-${node.endPosition.line}');
+      print(
+          '   Position: Line ${node.startPosition.line}-${node.endPosition.line}');
       print('   Memory: Node #$nodeCount (buffer cleared)');
     },
     onDone: () {
@@ -79,12 +81,12 @@ void main() async {
   for (var i = 0; i < lines.length; i++) {
     chunkCount++;
     final chunk = lines[i] + '\n';
-    
+
     // Visual progress
     stdout.write('\r📦 Chunk $chunkCount/${lines.length}: ${_preview(chunk)}');
-    
+
     controller.add(chunk);
-    
+
     // Small delay to make it visible (remove in production)
     await Future.delayed(Duration(milliseconds: 50));
   }
@@ -96,7 +98,8 @@ void main() async {
 
 String _formatNode(AstNode node) {
   if (node is DirectiveNode) {
-    final expr = node.expression != null ? '(${_truncate(node.expression!, 30)})' : '';
+    final expr =
+        node.expression != null ? '(${_truncate(node.expression!, 30)})' : '';
     return '@${node.name}$expr [${node.children.length} children]';
   } else if (node is ComponentNode) {
     return '<x-${node.name}> [${node.children.length} children]';

@@ -45,7 +45,10 @@ class ExpressionParser {
     final token = _peek();
 
     // Handle unary operators
-    if (token.value == '!' || token.value == '-' || token.value == '+' || token.value == '~') {
+    if (token.value == '!' ||
+        token.value == '-' ||
+        token.value == '+' ||
+        token.value == '~') {
       final op = _advance();
       final expr = _parsePrimary();
       return '${op.value}$expr';
@@ -58,12 +61,14 @@ class ExpressionParser {
 
     // String literal
     if (token.type == TokenType.stringLiteral ||
-        token.value.startsWith("'") || token.value.startsWith('"')) {
+        token.value.startsWith("'") ||
+        token.value.startsWith('"')) {
       return _advance().value;
     }
 
     // Number literal
-    if (token.type == TokenType.numberLiteral || RegExp(r'^\d').hasMatch(token.value)) {
+    if (token.type == TokenType.numberLiteral ||
+        RegExp(r'^\d').hasMatch(token.value)) {
       return _advance().value;
     }
 
@@ -177,31 +182,81 @@ class ExpressionParser {
 
     // Precedence levels (higher = tighter binding)
     switch (op) {
-      case '||': case 'or': return 10;
-      case '&&': case 'and': return 20;
-      case '|': return 30;
-      case '^': return 40;
-      case '&': return 50;
-      case '==': case '!=': case '===': case '!==': return 60;
-      case '<': case '<=': case '>': case '>=': case '<=>': return 70;
-      case '<<': case '>>': return 80;
-      case '+': case '-': case '.': return 90;
-      case '*': case '/': case '%': return 100;
-      case '**': return 110;
-      case '?': return 5; // Ternary has low precedence
-      default: return 0;
+      case '||':
+      case 'or':
+        return 10;
+      case '&&':
+      case 'and':
+        return 20;
+      case '|':
+        return 30;
+      case '^':
+        return 40;
+      case '&':
+        return 50;
+      case '==':
+      case '!=':
+      case '===':
+      case '!==':
+        return 60;
+      case '<':
+      case '<=':
+      case '>':
+      case '>=':
+      case '<=>':
+        return 70;
+      case '<<':
+      case '>>':
+        return 80;
+      case '+':
+      case '-':
+      case '.':
+        return 90;
+      case '*':
+      case '/':
+      case '%':
+        return 100;
+      case '**':
+        return 110;
+      case '?':
+        return 5; // Ternary has low precedence
+      default:
+        return 0;
     }
   }
 
   /// Check if value is an operator.
   bool _isOperator(String value) {
     return [
-      '+', '-', '*', '/', '%', '**',
-      '==', '!=', '===', '!==',
-      '<', '<=', '>', '>=', '<=>',
-      '&&', '||', 'and', 'or',
-      '!', '&', '|', '^', '~',
-      '<<', '>>', '.', '?', ':'
+      '+',
+      '-',
+      '*',
+      '/',
+      '%',
+      '**',
+      '==',
+      '!=',
+      '===',
+      '!==',
+      '<',
+      '<=',
+      '>',
+      '>=',
+      '<=>',
+      '&&',
+      '||',
+      'and',
+      'or',
+      '!',
+      '&',
+      '|',
+      '^',
+      '~',
+      '<<',
+      '>>',
+      '.',
+      '?',
+      ':'
     ].contains(value);
   }
 

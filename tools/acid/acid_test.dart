@@ -28,7 +28,8 @@ void main(List<String> args) async {
   }
 
   if (!['console', 'html', 'both'].contains(format)) {
-    print('Error: Invalid format "$format". Must be one of: console, html, both');
+    print(
+        'Error: Invalid format "$format". Must be one of: console, html, both');
     exit(2);
   }
 
@@ -64,7 +65,8 @@ void main(List<String> args) async {
 
   if (format == 'html' || format == 'both') {
     // Determine output path
-    final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-').split('.')[0];
+    final timestamp =
+        DateTime.now().toIso8601String().replaceAll(':', '-').split('.')[0];
     outputPath ??= '$projectRoot/tools/acid/reports/acid_test_report_$timestamp.html';
 
     // Ensure reports directory exists

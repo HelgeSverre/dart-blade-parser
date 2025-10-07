@@ -94,7 +94,8 @@ class BladeLexer {
         if (ch == '@') {
           // Check if next chars are "endverbatim"
           final remainingLength = input.length - _position - 1;
-          if (remainingLength >= 11 && input.substring(_position + 1, _position + 12) == 'endverbatim') {
+          if (remainingLength >= 11 &&
+              input.substring(_position + 1, _position + 12) == 'endverbatim') {
             // Emit accumulated text before @endverbatim
             if (_position > _start) {
               _emitToken(TokenType.text, input.substring(_start, _position));
@@ -171,7 +172,10 @@ class BladeLexer {
       }
 
       // Check for {{-- Blade comment
-      if (ch == '{' && _peekNext() == '{' && _peekAhead(2) == '-' && _peekAhead(3) == '-') {
+      if (ch == '{' &&
+          _peekNext() == '{' &&
+          _peekAhead(2) == '-' &&
+          _peekAhead(3) == '-') {
         if (_position > _start) {
           _emitToken(TokenType.text, input.substring(_start, _position));
         }
@@ -203,7 +207,10 @@ class BladeLexer {
       }
 
       // Check for </x- component closing tag
-      if (ch == '<' && _peekNext() == '/' && _peekAhead(2) == 'x' && _peekAhead(3) == '-') {
+      if (ch == '<' &&
+          _peekNext() == '/' &&
+          _peekAhead(2) == 'x' &&
+          _peekAhead(3) == '-') {
         if (_position > _start) {
           _emitToken(TokenType.text, input.substring(_start, _position));
         }
@@ -227,7 +234,7 @@ class BladeLexer {
         }
         if (_peek() == '>') {
           _advance();
-          _emitToken(TokenType.text, '>');
+          // Don't emit the > as text - it's part of the component tag structure
         }
 
         _start = _position;
@@ -277,6 +284,35 @@ class BladeLexer {
           _start = _position;
         }
 
+        continue;
+      }
+
+      // Check for HTML closing tags </ (before opening tags)
+      if (ch == '<' && _peekNext() == '/' && _isAlpha(_peekAhead(2))) {
+        if (_position > _start) {
+          _emitToken(TokenType.text, input.substring(_start, _position));
+        }
+        return _LexerState.htmlTag;
+      }
+
+      // Check for invalid tag names (e.g., <123>)
+      if (ch == '<' && _isDigit(_peekNext())) {
+        if (_position > _start) {
+          _emitToken(TokenType.text, input.substring(_start, _position));
+        }
+        // Emit error and skip past the invalid tag
+        _start = _position;
+        _startLine = _line;
+        _startColumn = _column;
+        _advance(); // <
+        while (!_isAtEnd() && _peek() != '>') {
+          _advance();
+        }
+        if (_peek() == '>') {
+          _advance();
+        }
+        _emitToken(TokenType.error, 'Invalid tag name');
+        _start = _position;
         continue;
       }
 
@@ -405,7 +441,10 @@ class BladeLexer {
     final contentStart = _position;
 
     while (!_isAtEnd()) {
-      if (_peek() == '-' && _peekNext() == '-' && _peekAhead(2) == '}' && _peekAhead(3) == '}') {
+      if (_peek() == '-' &&
+          _peekNext() == '-' &&
+          _peekAhead(2) == '}' &&
+          _peekAhead(3) == '}') {
         final content = input.substring(contentStart, _position);
         _advance(); // -
         _advance(); // -
@@ -449,7 +488,8 @@ class BladeLexer {
         } else {
           // End of echo
           if (_position > exprStart) {
-            _emitToken(TokenType.expression, input.substring(exprStart, _position));
+            _emitToken(
+                TokenType.expression, input.substring(exprStart, _position));
           }
           _advance(); // }
           _advance(); // }
@@ -485,7 +525,8 @@ class BladeLexer {
     while (!_isAtEnd()) {
       if (_peek() == '!' && _peekNext() == '!' && _peekAhead(2) == '}') {
         if (_position > exprStart) {
-          _emitToken(TokenType.expression, input.substring(exprStart, _position));
+          _emitToken(
+              TokenType.expression, input.substring(exprStart, _position));
         }
         _advance(); // !
         _advance(); // !
@@ -520,7 +561,8 @@ class BladeLexer {
     while (!_isAtEnd()) {
       if (_peek() == '}' && _peekNext() == '}' && _peekAhead(2) == '}') {
         if (_position > exprStart) {
-          _emitToken(TokenType.expression, input.substring(exprStart, _position));
+          _emitToken(
+              TokenType.expression, input.substring(exprStart, _position));
         }
         _advance(); // }
         _advance(); // }
@@ -564,7 +606,10 @@ class BladeLexer {
     _emitToken(TokenType.componentTagOpen, '<x-$componentName');
 
     // Skip whitespace
-    while (_peek() == ' ' || _peek() == '\t' || _peek() == '\n' || _peek() == '\r') {
+    while (_peek() == ' ' ||
+        _peek() == '\t' ||
+        _peek() == '\n' ||
+        _peek() == '\r') {
       _advance();
     }
 
@@ -573,7 +618,10 @@ class BladeLexer {
       _lexAttribute();
 
       // Skip whitespace
-      while (_peek() == ' ' || _peek() == '\t' || _peek() == '\n' || _peek() == '\r') {
+      while (_peek() == ' ' ||
+          _peek() == '\t' ||
+          _peek() == '\n' ||
+          _peek() == '\r') {
         _advance();
       }
     }
@@ -589,7 +637,7 @@ class BladeLexer {
     // Regular closing >
     if (_peek() == '>') {
       _advance();
-      _emitToken(TokenType.text, '>');
+      // Don't emit the > as text - it's part of the component tag structure
       return _LexerState.text;
     }
 
@@ -598,12 +646,83 @@ class BladeLexer {
 
   /// Lex HTML tag <tag>
   _LexerState _lexHtmlTag() {
-    // Similar to component tag but for regular HTML
-    // This allows us to detect Alpine.js and Livewire attributes
-    _advance(); // <
+    // T028-T030: Full HTML tag lexing implementation
+    final tagStartPos = _position;
+    _advance(); // consume '<'
 
-    // For now, just return to text mode
-    // Full HTML parsing would be implemented here
+    // Check for closing tag: </
+    final isClosingTag = _peek() == '/';
+    if (isClosingTag) {
+      _emitToken(TokenType.htmlClosingTagStart, '</');
+      _advance(); // consume '/'
+    } else {
+      _emitToken(TokenType.htmlTagOpen, '<');
+    }
+
+    // Lex tag name
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
+    if (!_isAlpha(_peek())) {
+      // Invalid tag name (e.g., <123>)
+      // Emit error token and return to text
+      _emitToken(TokenType.error, 'Invalid tag name');
+      return _LexerState.text;
+    }
+
+    // Scan tag name: letters, digits, hyphens
+    while (_isAlphaNumeric(_peek()) || _peek() == '-') {
+      _advance();
+    }
+
+    final tagName = input.substring(_start, _position);
+    _emitToken(TokenType.htmlTagName, tagName);
+
+    // Skip whitespace before attributes or tag close
+    while (_peek() == ' ' ||
+        _peek() == '\t' ||
+        _peek() == '\n' ||
+        _peek() == '\r') {
+      _advance();
+    }
+
+    // Lex attributes (reuse existing _lexAttribute)
+    while (!_isAtEnd() && _peek() != '>' && _peek() != '/') {
+      _lexAttribute();
+
+      // Skip whitespace after attribute
+      while (_peek() == ' ' ||
+          _peek() == '\t' ||
+          _peek() == '\n' ||
+          _peek() == '\r') {
+        _advance();
+      }
+    }
+
+    // Check for self-closing: />
+    if (_peek() == '/' && _peekNext() == '>') {
+      _advance(); // consume '/'
+      _advance(); // consume '>'
+      _emitToken(TokenType.htmlSelfClose, '/>');
+      _start = _position;
+      return _LexerState.text;
+    }
+
+    // Regular close: >
+    if (_peek() == '>') {
+      _advance(); // consume '>'
+      if (isClosingTag) {
+        _emitToken(TokenType.htmlClosingTagEnd, '>');
+      } else {
+        _emitToken(TokenType.htmlTagClose, '>');
+      }
+      _start = _position;
+      return _LexerState.text;
+    }
+
+    // If we reach here, something went wrong
+    _emitToken(TokenType.error, 'Unexpected character in HTML tag');
     return _LexerState.text;
   }
 
@@ -612,7 +731,10 @@ class BladeLexer {
     final attrStart = _position;
 
     // Skip any unexpected characters (like dots in wire:loading.delay)
-    if (!_isAlphaNumeric(_peek()) && _peek() != '@' && _peek() != ':' && _peek() != '_') {
+    if (!_isAlphaNumeric(_peek()) &&
+        _peek() != '@' &&
+        _peek() != ':' &&
+        _peek() != '_') {
       _advance(); // Skip the unexpected character
       return;
     }
@@ -650,7 +772,10 @@ class BladeLexer {
 
     // Scan attribute name
     final nameStart = _position;
-    while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == ':' || _peek() == '.') {
+    while (_isAlphaNumeric(_peek()) ||
+        _peek() == '-' ||
+        _peek() == ':' ||
+        _peek() == '.') {
       _advance();
     }
 
@@ -738,9 +863,11 @@ class BladeLexer {
 
   String _peek() => _isAtEnd() ? '\x00' : input[_position];
 
-  String _peekNext() => _position + 1 >= input.length ? '\x00' : input[_position + 1];
+  String _peekNext() =>
+      _position + 1 >= input.length ? '\x00' : input[_position + 1];
 
-  String _peekAhead(int n) => _position + n >= input.length ? '\x00' : input[_position + n];
+  String _peekAhead(int n) =>
+      _position + n >= input.length ? '\x00' : input[_position + n];
 
   void _advance() {
     if (_isAtEnd()) return;
@@ -787,135 +914,256 @@ class BladeLexer {
   TokenType _directiveNameToType(String name) {
     switch (name) {
       // Control Flow
-      case 'if': return TokenType.directiveIf;
-      case 'elseif': return TokenType.directiveElseif;
-      case 'else': return TokenType.directiveElse;
-      case 'endif': return TokenType.directiveEndif;
-      case 'unless': return TokenType.directiveUnless;
-      case 'endunless': return TokenType.directiveEndunless;
-      case 'isset': return TokenType.directiveIsset;
-      case 'empty': return TokenType.directiveEmpty;
-      case 'switch': return TokenType.directiveSwitch;
-      case 'case': return TokenType.directiveCase;
-      case 'default': return TokenType.directiveDefault;
-      case 'endswitch': return TokenType.directiveEndswitch;
+      case 'if':
+        return TokenType.directiveIf;
+      case 'elseif':
+        return TokenType.directiveElseif;
+      case 'else':
+        return TokenType.directiveElse;
+      case 'endif':
+        return TokenType.directiveEndif;
+      case 'unless':
+        return TokenType.directiveUnless;
+      case 'endunless':
+        return TokenType.directiveEndunless;
+      case 'isset':
+        return TokenType.directiveIsset;
+      case 'endisset':
+        return TokenType.directiveEndisset;
+      case 'empty':
+        return TokenType.directiveEmpty;
+      case 'endempty':
+        return TokenType.directiveEndempty;
+      case 'switch':
+        return TokenType.directiveSwitch;
+      case 'case':
+        return TokenType.directiveCase;
+      case 'default':
+        return TokenType.directiveDefault;
+      case 'endswitch':
+        return TokenType.directiveEndswitch;
 
       // Loops
-      case 'for': return TokenType.directiveFor;
-      case 'endfor': return TokenType.directiveEndfor;
-      case 'foreach': return TokenType.directiveForeach;
-      case 'endforeach': return TokenType.directiveEndforeach;
-      case 'forelse': return TokenType.directiveForelse;
-      case 'endforelse': return TokenType.directiveEndforelse;
-      case 'while': return TokenType.directiveWhile;
-      case 'endwhile': return TokenType.directiveEndwhile;
-      case 'continue': return TokenType.directiveContinue;
-      case 'break': return TokenType.directiveBreak;
+      case 'for':
+        return TokenType.directiveFor;
+      case 'endfor':
+        return TokenType.directiveEndfor;
+      case 'foreach':
+        return TokenType.directiveForeach;
+      case 'endforeach':
+        return TokenType.directiveEndforeach;
+      case 'forelse':
+        return TokenType.directiveForelse;
+      case 'endforelse':
+        return TokenType.directiveEndforelse;
+      case 'while':
+        return TokenType.directiveWhile;
+      case 'endwhile':
+        return TokenType.directiveEndwhile;
+      case 'continue':
+        return TokenType.directiveContinue;
+      case 'break':
+        return TokenType.directiveBreak;
 
       // Template Inheritance
-      case 'extends': return TokenType.directiveExtends;
-      case 'section': return TokenType.directiveSection;
-      case 'endsection': return TokenType.directiveEndsection;
-      case 'yield': return TokenType.directiveYield;
-      case 'parent': return TokenType.directiveParent;
-      case 'show': return TokenType.directiveShow;
-      case 'overwrite': return TokenType.directiveOverwrite;
+      case 'extends':
+        return TokenType.directiveExtends;
+      case 'section':
+        return TokenType.directiveSection;
+      case 'endsection':
+        return TokenType.directiveEndsection;
+      case 'yield':
+        return TokenType.directiveYield;
+      case 'parent':
+        return TokenType.directiveParent;
+      case 'show':
+        return TokenType.directiveShow;
+      case 'overwrite':
+        return TokenType.directiveOverwrite;
 
       // Stacks
-      case 'push': return TokenType.directivePush;
-      case 'endpush': return TokenType.directiveEndpush;
-      case 'prepend': return TokenType.directivePrepend;
-      case 'endprepend': return TokenType.directiveEndprepend;
-      case 'stack': return TokenType.directiveStack;
-      case 'pushOnce': return TokenType.directivePushOnce;
-      case 'endPushOnce': return TokenType.directiveEndPushOnce;
-      case 'pushIf': return TokenType.directivePushIf;
-      case 'prependOnce': return TokenType.directivePrependOnce;
-      case 'endPrependOnce': return TokenType.directiveEndPrependOnce;
+      case 'push':
+        return TokenType.directivePush;
+      case 'endpush':
+        return TokenType.directiveEndpush;
+      case 'prepend':
+        return TokenType.directivePrepend;
+      case 'endprepend':
+        return TokenType.directiveEndprepend;
+      case 'stack':
+        return TokenType.directiveStack;
+      case 'pushOnce':
+        return TokenType.directivePushOnce;
+      case 'endPushOnce':
+        return TokenType.directiveEndPushOnce;
+      case 'pushIf':
+        return TokenType.directivePushIf;
+      case 'prependOnce':
+        return TokenType.directivePrependOnce;
+      case 'endPrependOnce':
+        return TokenType.directiveEndPrependOnce;
 
       // Components
-      case 'component': return TokenType.directiveComponent;
-      case 'endcomponent': return TokenType.directiveEndcomponent;
-      case 'slot': return TokenType.directiveSlot;
-      case 'endslot': return TokenType.directiveEndslot;
-      case 'props': return TokenType.directiveProps;
-      case 'aware': return TokenType.directiveAware;
+      case 'component':
+        return TokenType.directiveComponent;
+      case 'endcomponent':
+        return TokenType.directiveEndcomponent;
+      case 'slot':
+        return TokenType.directiveSlot;
+      case 'endslot':
+        return TokenType.directiveEndslot;
+      case 'props':
+        return TokenType.directiveProps;
+      case 'aware':
+        return TokenType.directiveAware;
 
       // Includes
-      case 'include': return TokenType.directiveInclude;
-      case 'includeIf': return TokenType.directiveIncludeIf;
-      case 'includeWhen': return TokenType.directiveIncludeWhen;
-      case 'includeUnless': return TokenType.directiveIncludeUnless;
-      case 'includeFirst': return TokenType.directiveIncludeFirst;
-      case 'each': return TokenType.directiveEach;
+      case 'include':
+        return TokenType.directiveInclude;
+      case 'includeIf':
+        return TokenType.directiveIncludeIf;
+      case 'includeWhen':
+        return TokenType.directiveIncludeWhen;
+      case 'includeUnless':
+        return TokenType.directiveIncludeUnless;
+      case 'includeFirst':
+        return TokenType.directiveIncludeFirst;
+      case 'each':
+        return TokenType.directiveEach;
 
       // Special
-      case 'once': return TokenType.directiveOnce;
-      case 'endonce': return TokenType.directiveEndonce;
-      case 'php': return TokenType.directivePhp;
-      case 'endphp': return TokenType.directiveEndphp;
-      case 'verbatim': return TokenType.directiveVerbatim;
-      case 'endverbatim': return TokenType.directiveEndverbatim;
+      case 'once':
+        return TokenType.directiveOnce;
+      case 'endonce':
+        return TokenType.directiveEndonce;
+      case 'php':
+        return TokenType.directivePhp;
+      case 'endphp':
+        return TokenType.directiveEndphp;
+      case 'verbatim':
+        return TokenType.directiveVerbatim;
+      case 'endverbatim':
+        return TokenType.directiveEndverbatim;
 
       // Authentication & Authorization
-      case 'auth': return TokenType.directiveAuth;
-      case 'endauth': return TokenType.directiveEndauth;
-      case 'guest': return TokenType.directiveGuest;
-      case 'endguest': return TokenType.directiveEndguest;
-      case 'can': return TokenType.directiveCan;
-      case 'endcan': return TokenType.directiveEndcan;
-      case 'cannot': return TokenType.directiveCannot;
-      case 'endcannot': return TokenType.directiveEndcannot;
-      case 'canany': return TokenType.directiveCanany;
-      case 'endcanany': return TokenType.directiveEndcanany;
+      case 'auth':
+        return TokenType.directiveAuth;
+      case 'endauth':
+        return TokenType.directiveEndauth;
+      case 'guest':
+        return TokenType.directiveGuest;
+      case 'endguest':
+        return TokenType.directiveEndguest;
+      case 'can':
+        return TokenType.directiveCan;
+      case 'endcan':
+        return TokenType.directiveEndcan;
+      case 'cannot':
+        return TokenType.directiveCannot;
+      case 'endcannot':
+        return TokenType.directiveEndcannot;
+      case 'canany':
+        return TokenType.directiveCanany;
+      case 'endcanany':
+        return TokenType.directiveEndcanany;
 
       // Environment
-      case 'env': return TokenType.directiveEnv;
-      case 'endenv': return TokenType.directiveEndenv;
-      case 'production': return TokenType.directiveProduction;
-      case 'endproduction': return TokenType.directiveEndproduction;
-      case 'session': return TokenType.directiveSession;
-      case 'endsession': return TokenType.directiveEndsession;
+      case 'env':
+        return TokenType.directiveEnv;
+      case 'endenv':
+        return TokenType.directiveEndenv;
+      case 'production':
+        return TokenType.directiveProduction;
+      case 'endproduction':
+        return TokenType.directiveEndproduction;
+      case 'session':
+        return TokenType.directiveSession;
+      case 'endsession':
+        return TokenType.directiveEndsession;
 
       // Debugging
-      case 'dd': return TokenType.directiveDd;
-      case 'dump': return TokenType.directiveDump;
+      case 'dd':
+        return TokenType.directiveDd;
+      case 'dump':
+        return TokenType.directiveDump;
 
       // Validation
-      case 'error': return TokenType.directiveError;
-      case 'enderror': return TokenType.directiveEnderror;
+      case 'error':
+        return TokenType.directiveError;
+      case 'enderror':
+        return TokenType.directiveEnderror;
 
       // Section Conditionals
-      case 'hasSection': return TokenType.directiveHasSection;
-      case 'sectionMissing': return TokenType.directiveSectionMissing;
+      case 'hasSection':
+        return TokenType.directiveHasSection;
+      case 'sectionMissing':
+        return TokenType.directiveSectionMissing;
 
       // HTML Attributes
-      case 'class': return TokenType.directiveClass;
-      case 'style': return TokenType.directiveStyle;
-      case 'checked': return TokenType.directiveChecked;
-      case 'selected': return TokenType.directiveSelected;
-      case 'disabled': return TokenType.directiveDisabled;
-      case 'readonly': return TokenType.directiveReadonly;
-      case 'required': return TokenType.directiveRequired;
+      case 'class':
+        return TokenType.directiveClass;
+      case 'style':
+        return TokenType.directiveStyle;
+      case 'checked':
+        return TokenType.directiveChecked;
+      case 'selected':
+        return TokenType.directiveSelected;
+      case 'disabled':
+        return TokenType.directiveDisabled;
+      case 'readonly':
+        return TokenType.directiveReadonly;
+      case 'required':
+        return TokenType.directiveRequired;
 
       // Assets & Data
-      case 'json': return TokenType.directiveJson;
-      case 'method': return TokenType.directiveMethod;
-      case 'csrf': return TokenType.directiveCsrf;
-      case 'vite': return TokenType.directiveVite;
+      case 'json':
+        return TokenType.directiveJson;
+      case 'method':
+        return TokenType.directiveMethod;
+      case 'csrf':
+        return TokenType.directiveCsrf;
+      case 'vite':
+        return TokenType.directiveVite;
 
       // Service Injection
-      case 'inject': return TokenType.directiveInject;
+      case 'inject':
+        return TokenType.directiveInject;
 
       // Modern Features
-      case 'fragment': return TokenType.directiveFragment;
-      case 'endfragment': return TokenType.directiveEndfragment;
-      case 'use': return TokenType.directiveUse;
+      case 'fragment':
+        return TokenType.directiveFragment;
+      case 'endfragment':
+        return TokenType.directiveEndfragment;
+      case 'use':
+        return TokenType.directiveUse;
 
       // Livewire Directives
-      case 'entangle': return TokenType.directiveEntangle;
-      case 'this': return TokenType.directiveThis;
-      case 'js': return TokenType.directiveJs;
+      case 'entangle':
+        return TokenType.directiveEntangle;
+      case 'this':
+        return TokenType.directiveThis;
+      case 'js':
+        return TokenType.directiveJs;
+      case 'livewireStyles':
+        return TokenType.directiveLivewireStyles;
+      case 'livewireScripts':
+        return TokenType.directiveLivewireScripts;
+      case 'livewireScriptConfig':
+        return TokenType.directiveLivewireScriptConfig;
+      case 'script':
+        return TokenType.directiveScript;
+      case 'endscript':
+        return TokenType.directiveEndscript;
+      case 'assets':
+        return TokenType.directiveAssets;
+      case 'endassets':
+        return TokenType.directiveEndassets;
+
+      // Filament Directives
+      case 'filamentStyles':
+        return TokenType.directiveFilamentStyles;
+      case 'filamentScripts':
+        return TokenType.directiveFilamentScripts;
 
       default:
         return TokenType.identifier;
@@ -925,22 +1173,38 @@ class BladeLexer {
   /// Map Alpine.js directive to token type
   TokenType _alpineDirectiveToTokenType(String directive) {
     switch (directive) {
-      case 'data': return TokenType.alpineData;
-      case 'init': return TokenType.alpineInit;
-      case 'show': return TokenType.alpineShow;
-      case 'if': return TokenType.alpineIf;
-      case 'for': return TokenType.alpineFor;
-      case 'model': return TokenType.alpineModel;
-      case 'text': return TokenType.alpineText;
-      case 'html': return TokenType.alpineHtml;
-      case 'bind': return TokenType.alpineBind;
-      case 'on': return TokenType.alpineOn;
-      case 'transition': return TokenType.alpineTransition;
-      case 'cloak': return TokenType.alpineCloak;
-      case 'ignore': return TokenType.alpineIgnore;
-      case 'ref': return TokenType.alpineRef;
-      case 'teleport': return TokenType.alpineTeleport;
-      default: return TokenType.identifier;
+      case 'data':
+        return TokenType.alpineData;
+      case 'init':
+        return TokenType.alpineInit;
+      case 'show':
+        return TokenType.alpineShow;
+      case 'if':
+        return TokenType.alpineIf;
+      case 'for':
+        return TokenType.alpineFor;
+      case 'model':
+        return TokenType.alpineModel;
+      case 'text':
+        return TokenType.alpineText;
+      case 'html':
+        return TokenType.alpineHtml;
+      case 'bind':
+        return TokenType.alpineBind;
+      case 'on':
+        return TokenType.alpineOn;
+      case 'transition':
+        return TokenType.alpineTransition;
+      case 'cloak':
+        return TokenType.alpineCloak;
+      case 'ignore':
+        return TokenType.alpineIgnore;
+      case 'ref':
+        return TokenType.alpineRef;
+      case 'teleport':
+        return TokenType.alpineTeleport;
+      default:
+        return TokenType.identifier;
     }
   }
 
@@ -950,26 +1214,46 @@ class BladeLexer {
     final baseName = action.split('.').first;
 
     switch (baseName) {
-      case 'click': return TokenType.livewireClick;
-      case 'submit': return TokenType.livewireSubmit;
-      case 'keydown': return TokenType.livewireKeydown;
-      case 'keyup': return TokenType.livewireKeyup;
-      case 'mouseenter': return TokenType.livewireMouseenter;
-      case 'mouseleave': return TokenType.livewireMouseleave;
-      case 'model': return TokenType.livewireModel;
-      case 'loading': return TokenType.livewireLoading;
-      case 'target': return TokenType.livewireTarget;
-      case 'poll': return TokenType.livewirePoll;
-      case 'ignore': return TokenType.livewireIgnore;
-      case 'key': return TokenType.livewireKey;
-      case 'id': return TokenType.livewireId;
-      case 'init': return TokenType.livewireInit;
-      case 'dirty': return TokenType.livewireDirty;
-      case 'offline': return TokenType.livewireOffline;
-      case 'navigate': return TokenType.livewireNavigate;
-      case 'transition': return TokenType.livewireTransition;
-      case 'stream': return TokenType.livewireStream;
-      default: return TokenType.identifier;
+      case 'click':
+        return TokenType.livewireClick;
+      case 'submit':
+        return TokenType.livewireSubmit;
+      case 'keydown':
+        return TokenType.livewireKeydown;
+      case 'keyup':
+        return TokenType.livewireKeyup;
+      case 'mouseenter':
+        return TokenType.livewireMouseenter;
+      case 'mouseleave':
+        return TokenType.livewireMouseleave;
+      case 'model':
+        return TokenType.livewireModel;
+      case 'loading':
+        return TokenType.livewireLoading;
+      case 'target':
+        return TokenType.livewireTarget;
+      case 'poll':
+        return TokenType.livewirePoll;
+      case 'ignore':
+        return TokenType.livewireIgnore;
+      case 'key':
+        return TokenType.livewireKey;
+      case 'id':
+        return TokenType.livewireId;
+      case 'init':
+        return TokenType.livewireInit;
+      case 'dirty':
+        return TokenType.livewireDirty;
+      case 'offline':
+        return TokenType.livewireOffline;
+      case 'navigate':
+        return TokenType.livewireNavigate;
+      case 'transition':
+        return TokenType.livewireTransition;
+      case 'stream':
+        return TokenType.livewireStream;
+      default:
+        return TokenType.identifier;
     }
   }
 }

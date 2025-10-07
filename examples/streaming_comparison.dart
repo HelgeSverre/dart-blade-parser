@@ -10,7 +10,8 @@ void main() async {
   // Create a template with multiple top-level nodes
   final template = generateLargeTemplate(100);
 
-  print('Template: ${template.split('\n').length} lines, ${template.length} characters\n');
+  print(
+      'Template: ${template.split('\n').length} lines, ${template.length} characters\n');
   print('═' * 60);
 
   // REGULAR PARSING
@@ -42,10 +43,12 @@ void main() async {
   final streamingParser = StreamingParser();
 
   // Start listening before adding chunks
-  final streamFuture = streamingParser.parseStreaming(controller.stream).forEach((node) {
+  final streamFuture =
+      streamingParser.parseStreaming(controller.stream).forEach((node) {
     streamedNodeCount++;
     final timestamp = DateTime.now().difference(streamingStart).inMilliseconds;
-    emittedNodes.add('  [$timestamp ms] Node #$streamedNodeCount: ${_nodeType(node)}');
+    emittedNodes
+        .add('  [$timestamp ms] Node #$streamedNodeCount: ${_nodeType(node)}');
   });
 
   // Simulate streaming chunks
@@ -79,7 +82,8 @@ void main() async {
   print('═' * 60);
   print('│ Metric              │ Regular  │ Streaming            │');
   print('├─────────────────────┼──────────┼──────────────────────┤');
-  print('│ Parse Time          │ ${regularTime.toString().padRight(8)} │ ${streamingTime.toString().padRight(20)} │');
+  print(
+      '│ Parse Time          │ ${regularTime.toString().padRight(8)} │ ${streamingTime.toString().padRight(20)} │');
   print('│ Memory Usage        │ O(n)     │ O(buffered)          │');
   print('│ First Node Ready    │ ${regularTime}ms    │ ~0ms (immediate)     │');
   print('│ Processing Model    │ Batch    │ Incremental          │');
