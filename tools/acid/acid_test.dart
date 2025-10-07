@@ -34,8 +34,8 @@ void main(List<String> args) async {
 
   // Determine fixtures path
   final scriptPath = Platform.script.toFilePath();
-  final testDir = Directory(scriptPath).parent.parent.path;
-  final fixturesPath = '$testDir/fixtures';
+  final projectRoot = Directory(scriptPath).parent.parent.parent.path;
+  final fixturesPath = '$projectRoot/test/fixtures';
 
   if (!Directory(fixturesPath).existsSync()) {
     print('Error: Fixtures directory not found at $fixturesPath');
@@ -65,10 +65,10 @@ void main(List<String> args) async {
   if (format == 'html' || format == 'both') {
     // Determine output path
     final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-').split('.')[0];
-    outputPath ??= '$testDir/acid/reports/acid_test_report_$timestamp.html';
+    outputPath ??= '$projectRoot/tools/acid/reports/acid_test_report_$timestamp.html';
 
     // Ensure reports directory exists
-    final reportsDir = Directory('$testDir/acid/reports');
+    final reportsDir = Directory('$projectRoot/tools/acid/reports');
     if (!reportsDir.existsSync()) {
       reportsDir.createSync(recursive: true);
     }

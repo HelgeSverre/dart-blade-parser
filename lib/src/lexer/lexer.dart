@@ -200,6 +200,44 @@ class BladeLexer {
         return _LexerState.componentTag;
       }
 
+      // Check for HTML comment <!-- ... -->
+      if (ch == '<' && _peekNext() == '!' && _peekAhead(2) == '-' && _peekAhead(3) == '-') {
+        if (_position > _start) {
+          _emitToken(TokenType.text, input.substring(_start, _position));
+        }
+        // Scan HTML comment
+        _advance(); // <
+        _advance(); // !
+        _advance(); // -
+        _advance(); // -
+
+        final commentStart = _position;
+        bool foundClosing = false;
+        // Scan until -->
+        while (!_isAtEnd()) {
+          if (_peek() == '-' && _peekNext() == '-' && _peekAhead(2) == '>') {
+            final commentContent = input.substring(commentStart, _position);
+            _emitToken(TokenType.htmlComment, commentContent);
+            _advance(); // -
+            _advance(); // -
+            _advance(); // >
+            _start = _position;
+            foundClosing = true;
+            break;
+          }
+          _advance();
+        }
+
+        // If we hit end without closing -->, emit what we have
+        if (!foundClosing && _position > commentStart) {
+          final commentContent = input.substring(commentStart, _position);
+          _emitToken(TokenType.htmlComment, commentContent);
+          _start = _position;
+        }
+
+        continue;
+      }
+
       // Check for regular HTML tags (to parse attributes with Alpine.js/Livewire)
       if (ch == '<' && _isAlpha(_peekNext())) {
         if (_position > _start) {

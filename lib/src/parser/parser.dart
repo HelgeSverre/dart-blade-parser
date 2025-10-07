@@ -128,8 +128,21 @@ class BladeParser {
       case TokenType.text:
         return _parseText();
       case TokenType.bladeComment:
-        _advance(); // Skip comments
-        return null;
+        final token = _advance();
+        return CommentNode(
+          startPosition: token.startPosition,
+          endPosition: token.endPosition,
+          content: token.value,
+          isBladeComment: true,
+        );
+      case TokenType.htmlComment:
+        final token = _advance();
+        return CommentNode(
+          startPosition: token.startPosition,
+          endPosition: token.endPosition,
+          content: token.value,
+          isBladeComment: false,
+        );
       case TokenType.eof:
         _advance(); // Advance past EOF to terminate loop
         return null;
