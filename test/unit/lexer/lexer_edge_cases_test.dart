@@ -11,7 +11,8 @@ void main() {
 
       // Email should be treated as text, not a directive
       expect(tokens.any((t) => t.value.contains('user@example.com')), isTrue);
-      expect(tokens.any((t) => t.type.toString().contains('directive')), isFalse);
+      expect(
+          tokens.any((t) => t.type.toString().contains('directive')), isFalse);
     });
 
     test('@verbatim with {{ }} inside', () {
@@ -19,18 +20,18 @@ void main() {
       final tokens = lexer.tokenize();
 
       // Find verbatim directive
-      final verbatimTokens = tokens.where((t) =>
-        t.type == TokenType.directiveVerbatim ||
-        t.type == TokenType.directiveEndverbatim
-      ).toList();
+      final verbatimTokens = tokens
+          .where((t) =>
+              t.type == TokenType.directiveVerbatim ||
+              t.type == TokenType.directiveEndverbatim)
+          .toList();
 
-      expect(verbatimTokens.length, greaterThanOrEqualTo(2)); // @verbatim and @endverbatim
+      expect(verbatimTokens.length,
+          greaterThanOrEqualTo(2)); // @verbatim and @endverbatim
 
       // Content inside verbatim should be text, not echo tokens
-      final hasEchoToken = tokens.any((t) =>
-        t.type == TokenType.echoOpen ||
-        t.type == TokenType.echoClose
-      );
+      final hasEchoToken = tokens.any(
+          (t) => t.type == TokenType.echoOpen || t.type == TokenType.echoClose);
       expect(hasEchoToken, isFalse);
     });
 
@@ -38,7 +39,8 @@ void main() {
       lexer = BladeLexer('{{-- This is a comment --}}');
       final tokens = lexer.tokenize();
 
-      final commentTokens = tokens.where((t) => t.type == TokenType.bladeComment).toList();
+      final commentTokens =
+          tokens.where((t) => t.type == TokenType.bladeComment).toList();
       expect(commentTokens.length, equals(1));
       expect(commentTokens.first.value, contains('This is a comment'));
     });
@@ -61,7 +63,8 @@ void main() {
       lexer = BladeLexer("{{ 'Héllo Wörld 你好' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('Héllo'));
       expect(expressionTokens.first.value, contains('你好'));
@@ -79,11 +82,13 @@ void main() {
 
       // Should produce same token types
       expect(tokensLF.map((t) => t.type).toList(),
-             equals(tokensCRLF.map((t) => t.type).toList()));
+          equals(tokensCRLF.map((t) => t.type).toList()));
 
       // Line numbers should be correct
-      final endifLF = tokensLF.firstWhere((t) => t.type == TokenType.directiveEndif);
-      final endifCRLF = tokensCRLF.firstWhere((t) => t.type == TokenType.directiveEndif);
+      final endifLF =
+          tokensLF.firstWhere((t) => t.type == TokenType.directiveEndif);
+      final endifCRLF =
+          tokensCRLF.firstWhere((t) => t.type == TokenType.directiveEndif);
 
       expect(endifLF.startLine, equals(endifCRLF.startLine));
     });
@@ -92,7 +97,8 @@ void main() {
       lexer = BladeLexer("{{ \$x ? 'or' : 'other' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains("'or'"));
     });
@@ -108,14 +114,16 @@ void main() {
 
     test('Nested directives (20 levels)', () {
       final nested = List.generate(20, (i) => '@if(\$x$i)').join('\n') +
-                     '\n<p>Deep</p>\n' +
-                     List.generate(20, (_) => '@endif').join('\n');
+          '\n<p>Deep</p>\n' +
+          List.generate(20, (_) => '@endif').join('\n');
 
       lexer = BladeLexer(nested);
       final tokens = lexer.tokenize();
 
-      final ifTokens = tokens.where((t) => t.type == TokenType.directiveIf).toList();
-      final endifTokens = tokens.where((t) => t.type == TokenType.directiveEndif).toList();
+      final ifTokens =
+          tokens.where((t) => t.type == TokenType.directiveIf).toList();
+      final endifTokens =
+          tokens.where((t) => t.type == TokenType.directiveEndif).toList();
 
       expect(ifTokens.length, equals(20));
       expect(endifTokens.length, equals(20));
@@ -142,10 +150,12 @@ void main() {
       lexer = BladeLexer('@continue(\$user->type == 1)');
       final tokens = lexer.tokenize();
 
-      final continueTokens = tokens.where((t) => t.type == TokenType.directiveContinue).toList();
+      final continueTokens =
+          tokens.where((t) => t.type == TokenType.directiveContinue).toList();
       expect(continueTokens.length, equals(1));
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('->type'));
     });

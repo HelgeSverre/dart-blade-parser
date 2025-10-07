@@ -10,7 +10,8 @@ void main() {
     });
 
     test('Parse @if directive with expression', () {
-      final result = parser.parse('@if(\$user->isAdmin())\n  <p>Admin</p>\n@endif');
+      final result =
+          parser.parse('@if(\$user->isAdmin())\n  <p>Admin</p>\n@endif');
 
       expect(result.isSuccess, isTrue);
       expect(result.errors, isEmpty);
@@ -30,14 +31,16 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final ifNode = result.ast!.children.whereType<DirectiveNode>()
-        .firstWhere((n) => n.name == 'if');
+      final ifNode = result.ast!.children
+          .whereType<DirectiveNode>()
+          .firstWhere((n) => n.name == 'if');
       expect(ifNode.name, equals('if'));
       expect(ifNode.children.length, greaterThan(0));
     });
 
     test('Parse @foreach directive', () {
-      final result = parser.parse('@foreach(\$items as \$item)\n  {{ \$item }}\n@endforeach');
+      final result = parser
+          .parse('@foreach(\$items as \$item)\n  {{ \$item }}\n@endforeach');
 
       expect(result.isSuccess, isTrue);
 
@@ -47,7 +50,8 @@ void main() {
     });
 
     test('Parse @for directive', () {
-      final result = parser.parse('@for(\$i = 0; \$i < 10; \$i++)\n  {{ \$i }}\n@endfor');
+      final result =
+          parser.parse('@for(\$i = 0; \$i < 10; \$i++)\n  {{ \$i }}\n@endfor');
 
       expect(result.isSuccess, isTrue);
 
@@ -57,7 +61,8 @@ void main() {
     });
 
     test('Parse @while directive', () {
-      final result = parser.parse('@while(\$condition)\n  <p>Loop</p>\n@endwhile');
+      final result =
+          parser.parse('@while(\$condition)\n  <p>Loop</p>\n@endwhile');
 
       expect(result.isSuccess, isTrue);
 
@@ -80,18 +85,21 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       // Find outer if (might not be first due to whitespace)
-      final outerIf = result.ast!.children.whereType<DirectiveNode>()
-        .firstWhere((n) => n.name == 'if');
+      final outerIf = result.ast!.children
+          .whereType<DirectiveNode>()
+          .firstWhere((n) => n.name == 'if');
       expect(outerIf.name, equals('if'));
 
       // Find nested foreach
-      final nestedForeach = outerIf.children.whereType<DirectiveNode>()
-        .firstWhere((n) => n.name == 'foreach');
+      final nestedForeach = outerIf.children
+          .whereType<DirectiveNode>()
+          .firstWhere((n) => n.name == 'foreach');
       expect(nestedForeach, isNotNull);
 
       // Find innermost if
-      final innerIf = nestedForeach.children.whereType<DirectiveNode>()
-        .firstWhere((n) => n.name == 'if');
+      final innerIf = nestedForeach.children
+          .whereType<DirectiveNode>()
+          .firstWhere((n) => n.name == 'if');
       expect(innerIf, isNotNull);
     });
 
@@ -105,7 +113,8 @@ void main() {
     });
 
     test('Detect unclosed @foreach directive', () {
-      final result = parser.parse('@foreach(\$items as \$item)\n  {{ \$item }}');
+      final result =
+          parser.parse('@foreach(\$items as \$item)\n  {{ \$item }}');
 
       expect(result.isSuccess, isFalse);
       expect(result.errors, isNotEmpty);

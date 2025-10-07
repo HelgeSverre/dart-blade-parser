@@ -9,13 +9,13 @@ void main() {
       // Tokenize just the expression content
       final lexer = BladeLexer('@if($input)');
       final tokens = lexer.tokenize();
-      
+
       // Find the expression token
       final exprToken = tokens.firstWhere(
         (t) => t.type == TokenType.expression,
         orElse: () => throw Exception('No expression token found'),
       );
-      
+
       // Parse the expression
       final parser = ExpressionParser([exprToken]);
       return parser.parse();
@@ -74,7 +74,8 @@ void main() {
     });
 
     test('Parse complex nested expression', () {
-      final result = parseExpression('\$user->posts()->where("status", "published")->count() > 0');
+      final result = parseExpression(
+          '\$user->posts()->where("status", "published")->count() > 0');
       expect(result, isNotEmpty);
       expect(result, contains('->'));
     });
@@ -100,7 +101,8 @@ void main() {
     });
 
     test('Parse complex boolean expression', () {
-      final result = parseExpression('(\$age >= 18 && \$verified) || \$isAdmin');
+      final result =
+          parseExpression('(\$age >= 18 && \$verified) || \$isAdmin');
       expect(result, isNotEmpty);
       expect(result, contains('&&'));
       expect(result, contains('||'));

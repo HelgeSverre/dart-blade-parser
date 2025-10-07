@@ -84,14 +84,16 @@ void main() {
       // If flat time is 0, parser is too fast to measure - that's good!
       if (flatTime == 0) {
         print('Parser is too fast to measure degradation (both < 1ms) - PASS');
-        expect(nestedTime, lessThan(10), reason: 'Even nested should be very fast');
+        expect(nestedTime, lessThan(10),
+            reason: 'Even nested should be very fast');
       } else {
         final slowdown = (nestedTime - flatTime) / flatTime;
         print('Slowdown: ${(slowdown * 100).toStringAsFixed(1)}%');
 
         // FR-030: Should be <10% slowdown
         expect(slowdown, lessThan(0.10),
-          reason: 'Nested parsing should not degrade by more than 10%. Actual: ${(slowdown * 100).toStringAsFixed(1)}%');
+            reason:
+                'Nested parsing should not degrade by more than 10%. Actual: ${(slowdown * 100).toStringAsFixed(1)}%');
       }
     });
 
@@ -132,7 +134,8 @@ void main() {
       stopwatch.stop();
 
       expect(result.isSuccess, isTrue);
-      print('Mixed nesting (20 levels with content): ${stopwatch.elapsedMilliseconds}ms');
+      print(
+          'Mixed nesting (20 levels with content): ${stopwatch.elapsedMilliseconds}ms');
 
       // Verify the template was parsed successfully
       // Note: Full HTML nesting validation requires T059 (HTML element parsing)
@@ -146,11 +149,12 @@ void main() {
           findDirectives(child);
         }
       }
+
       findDirectives(result.ast!);
 
       // Should have found the @if directives (20 of them)
       expect(directives.length, greaterThanOrEqualTo(1),
-        reason: 'Should have parsed @if directives');
+          reason: 'Should have parsed @if directives');
     });
   });
 }
