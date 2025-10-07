@@ -139,13 +139,20 @@ enum TokenType {
   legacyEchoOpen, // {{{
   legacyEchoClose, // }}}
   bladeEscape, // @{{
-
   // Components
   componentTagOpen, // <x-
   componentTagClose, // </x-
   componentSelfClose, // />
   componentSlotOpen, // <x-slot:
   componentSlotClose, // </x-slot>
+
+  // HTML Elements
+  htmlTagOpen, // < (for HTML elements, not components)
+  htmlTagName, // Tag name after <
+  htmlTagClose, // >
+  htmlSelfClose, // />
+  htmlClosingTagStart, // </
+  htmlClosingTagEnd, // > (after closing tag name)
 
   // Alpine.js Attributes
   alpineData,

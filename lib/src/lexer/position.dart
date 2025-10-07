@@ -31,7 +31,8 @@ class Position {
   int get hashCode => Object.hash(line, column, offset);
 
   @override
-  String toString() => 'Position(line: $line, column: $column, offset: $offset)';
+  String toString() =>
+      'Position(line: $line, column: $column, offset: $offset)';
 
   Map<String, dynamic> toJson() => {
         'line': line,

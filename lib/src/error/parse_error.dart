@@ -25,7 +25,8 @@ class ParseError {
   @override
   String toString() {
     final buffer = StringBuffer();
-    buffer.write('[$severity] $message at line ${position.line}, column ${position.column}');
+    buffer.write(
+        '[$severity] $message at line ${position.line}, column ${position.column}');
     if (hint != null) {
       buffer.write('\nHint: $hint');
     }
