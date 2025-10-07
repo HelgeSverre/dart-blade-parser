@@ -104,6 +104,10 @@ class BladeParser {
         return _parseForDirective();
       case TokenType.directiveWhile:
         return _parseWhileDirective();
+      case TokenType.directiveSwitch:
+        return _parseSwitchDirective();
+      case TokenType.directiveForelse:
+        return _parseForelseDirective();
 
       // Authentication directives
       case TokenType.directiveAuth:
@@ -131,12 +135,86 @@ class BladeParser {
         return _parseGenericDirective(
             'component', TokenType.directiveEndcomponent);
 
+      // Control flow - paired directives
+      case TokenType.directiveUnless:
+        return _parseGenericDirective('unless', TokenType.directiveEndunless);
+      case TokenType.directiveIsset:
+        return _parseGenericDirective('isset', TokenType.directiveEndisset);
+      case TokenType.directiveEmpty:
+        return _parseGenericDirective('empty', TokenType.directiveEndempty);
+
+      // Authorization - paired directives
+      case TokenType.directiveCan:
+        return _parseGenericDirective('can', TokenType.directiveEndcan);
+      case TokenType.directiveCannot:
+        return _parseGenericDirective('cannot', TokenType.directiveEndcannot);
+      case TokenType.directiveCanany:
+        return _parseGenericDirective('canany', TokenType.directiveEndcanany);
+
+      // Template features - paired directives
+      case TokenType.directiveOnce:
+        return _parseGenericDirective('once', TokenType.directiveEndonce);
+      case TokenType.directivePhp:
+        return _parseGenericDirective('php', TokenType.directiveEndphp);
+      case TokenType.directiveVerbatim:
+        return _parseGenericDirective('verbatim', TokenType.directiveEndverbatim);
+      case TokenType.directivePush:
+        return _parseGenericDirective('push', TokenType.directiveEndpush);
+      case TokenType.directivePrepend:
+        return _parseGenericDirective('prepend', TokenType.directiveEndprepend);
+      case TokenType.directiveFragment:
+        return _parseGenericDirective('fragment', TokenType.directiveEndfragment);
+      case TokenType.directiveSession:
+        return _parseGenericDirective('session', TokenType.directiveEndsession);
+
+      // Livewire - paired directives
+      case TokenType.directiveScript:
+        return _parseGenericDirective('script', TokenType.directiveEndscript);
+      case TokenType.directiveAssets:
+        return _parseGenericDirective('assets', TokenType.directiveEndassets);
+
       // Other directives (inline, no closing tag)
       case TokenType.directiveExtends:
       case TokenType.directiveYield:
       case TokenType.directiveInclude:
+      case TokenType.directiveIncludeIf:
+      case TokenType.directiveIncludeWhen:
+      case TokenType.directiveIncludeUnless:
+      case TokenType.directiveIncludeFirst:
+      case TokenType.directiveEach:
       case TokenType.directiveContinue:
       case TokenType.directiveBreak:
+      case TokenType.directiveCsrf:
+      case TokenType.directiveMethod:
+      case TokenType.directiveVite:
+      case TokenType.directiveJson:
+      case TokenType.directiveDd:
+      case TokenType.directiveDump:
+      case TokenType.directiveParent:
+      case TokenType.directiveShow:
+      case TokenType.directiveOverwrite:
+      case TokenType.directiveStack:
+      case TokenType.directiveHasSection:
+      case TokenType.directiveSectionMissing:
+      case TokenType.directiveClass:
+      case TokenType.directiveStyle:
+      case TokenType.directiveChecked:
+      case TokenType.directiveSelected:
+      case TokenType.directiveDisabled:
+      case TokenType.directiveReadonly:
+      case TokenType.directiveRequired:
+      case TokenType.directiveInject:
+      case TokenType.directiveUse:
+      case TokenType.directiveEntangle:
+      case TokenType.directiveThis:
+      case TokenType.directiveJs:
+      case TokenType.directiveProps:
+      case TokenType.directiveAware:
+      case TokenType.directiveLivewireStyles:
+      case TokenType.directiveLivewireScripts:
+      case TokenType.directiveLivewireScriptConfig:
+      case TokenType.directiveFilamentStyles:
+      case TokenType.directiveFilamentScripts:
         return _parseInlineDirective();
 
       // Echo statements
@@ -169,8 +247,13 @@ class BladeParser {
       case TokenType.text:
         return _parseText();
       case TokenType.bladeComment:
-        _advance(); // Skip comments
-        return null;
+        final token = _advance();
+        return CommentNode(
+          startPosition: token.startPosition,
+          endPosition: token.endPosition,
+          content: token.value,
+          isBladeComment: true,
+        );
       case TokenType.eof:
         _advance(); // Advance past EOF to terminate loop
         return null;
@@ -346,6 +429,130 @@ class BladeParser {
       name: 'while',
       expression: expression,
       children: children,
+    );
+  }
+
+  /// Parse @switch/@case/@default/@endswitch directive
+  DirectiveNode _parseSwitchDirective() {
+    final startToken = _advance();
+    final expression = _extractExpression();
+    final children = <AstNode>[];
+
+    while (!_check(TokenType.directiveEndswitch) && !_isAtEnd()) {
+      if (_check(TokenType.directiveCase)) {
+        final caseToken = _advance();
+        final caseExpression = _extractExpression();
+        final caseChildren = <AstNode>[];
+
+        while (!_checkAny([
+          TokenType.directiveCase,
+          TokenType.directiveDefault,
+          TokenType.directiveEndswitch,
+          TokenType.eof
+        ])) {
+          final node = _parseNode();
+          if (node != null) caseChildren.add(node);
+        }
+
+        children.add(DirectiveNode(
+          startPosition: caseToken.startPosition,
+          endPosition: _previous().endPosition,
+          name: 'case',
+          expression: caseExpression,
+          children: caseChildren,
+        ));
+      } else if (_check(TokenType.directiveDefault)) {
+        final defaultToken = _advance();
+        final defaultChildren = <AstNode>[];
+
+        while (!_check(TokenType.directiveEndswitch) && !_isAtEnd()) {
+          final node = _parseNode();
+          if (node != null) defaultChildren.add(node);
+        }
+
+        children.add(DirectiveNode(
+          startPosition: defaultToken.startPosition,
+          endPosition: _previous().endPosition,
+          name: 'default',
+          expression: null,
+          children: defaultChildren,
+        ));
+      } else {
+        // Skip non-case/default content (whitespace, etc.) and continue looking
+        final node = _parseNode();
+        if (node != null) {
+          // Content outside case/default - add to switch children
+          children.add(node);
+        }
+      }
+    }
+
+    if (!_check(TokenType.directiveEndswitch)) {
+      _errors.add(ParseError(
+        message: 'Unclosed @switch directive',
+        position: startToken.startPosition,
+      ));
+    } else {
+      _advance(); // @endswitch
+    }
+
+    return DirectiveNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      name: 'switch',
+      expression: expression,
+      children: children,
+    );
+  }
+
+  /// Parse @forelse/@empty/@endforelse directive
+  DirectiveNode _parseForelseDirective() {
+    final startToken = _advance();
+    final expression = _extractExpression();
+    final loopChildren = <AstNode>[];
+    final emptyChildren = <AstNode>[];
+
+    // Parse loop body
+    while (!_checkAny([TokenType.directiveEmpty, TokenType.directiveEndforelse, TokenType.eof])) {
+      final node = _parseNode();
+      if (node != null) loopChildren.add(node);
+    }
+
+    // Parse @empty clause if present
+    if (_check(TokenType.directiveEmpty)) {
+      _advance(); // consume @empty
+      while (!_check(TokenType.directiveEndforelse) && !_isAtEnd()) {
+        final node = _parseNode();
+        if (node != null) emptyChildren.add(node);
+      }
+    }
+
+    if (!_check(TokenType.directiveEndforelse)) {
+      _errors.add(ParseError(
+        message: 'Unclosed @forelse directive',
+        position: startToken.startPosition,
+      ));
+    } else {
+      _advance(); // @endforelse
+    }
+
+    // Add @empty as nested directive if it exists
+    if (emptyChildren.isNotEmpty) {
+      loopChildren.add(DirectiveNode(
+        startPosition: startToken.startPosition,
+        endPosition: _previous().endPosition,
+        name: 'empty',
+        expression: null,
+        children: emptyChildren,
+      ));
+    }
+
+    return DirectiveNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      name: 'forelse',
+      expression: expression,
+      children: loopChildren,
     );
   }
 
