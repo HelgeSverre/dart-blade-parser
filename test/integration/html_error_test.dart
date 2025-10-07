@@ -194,7 +194,7 @@ void main() {
       // This should NOT be an error
       expect(result.isSuccess, isTrue);
 
-      final br = result.ast!.children[0] as HtmlElementNode;
+      final br = result.ast!.children.whereType<HtmlElementNode>().first;
       expect(br.isVoid, true);
       expect(br.isSelfClosing, true);
     });

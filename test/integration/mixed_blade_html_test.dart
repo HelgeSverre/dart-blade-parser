@@ -15,7 +15,7 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.tagName, 'div');
       expect(div.children.whereType<DirectiveNode>(), hasLength(1));
@@ -88,7 +88,7 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       final h1 = div.children.whereType<HtmlElementNode>().first;
       expect(h1.tagName, 'h1');
@@ -104,7 +104,7 @@ void main() {
       final result = parser.parse('<div>{!! \$html !!}</div>');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.children.whereType<EchoNode>(), hasLength(1));
       final echo = div.children.whereType<EchoNode>().first;
@@ -125,7 +125,7 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.children.whereType<ComponentNode>(), hasLength(1));
       expect(div.children.whereType<HtmlElementNode>(), hasLength(1));
@@ -228,7 +228,7 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.children.whereType<CommentNode>(), hasLength(1));
       expect(div.children.whereType<HtmlElementNode>(), hasLength(1));

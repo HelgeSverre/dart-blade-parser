@@ -12,7 +12,7 @@ void main() {
       expect(result.isSuccess, isTrue);
       expect(result.ast!.children, hasLength(1));
 
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
       expect(div.tagName, 'div');
       expect(div.attributes['class'], isA<StandardAttribute>());
       expect(div.attributes['class']!.value, 'container');
@@ -29,7 +29,7 @@ void main() {
       final result = parser.parse('<br>');
 
       expect(result.isSuccess, isTrue);
-      final br = result.ast!.children[0] as HtmlElementNode;
+      final br = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(br.tagName, 'br');
       expect(br.isVoid, true);
@@ -42,7 +42,7 @@ void main() {
       final result = parser.parse('<div />');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.tagName, 'div');
       expect(div.isSelfClosing, true);
@@ -56,7 +56,7 @@ void main() {
           parser.parse('<div x-data="{count: 0}" @click="count++"></div>');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       final xData = div.attributes['x-data'] as AlpineAttribute;
       expect(xData, isNotNull);
@@ -74,7 +74,7 @@ void main() {
           '<button wire:click="save" wire:loading.class="opacity-50">Save</button>');
 
       expect(result.isSuccess, isTrue);
-      final button = result.ast!.children[0] as HtmlElementNode;
+      final button = result.ast!.children.whereType<HtmlElementNode>().first;
 
       final wireClick = button.attributes['wire:click'] as LivewireAttribute;
       expect(wireClick, isNotNull);
@@ -102,7 +102,7 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.tagName, 'div');
       expect(div.children.whereType<HtmlElementNode>(), hasLength(2));
@@ -128,7 +128,7 @@ void main() {
       final result = parser.parse('<input type="text" disabled required>');
 
       expect(result.isSuccess, isTrue);
-      final input = result.ast!.children[0] as HtmlElementNode;
+      final input = result.ast!.children.whereType<HtmlElementNode>().first;
 
       final disabled = input.attributes['disabled'] as StandardAttribute;
       expect(disabled, isNotNull);
@@ -149,7 +149,7 @@ void main() {
       final result = parser.parse('<div class="foo" x-data="{}"></div>');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       final json = div.toJson();
 
@@ -189,7 +189,7 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.tagName, 'div');
       expect(div.attributes['class']!.value, 'wrapper');
@@ -220,7 +220,7 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.attributes['id'], isA<StandardAttribute>());
       expect(div.attributes['class'], isA<StandardAttribute>());
@@ -238,7 +238,7 @@ void main() {
       final result = parser.parse('<input type="email" name="email" required>');
 
       expect(result.isSuccess, isTrue);
-      final input = result.ast!.children[0] as HtmlElementNode;
+      final input = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(input.tagName, 'input');
       expect(input.isVoid, true);
@@ -259,7 +259,7 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final div = result.ast!.children[0] as HtmlElementNode;
+      final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(div.children, isNotEmpty);
       expect(div.children.whereType<TextNode>(), isNotEmpty);
@@ -271,7 +271,7 @@ void main() {
       final result = parser.parse('<br />');
 
       expect(result.isSuccess, isTrue);
-      final br = result.ast!.children[0] as HtmlElementNode;
+      final br = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(br.tagName, 'br');
       expect(br.isVoid, true);
@@ -302,7 +302,7 @@ void main() {
         final result = parser.parse('<$tag>');
         expect(result.isSuccess, isTrue, reason: 'Failed parsing <$tag>');
 
-        final element = result.ast!.children[0] as HtmlElementNode;
+        final element = result.ast!.children.whereType<HtmlElementNode>().first;
         expect(element.tagName, tag);
         expect(element.isVoid, true, reason: '<$tag> should be void');
       }
