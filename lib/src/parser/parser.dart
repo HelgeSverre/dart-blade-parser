@@ -12,6 +12,31 @@ class BladeParser {
   int _current = 0;
   final List<ParseError> _errors = [];
 
+  /// HTML5 void elements that cannot have children.
+  static const Set<String> _voidElements = {
+    'area',
+    'base',
+    'br',
+    'col',
+    'embed',
+    'hr',
+    'img',
+    'input',
+    'link',
+    'meta',
+    'param',
+    'source',
+    'track',
+    'wbr',
+  };
+
+  /// Tag stack for tracking open HTML elements (T032)
+  final List<_TagStackEntry> _tagStack = [];
+
+  /// Check if a tag name is a void element.
+  bool _isVoidElement(String tagName) =>
+      _voidElements.contains(tagName.toLowerCase());
+
   /// Parse a Blade template string.
   ParseResult parse(String source) {
     final lexer = BladeLexer(source);
@@ -90,7 +115,8 @@ class BladeParser {
       case TokenType.directiveEnv:
         return _parseGenericDirective('env', TokenType.directiveEndenv);
       case TokenType.directiveProduction:
-        return _parseGenericDirective('production', TokenType.directiveEndproduction);
+        return _parseGenericDirective(
+            'production', TokenType.directiveEndproduction);
 
       // Validation directives
       case TokenType.directiveError:
@@ -102,7 +128,8 @@ class BladeParser {
 
       // Component directives
       case TokenType.directiveComponent:
-        return _parseGenericDirective('component', TokenType.directiveEndcomponent);
+        return _parseGenericDirective(
+            'component', TokenType.directiveEndcomponent);
 
       // Other directives (inline, no closing tag)
       case TokenType.directiveExtends:
@@ -123,6 +150,20 @@ class BladeParser {
       // Components
       case TokenType.componentTagOpen:
         return _parseComponent();
+
+      // HTML Elements
+      case TokenType.htmlTagOpen:
+      case TokenType.htmlClosingTagStart:
+        return _parseHtmlElement();
+
+      // Error tokens
+      case TokenType.error:
+        final token = _advance();
+        _errors.add(ParseError(
+          message: token.value,
+          position: token.startPosition,
+        ));
+        return null;
 
       // Text and comments
       case TokenType.text:
@@ -145,7 +186,12 @@ class BladeParser {
     final children = <AstNode>[];
 
     // Parse the 'then' branch
-    while (!_checkAny([TokenType.directiveEndif, TokenType.directiveElse, TokenType.directiveElseif, TokenType.eof])) {
+    while (!_checkAny([
+      TokenType.directiveEndif,
+      TokenType.directiveElse,
+      TokenType.directiveElseif,
+      TokenType.eof
+    ])) {
       final node = _parseNode();
       if (node != null) children.add(node);
     }
@@ -156,7 +202,12 @@ class BladeParser {
       final elseifExpression = _extractExpression();
       final elseifChildren = <AstNode>[];
 
-      while (!_checkAny([TokenType.directiveEndif, TokenType.directiveElse, TokenType.directiveElseif, TokenType.eof])) {
+      while (!_checkAny([
+        TokenType.directiveEndif,
+        TokenType.directiveElse,
+        TokenType.directiveElseif,
+        TokenType.eof
+      ])) {
         final node = _parseNode();
         if (node != null) elseifChildren.add(node);
       }
@@ -193,7 +244,8 @@ class BladeParser {
 
     if (!_check(TokenType.directiveEndif)) {
       _errors.add(ParseError(
-        message: 'Unclosed @if directive starting at line ${startToken.startLine}',
+        message:
+            'Unclosed @if directive starting at line ${startToken.startLine}',
         position: startToken.startPosition,
         hint: 'Add @endif to close the conditional block',
       ));
@@ -303,7 +355,6 @@ class BladeParser {
     }
     return null;
   }
-
 
   EchoNode _parseEcho() {
     final openToken = _advance(); // {{
@@ -432,15 +483,18 @@ class BladeParser {
 
       final isLivewireToken = attrToken.type.toString().contains('livewire');
 
-      if (isAlpineToken || attrName.startsWith('x-') || attrName.startsWith('@') || attrName.startsWith(':')) {
+      if (isAlpineToken ||
+          attrName.startsWith('x-') ||
+          attrName.startsWith('@') ||
+          attrName.startsWith(':')) {
         // Extract directive from attribute name
         final directive = attrName.startsWith('x-')
             ? attrName.substring(2)
             : attrName.startsWith('@')
-            ? attrName.substring(1)
-            : attrName.startsWith(':')
-            ? attrName.substring(1)
-            : attrName;
+                ? attrName.substring(1)
+                : attrName.startsWith(':')
+                    ? attrName.substring(1)
+                    : attrName;
 
         attrNode = AlpineAttribute(
           name: attrName,
@@ -589,16 +643,18 @@ class BladeParser {
 
   Token _peek() {
     if (_isAtEnd()) {
-      return _tokens.isNotEmpty ? _tokens.last : Token(
-        type: TokenType.eof,
-        value: '',
-        startLine: 1,
-        startColumn: 1,
-        endLine: 1,
-        endColumn: 1,
-        startOffset: 0,
-        endOffset: 0,
-      );
+      return _tokens.isNotEmpty
+          ? _tokens.last
+          : Token(
+              type: TokenType.eof,
+              value: '',
+              startLine: 1,
+              startColumn: 1,
+              endLine: 1,
+              endColumn: 1,
+              startOffset: 0,
+              endOffset: 0,
+            );
     }
     return _tokens[_current];
   }
@@ -620,39 +676,61 @@ class BladeParser {
     if (type == TokenType.identifier) return true;
 
     // Alpine.js shorthand
-    if (type == TokenType.alpineShorthandBind || type == TokenType.alpineShorthandOn) return true;
+    if (type == TokenType.alpineShorthandBind ||
+        type == TokenType.alpineShorthandOn) return true;
 
     // Alpine.js directives
-    if (type == TokenType.alpineData || type == TokenType.alpineInit ||
-        type == TokenType.alpineShow || type == TokenType.alpineIf ||
-        type == TokenType.alpineFor || type == TokenType.alpineModel ||
-        type == TokenType.alpineText || type == TokenType.alpineHtml ||
-        type == TokenType.alpineBind || type == TokenType.alpineOn ||
-        type == TokenType.alpineTransition || type == TokenType.alpineCloak ||
-        type == TokenType.alpineIgnore || type == TokenType.alpineRef ||
+    if (type == TokenType.alpineData ||
+        type == TokenType.alpineInit ||
+        type == TokenType.alpineShow ||
+        type == TokenType.alpineIf ||
+        type == TokenType.alpineFor ||
+        type == TokenType.alpineModel ||
+        type == TokenType.alpineText ||
+        type == TokenType.alpineHtml ||
+        type == TokenType.alpineBind ||
+        type == TokenType.alpineOn ||
+        type == TokenType.alpineTransition ||
+        type == TokenType.alpineCloak ||
+        type == TokenType.alpineIgnore ||
+        type == TokenType.alpineRef ||
         type == TokenType.alpineTeleport) return true;
 
     // Livewire attributes
-    if (type == TokenType.livewireClick || type == TokenType.livewireSubmit ||
-        type == TokenType.livewireKeydown || type == TokenType.livewireKeyup ||
-        type == TokenType.livewireMouseenter || type == TokenType.livewireMouseleave ||
-        type == TokenType.livewireModel || type == TokenType.livewireModelLive ||
-        type == TokenType.livewireModelBlur || type == TokenType.livewireModelDebounce ||
-        type == TokenType.livewireModelLazy || type == TokenType.livewireModelDefer ||
-        type == TokenType.livewireLoading || type == TokenType.livewireTarget ||
-        type == TokenType.livewireLoadingClass || type == TokenType.livewireLoadingRemove ||
-        type == TokenType.livewireLoadingAttr || type == TokenType.livewirePoll ||
-        type == TokenType.livewirePollKeepAlive || type == TokenType.livewirePollVisible ||
-        type == TokenType.livewireIgnore || type == TokenType.livewireKey ||
-        type == TokenType.livewireId || type == TokenType.livewireInit ||
-        type == TokenType.livewireDirty || type == TokenType.livewireOffline ||
-        type == TokenType.livewireNavigate || type == TokenType.livewireTransition ||
+    if (type == TokenType.livewireClick ||
+        type == TokenType.livewireSubmit ||
+        type == TokenType.livewireKeydown ||
+        type == TokenType.livewireKeyup ||
+        type == TokenType.livewireMouseenter ||
+        type == TokenType.livewireMouseleave ||
+        type == TokenType.livewireModel ||
+        type == TokenType.livewireModelLive ||
+        type == TokenType.livewireModelBlur ||
+        type == TokenType.livewireModelDebounce ||
+        type == TokenType.livewireModelLazy ||
+        type == TokenType.livewireModelDefer ||
+        type == TokenType.livewireLoading ||
+        type == TokenType.livewireTarget ||
+        type == TokenType.livewireLoadingClass ||
+        type == TokenType.livewireLoadingRemove ||
+        type == TokenType.livewireLoadingAttr ||
+        type == TokenType.livewirePoll ||
+        type == TokenType.livewirePollKeepAlive ||
+        type == TokenType.livewirePollVisible ||
+        type == TokenType.livewireIgnore ||
+        type == TokenType.livewireKey ||
+        type == TokenType.livewireId ||
+        type == TokenType.livewireInit ||
+        type == TokenType.livewireDirty ||
+        type == TokenType.livewireOffline ||
+        type == TokenType.livewireNavigate ||
+        type == TokenType.livewireTransition ||
         type == TokenType.livewireStream) return true;
 
     return false;
   }
 
-  /// Parse HTML element into HtmlElementNode
+  /// Parse HTML element into HtmlElementNode (T031-T037)
   ///
   /// Handles:
   /// - Opening tags: <div>, <p>, etc.
@@ -662,21 +740,259 @@ class BladeParser {
   /// - Self-closing: <br/>, <img/>
   /// - Void elements: <br>, <img>, <meta>, <input>, <hr>, <link>
   HtmlElementNode? _parseHtmlElement() {
-    // This would require the lexer to emit HTML tag tokens
-    // For now, HTML tags are treated as text by the lexer
-    // A complete implementation would need:
-    // 1. Lexer to emit TokenType.htmlTagOpen, TokenType.htmlTagClose, etc.
-    // 2. Parser to handle tag names, attributes, nesting
-    // 3. Validation of void elements (can't have children)
-    // 4. Proper handling of self-closing syntax
+    final startToken = _peek();
 
-    // Placeholder implementation:
-    // In practice, HTML elements mixed with Blade are challenging because
-    // the lexer needs context-sensitive parsing to distinguish:
-    // - <div> (HTML) from <x-div> (component)
-    // - Regular attributes from Alpine.js/Livewire attributes
-    // - When to stop parsing (matching closing tag)
+    // Handle closing tag (shouldn't be called directly, but handle gracefully)
+    if (_check(TokenType.htmlClosingTagStart)) {
+      final closingStartPos = _advance().startPosition; // consume '</
 
-    return null;
+      if (_check(TokenType.htmlTagName)) {
+        final tagNameToken = _advance(); // consume tag name
+        final tagName = tagNameToken.value.toLowerCase();
+
+        // Check if this is a void element closing tag (T035 - error case)
+        if (_isVoidElement(tagName)) {
+          _error(
+            'Void element <$tagName> cannot have closing tag',
+            closingStartPos,
+          );
+        }
+
+        if (_check(TokenType.htmlClosingTagEnd)) {
+          _advance(); // consume '>'
+        }
+      }
+
+      return null; // Closing tags handled by parent
+    }
+
+    // Parse opening tag
+    if (!_check(TokenType.htmlTagOpen)) {
+      return null;
+    }
+
+    final openingTagPos = _advance().startPosition; // consume '<'
+
+    // Get tag name
+    if (!_check(TokenType.htmlTagName)) {
+      _error('Expected tag name after <', _peek().startPosition);
+      return null;
+    }
+
+    final tagNameToken = _advance();
+    final tagName = tagNameToken.value.toLowerCase(); // Normalize to lowercase
+
+    // Validate tag name (T036 - invalid tag name)
+    // HTML tag names must start with a letter
+    if (tagName.isEmpty || !RegExp(r'^[a-z]').hasMatch(tagName)) {
+      _error('Invalid tag name: <$tagName>', tagNameToken.startPosition);
+      return null;
+    }
+
+    final isVoid = _isVoidElement(tagName);
+
+    // Parse attributes (T034)
+    final attributes = <String, AttributeNode>{};
+    while (_isAttributeToken(_peek().type)) {
+      final attrToken = _advance();
+      final attrName = attrToken.value;
+
+      // Check for attribute value in next token
+      String? attrValue;
+      if (_check(TokenType.attributeValue)) {
+        attrValue = _advance().value;
+      }
+
+      // Create appropriate attribute node based on token type
+      AttributeNode attrNode;
+
+      // Check token type first for proper classification
+      final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
+          attrToken.type == TokenType.alpineShorthandBind ||
+          attrToken.type == TokenType.alpineData ||
+          attrToken.type == TokenType.alpineInit ||
+          attrToken.type == TokenType.alpineShow ||
+          attrToken.type == TokenType.alpineIf ||
+          attrToken.type == TokenType.alpineFor ||
+          attrToken.type == TokenType.alpineModel ||
+          attrToken.type == TokenType.alpineText ||
+          attrToken.type == TokenType.alpineHtml ||
+          attrToken.type == TokenType.alpineBind ||
+          attrToken.type == TokenType.alpineOn ||
+          attrToken.type == TokenType.alpineTransition ||
+          attrToken.type == TokenType.alpineCloak ||
+          attrToken.type == TokenType.alpineIgnore ||
+          attrToken.type == TokenType.alpineRef ||
+          attrToken.type == TokenType.alpineTeleport;
+
+      final isLivewireToken =
+          attrToken.type.toString().startsWith('TokenType.livewire');
+
+      if (isAlpineToken) {
+        // Alpine.js attribute
+        final directive = attrName.startsWith('@')
+            ? 'on:${attrName.substring(1)}'
+            : attrName.startsWith(':')
+                ? 'bind:${attrName.substring(1)}'
+                : attrName.startsWith('x-')
+                    ? attrName.substring(2)
+                    : attrName;
+
+        attrNode = AlpineAttribute(
+          name: attrName,
+          directive: directive,
+          value: attrValue,
+        );
+      } else if (isLivewireToken) {
+        // Livewire attribute - parse action and modifiers
+        final parts = attrName.split('.');
+        final action =
+            parts[0].startsWith('wire:') ? parts[0].substring(5) : parts[0];
+        final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
+
+        attrNode = LivewireAttribute(
+          name: attrName,
+          action: action,
+          modifiers: modifiers,
+          value: attrValue,
+        );
+      } else {
+        // Standard attribute
+        attrNode = StandardAttribute(
+          name: attrName,
+          value: attrValue,
+        );
+      }
+
+      attributes[attrName] = attrNode;
+    }
+
+    // Check for self-closing or regular close
+    bool isSelfClosing = false;
+    Position? endPosition;
+
+    if (_check(TokenType.htmlSelfClose)) {
+      isSelfClosing = true;
+      endPosition = _advance().endPosition; // consume '/>'
+
+      return HtmlElementNode(
+        tagName: tagName,
+        attributes: attributes,
+        isSelfClosing: isSelfClosing,
+        isVoid: isVoid,
+        startPosition: openingTagPos,
+        endPosition: endPosition,
+        children: [],
+      );
+    }
+
+    if (_check(TokenType.htmlTagClose)) {
+      endPosition = _advance().endPosition; // consume '>'
+    } else {
+      _error('Expected > or /> to close tag', _peek().startPosition);
+      return null;
+    }
+
+    // If void element, no children expected (T035)
+    if (isVoid) {
+      return HtmlElementNode(
+        tagName: tagName,
+        attributes: attributes,
+        isSelfClosing: false,
+        isVoid: true,
+        startPosition: openingTagPos,
+        endPosition: endPosition,
+        children: [],
+      );
+    }
+
+    // Parse children (T031)
+    _tagStack.add(_TagStackEntry(tagName, openingTagPos)); // T032
+    final children = <AstNode>[];
+
+    while (!_isAtEnd()) {
+      // Check for closing tag
+      if (_check(TokenType.htmlClosingTagStart)) {
+        _advance(); // consume '</
+
+        if (!_check(TokenType.htmlTagName)) {
+          _error('Expected tag name after </', _peek().startPosition);
+          break;
+        }
+
+        final closingTagName = _advance().value.toLowerCase();
+        final closingEndPos = _peek().endPosition;
+
+        // Tag matching validation (T033)
+        if (closingTagName != tagName) {
+          _error(
+            'Expected </$tagName>, found </$closingTagName>',
+            _peek().startPosition,
+          );
+          // Continue parsing for error recovery
+        }
+
+        // Consume '>'
+        if (_check(TokenType.htmlClosingTagEnd)) {
+          _advance();
+        }
+
+        _tagStack.removeLast(); // Pop from stack (T032)
+
+        return HtmlElementNode(
+          tagName: tagName,
+          attributes: attributes,
+          isSelfClosing: false,
+          isVoid: false,
+          startPosition: openingTagPos,
+          endPosition: closingEndPos,
+          children: children,
+        );
+      }
+
+      // Parse child node
+      final child = _parseNode();
+      if (child != null) {
+        children.add(child);
+      }
+
+      // Safety: break if we're stuck
+      if (_current >= _tokens.length - 1) {
+        break;
+      }
+    }
+
+    // Unclosed tag error (T036)
+    _error(
+        'Unclosed <$tagName> at ${openingTagPos.line}:${openingTagPos.column}',
+        openingTagPos);
+    _tagStack.removeLast(); // Pop from stack
+
+    // Return partial AST (T037)
+    return HtmlElementNode(
+      tagName: tagName,
+      attributes: attributes,
+      isSelfClosing: false,
+      isVoid: false,
+      startPosition: openingTagPos,
+      endPosition: endPosition,
+      children: children,
+    );
   }
+
+  /// Report an error (T036)
+  void _error(String message, Position position) {
+    _errors.add(ParseError(
+      message: message,
+      position: position,
+    ));
+  }
+}
+
+/// Tag stack entry for tracking open tags (T032)
+class _TagStackEntry {
+  final String tagName;
+  final Position startPosition;
+
+  _TagStackEntry(this.tagName, this.startPosition);
 }
