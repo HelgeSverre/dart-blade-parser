@@ -81,7 +81,8 @@ Future<void> _visualizeStreamingParsing(String template, int lines) async {
     final buffered = '█' * currentBuffered;
 
     if (i % 5 == 0 || i == templateLines.length - 1) {
-      print('  Line ${(i + 1).toString().padLeft(2)}/$lines: $progress$empty  Buffer: $buffered');
+      print(
+          '  Line ${(i + 1).toString().padLeft(2)}/$lines: $progress$empty  Buffer: $buffered');
     }
   }
 
@@ -89,7 +90,8 @@ Future<void> _visualizeStreamingParsing(String template, int lines) async {
   await subscription.asFuture();
 
   print('\n  Status: ✅ Complete - all nodes processed incrementally');
-  print('  Peak Memory: ${"█" * maxBuffered}  ($maxBuffered nodes max, vs $lines for regular)');
+  print(
+      '  Peak Memory: ${"█" * maxBuffered}  ($maxBuffered nodes max, vs $lines for regular)');
 }
 
 String _generateTemplate(int sections) {
