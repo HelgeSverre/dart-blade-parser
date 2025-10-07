@@ -112,10 +112,52 @@ class BladeLexer {
 
       // Check for @ directive
       if (ch == '@') {
-        // Check for @{{ (escaped echo - treat as literal text)
+        // Check for @{{ (escaped echo - treat entire @{{ ... }} as literal text)
         if (_peekNext() == '{' && _peekAhead(2) == '{') {
-          // This is an escaped echo, skip @ and continue as text
-          _advance();
+          // Emit any text before @{{
+          if (_position > _start) {
+            _emitToken(TokenType.text, input.substring(_start, _position));
+          }
+
+          // Scan the entire @{{ ... }} as literal text
+          final escapeStart = _position;
+          _advance(); // @
+          _advance(); // {
+          _advance(); // {
+
+          // Scan until we find }}
+          int braceDepth = 2; // We have {{
+          while (!_isAtEnd() && braceDepth > 0) {
+            if (_peek() == '{') {
+              braceDepth++;
+            } else if (_peek() == '}') {
+              braceDepth--;
+              if (braceDepth == 0) {
+                _advance(); // Last }
+                break;
+              }
+            }
+            _advance();
+          }
+
+          // Emit the entire @{{ ... }} as text
+          final escapedContent = input.substring(escapeStart, _position);
+          _emitToken(TokenType.text, escapedContent);
+          _start = _position;
+          continue;
+        }
+
+        // Check for @@ (literal @ escape - emit single @)
+        if (_peekNext() == '@') {
+          // Emit any text before @@
+          if (_position > _start) {
+            _emitToken(TokenType.text, input.substring(_start, _position));
+          }
+          // Consume both @ characters, emit single @
+          _advance(); // First @
+          _advance(); // Second @
+          _emitToken(TokenType.text, '@');
+          _start = _position;
           continue;
         }
 

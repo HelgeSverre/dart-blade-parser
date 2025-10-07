@@ -513,7 +513,18 @@ class BladeParser {
           hint: 'Add closing tag </x-$componentName>',
         ));
       } else {
-        _advance(); // </x-component>
+        // Validate closing tag matches opening tag
+        final closingToken = _advance(); // </x-component>
+        // Closing token value is like "</x-alert" (no trailing >)
+        final closingName = closingToken.value.substring(4); // Remove "</x-" prefix
+
+        if (closingName != componentName) {
+          _errors.add(ParseError(
+            message: 'Mismatched component tags: expected </x-$componentName>, found </x-$closingName>',
+            position: closingToken.startPosition,
+            hint: 'Change closing tag to </x-$componentName> or fix opening tag to <x-$closingName>',
+          ));
+        }
       }
     }
 

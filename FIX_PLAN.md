@@ -21,11 +21,29 @@
 
 ## P0 - Critical Fixes (Week 1)
 
-### 1. Raw Text Elements (script/style) - 9 failures
+### ⚠️ BLOCKER DISCOVERED: HTML Element Parsing Not Implemented
+
+**File**: `lib/src/parser/parser.dart:677-693`
+**Status**: `_parseHtmlElement()` returns null - not implemented
+**Impact**: Blocks P0.1, P1 (partial), and P2.1 fixes
+**Estimated Effort**: 2-3 days to implement full HTML parsing
+
+**What's Needed**:
+1. Lexer must emit htmlTagOpen, htmlTagClose, htmlSelfClosing tokens
+2. Parser must build HtmlElementNode tree
+3. Handle void elements, self-closing, nesting
+4. Parse attributes (quoted/unquoted/boolean)
+
+**Decision Required**: Implement HTML parsing first, or focus on non-blocked fixes?
+
+---
+
+### 1. Raw Text Elements (script/style) - 9 failures ❌ BLOCKED
 **Impact**: CRITICAL - Breaks JavaScript/CSS in templates
-**Difficulty**: Medium
-**Effort**: 2-3 days
+**Difficulty**: Medium → **Blocked by HTML parsing**
+**Effort**: 2-3 days (after HTML parsing implemented)
 **Tests Failing**: 9/10 tests
+**Status**: ⚠️ **BLOCKED** - Cannot fix without HTML element parsing
 
 **Why P0**:
 - Every Laravel app with `<script>` or `<style>` tags breaks
@@ -66,16 +84,29 @@ Expected: Single text node with raw content
 
 ---
 
-### 2. HTML Comments - 10 failures
+### 2. HTML Comments - 10 failures ✅ COMPLETED
 **Impact**: HIGH - Comments stripped from output
 **Difficulty**: Low
-**Effort**: 1 day
-**Tests Failing**: 10/11 tests (1 partial pass)
+**Effort**: 1 day → **Completed in 2 hours**
+**Tests Passing**: 10/11 tests (91% - 1 test blocked on HTML parsing)
+**Status**: ✅ **DONE** - Committed in `57978d7`
 
 **Why P0**:
 - HTML comments used for IE conditionals, debugging, documentation
-- Blade comments already work, HTML comments don't
+- Blade comments already work, HTML comments didn't
 - Simple fix with high impact
+
+**What Was Done**:
+- Added `<!-- ... -->` detection in lexer
+- Emit `TokenType.htmlComment` tokens
+- Fixed duplicate emission bug
+- Parser creates `CommentNode` with `isBladeComment=false`
+- Bonus: Blade comments also create nodes now (previously skipped)
+
+**Results**:
+- ✅ 10/11 tests passing
+- ✅ 9 more tests passing overall (67% pass rate, up from 62%)
+- ❌ 1 test blocked on HTML element parsing
 
 **Technical Approach**:
 ```
