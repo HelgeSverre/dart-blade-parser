@@ -67,8 +67,8 @@ Future<void> _visualizeStreamingParsing(String template, int lines) async {
 
   final templateLines = template.split('\n');
   for (var i = 0; i < templateLines.length; i++) {
-    controller.add(templateLines[i] + '\n');
-    await Future.delayed(Duration.zero);
+    controller.add('${templateLines[i]}\n');
+    await Future<void>.delayed(Duration.zero);
 
     // Estimate buffered nodes (simplified)
     if (i % 4 == 0) {
@@ -87,7 +87,7 @@ Future<void> _visualizeStreamingParsing(String template, int lines) async {
   }
 
   await controller.close();
-  await subscription.asFuture();
+  await subscription.asFuture<void>();
 
   print('\n  Status: ✅ Complete - all nodes processed incrementally');
   print(

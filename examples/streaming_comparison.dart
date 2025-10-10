@@ -54,8 +54,8 @@ void main() async {
   // Simulate streaming chunks
   final lines = template.split('\n');
   for (final line in lines) {
-    controller.add(line + '\n');
-    await Future.delayed(Duration.zero); // Allow stream to process
+    controller.add('$line\n');
+    await Future<void>.delayed(Duration.zero); // Allow stream to process
   }
 
   await controller.close();

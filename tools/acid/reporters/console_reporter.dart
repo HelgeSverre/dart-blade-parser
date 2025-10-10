@@ -46,18 +46,18 @@ class ConsoleReporter {
 
     print('$_bold📊 SUMMARY$_reset');
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    print('  Total Fixtures:     ${_bold}${coverage.totalTests}$_reset');
+    print('  Total Fixtures:     $_bold${coverage.totalTests}$_reset');
     print(
-        '  $_green✅ Passed:          ${_bold}${coverage.passedTests}$_reset  ($passRateColor${coverage.passRate.toStringAsFixed(1)}%$_reset)');
+        '  $_green✅ Passed:          $_bold${coverage.passedTests}$_reset  ($passRateColor${coverage.passRate.toStringAsFixed(1)}%$_reset)');
     print(
-        '  $_red❌ Failed:          ${_bold}${coverage.failedTests}$_reset  (${(100 - coverage.passRate).toStringAsFixed(1)}%)');
+        '  $_red❌ Failed:          $_bold${coverage.failedTests}$_reset  (${(100 - coverage.passRate).toStringAsFixed(1)}%)');
     print('');
     print('  ⏱️  Total Time:       ${_formatTime(coverage.totalTimeMs)}');
     print('  📈 Avg Time:         ${_formatTime(coverage.avgTimeMs)}/file');
     print(
-        '  🔢 Total Tokens:     ${_bold}${_formatNumber(coverage.totalTokens)}$_reset');
+        '  🔢 Total Tokens:     $_bold${_formatNumber(coverage.totalTokens)}$_reset');
     print(
-        '  🌳 Total Nodes:      ${_bold}${_formatNumber(coverage.totalNodes)}$_reset');
+        '  🌳 Total Nodes:      $_bold${_formatNumber(coverage.totalNodes)}$_reset');
     print('');
   }
 
@@ -198,13 +198,13 @@ class ConsoleReporter {
 
   void _printFooter() {
     print(
-        '${_gray}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$_reset');
+        '$_gray━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$_reset');
     print('');
   }
 
   String _formatTime(double ms) {
     if (ms < 1) {
-      return '$_bold${(ms * 1000).toStringAsFixed(0)}$_reset${_gray}μs$_reset';
+      return '$_bold${(ms * 1000).toStringAsFixed(0)}$_reset$_grayμs$_reset';
     } else if (ms < 1000) {
       return '$_bold${ms.toStringAsFixed(1)}$_reset${_gray}ms$_reset';
     } else {

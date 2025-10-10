@@ -102,13 +102,13 @@ void _printTree(AstNode node, int indent) {
       _printTree(child, indent + 1);
     }
   } else if (node is DirectiveNode) {
-    print('${prefix}@${node.name}');
+    print('$prefix@${node.name}');
     for (final child in node.children) {
       _printTree(child, indent + 1);
     }
   } else if (node is EchoNode) {
     final type = node.isRaw ? 'RawEcho' : 'Echo';
-    print('${prefix}$type: ${node.expression}');
+    print('$prefix$type: ${node.expression}');
   } else if (node is TextNode) {
     final preview = node.content.length > 30
         ? '${node.content.substring(0, 30)}...'

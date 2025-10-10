@@ -1,7 +1,7 @@
 /// Laravel Blade template parser library.
 ///
 /// Provides tokenization, parsing, and AST generation for Blade templates.
-library blade_parser;
+library;
 
 export 'src/ast/node.dart';
 export 'src/ast/visitor.dart';

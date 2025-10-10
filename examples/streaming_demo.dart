@@ -67,7 +67,7 @@ void main() async {
       print('   Memory: Node #$nodeCount (buffer cleared)');
     },
     onDone: () {
-      print('\n' + '─' * 60);
+      print('\n${'─' * 60}');
       print('\n✅ Streaming parse complete!');
       print('   Total nodes emitted: $nodeCount');
       print('   Total chunks processed: $chunkCount');
@@ -80,7 +80,7 @@ void main() async {
   // Simulate streaming chunks with delays to visualize
   for (var i = 0; i < lines.length; i++) {
     chunkCount++;
-    final chunk = lines[i] + '\n';
+    final chunk = '${lines[i]}\n';
 
     // Visual progress
     stdout.write('\r📦 Chunk $chunkCount/${lines.length}: ${_preview(chunk)}');
@@ -88,12 +88,12 @@ void main() async {
     controller.add(chunk);
 
     // Small delay to make it visible (remove in production)
-    await Future.delayed(Duration(milliseconds: 50));
+    await Future<void>.delayed(Duration(milliseconds: 50));
   }
 
   // Close stream
   await controller.close();
-  await subscription.asFuture();
+  await subscription.asFuture<void>();
 }
 
 String _formatNode(AstNode node) {
