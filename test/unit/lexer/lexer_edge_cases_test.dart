@@ -71,8 +71,8 @@ void main() {
     });
 
     test('CRLF line endings', () {
-      final templateLF = "@if(\$x)\n  <p>Test</p>\n@endif";
-      final templateCRLF = "@if(\$x)\r\n  <p>Test</p>\r\n@endif";
+      final templateLF = '@if(\$x)\n  <p>Test</p>\n@endif';
+      final templateCRLF = '@if(\$x)\r\n  <p>Test</p>\r\n@endif';
 
       final lexerLF = BladeLexer(templateLF);
       final lexerCRLF = BladeLexer(templateCRLF);
@@ -113,9 +113,7 @@ void main() {
     });
 
     test('Nested directives (20 levels)', () {
-      final nested = List.generate(20, (i) => '@if(\$x$i)').join('\n') +
-          '\n<p>Deep</p>\n' +
-          List.generate(20, (_) => '@endif').join('\n');
+      final nested = '${List.generate(20, (i) => '@if(\$x$i)').join('\n')}\n<p>Deep</p>\n${List.generate(20, (_) => '@endif').join('\n')}';
 
       lexer = BladeLexer(nested);
       final tokens = lexer.tokenize();

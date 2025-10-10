@@ -7,7 +7,7 @@ void main() {
       final parser = BladeParser();
 
       // Create a template with 1000 lines of HTML
-      final template = '<div class="container">\n' * 1000;
+      final template = '<div class="container"></div>\n' * 1000;
 
       final stopwatch = Stopwatch()..start();
       final result = parser.parse(template);

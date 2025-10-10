@@ -127,9 +127,9 @@ void main() {
 
       final error = result.errors.first;
       expect(error.position, isNotNull);
-      expect(error.position!.line, greaterThanOrEqualTo(1));
-      expect(error.position!.column, greaterThanOrEqualTo(1));
-      expect(error.position!.offset, greaterThanOrEqualTo(0));
+      expect(error.position.line, greaterThanOrEqualTo(1));
+      expect(error.position.column, greaterThanOrEqualTo(1));
+      expect(error.position.offset, greaterThanOrEqualTo(0));
     });
 
     test('Partial AST preserves valid nodes before error', () {

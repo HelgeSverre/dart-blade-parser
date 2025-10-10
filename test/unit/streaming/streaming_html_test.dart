@@ -180,7 +180,7 @@ void main() {
       final streamingParser = StreamingParser();
 
       // Create large chunks
-      final chunk1 = '<div>' + ('<p>Paragraph</p>' * 100);
+      final chunk1 = '<div>${'<p>Paragraph</p>' * 100}';
       final chunk2 = '<span>Text</span>' * 100;
       final chunk3 = '</div>';
 
@@ -230,7 +230,7 @@ void main() {
       // Add chunks
       for (final chunk in chunks) {
         controller.add(chunk);
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future<void>.delayed(Duration(milliseconds: 10));
       }
 
       // Complete the HTML

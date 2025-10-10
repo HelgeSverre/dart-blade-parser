@@ -254,8 +254,8 @@ void main() {
 
       final error = result.errors.first;
       expect(error.position, isNotNull);
-      expect(error.position!.line, greaterThanOrEqualTo(1));
-      expect(error.position!.column, greaterThanOrEqualTo(1));
+      expect(error.position.line, greaterThanOrEqualTo(1));
+      expect(error.position.column, greaterThanOrEqualTo(1));
     });
   });
 

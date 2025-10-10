@@ -87,7 +87,7 @@ void main() {
         final elapsed = stopwatch.elapsedMilliseconds;
 
         if (node is HtmlElementNode) {
-          emissionTimes[node.tagName + '_' + (node.attributes['id']?.value ?? '?')] =
+          emissionTimes['${node.tagName}_${node.attributes['id']?.value ?? '?'}'] =
               elapsed;
         }
       }
@@ -155,7 +155,7 @@ void main() {
       final stream = Stream.fromIterable(chunks);
 
       var nodesEmitted = 0;
-      await for (final node in streamingParser.parseStreaming(stream)) {
+      await for (final _ in streamingParser.parseStreaming(stream)) {
         nodesEmitted++;
 
         // In true streaming, nodes should start appearing early
@@ -211,12 +211,12 @@ void main() {
       var consumedCount = 0;
       final stopwatch = Stopwatch()..start();
 
-      await for (final node in streamingParser.parseStreaming(stream)) {
+      await for (final _ in streamingParser.parseStreaming(stream)) {
         consumedCount++;
 
         // Simulate slow consumer
         if (consumedCount < 5) {
-          await Future.delayed(Duration(milliseconds: 50));
+          await Future<void>.delayed(Duration(milliseconds: 50));
         }
       }
 

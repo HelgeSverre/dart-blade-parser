@@ -251,8 +251,8 @@ void main() {
       expect(result.isSuccess, isFalse);
       expect(result.errors, isNotEmpty);
       expect(result.errors.first.position, isNotNull);
-      expect(result.errors.first.position!.line, greaterThanOrEqualTo(1));
-      expect(result.errors.first.position!.column, greaterThanOrEqualTo(1));
+      expect(result.errors.first.position.line, greaterThanOrEqualTo(1));
+      expect(result.errors.first.position.column, greaterThanOrEqualTo(1));
     });
   });
 
