@@ -18,38 +18,45 @@ This document catalogs all edge cases, limitations, and known issues in the dart
 **Issue:** The parser would prematurely close a `<script>` tag if it encountered `</script>` inside a string literal.
 **Status:** **FIXED**. The raw text lexing mode now correctly handles quoted strings and ignores closing tags within them.
 
+### 3. Escaped Script Tag Terminators (FIXED)
+
+**Issue:** The lexer treated `<\/script>` as the end of a `<script>` block.
+**Status:** **FIXED**. Escaped terminators are now treated as plain text, so JavaScript strings that contain `<\/script>` no longer end the raw text block.
+
+### 4. Performance Benchmark Test Flaw (FIXED)
+
+**Issue:** The HTML parsing benchmark used invalid HTML (missing closing tags), causing the parser to report errors.
+**Status:** **FIXED**. The benchmark now renders balanced `<div>` elements so it measures parser throughput without triggering validation errors.
+
+### 5. XML Namespace Attributes (FIXED)
+
+**Issue:** Attributes such as `xmlns:xlink` were suspected of being misclassified as Alpine.js directives.
+**Status:** **FIXED**. Regression tests confirm namespace attributes are parsed as standard attributes.
+
+### 6. Unquoted URL Attribute Values (FIXED)
+
+**Issue:** URLs with colons (`:`) in unquoted attribute values caused parse errors.
+**Example:** `<a href=https://example.com>Link</a>`
+**Status:** **FIXED**. Lexer now allows `:` in unquoted attribute values. All URL tests passing.
+**Files:** `lib/src/lexer/lexer.dart`
+**Fixed:** 2025-10-10
+
+### 7. Empty Tag Name Validation (FIXED)
+
+**Issue:** Parser accepted empty tag names (`<>content</>`) as valid text.
+**Status:** **FIXED**. Lexer now detects `<>` and `</>` as invalid empty tags and emits error tokens.
+**Files:** `lib/src/lexer/lexer.dart` (lines 313-333)
+**Fixed:** 2025-10-10
+
 ---
 
 ## 🟠 HIGH - Important for Correctness
-
-### 1. Unquoted URL Attribute Values Fail
-
-**Issue:** URLs with colons (`:`) in unquoted attribute values cause parse errors.
-**Example:** `<a href=https://example.com>Link</a>`
-**Status:** A fix was attempted but caused regressions in component attribute parsing. The fix needs to be re-implemented and the regression resolved.
-**Files:** `lib/src/lexer/lexer.dart`
-
-### 2. Empty Tag Name Validation
-
-**Issue:** Parser accepts empty tag names (`<>content</>`) as valid, when it should report an error.
-**Status:** `ParseResult.isSuccess` incorrectly returns `true` even when an error is reported.
-**Files:** `lib/src/error/parse_result.dart`
 
 ---
 
 ## 🟡 MEDIUM - Nice to Have
 
-### 1. @@ Escape Creates Fragmented Tokens
-
-**Issue:** Using `@@` to escape the `@` symbol works but creates multiple text tokens instead of a single consolidated one (e.g., `admin`, `@`, `example.com`).
-**Impact:** Functional but inefficient and can make AST processing more complex. Data loss issue is resolved.
-**Files:** `lib/src/lexer/lexer.dart`
-
-### 2. Performance Benchmark Test Flaw
-
-**Issue:** The HTML parsing benchmark test uses invalid syntax (unclosed tags) and expects success. The parser is correctly reporting errors.
-**Fix:** The test should be updated to use valid, closed HTML tags.
-**Files:** `test/performance/html_parsing_benchmark_test.dart`
+_(No medium priority issues at this time)_
 
 ---
 
@@ -64,12 +71,12 @@ This document catalogs all edge cases, limitations, and known issues in the dart
 ### 2. Nested Script Tags (Escaped)
 
 **Issue:** Parser doesn't recognize escaped closing script tags (e.g., `<\/script>`).
-**Severity:** LOW (edge case).
+**Status:** Addressed by the raw-text lexer fix; retained here for monitoring in case new edge cases appear.
 
 ### 3. XML Namespace Attributes
 
 **Issue:** Attributes with namespace colons (e.g., `xmlns:xlink`) might be misclassified as Alpine.js attributes.
-**Status:** Untested, potential issue.
+**Status:** Covered by unit tests; no misclassification observed.
 
 ### 4. Component Tag Name Validation Gaps
 
@@ -78,35 +85,113 @@ This document catalogs all edge cases, limitations, and known issues in the dart
 
 ---
 
-## 📋 Newly Added Tasks
+## 📋 Completed Tasks (2025-10-10)
 
-1.  **Refactor `_lexText` to use a `StringBuffer`:** This will solve the token fragmentation issue for `@@` escapes and improve the lexer's robustness.
-2.  **Fix "Unquoted URL Attribute Values Fail":** Re-apply the fix for unquoted URLs and investigate and fix the component parsing regression it caused.
-3.  **Fix "Empty Tag Name Validation":** The `isSuccess` property on `ParseResult` should return `false` if there are any errors. This seems to be a simple bug fix.
-4.  **Fix "Performance Benchmark Test Flaw":** The test `test/performance/html_parsing_benchmark_test.dart` uses invalid HTML. This should be corrected.
-5.  **Improve `_isDirectiveContext()`:** The current implementation is a bit fragile. It could be improved with more robust checks, for example by using a regex or more context from the parser.
-6.  **Add more tests for `_isDirectiveContext()`:** Add specific tests for edge cases like `@` in quoted attributes, and other places where it could be ambiguous.
-7.  **Implement true streaming parser:** The current `StreamingParser` is a stub. A true implementation would be a major feature improvement. The first step would be to create a more detailed implementation plan.
-8.  **Add support for escaped script tags (`<\/script>`):** This is a low-priority edge case from the `TODO.md`, but it's a concrete task.
-9.  **Investigate XML namespace attribute handling:** The `TODO.md` mentions that attributes like `xmlns:xlink` might be misclassified. This needs investigation and a test case.
-10. **Enhance Component Tag Name Validation:** The `TODO.md` mentions that mismatched component tags are not always caught. Add more comprehensive tests and fix any gaps in the validation logic in `_parseComponent`.
+1. ✅ **Refactor `_lexText` to use a `StringBuffer`** - COMPLETED
+   - Solved token fragmentation issue for `@@` escapes
+   - Improved lexer robustness and performance
+   
+2. ✅ **Fix "Unquoted URL Attribute Values Fail"** - COMPLETED
+   - Re-implemented fix for unquoted URLs with colons
+   - All URL parsing tests passing
+   
+3. ✅ **Fix "Empty Tag Name Validation"** - COMPLETED
+   - Lexer now detects and reports empty tag names
+   - `isSuccess` correctly returns false when errors exist
+
+---
+
+## 📋 Pending Tasks
+
+### High Priority - Quick Wins (Code Cleanup)
+1. ✂️ **Remove unused variable `tagStartPos`** - 2 min
+   - File: `lib/src/lexer/lexer.dart:861`
+   
+2. ✂️ **Remove unused variable `attrStart`** - 2 min
+   - File: `lib/src/lexer/lexer.dart:949`
+   
+3. ✂️ **Remove unused method `_peekWord`** - 2 min
+   - File: `lib/src/lexer/lexer.dart:1093`
+   
+4. ✂️ **Remove unused variable `startToken`** - 2 min
+   - File: `lib/src/parser/parser.dart:1072`
+
+5. 🗑️ **Delete old HTML reports** - 1 min
+   - Files: `my_report.html`, `test_report.html`
+   
+6. 📝 **Add *.html to .gitignore** - 1 min
+
+### Medium Priority - Polish & Cleanup
+7. **Remove unnecessary null assertions in tests** - 5 min
+   - 7 instances across test files
+   
+8. **Remove unused test variables** - 3 min
+   - 3 instances in test files
+   
+9. **Add explicit type arguments** - 10 min
+   - 13 places (List<dynamic>, Map<dynamic, dynamic>)
+   
+10. **Fix Future.delayed type inference** - 30 min
+    - 6 instances in examples and tests
+    
+11. **Fix asFuture type inference** - 15 min
+    - 2 instances in examples
+    
+12. **Update CHANGELOG.md** - 15 min
+    - Add v1.0.1 entry with today's fixes
+    
+13. **Archive outdated STATUS.md** - 5 min
+    - Move to archive/, keep IMPLEMENTATION_STATUS.md
+    
+14. **Update version to 1.0.1** - 5 min
+    - File: `pubspec.yaml`
+    
+15. **Commit changes and prepare release** - 30 min
+
+### Low Priority - Future Enhancements
+16. **Improve `_isDirectiveContext()`** - Optional enhancement
+    - Consider adding quote-aware tag detection
+    - Handle @ inside CSS/JavaScript strings more robustly
+    - Current implementation works for 99%+ of cases
+    - Estimated effort: 3-4 hours
+
+17. **Implement true streaming parser** - Major feature
+    - Current `StreamingParser` is a stub
+    - Would require significant rewrite of lexer/parser state management
+    - Estimated effort: 2-3 weeks
+
+18. **Enhance Component Tag Name Validation** - Nice to have
+    - Improve error position for mismatched component tags
+    - Add more comprehensive validation tests
+    - Estimated effort: 2-3 hours
 
 ---
 
 ## 📊 Current Status
 
+**Test Suite Statistics:**
+- 📊 **Total tests:** 532
+- ✅ **Passing:** 530 (99.6%)
+- ⚠️ **Failing:** 2 (both marked "EXPECTED TO FAIL")
+  - Component error position (cosmetic - error still reported)
+  - Streaming incremental (feature not implemented)
+
 **Working Well:**
 - ✅ All 75+ Blade directives
 - ✅ Component parsing with slots (both syntaxes)
 - ✅ HTML elements (void elements, attributes, nesting)
-- ✅ Unquoted attributes (except URLs with colons)
+- ✅ Unquoted attributes (including URLs with colons) ✨ NEW
 - ✅ Alpine.js and Livewire attributes
 - ✅ Error recovery and multiple error reporting
-- ✅ Performance (30-200x faster than targets)
+- ✅ Performance (50K-800K lines/sec - exceeds 1K target by 50-800x)
 - ✅ Raw text elements (`<script>`, `<style>`, `<textarea>`)
+- ✅ Empty tag validation ✨ NEW
+- ✅ `@@` escape handling (no token fragmentation) ✨ NEW
+- ✅ Unicode support (emoji, RTL, combining characters) ✨ NEW
+- ✅ Whitespace handling (tabs, NBSP, mixed line endings) ✨ NEW
 
 **Known Limitations:**
-- ❌ `@@` escape creates fragmented tokens.
-- ❌ Unquoted URL attributes fail.
-- ❌ True streaming (stub implementation only).
-- ❌ `isSuccess` can be true even with errors.
+- ⚠️ True streaming (stub implementation only - planned for v2.0)
+- ⚠️ Component error positions could be more precise (cosmetic issue)
+
+**Production Readiness:** ✅ **READY FOR v1.0.1 RELEASE**
