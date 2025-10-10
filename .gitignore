@@ -24,3 +24,7 @@ test/acid/reports/*.html
 # OS
 .DS_Store
 Thumbs.db
+
+# Coverage
+coverage/
+*.lcov
