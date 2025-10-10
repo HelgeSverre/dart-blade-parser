@@ -1006,7 +1006,9 @@ class BladeParser {
 
     // Alpine.js shorthand
     if (type == TokenType.alpineShorthandBind ||
-        type == TokenType.alpineShorthandOn) return true;
+        type == TokenType.alpineShorthandOn) {
+      return true;
+    }
 
     // Alpine.js directives
     if (type == TokenType.alpineData ||
@@ -1023,7 +1025,9 @@ class BladeParser {
         type == TokenType.alpineCloak ||
         type == TokenType.alpineIgnore ||
         type == TokenType.alpineRef ||
-        type == TokenType.alpineTeleport) return true;
+        type == TokenType.alpineTeleport) {
+      return true;
+    }
 
     // Livewire attributes
     if (type == TokenType.livewireClick ||
@@ -1054,7 +1058,9 @@ class BladeParser {
         type == TokenType.livewireOffline ||
         type == TokenType.livewireNavigate ||
         type == TokenType.livewireTransition ||
-        type == TokenType.livewireStream) return true;
+        type == TokenType.livewireStream) {
+      return true;
+    }
 
     return false;
   }
@@ -1069,8 +1075,6 @@ class BladeParser {
   /// - Self-closing: <br/>, <img/>
   /// - Void elements: <br>, <img>, <meta>, <input>, <hr>, <link>
   HtmlElementNode? _parseHtmlElement() {
-    final startToken = _peek();
-
     // Handle closing tag (shouldn't be called directly, but handle gracefully)
     if (_check(TokenType.htmlClosingTagStart)) {
       final closingStartPos = _advance().startPosition; // consume '</
