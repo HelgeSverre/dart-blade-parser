@@ -92,6 +92,7 @@ class BladeLexer {
 
   /// Main text lexing state
   _LexerState _lexText() {
+    final buffer = StringBuffer();
     _start = _position;
     _startLine = _line;
     _startColumn = _column;
@@ -107,8 +108,8 @@ class BladeLexer {
           if (remainingLength >= 11 &&
               input.substring(_position + 1, _position + 12) == 'endverbatim') {
             // Emit accumulated text before @endverbatim
-            if (_position > _start) {
-              _emitToken(TokenType.text, input.substring(_start, _position));
+            if (buffer.isNotEmpty) {
+              _emitToken(TokenType.text, buffer.toString());
             }
             // Reset _start for the directive itself
             _start = _position;
@@ -117,6 +118,7 @@ class BladeLexer {
             return _LexerState.directiveOrComment;
           }
         }
+        buffer.writeCharCode(input.codeUnitAt(_position));
         _advance();
         continue;
       }
@@ -125,11 +127,6 @@ class BladeLexer {
       if (ch == '@') {
         // Check for @{{ (escaped echo - treat entire @{{ ... }} as literal text)
         if (_peekNext() == '{' && _peekAhead(2) == '{') {
-          // Emit any text before @{{
-          if (_position > _start) {
-            _emitToken(TokenType.text, input.substring(_start, _position));
-          }
-
           // Scan the entire @{{ ... }} as literal text
           final escapeStart = _position;
           _advance(); // @
@@ -151,31 +148,24 @@ class BladeLexer {
             _advance();
           }
 
-          // Emit the entire @{{ ... }} as text
-          final escapedContent = input.substring(escapeStart, _position);
-          _emitToken(TokenType.text, escapedContent);
-          _start = _position;
+          // Add the entire @{{ ... }} to buffer as literal text
+          buffer.write(input.substring(escapeStart, _position));
           continue;
         }
 
-        // Check for @@ (literal @ escape - emit single @)
+        // Check for @@ (literal @ escape - add single @ to buffer)
         if (_peekNext() == '@') {
-          // Emit any text before @@
-          if (_position > _start) {
-            _emitToken(TokenType.text, input.substring(_start, _position));
-          }
-          // Consume both @ characters, emit single @
+          // Consume both @ characters, add single @ to buffer
           _advance(); // First @
           _advance(); // Second @
-          _emitToken(TokenType.text, '@');
-          _start = _position;
-          return _LexerState.text; // Re-evaluate state to prevent data loss
+          buffer.write('@');
+          continue;
         }
 
         // Disambiguate: directive vs email vs Alpine.js @event
         if (_isDirectiveContext()) {
-          if (_position > _start) {
-            _emitToken(TokenType.text, input.substring(_start, _position));
+          if (buffer.isNotEmpty) {
+            _emitToken(TokenType.text, buffer.toString());
           }
           return _LexerState.directiveOrComment;
         }
@@ -186,8 +176,8 @@ class BladeLexer {
           _peekNext() == '{' &&
           _peekAhead(2) == '-' &&
           _peekAhead(3) == '-') {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         return _LexerState.bladeComment;
       }
@@ -195,23 +185,23 @@ class BladeLexer {
       // Check for {{ echo
       // Check for {{{ legacy echo (must check before {{ regular echo)
       if (ch == '{' && _peekNext() == '{' && _peekAhead(2) == '{') {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         return _LexerState.legacyEcho;
       }
 
       if (ch == '{' && _peekNext() == '{') {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         return _LexerState.echo;
       }
 
       // Check for {!! raw echo
       if (ch == '{' && _peekNext() == '!' && _peekAhead(2) == '!') {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         return _LexerState.rawEcho;
       }
@@ -221,8 +211,8 @@ class BladeLexer {
           _peekNext() == '/' &&
           _peekAhead(2) == 'x' &&
           _peekAhead(3) == '-') {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         // Scan closing tag
         _advance(); // <
@@ -263,21 +253,21 @@ class BladeLexer {
         }
 
         _start = _position;
-        continue;
+        return _LexerState.text; // Return to text mode with fresh buffer
       }
 
       // Check for <x- component tag
       if (ch == '<' && _peekNext() == 'x' && _peekAhead(2) == '-') {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         return _LexerState.componentTag;
       }
 
       // Check for HTML comment <!-- ... -->
       if (ch == '<' && _peekNext() == '!' && _peekAhead(2) == '-' && _peekAhead(3) == '-') {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         // Scan HTML comment
         _advance(); // <
@@ -309,21 +299,42 @@ class BladeLexer {
           _start = _position;
         }
 
-        continue;
+        return _LexerState.text; // Return to text mode with fresh buffer
       }
 
       // Check for HTML closing tags </ (before opening tags)
       if (ch == '<' && _peekNext() == '/' && _isAlpha(_peekAhead(2))) {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         return _LexerState.htmlTag;
       }
 
+      // Check for empty tag names (e.g., <> or </>)
+      if (ch == '<' && (_peekNext() == '>' || (_peekNext() == '/' && _peekAhead(2) == '>'))) {
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
+        }
+        // Emit error and skip past the empty tag
+        _start = _position;
+        _startLine = _line;
+        _startColumn = _column;
+        _advance(); // <
+        if (_peek() == '/') {
+          _advance(); // /
+        }
+        if (_peek() == '>') {
+          _advance(); // >
+        }
+        _emitToken(TokenType.error, 'Empty tag name');
+        _start = _position;
+        return _LexerState.text; // Return to text mode with fresh buffer
+      }
+
       // Check for invalid tag names (e.g., <123>)
       if (ch == '<' && _isDigit(_peekNext())) {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         // Emit error and skip past the invalid tag
         _start = _position;
@@ -338,23 +349,25 @@ class BladeLexer {
         }
         _emitToken(TokenType.error, 'Invalid tag name');
         _start = _position;
-        continue;
+        return _LexerState.text; // Return to text mode with fresh buffer
       }
 
       // Check for regular HTML tags (to parse attributes with Alpine.js/Livewire)
       if (ch == '<' && _isAlpha(_peekNext())) {
-        if (_position > _start) {
-          _emitToken(TokenType.text, input.substring(_start, _position));
+        if (buffer.isNotEmpty) {
+          _emitToken(TokenType.text, buffer.toString());
         }
         return _LexerState.htmlTag;
       }
 
+      // Accumulate regular text character
+      buffer.writeCharCode(input.codeUnitAt(_position));
       _advance();
     }
 
     // Emit remaining text
-    if (_position > _start) {
-      _emitToken(TokenType.text, input.substring(_start, _position));
+    if (buffer.isNotEmpty) {
+      _emitToken(TokenType.text, buffer.toString());
     }
 
     // Emit EOF
@@ -391,6 +404,13 @@ class BladeLexer {
         if (ch == '<' &&
             _peekNext() == '/' &&
             input.substring(_position).startsWith(closingTag)) {
+          // Check if the tag is escaped, e.g., <\/script>
+          if (_position > 0 && input[_position - 1] == '\\') {
+            // It's escaped, treat as text
+            _advance();
+            continue;
+          }
+
           // Found the closing tag. Emit the content before it.
           if (_position > _start) {
             _emitToken(TokenType.text, input.substring(_start, _position));
@@ -422,24 +442,127 @@ class BladeLexer {
       return false; // Email address like user@example.com
     }
 
+    // Check if inside a quoted attribute value
+    if (_isInsideQuotedValue()) {
+      return false; // @ in quoted values should be treated as literal text
+    }
+
+    // Check if inside raw text element (script/style/textarea)
+    if (_rawTextTagName != null) {
+      return false; // @ in scripts/styles is literal text
+    }
+
     // @ at start of line or after whitespace -> likely directive
     if (prev == '\n' || prev == '\r' || prev == ' ' || prev == '\t') {
       return true;
     }
 
-    // Inside HTML attribute -> likely Alpine.js @event
-    // Simplified: check if we're between < and >
-    int tagStart = _position - 1;
-    while (tagStart >= 0 && input[tagStart] != '<' && input[tagStart] != '>') {
-      tagStart--;
-    }
-    if (tagStart >= 0 && input[tagStart] == '<') {
-      // Inside tag, likely Alpine.js
+    // Enhanced tag detection with quote awareness
+    // Check if we're inside a tag but NOT inside a quoted value
+    if (_isInsideTag() && !_isInsideQuotedValue()) {
+      // Inside tag, likely Alpine.js @event or similar
       return false;
     }
 
     // Otherwise treat as directive
     return true;
+  }
+
+  /// Check if current position is inside a quoted attribute value
+  /// Scans backward from current position to detect quote context
+  bool _isInsideQuotedValue() {
+    int pos = _position - 1;
+    String? openQuote;
+
+    // Scan backward looking for opening quote or tag boundary
+    while (pos >= 0) {
+      final ch = input[pos];
+
+      // If we hit a tag boundary before finding a quote, we're not in a quoted value
+      if (ch == '<' || ch == '>') {
+        return false;
+      }
+
+      // Check for quotes
+      if (ch == '"' || ch == "'") {
+        // Check if this quote is escaped
+        bool isEscaped = false;
+        int backslashCount = 0;
+        int escapePos = pos - 1;
+        while (escapePos >= 0 && input[escapePos] == '\\') {
+          backslashCount++;
+          escapePos--;
+        }
+        isEscaped = backslashCount % 2 == 1;
+
+        if (!isEscaped) {
+          if (openQuote == null) {
+            // Found a quote - we're inside it
+            openQuote = ch;
+          } else if (openQuote == ch) {
+            // Found matching closing quote - reset
+            openQuote = null;
+          }
+          // If mismatched quote type, continue (could be nested quotes)
+        }
+      }
+
+      pos--;
+    }
+
+    // If we found an unclosed quote, we're inside it
+    return openQuote != null;
+  }
+
+  /// Check if current position is inside an HTML/component tag
+  /// Improved version that accounts for quotes in attribute values
+  bool _isInsideTag() {
+    int pos = _position - 1;
+    String? currentQuote;
+    bool insideTag = false;
+
+    // Scan backward to find tag start '<' or tag end '>'
+    while (pos >= 0) {
+      final ch = input[pos];
+
+      // Track quote state as we scan backward
+      if (ch == '"' || ch == "'") {
+        // Check if escaped
+        bool isEscaped = false;
+        int backslashCount = 0;
+        int escapePos = pos - 1;
+        while (escapePos >= 0 && input[escapePos] == '\\') {
+          backslashCount++;
+          escapePos--;
+        }
+        isEscaped = backslashCount % 2 == 1;
+
+        if (!isEscaped) {
+          if (currentQuote == null) {
+            currentQuote = ch; // Entering quoted region
+          } else if (currentQuote == ch) {
+            currentQuote = null; // Exiting quoted region
+          }
+        }
+      }
+
+      // Only check for tag boundaries when not inside quotes
+      if (currentQuote == null) {
+        if (ch == '<') {
+          // Found tag start before tag end - we're inside a tag
+          insideTag = true;
+          break;
+        } else if (ch == '>') {
+          // Found tag end before tag start - we're outside a tag
+          insideTag = false;
+          break;
+        }
+      }
+
+      pos--;
+    }
+
+    return insideTag;
   }
 
   /// Lex Blade directive or @ symbol
@@ -735,7 +858,6 @@ class BladeLexer {
   /// Lex HTML tag <tag>
   _LexerState _lexHtmlTag() {
     // T028-T030: Full HTML tag lexing implementation
-    final tagStartPos = _position;
     _advance(); // consume '<'
 
     // Check for closing tag: </
@@ -823,8 +945,6 @@ class BladeLexer {
 
   /// Lex attribute (Standard, Alpine.js, or Livewire)
   void _lexAttribute() {
-    final attrStart = _position;
-
     // Skip any unexpected characters (like dots in wire:loading.delay)
     if (!_isAlphaNumeric(_peek()) &&
         _peek() != '@' &&
@@ -952,8 +1072,8 @@ class BladeLexer {
         // Stop at self-closing marker (only if followed by >)
         if (ch == '/' && _peekNext() == '>') break;
 
-        // Stop at invalid characters for unquoted values
-        if (ch == '"' || ch == "'" || ch == '=' || ch == '`') break;
+        // Stop at invalid characters for unquoted values (HTML5 spec)
+        if (ch == '"' || ch == "'" || ch == '=' || ch == '<' || ch == '`') break;
 
         _advance();
       }
@@ -964,21 +1084,6 @@ class BladeLexer {
         _emitToken(TokenType.attributeValue, value);
       }
     }
-  }
-
-  /// Peek word starting at current position
-  String _peekWord() {
-    int end = _position;
-    while (end < input.length && _isAlphaAt(end)) {
-      end++;
-    }
-    return input.substring(_position, end);
-  }
-
-  bool _isAlphaAt(int index) {
-    if (index >= input.length) return false;
-    final code = input.codeUnitAt(index);
-    return (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
   }
 
   // Helper methods
