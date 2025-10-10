@@ -397,12 +397,13 @@ void main() {
           reason: '@forelse should contain both branches');
 
       // Should recognize @empty as part of structure
-      final hasEmptyBranch = result.ast!.children
+      final hasEmptyBranch = forelseDirective.children
           .whereType<DirectiveNode>()
           .any((n) => n.name == 'empty');
 
       expect(hasEmptyBranch, isTrue,
-          reason: '@empty should be recognized in @forelse structure');
+          reason:
+              '@empty should be a child of the @forelse directive structure');
     });
 
     test('Nested @unless directives', () {

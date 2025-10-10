@@ -4,6 +4,7 @@ import 'token_type.dart';
 /// State enum for iterative lexing (no recursion)
 enum _LexerState {
   text,
+  rawText,
   directiveOrComment,
   bladeComment,
   echo,
@@ -27,6 +28,12 @@ class BladeLexer {
   int _startColumn = 1;
   final List<Token> _tokens = [];
 
+  // Raw text elements (HTML5 spec)
+  static const Set<String> _rawTextElements = {'script', 'style', 'textarea'};
+
+  // Raw text mode tracking
+  String? _rawTextTagName;
+
   // Verbatim mode tracking
   bool _inVerbatim = false;
 
@@ -47,6 +54,9 @@ class BladeLexer {
       switch (state) {
         case _LexerState.text:
           state = _lexText();
+          break;
+        case _LexerState.rawText:
+          state = _lexRawText();
           break;
         case _LexerState.directiveOrComment:
           state = _lexDirectiveOrComment();
@@ -159,7 +169,7 @@ class BladeLexer {
           _advance(); // Second @
           _emitToken(TokenType.text, '@');
           _start = _position;
-          continue;
+          return _LexerState.text; // Re-evaluate state to prevent data loss
         }
 
         // Disambiguate: directive vs email vs Alpine.js @event
@@ -226,7 +236,22 @@ class BladeLexer {
         }
 
         final componentName = input.substring(nameStart, _position);
-        _emitToken(TokenType.componentTagClose, '</x-$componentName');
+
+        // Check for slot closing tag with colon syntax: </x-slot:name>
+        if (componentName == 'slot' && _peek() == ':') {
+          _advance(); // consume ':'
+
+          // Scan slot name after colon
+          final slotNameStart = _position;
+          while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == '_') {
+            _advance();
+          }
+
+          final slotName = input.substring(slotNameStart, _position);
+          _emitToken(TokenType.componentTagClose, '</x-slot:$slotName');
+        } else {
+          _emitToken(TokenType.componentTagClose, '</x-$componentName');
+        }
 
         // Skip to >
         while (!_isAtEnd() && _peek() != '>') {
@@ -333,6 +358,54 @@ class BladeLexer {
     }
 
     // Emit EOF
+    _emitToken(TokenType.eof, '');
+    return _LexerState.done;
+  }
+
+  /// Raw text lexing state (for <script>, <style>, <textarea>)
+  _LexerState _lexRawText() {
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
+    final closingTag = '</$_rawTextTagName>';
+    bool inSingleQuote = false;
+    bool inDoubleQuote = false;
+    bool inTemplateLiteral = false;
+
+    while (!_isAtEnd()) {
+      final ch = _peek();
+
+      if (inSingleQuote) {
+        if (ch == '\'' && _previousChar() != '\\') inSingleQuote = false;
+      } else if (inDoubleQuote) {
+        if (ch == '"' && _previousChar() != '\\') inDoubleQuote = false;
+      } else if (inTemplateLiteral) {
+        if (ch == '`' && _previousChar() != '\\') inTemplateLiteral = false;
+      } else {
+        if (ch == '\'') inSingleQuote = true;
+        if (ch == '"') inDoubleQuote = true;
+        if (ch == '`') inTemplateLiteral = true;
+
+        // Check for closing tag
+        if (ch == '<' &&
+            _peekNext() == '/' &&
+            input.substring(_position).startsWith(closingTag)) {
+          // Found the closing tag. Emit the content before it.
+          if (_position > _start) {
+            _emitToken(TokenType.text, input.substring(_start, _position));
+          }
+
+          _rawTextTagName = null; // Exit raw text mode
+          return _LexerState.text; // Let the main loop handle the closing tag
+        }
+      }
+
+      _advance();
+    }
+
+    // If we reach here, the tag was unclosed
+    _emitToken(TokenType.error, 'Unclosed $_rawTextTagName tag');
     _emitToken(TokenType.eof, '');
     return _LexerState.done;
   }
@@ -603,7 +676,22 @@ class BladeLexer {
     }
 
     final componentName = input.substring(nameStart, _position);
-    _emitToken(TokenType.componentTagOpen, '<x-$componentName');
+
+    // Check for slot with colon syntax: <x-slot:name>
+    if (componentName == 'slot' && _peek() == ':') {
+      _advance(); // consume ':'
+
+      // Scan slot name after colon
+      final slotNameStart = _position;
+      while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == '_') {
+        _advance();
+      }
+
+      final slotName = input.substring(slotNameStart, _position);
+      _emitToken(TokenType.componentTagOpen, '<x-slot:$slotName');
+    } else {
+      _emitToken(TokenType.componentTagOpen, '<x-$componentName');
+    }
 
     // Skip whitespace
     while (_peek() == ' ' ||
@@ -718,6 +806,13 @@ class BladeLexer {
         _emitToken(TokenType.htmlTagClose, '>');
       }
       _start = _position;
+
+      // If this is an opening raw text tag, switch to raw text mode.
+      if (!isClosingTag && _rawTextElements.contains(tagName.toLowerCase())) {
+        _rawTextTagName = tagName.toLowerCase();
+        return _LexerState.rawText;
+      }
+
       return _LexerState.text;
     }
 
@@ -775,7 +870,8 @@ class BladeLexer {
     while (_isAlphaNumeric(_peek()) ||
         _peek() == '-' ||
         _peek() == ':' ||
-        _peek() == '.') {
+        _peek() == '.' ||
+        _peek() == '_') {
       _advance();
     }
 
@@ -839,6 +935,34 @@ class BladeLexer {
 
       // Emit the value without quotes (but includes backslashes for escaped quotes)
       _emitToken(TokenType.attributeValue, value);
+    } else {
+      // Unquoted attribute value
+      // HTML5: unquoted values cannot contain whitespace, quotes, =, <, >, or `
+      final valueStart = _position;
+
+      while (!_isAtEnd()) {
+        final ch = _peek();
+
+        // Stop at whitespace
+        if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') break;
+
+        // Stop at tag delimiters
+        if (ch == '>') break;
+
+        // Stop at self-closing marker (only if followed by >)
+        if (ch == '/' && _peekNext() == '>') break;
+
+        // Stop at invalid characters for unquoted values
+        if (ch == '"' || ch == "'" || ch == '=' || ch == '`') break;
+
+        _advance();
+      }
+
+      // Emit unquoted value if we captured anything
+      if (_position > valueStart) {
+        final value = input.substring(valueStart, _position);
+        _emitToken(TokenType.attributeValue, value);
+      }
     }
   }
 
@@ -868,6 +992,11 @@ class BladeLexer {
 
   String _peekAhead(int n) =>
       _position + n >= input.length ? '\x00' : input[_position + n];
+
+  String _previousChar() {
+    if (_position == 0) return '\x00';
+    return input[_position - 1];
+  }
 
   void _advance() {
     if (_isAtEnd()) return;

@@ -655,12 +655,115 @@ class BladeParser {
     );
   }
 
-  ComponentNode _parseComponent() {
-    final startToken = _advance(); // <x-component
+  /// Parse slot tag: <x-slot:name> or <x-slot name="...">
+  SlotNode _parseSlot(Token startToken, String componentName) {
+    String slotName = 'default';
+    final attributes = <String, AttributeNode>{};
+
+    // Check if name is in colon syntax: "slot:header"
+    if (componentName.startsWith('slot:')) {
+      slotName = componentName.substring(5); // Remove "slot:"
+
+      // Still need to parse any additional attributes after the colon
+      // e.g., <x-slot:header class="bold" id="title">
+      while (_isAttributeToken(_peek().type)) {
+        final attrToken = _advance();
+        final attrName = attrToken.value;
+
+        String? attrValue;
+        if (_check(TokenType.attributeValue)) {
+          attrValue = _advance().value;
+        }
+
+        attributes[attrName] = StandardAttribute(
+          name: attrName,
+          value: attrValue,
+        );
+      }
+    } else {
+      // componentName is just "slot", need to parse name attribute
+      // Parse attributes to find name
+      while (_isAttributeToken(_peek().type)) {
+        final attrToken = _advance();
+        final attrName = attrToken.value;
+
+        String? attrValue;
+        if (_check(TokenType.attributeValue)) {
+          attrValue = _advance().value;
+        }
+
+        if (attrName == 'name' && attrValue != null) {
+          slotName = attrValue;
+        }
+
+        attributes[attrName] = StandardAttribute(
+          name: attrName,
+          value: attrValue,
+        );
+      }
+    }
+
+    // Check for self-closing (rare for slots but possible)
+    bool isSelfClosing = false;
+    if (_check(TokenType.componentSelfClose)) {
+      _advance(); // />
+      isSelfClosing = true;
+    }
+
+    // Parse slot content
+    final children = <AstNode>[];
+
+    if (!isSelfClosing) {
+      // Parse until closing tag
+      while (!_check(TokenType.componentTagClose) && !_check(TokenType.eof)) {
+        final node = _parseNode();
+        if (node != null) {
+          children.add(node);
+        }
+      }
+
+      // Validate closing tag
+      if (!_check(TokenType.componentTagClose)) {
+        _errors.add(ParseError(
+          message: 'Unclosed slot <x-slot${componentName.startsWith('slot:') ? ':$slotName' : ''}>',
+          position: startToken.startPosition,
+        ));
+      } else {
+        final closingToken = _advance();
+        // Closing token is like "</x-slot:header" or "</x-slot"
+        final expectedClosing = componentName.startsWith('slot:')
+            ? '</x-slot:$slotName'
+            : '</x-slot';
+
+        if (!closingToken.value.startsWith(expectedClosing)) {
+          _errors.add(ParseError(
+            message: 'Mismatched slot tags',
+            position: closingToken.startPosition,
+          ));
+        }
+      }
+    }
+
+    return SlotNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      name: slotName,
+      attributes: attributes,
+      children: children,
+    );
+  }
+
+  AstNode _parseComponent() {
+    final startToken = _advance(); // <x-component or <x-slot:name
 
     // Extract component name from token value
-    // Token value is like "<x-alert" or "<x-button"
+    // Token value is like "<x-alert" or "<x-button" or "<x-slot:header"
     final componentName = startToken.value.substring(3); // Remove "<x-"
+
+    // Check if this is a slot tag
+    if (componentName.startsWith('slot:') || componentName == 'slot') {
+      return _parseSlot(startToken, componentName);
+    }
 
     // Parse attributes - collect tokens until we hit > or />
     final attributes = <String, AttributeNode>{};

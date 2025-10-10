@@ -122,13 +122,8 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
       
-      // The @@ should be normalized to single @
-      // Current bug: likely keeps @@ as-is or has undefined behavior
-      final hasNormalizedAt = textTokens.any((t) => 
-        t.value.contains('admin@example.com') && !t.value.contains('@@'));
-      
-      expect(hasNormalizedAt, isTrue,
-        reason: '@@ should be converted to single @ in output');
+      final combinedText = textTokens.map((t) => t.value).join('');
+      expect(combinedText, equals('Contact us at admin@example.com'));
     });
 
     test('@@ before directive-like word', () {
@@ -141,7 +136,9 @@ void main() {
       
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
-      expect(textTokens.first.value, equals('@if this is literal text'));
+      
+      final combinedText = textTokens.map((t) => t.value).join('');
+      expect(combinedText, equals('@if this is literal text'));
     });
 
     test('Multiple @@ in string', () {
@@ -150,12 +147,8 @@ void main() {
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       
-      // Both @@ should be normalized
-      final content = textTokens.map((t) => t.value).join();
-      expect(content.contains('user@domain.com'), isTrue);
-      expect(content.contains('admin@domain.com'), isTrue);
-      expect(content.contains('@@'), isFalse,
-        reason: 'All @@ should be converted to single @');
+      final content = textTokens.map((t) => t.value).join('');
+      expect(content, equals('user@domain.com or admin@domain.com'));
     });
 
     test('@@ vs @ in email addresses', () {
@@ -168,7 +161,7 @@ void main() {
       // @@ should be escaped to @
       lexer = BladeLexer('Escaped: user@@example.com');
       tokens = lexer.tokenize();
-      text = tokens.where((t) => t.type == TokenType.text).first.value;
+      text = tokens.where((t) => t.type == TokenType.text).map((t) => t.value).join('');
       expect(text, equals('Escaped: user@example.com'),
         reason: '@@ should normalize to @');
     });
@@ -190,12 +183,10 @@ void main() {
       final textNodes = html.children.whereType<TextNode>();
       
       expect(textNodes, isNotEmpty);
-      final textContent = textNodes.map((t) => t.content).join();
+      final textContent = textNodes.map((t) => t.content).join('');
       
       // Should contain admin@site.com (single @)
-      expect(textContent, contains('admin@site.com'));
-      expect(textContent, isNot(contains('@@')),
-        reason: '@@ should be normalized to single @');
+      expect(textContent, equals('Email: admin@site.com'));
     });
   });
 }

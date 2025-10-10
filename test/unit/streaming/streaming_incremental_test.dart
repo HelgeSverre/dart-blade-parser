@@ -128,7 +128,7 @@ void main() {
 
       final divElements = nodes
           .expand((n) =>
-              n is HtmlElementNode ? [n] : (n as Document).children.whereType<HtmlElementNode>())
+              n is HtmlElementNode ? [n] : (n as DocumentNode).children.whereType<HtmlElementNode>())
           .where((e) => e.tagName == 'div');
 
       expect(divElements, isNotEmpty);
@@ -195,7 +195,7 @@ void main() {
       final htmlElements = nodes
           .expand((n) => n is HtmlElementNode
               ? [n]
-              : (n is Document ? n.children.whereType<HtmlElementNode>() : <HtmlElementNode>[]))
+              : (n is DocumentNode ? n.children.whereType<HtmlElementNode>() : <HtmlElementNode>[]))
           .toList();
 
       expect(htmlElements.length, greaterThan(0),
@@ -253,7 +253,7 @@ void main() {
       final divElements = nodes
           .expand((n) => n is HtmlElementNode
               ? [n]
-              : (n is Document ? n.children.whereType<HtmlElementNode>() : <HtmlElementNode>[]))
+              : (n is DocumentNode ? n.children.whereType<HtmlElementNode>() : <HtmlElementNode>[]))
           .where((e) => e.tagName == 'div');
 
       if (divElements.isNotEmpty) {

@@ -199,6 +199,9 @@ void main() {
     test('Component with unquoted attributes', () {
       final result = parser.parse('<x-button size=lg variant=primary>Click</x-button>');
 
+      if (!result.isSuccess) {
+        print('Parser errors: ${result.errors}');
+      }
       expect(result.isSuccess, isTrue);
 
       final component = result.ast!.children
