@@ -5,6 +5,30 @@ All notable changes to the Blade Parser project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-10-10
+
+### Fixed
+- **Empty tag name validation:** Lexer now properly detects and reports empty HTML tags (`<>` and `</>`) as errors
+- **Token fragmentation:** Refactored `_lexText()` to use `StringBuffer`, eliminating fragmented text tokens from `@@` escapes
+- **Unquoted URL attributes:** Fixed parsing of URLs with colons in unquoted attribute values (e.g., `href=https://example.com`)
+
+### Changed
+- Improved performance with StringBuffer-based text lexing
+- Enhanced error reporting for malformed HTML
+
+### Code Quality
+- Removed 4 unused variables from core library
+- Removed 1 unused method from lexer
+- Fixed 7 unnecessary null assertions in tests
+- Fixed 3 unused variables in tests
+- Applied 50 automated code style fixes via `dart fix`
+- Reduced linter warnings from 577 to ~513
+
+### Tests
+- Test suite expanded to 532 tests
+- Pass rate improved to 99.6% (530/532 passing)
+- Only 2 expected failures remain (streaming feature not implemented, cosmetic error position issue)
+
 ## [1.0.0] - 2025-10-05
 
 ### Added
