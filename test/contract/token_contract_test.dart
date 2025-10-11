@@ -30,10 +30,7 @@ void main() {
         () => Position(line: 0, column: 1, offset: 0),
         throwsArgumentError,
       );
-      expect(
-        () => Position(line: 1, column: 1, offset: 0),
-        returnsNormally,
-      );
+      expect(() => Position(line: 1, column: 1, offset: 0), returnsNormally);
     });
 
     test('Position validation: column >= 1', () {
@@ -41,10 +38,7 @@ void main() {
         () => Position(line: 1, column: 0, offset: 0),
         throwsArgumentError,
       );
-      expect(
-        () => Position(line: 1, column: 1, offset: 0),
-        returnsNormally,
-      );
+      expect(() => Position(line: 1, column: 1, offset: 0), returnsNormally);
     });
 
     test('Position validation: offset >= 0', () {
@@ -52,10 +46,7 @@ void main() {
         () => Position(line: 1, column: 1, offset: -1),
         throwsArgumentError,
       );
-      expect(
-        () => Position(line: 1, column: 1, offset: 0),
-        returnsNormally,
-      );
+      expect(() => Position(line: 1, column: 1, offset: 0), returnsNormally);
     });
 
     test('Token provides startPosition and endPosition', () {

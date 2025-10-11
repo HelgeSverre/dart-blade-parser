@@ -34,9 +34,12 @@ void main() {
       stopwatch.stop();
 
       expect(result.ast, isNotNull);
-      expect(stopwatch.elapsedMilliseconds, lessThan(1000),
-          reason:
-              'Should parse 1000 lines in under 1 second. Took: ${stopwatch.elapsedMilliseconds}ms');
+      expect(
+        stopwatch.elapsedMilliseconds,
+        lessThan(1000),
+        reason:
+            'Should parse 1000 lines in under 1 second. Took: ${stopwatch.elapsedMilliseconds}ms',
+      );
 
       final linesPerSecond = 1000 / (stopwatch.elapsedMilliseconds / 1000);
       print('Throughput: ${linesPerSecond.toStringAsFixed(0)} lines/sec');
@@ -54,7 +57,8 @@ void main() {
 
       final linesPerSecond = 5000 / (stopwatch.elapsedMilliseconds / 1000);
       print(
-          'Throughput (5000 lines): ${linesPerSecond.toStringAsFixed(0)} lines/sec');
+        'Throughput (5000 lines): ${linesPerSecond.toStringAsFixed(0)} lines/sec',
+      );
 
       // Should still maintain ≥1000 lines/sec
       expect(linesPerSecond, greaterThanOrEqualTo(1000));
@@ -68,13 +72,17 @@ void main() {
       stopwatch.stop();
 
       expect(result.ast, isNotNull);
-      expect(stopwatch.elapsed.inSeconds, lessThan(10),
-          reason:
-              'Should parse 10k lines in under 10 seconds. Took: ${stopwatch.elapsed.inSeconds}s');
+      expect(
+        stopwatch.elapsed.inSeconds,
+        lessThan(10),
+        reason:
+            'Should parse 10k lines in under 10 seconds. Took: ${stopwatch.elapsed.inSeconds}s',
+      );
 
       final linesPerSecond = 10000 / (stopwatch.elapsedMilliseconds / 1000);
       print(
-          'Throughput (10k lines): ${linesPerSecond.toStringAsFixed(0)} lines/sec');
+        'Throughput (10k lines): ${linesPerSecond.toStringAsFixed(0)} lines/sec',
+      );
     });
 
     test('Measure tokens per second', () {
@@ -88,7 +96,8 @@ void main() {
       final tokensPerSecond =
           tokens.length / (stopwatch.elapsedMilliseconds / 1000);
       print(
-          'Lexer throughput: ${tokensPerSecond.toStringAsFixed(0)} tokens/sec');
+        'Lexer throughput: ${tokensPerSecond.toStringAsFixed(0)} tokens/sec',
+      );
 
       expect(tokensPerSecond, greaterThan(1000)); // Should be very fast
     });
@@ -117,7 +126,8 @@ void main() {
 
       final linesPerSecond = lineCount / (stopwatch.elapsedMilliseconds / 1000);
       print(
-          'Complex template: ${linesPerSecond.toStringAsFixed(0)} lines/sec ($lineCount lines)');
+        'Complex template: ${linesPerSecond.toStringAsFixed(0)} lines/sec ($lineCount lines)',
+      );
 
       expect(linesPerSecond, greaterThanOrEqualTo(1000));
     });
@@ -164,10 +174,15 @@ void main() {
 
       print('Average parse time: ${avgMs.toStringAsFixed(2)}ms');
       print('Throughput: ${linesPerSec.toStringAsFixed(0)} lines/sec');
-      print('Memory: ~${(template.length / 1024 / 1024).toStringAsFixed(2)} MB template');
+      print(
+        'Memory: ~${(template.length / 1024 / 1024).toStringAsFixed(2)} MB template',
+      );
 
-      expect(linesPerSec, greaterThan(10000),
-          reason: 'Should parse > 10K lines/sec, got $linesPerSec');
+      expect(
+        linesPerSec,
+        greaterThan(10000),
+        reason: 'Should parse > 10K lines/sec, got $linesPerSec',
+      );
     });
 
     test('10K component instances throughput', () {
@@ -210,10 +225,15 @@ void main() {
       final componentsPerSec = (10000 / (avgMs / 1000)).round();
 
       print('Average parse time: ${avgMs.toStringAsFixed(2)}ms');
-      print('Throughput: ${componentsPerSec.toStringAsFixed(0)} components/sec');
+      print(
+        'Throughput: ${componentsPerSec.toStringAsFixed(0)} components/sec',
+      );
 
-      expect(componentsPerSec, greaterThan(1000),
-          reason: 'Should parse > 1K components/sec, got $componentsPerSec');
+      expect(
+        componentsPerSec,
+        greaterThan(1000),
+        reason: 'Should parse > 1K components/sec, got $componentsPerSec',
+      );
     });
 
     test('1000 nested levels - extreme nesting', () {
@@ -270,8 +290,12 @@ void main() {
 
       print('Parse time: ${stopwatch.elapsedMilliseconds}ms');
 
-      expect(stopwatch.elapsedMilliseconds, lessThan(2000),
-          reason: 'Should parse extreme nesting in < 2000ms, took ${stopwatch.elapsedMilliseconds}ms');
+      expect(
+        stopwatch.elapsedMilliseconds,
+        lessThan(2000),
+        reason:
+            'Should parse extreme nesting in < 2000ms, took ${stopwatch.elapsedMilliseconds}ms',
+      );
       print('SUCCESS: No stack overflow with 1000 nested levels');
     });
 
@@ -332,11 +356,21 @@ void main() {
           'templateSize': template.length,
         };
 
-        print('  Template size: ${(template.length / 1024).toStringAsFixed(2)} KB');
-        print('  Memory before: ${(memBefore / 1024 / 1024).toStringAsFixed(2)} MB');
-        print('  Memory after: ${(memAfter / 1024 / 1024).toStringAsFixed(2)} MB');
-        print('  Memory delta: ${(memDelta / 1024 / 1024).toStringAsFixed(2)} MB');
-        print('  Bytes per line: ${bytesPerLine.toStringAsFixed(2)} bytes/line');
+        print(
+          '  Template size: ${(template.length / 1024).toStringAsFixed(2)} KB',
+        );
+        print(
+          '  Memory before: ${(memBefore / 1024 / 1024).toStringAsFixed(2)} MB',
+        );
+        print(
+          '  Memory after: ${(memAfter / 1024 / 1024).toStringAsFixed(2)} MB',
+        );
+        print(
+          '  Memory delta: ${(memDelta / 1024 / 1024).toStringAsFixed(2)} MB',
+        );
+        print(
+          '  Bytes per line: ${bytesPerLine.toStringAsFixed(2)} bytes/line',
+        );
         print('  Parse time: ${avgMs.toStringAsFixed(2)}ms');
       }
 
@@ -345,16 +379,22 @@ void main() {
       for (final entry in memoryResults.entries) {
         final size = entry.key;
         final data = entry.value;
-        print('${size.toString().padRight(8)}\t'
-              '${((data['memDelta'] as num) / 1024 / 1024).toStringAsFixed(2)}MB\t\t'
-              '${(data['bytesPerLine'] as num).toStringAsFixed(2)}\t\t'
-              '${(data['parseTimeMs'] as num).toStringAsFixed(2)}ms');
+        print(
+          '${size.toString().padRight(8)}\t'
+          '${((data['memDelta'] as num) / 1024 / 1024).toStringAsFixed(2)}MB\t\t'
+          '${(data['bytesPerLine'] as num).toStringAsFixed(2)}\t\t'
+          '${(data['parseTimeMs'] as num).toStringAsFixed(2)}ms',
+        );
       }
 
       // Verify reasonable memory usage (less than 2KB per line for 100K lines)
       final largeTestBytes = memoryResults[100000]!['bytesPerLine'] as num;
-      expect(largeTestBytes, lessThan(2000),
-          reason: 'Memory efficiency should be < 2000 bytes/line, got ${largeTestBytes.toStringAsFixed(2)}');
+      expect(
+        largeTestBytes,
+        lessThan(2000),
+        reason:
+            'Memory efficiency should be < 2000 bytes/line, got ${largeTestBytes.toStringAsFixed(2)}',
+      );
     });
   });
 }

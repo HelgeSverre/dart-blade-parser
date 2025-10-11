@@ -52,8 +52,9 @@ void main() {
     // Quickstart scenario #4
     test('Parse Alpine.js attributes (x-data, @click)', () {
       final parser = BladeParser();
-      final result =
-          parser.parse('<div x-data="{count: 0}" @click="count++"></div>');
+      final result = parser.parse(
+        '<div x-data="{count: 0}" @click="count++"></div>',
+      );
 
       expect(result.isSuccess, isTrue);
       final div = result.ast!.children.whereType<HtmlElementNode>().first;
@@ -71,7 +72,8 @@ void main() {
     test('Parse Livewire attributes (wire:click, wire:loading.class)', () {
       final parser = BladeParser();
       final result = parser.parse(
-          '<button wire:click="save" wire:loading.class="opacity-50">Save</button>');
+        '<button wire:click="save" wire:loading.class="opacity-50">Save</button>',
+      );
 
       expect(result.isSuccess, isTrue);
       final button = result.ast!.children.whereType<HtmlElementNode>().first;
@@ -295,7 +297,7 @@ void main() {
         'param',
         'source',
         'track',
-        'wbr'
+        'wbr',
       ];
 
       for (final tag in voidElements) {

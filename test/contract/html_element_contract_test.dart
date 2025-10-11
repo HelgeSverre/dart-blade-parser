@@ -215,10 +215,16 @@ void main() {
         tagName: 'button',
         attributes: {
           'class': StandardAttribute(name: 'class', value: 'btn'),
-          'x-data':
-              AlpineAttribute(name: 'x-data', directive: 'data', value: '{}'),
+          'x-data': AlpineAttribute(
+            name: 'x-data',
+            directive: 'data',
+            value: '{}',
+          ),
           'wire:click': LivewireAttribute(
-              name: 'wire:click', action: 'click', value: 'save'),
+            name: 'wire:click',
+            action: 'click',
+            value: 'save',
+          ),
         },
         startPosition: Position(line: 1, column: 1, offset: 0),
         endPosition: Position(line: 1, column: 50, offset: 49),
@@ -241,9 +247,7 @@ void main() {
 
       final node = HtmlElementNode(
         tagName: 'div',
-        attributes: {
-          'id': StandardAttribute(name: 'id', value: 'test'),
-        },
+        attributes: {'id': StandardAttribute(name: 'id', value: 'test')},
         isSelfClosing: false,
         isVoid: false,
         startPosition: Position(line: 1, column: 1, offset: 0),

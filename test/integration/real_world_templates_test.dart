@@ -65,7 +65,11 @@ void main() {
       final parser = BladeParser();
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue, reason: 'Template should parse successfully');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Template should parse successfully',
+      );
       expect(result.errors, isEmpty, reason: 'Should have no parse errors');
 
       // Verify root component
@@ -84,16 +88,24 @@ void main() {
 
       // Verify directives exist
       final allDirectives = _findNodesRecursive<DirectiveNode>(result.ast!);
-      expect(allDirectives.length, greaterThan(2), reason: 'Should have multiple directives');
+      expect(
+        allDirectives.length,
+        greaterThan(2),
+        reason: 'Should have multiple directives',
+      );
 
       // Verify form element
-      final forms = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'form');
+      final forms = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'form');
       expect(forms, hasLength(1));
       final form = forms.first;
       expect(form.attributes['method']!.value, equals('POST'));
 
       // Verify input components
-      final inputComponents = _findNodesRecursive<ComponentNode>(result.ast!).where((c) => c.name == 'input');
+      final inputComponents = _findNodesRecursive<ComponentNode>(
+        result.ast!,
+      ).where((c) => c.name == 'input');
       expect(inputComponents.length, greaterThan(1));
 
       // Verify echo statements
@@ -104,8 +116,10 @@ void main() {
     // ==================================================================
     // 2. JETSTREAM AUTHENTICATION VIEWS - Registration Form
     // ==================================================================
-    test('Jetstream Registration Form with multiple input components and slots', () {
-      final template = '''
+    test(
+      'Jetstream Registration Form with multiple input components and slots',
+      () {
+        final template = '''
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
@@ -167,28 +181,44 @@ void main() {
 </x-guest-layout>
 ''';
 
-      final parser = BladeParser();
-      final result = parser.parse(template);
+        final parser = BladeParser();
+        final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue);
-      expect(result.errors, isEmpty);
+        expect(result.isSuccess, isTrue);
+        expect(result.errors, isEmpty);
 
-      // Verify component structure
-      final guestLayout = result.ast!.children.whereType<ComponentNode>().first;
-      expect(guestLayout.name, equals('guest-layout'));
+        // Verify component structure
+        final guestLayout = result.ast!.children
+            .whereType<ComponentNode>()
+            .first;
+        expect(guestLayout.name, equals('guest-layout'));
 
-      // Verify multiple input components
-      final inputComponents = _findNodesRecursive<ComponentNode>(result.ast!).where((c) => c.name == 'input');
-      expect(inputComponents.length, equals(4)); // name, email, password, password_confirmation
+        // Verify multiple input components
+        final inputComponents = _findNodesRecursive<ComponentNode>(
+          result.ast!,
+        ).where((c) => c.name == 'input');
+        expect(
+          inputComponents.length,
+          equals(4),
+        ); // name, email, password, password_confirmation
 
-      // Verify raw echo (terms and conditions)
-      final rawEchoes = _findNodesRecursive<EchoNode>(result.ast!).where((e) => e.isRaw);
-      expect(rawEchoes, isNotEmpty);
+        // Verify raw echo (terms and conditions)
+        final rawEchoes = _findNodesRecursive<EchoNode>(
+          result.ast!,
+        ).where((e) => e.isRaw);
+        expect(rawEchoes, isNotEmpty);
 
-      // Verify conditional terms section (may have parse issues with complex expressions)
-      final ifDirectives = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'if');
-      expect(ifDirectives.length, greaterThan(0), reason: 'Should have @if directives');
-    });
+        // Verify conditional terms section (may have parse issues with complex expressions)
+        final ifDirectives = _findNodesRecursive<DirectiveNode>(
+          result.ast!,
+        ).where((d) => d.name == 'if');
+        expect(
+          ifDirectives.length,
+          greaterThan(0),
+          reason: 'Should have @if directives',
+        );
+      },
+    );
 
     // ==================================================================
     // 3. BREEZE COMPONENTS - Navigation with Authentication Checks
@@ -258,20 +288,28 @@ void main() {
       expect(result.errors, isEmpty);
 
       // Verify navigation element
-      final navs = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'nav');
+      final navs = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'nav');
       expect(navs, hasLength(1));
 
       // Verify @auth directive
       final directives = _findNodesRecursive<DirectiveNode>(result.ast!);
-      final authDirective = directives.where((d) => d.name == 'auth').firstOrNull;
+      final authDirective = directives
+          .where((d) => d.name == 'auth')
+          .firstOrNull;
       expect(authDirective, isNotNull);
 
       // Verify @guest directive
-      final guestDirective = directives.where((d) => d.name == 'guest').firstOrNull;
+      final guestDirective = directives
+          .where((d) => d.name == 'guest')
+          .firstOrNull;
       expect(guestDirective, isNotNull);
 
       // Verify dropdown component with named slots
-      final dropdownComponents = _findNodesRecursive<ComponentNode>(result.ast!).where((c) => c.name == 'dropdown');
+      final dropdownComponents = _findNodesRecursive<ComponentNode>(
+        result.ast!,
+      ).where((c) => c.name == 'dropdown');
       expect(dropdownComponents, isNotEmpty);
       final dropdown = dropdownComponents.first;
 
@@ -352,35 +390,53 @@ void main() {
       expect(result.errors, isEmpty);
 
       // Verify Alpine.js x-data attribute
-      final divs = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'div');
+      final divs = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'div');
       final alpineDiv = divs.firstWhere(
-        (d) => d.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == 'x-data'),
+        (d) => d.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == 'x-data',
+        ),
         orElse: () => throw StateError('No Alpine.js x-data found'),
       );
       expect(alpineDiv, isNotNull);
 
-      final xDataAttr = alpineDiv.attributes.values.whereType<AlpineAttribute>().firstWhere((a) => a.name == 'x-data');
+      final xDataAttr = alpineDiv.attributes.values
+          .whereType<AlpineAttribute>()
+          .firstWhere((a) => a.name == 'x-data');
       expect(xDataAttr.value, contains('open'));
 
       // Verify @click attribute on button
-      final buttons = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'button');
+      final buttons = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'button');
       final toggleButton = buttons.firstWhere(
-        (b) => b.attributes.values.any((attr) => attr is AlpineAttribute && attr.name.startsWith('@click')),
+        (b) => b.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name.startsWith('@click'),
+        ),
         orElse: () => throw StateError('No @click button found'),
       );
       expect(toggleButton, isNotNull);
 
       // Verify :class bindings
       final classBindings = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == ':class'));
+          .where(
+            (e) => e.attributes.values.any(
+              (attr) => attr is AlpineAttribute && attr.name == ':class',
+            ),
+          );
       expect(classBindings.length, greaterThan(0));
 
       // Verify @auth directive
-      final authDirective = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'auth').firstOrNull;
+      final authDirective = _findNodesRecursive<DirectiveNode>(
+        result.ast!,
+      ).where((d) => d.name == 'auth').firstOrNull;
       expect(authDirective, isNotNull);
 
       // Verify responsive nav link components
-      final navLinks = _findNodesRecursive<ComponentNode>(result.ast!).where((c) => c.name == 'responsive-nav-link');
+      final navLinks = _findNodesRecursive<ComponentNode>(
+        result.ast!,
+      ).where((c) => c.name == 'responsive-nav-link');
       expect(navLinks.length, greaterThan(1));
     });
 
@@ -458,37 +514,64 @@ void main() {
       expect(result.errors, isEmpty);
 
       // Verify wire:submit.prevent on form
-      final forms = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'form');
+      final forms = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'form');
       expect(forms, hasLength(1));
       final form = forms.first;
 
-      final wireSubmit = form.attributes.values.whereType<LivewireAttribute>().firstWhere(
-        (attr) => attr.action == 'submit',
-        orElse: () => throw StateError('No wire:submit found'),
-      );
+      final wireSubmit = form.attributes.values
+          .whereType<LivewireAttribute>()
+          .firstWhere(
+            (attr) => attr.action == 'submit',
+            orElse: () => throw StateError('No wire:submit found'),
+          );
       expect(wireSubmit.modifiers, contains('prevent'));
 
       // Verify wire:model variations
-      final inputs = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'input' || e.tagName == 'textarea' || e.tagName == 'select');
-      final wireModelInputs = inputs.where((i) => i.attributes.values.any((attr) => attr is LivewireAttribute && attr.action == 'model'));
+      final inputs = _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) =>
+            e.tagName == 'input' ||
+            e.tagName == 'textarea' ||
+            e.tagName == 'select',
+      );
+      final wireModelInputs = inputs.where(
+        (i) => i.attributes.values.any(
+          (attr) => attr is LivewireAttribute && attr.action == 'model',
+        ),
+      );
       expect(wireModelInputs.length, greaterThan(2));
 
       // Verify wire:loading attributes
-      final wireLoadingElements = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr is LivewireAttribute && attr.action == 'loading'));
+      final wireLoadingElements =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+            (e) => e.attributes.values.any(
+              (attr) => attr is LivewireAttribute && attr.action == 'loading',
+            ),
+          );
       expect(wireLoadingElements.length, greaterThan(1));
 
       // Verify @error directives
-      final errorDirectives = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'error');
+      final errorDirectives = _findNodesRecursive<DirectiveNode>(
+        result.ast!,
+      ).where((d) => d.name == 'error');
       expect(errorDirectives.length, equals(3)); // title, description, category
 
       // Verify @foreach directive
-      final foreachDirectives = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'foreach');
+      final foreachDirectives = _findNodesRecursive<DirectiveNode>(
+        result.ast!,
+      ).where((d) => d.name == 'foreach');
       expect(foreachDirectives, hasLength(1));
 
       // Verify wire:click
       final wireClickButtons = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.tagName == 'button' && e.attributes.values.any((attr) => attr is LivewireAttribute && attr.action == 'click'));
+          .where(
+            (e) =>
+                e.tagName == 'button' &&
+                e.attributes.values.any(
+                  (attr) => attr is LivewireAttribute && attr.action == 'click',
+                ),
+          );
       expect(wireClickButtons, isNotEmpty);
     });
 
@@ -552,41 +635,69 @@ void main() {
       expect(result.errors, isEmpty);
 
       // Verify wire:poll
-      final pollDivs = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.tagName == 'div' && e.attributes.values.any((attr) => attr is LivewireAttribute && attr.action == 'poll'));
+      final pollDivs = _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) =>
+            e.tagName == 'div' &&
+            e.attributes.values.any(
+              (attr) => attr is LivewireAttribute && attr.action == 'poll',
+            ),
+      );
       expect(pollDivs, hasLength(1));
       final pollDiv = pollDivs.first;
-      final pollAttr = pollDiv.attributes.values.whereType<LivewireAttribute>().firstWhere((a) => a.action == 'poll');
+      final pollAttr = pollDiv.attributes.values
+          .whereType<LivewireAttribute>()
+          .firstWhere((a) => a.action == 'poll');
       expect(pollAttr.modifiers, contains('5s'));
 
       // Verify wire:model with debounce
       final searchInput = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.tagName == 'input' && e.attributes.values.any((attr) => attr is LivewireAttribute && attr.action == 'model'))
+          .where(
+            (e) =>
+                e.tagName == 'input' &&
+                e.attributes.values.any(
+                  (attr) => attr is LivewireAttribute && attr.action == 'model',
+                ),
+          )
           .first;
-      final modelAttr = searchInput.attributes.values.whereType<LivewireAttribute>().firstWhere((a) => a.action == 'model');
+      final modelAttr = searchInput.attributes.values
+          .whereType<LivewireAttribute>()
+          .firstWhere((a) => a.action == 'model');
       expect(modelAttr.modifiers, contains('live'));
       expect(modelAttr.modifiers, contains('debounce'));
 
       // Verify @forelse/@empty
-      final forelseDirectives = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'forelse');
+      final forelseDirectives = _findNodesRecursive<DirectiveNode>(
+        result.ast!,
+      ).where((d) => d.name == 'forelse');
       expect(forelseDirectives, hasLength(1));
 
       // The @empty clause is inside @forelse
-      final emptyDirectives = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'empty');
+      final emptyDirectives = _findNodesRecursive<DirectiveNode>(
+        result.ast!,
+      ).where((d) => d.name == 'empty');
       expect(emptyDirectives, hasLength(1));
 
       // Verify wire:key
-      final keyDivs = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr is LivewireAttribute && attr.action == 'key'));
+      final keyDivs = _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) => e.attributes.values.any(
+          (attr) => attr is LivewireAttribute && attr.action == 'key',
+        ),
+      );
       expect(keyDivs, hasLength(1));
 
       // Verify wire:target
       final targetElements = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr is LivewireAttribute && attr.action == 'target'));
+          .where(
+            (e) => e.attributes.values.any(
+              (attr) => attr is LivewireAttribute && attr.action == 'target',
+            ),
+          );
       expect(targetElements.length, greaterThan(2));
 
       // Verify nested @if/@else
-      final ifDirectives = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'if');
+      final ifDirectives = _findNodesRecursive<DirectiveNode>(
+        result.ast!,
+      ).where((d) => d.name == 'if');
       expect(ifDirectives.length, greaterThan(1));
     });
 
@@ -667,33 +778,62 @@ void main() {
       expect(result.errors, isEmpty);
 
       // Verify x-data initialization
-      final divs = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'div');
-      final xDataDivs = divs.where((d) => d.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == 'x-data'));
+      final divs = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'div');
+      final xDataDivs = divs.where(
+        (d) => d.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == 'x-data',
+        ),
+      );
       expect(xDataDivs, hasLength(1));
 
       // Verify @click handlers
-      final buttons = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'button');
-      final clickButtons = buttons.where((b) => b.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == '@click'));
+      final buttons = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'button');
+      final clickButtons = buttons.where(
+        (b) => b.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == '@click',
+        ),
+      );
       expect(clickButtons.length, greaterThan(2));
 
       // Verify x-show directives
       final xShowElements = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == 'x-show'));
+          .where(
+            (e) => e.attributes.values.any(
+              (attr) => attr is AlpineAttribute && attr.name == 'x-show',
+            ),
+          );
       expect(xShowElements.length, greaterThan(2));
 
       // Verify x-transition directives (may be parsed as standard attributes)
-      final xTransitionElements = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr.name.contains('transition')));
+      final xTransitionElements =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+            (e) => e.attributes.values.any(
+              (attr) => attr.name.contains('transition'),
+            ),
+          );
       expect(xTransitionElements.length, greaterThan(0));
 
       // Verify @keydown.escape.window
       final escapeHandlers = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr is AlpineAttribute && attr.name.contains('keydown')));
+          .where(
+            (e) => e.attributes.values.any(
+              (attr) =>
+                  attr is AlpineAttribute && attr.name.contains('keydown'),
+            ),
+          );
       expect(escapeHandlers, hasLength(1));
 
       // Verify @click.away
-      final clickAwayElements = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == '@click.away'));
+      final clickAwayElements =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+            (e) => e.attributes.values.any(
+              (attr) => attr is AlpineAttribute && attr.name == '@click.away',
+            ),
+          );
       expect(clickAwayElements, hasLength(1));
 
       // Verify echo statements for dynamic content
@@ -792,35 +932,50 @@ void main() {
       expect(result.errors, isEmpty);
 
       // Verify complex responsive grid classes
-      final gridDivs = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.tagName == 'div' && e.attributes['class']?.value?.contains('grid') == true);
+      final gridDivs = _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) =>
+            e.tagName == 'div' &&
+            e.attributes['class']?.value?.contains('grid') == true,
+      );
       expect(gridDivs, isNotEmpty);
       final gridDiv = gridDivs.first;
       expect(gridDiv.attributes['class']!.value, contains('md:grid-cols'));
       expect(gridDiv.attributes['class']!.value, contains('lg:grid-cols'));
 
       // Verify @foreach directive
-      final foreachDirectives = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'foreach');
+      final foreachDirectives = _findNodesRecursive<DirectiveNode>(
+        result.ast!,
+      ).where((d) => d.name == 'foreach');
       expect(foreachDirectives, hasLength(1));
 
       // Verify nested @if/@elseif/@endif
-      final ifDirectives = _findNodesRecursive<DirectiveNode>(result.ast!).where((d) => d.name == 'if');
+      final ifDirectives = _findNodesRecursive<DirectiveNode>(
+        result.ast!,
+      ).where((d) => d.name == 'if');
       expect(ifDirectives.length, greaterThan(2));
 
       // Verify complex class attributes with responsive variants
-      final allDivs = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'div');
+      final allDivs = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'div');
       final responsiveDivs = allDivs.where((d) {
         final classValue = d.attributes['class']?.value ?? '';
-        return classValue.contains('sm:') || classValue.contains('md:') || classValue.contains('lg:');
+        return classValue.contains('sm:') ||
+            classValue.contains('md:') ||
+            classValue.contains('lg:');
       });
       expect(responsiveDivs.length, greaterThan(3));
 
       // Verify button with responsive text
-      final buttons = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'button');
+      final buttons = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'button');
       expect(buttons, isNotEmpty);
 
       // Verify SVG elements
-      final svgs = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'svg');
+      final svgs = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'svg');
       expect(svgs.length, greaterThan(1));
     });
 
@@ -915,7 +1070,9 @@ void main() {
       final directives = _findNodesRecursive<DirectiveNode>(result.ast!);
 
       // Verify @extends
-      final extendsDirective = directives.where((d) => d.name == 'extends').firstOrNull;
+      final extendsDirective = directives
+          .where((d) => d.name == 'extends')
+          .firstOrNull;
       expect(extendsDirective, isNotNull);
       expect(extendsDirective!.expression, contains('layouts.app'));
 
@@ -924,26 +1081,37 @@ void main() {
       expect(sectionDirectives.length, greaterThan(3));
 
       // Find specific sections
-      final titleSection = sectionDirectives.where((d) => d.expression?.contains('title') == true).firstOrNull;
+      final titleSection = sectionDirectives
+          .where((d) => d.expression?.contains('title') == true)
+          .firstOrNull;
       expect(titleSection, isNotNull);
 
-      final contentSection = sectionDirectives.where((d) => d.expression?.contains('content') == true).firstOrNull;
+      final contentSection = sectionDirectives
+          .where((d) => d.expression?.contains('content') == true)
+          .firstOrNull;
       expect(contentSection, isNotNull);
 
       // Verify @parent directive
       final parentDirectives = directives.where((d) => d.name == 'parent');
-      expect(parentDirectives.length, equals(2)); // In styles and scripts sections
+      expect(
+        parentDirectives.length,
+        equals(2),
+      ); // In styles and scripts sections
 
       // Verify @include
       final includeDirectives = directives.where((d) => d.name == 'include');
       expect(includeDirectives, hasLength(1));
 
       // Verify @includeWhen
-      final includeWhenDirectives = directives.where((d) => d.name == 'includeWhen');
+      final includeWhenDirectives = directives.where(
+        (d) => d.name == 'includeWhen',
+      );
       expect(includeWhenDirectives, hasLength(1));
 
       // Verify @includeUnless
-      final includeUnlessDirectives = directives.where((d) => d.name == 'includeUnless');
+      final includeUnlessDirectives = directives.where(
+        (d) => d.name == 'includeUnless',
+      );
       expect(includeUnlessDirectives, hasLength(1));
 
       // Verify @yield
@@ -963,7 +1131,9 @@ void main() {
       expect(canDirectives, hasLength(1));
 
       // Verify @hasSection
-      final hasSectionDirectives = directives.where((d) => d.name == 'hasSection');
+      final hasSectionDirectives = directives.where(
+        (d) => d.name == 'hasSection',
+      );
       expect(hasSectionDirectives, hasLength(1));
 
       // Verify @foreach
@@ -1185,31 +1355,56 @@ if response.status_code == 200:
       final directives = _findNodesRecursive<DirectiveNode>(result.ast!);
 
       // Verify Alpine.js x-data with complex state
-      final divs = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'div');
-      final xDataDivs = divs.where((d) => d.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == 'x-data'));
+      final divs = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'div');
+      final xDataDivs = divs.where(
+        (d) => d.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == 'x-data',
+        ),
+      );
       expect(xDataDivs, hasLength(1));
       final xDataDiv = xDataDivs.first;
-      final xDataAttr = xDataDiv.attributes.values.whereType<AlpineAttribute>().firstWhere((a) => a.name == 'x-data');
+      final xDataAttr = xDataDiv.attributes.values
+          .whereType<AlpineAttribute>()
+          .firstWhere((a) => a.name == 'x-data');
       expect(xDataAttr.value, contains('activeTab'));
       expect(xDataAttr.value, contains('activeLang'));
 
       // Verify @click handlers for tabs
-      final buttons = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'button');
-      final clickButtons = buttons.where((b) => b.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == '@click'));
+      final buttons = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'button');
+      final clickButtons = buttons.where(
+        (b) => b.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == '@click',
+        ),
+      );
       expect(clickButtons.length, greaterThan(5));
 
       // Verify x-show for tab content
-      final xShowDivs = divs.where((d) => d.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == 'x-show'));
+      final xShowDivs = divs.where(
+        (d) => d.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == 'x-show',
+        ),
+      );
       expect(xShowDivs.length, greaterThan(5));
 
       // Verify :class bindings
       final classBindings = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where((e) => e.attributes.values.any((attr) => attr is AlpineAttribute && attr.name == ':class'));
+          .where(
+            (e) => e.attributes.values.any(
+              (attr) => attr is AlpineAttribute && attr.name == ':class',
+            ),
+          );
       expect(classBindings.length, greaterThan(3));
 
       // Verify @verbatim sections
       final verbatimDirectives = directives.where((d) => d.name == 'verbatim');
-      expect(verbatimDirectives.length, greaterThan(3)); // JSON response + code examples
+      expect(
+        verbatimDirectives.length,
+        greaterThan(3),
+      ); // JSON response + code examples
 
       // Verify @if directive
       final ifDirectives = directives.where((d) => d.name == 'if');
@@ -1228,7 +1423,9 @@ if response.status_code == 200:
       expect(echoNodes.length, greaterThan(10));
 
       // Verify table structure
-      final tables = _findNodesRecursive<HtmlElementNode>(result.ast!).where((e) => e.tagName == 'table');
+      final tables = _findNodesRecursive<HtmlElementNode>(
+        result.ast!,
+      ).where((e) => e.tagName == 'table');
       expect(tables, hasLength(1));
     });
   });

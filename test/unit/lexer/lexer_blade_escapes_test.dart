@@ -13,31 +13,41 @@ void main() {
 
       // Expected: Single text token containing '@{{ $variable }}'
       // Current bug: Text '@' + echo tokens for '{{ $variable }}'
-      
+
       // Filter out EOF token
-      final nonEofTokens = tokens.where((t) => t.type != TokenType.eof).toList();
-      
+      final nonEofTokens = tokens
+          .where((t) => t.type != TokenType.eof)
+          .toList();
+
       // Should be exactly one text token
-      expect(nonEofTokens.length, equals(1), 
-        reason: 'Should be single text token, not split into @ and echo');
+      expect(
+        nonEofTokens.length,
+        equals(1),
+        reason: 'Should be single text token, not split into @ and echo',
+      );
       expect(nonEofTokens.first.type, equals(TokenType.text));
       expect(nonEofTokens.first.value, equals('@{{ \$variable }}'));
-      
+
       // Should NOT have any echo tokens
-      expect(tokens.any((t) => t.type == TokenType.echoOpen), isFalse,
-        reason: '@{{ should be escaped, not parsed as echo');
+      expect(
+        tokens.any((t) => t.type == TokenType.echoOpen),
+        isFalse,
+        reason: '@{{ should be escaped, not parsed as echo',
+      );
     });
 
     test('Escaped echo with nested braces', () {
-      lexer = BladeLexer('@{{ \$array[\'key\'] }}');
+      lexer = BladeLexer("@{{ \$array['key'] }}");
       final tokens = lexer.tokenize();
 
-      final nonEofTokens = tokens.where((t) => t.type != TokenType.eof).toList();
-      
+      final nonEofTokens = tokens
+          .where((t) => t.type != TokenType.eof)
+          .toList();
+
       expect(nonEofTokens.length, equals(1));
       expect(nonEofTokens.first.type, equals(TokenType.text));
       expect(nonEofTokens.first.value, contains('@{{'));
-      
+
       // Should NOT be parsed as echo
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isFalse);
     });
@@ -47,13 +57,16 @@ void main() {
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      
+
       // Should have text tokens containing the escaped echoes
       expect(textTokens.length, greaterThan(0));
-      
+
       // Should NOT have echo tokens
-      expect(tokens.any((t) => t.type == TokenType.echoOpen), isFalse,
-        reason: 'Both @{{ should be escaped');
+      expect(
+        tokens.any((t) => t.type == TokenType.echoOpen),
+        isFalse,
+        reason: 'Both @{{ should be escaped',
+      );
     });
 
     test('Escaped echo in mixed content', () {
@@ -62,7 +75,7 @@ void main() {
 
       // Should be all text, no echo parsing
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isFalse);
-      
+
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens.any((t) => t.value.contains('@{{')), isTrue);
     });
@@ -79,34 +92,42 @@ void main() {
       final result = parser.parse('<p>Use @{{ \$var }} for literal</p>');
 
       expect(result.isSuccess, isTrue);
-      
+
       final html = result.ast!.children.first as HtmlElementNode;
       final textChildren = html.children.whereType<TextNode>();
-      
+
       // Text should contain the literal @{{ }}
       final hasEscapedEcho = textChildren.any((t) => t.content.contains('@{{'));
-      expect(hasEscapedEcho, isTrue,
-        reason: '@{{ should appear literally in text, not be parsed as echo');
-      
+      expect(
+        hasEscapedEcho,
+        isTrue,
+        reason: '@{{ should appear literally in text, not be parsed as echo',
+      );
+
       // Should NOT have echo nodes
       final echoChildren = html.children.whereType<EchoNode>();
-      expect(echoChildren, isEmpty,
-        reason: '@{{ should not create EchoNode');
+      expect(echoChildren, isEmpty, reason: '@{{ should not create EchoNode');
     });
 
     test('Normal echo vs escaped echo difference', () {
       // Normal echo
       final normalResult = parser.parse('{{ \$var }}');
       final normalEchoes = normalResult.ast!.children.whereType<EchoNode>();
-      expect(normalEchoes.length, equals(1), 
-        reason: 'Normal {{ }} should create echo');
+      expect(
+        normalEchoes.length,
+        equals(1),
+        reason: 'Normal {{ }} should create echo',
+      );
 
       // Escaped echo
       final escapedResult = parser.parse('@{{ \$var }}');
       final escapedEchoes = escapedResult.ast!.children.whereType<EchoNode>();
-      expect(escapedEchoes.length, equals(0),
-        reason: 'Escaped @{{ }} should NOT create echo');
-      
+      expect(
+        escapedEchoes.length,
+        equals(0),
+        reason: 'Escaped @{{ }} should NOT create echo',
+      );
+
       final textNodes = escapedResult.ast!.children.whereType<TextNode>();
       expect(textNodes.any((t) => t.content.contains('@{{')), isTrue);
     });
@@ -121,7 +142,7 @@ void main() {
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
-      
+
       final combinedText = textTokens.map((t) => t.value).join('');
       expect(combinedText, equals('Contact us at admin@example.com'));
     });
@@ -131,12 +152,15 @@ void main() {
       final tokens = lexer.tokenize();
 
       // Should be text, not an @if directive
-      expect(tokens.any((t) => t.type == TokenType.directiveIf), isFalse,
-        reason: '@@if should be literal @if, not a directive');
-      
+      expect(
+        tokens.any((t) => t.type == TokenType.directiveIf),
+        isFalse,
+        reason: '@@if should be literal @if, not a directive',
+      );
+
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
-      
+
       final combinedText = textTokens.map((t) => t.value).join('');
       expect(combinedText, equals('@if this is literal text'));
     });
@@ -146,7 +170,7 @@ void main() {
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      
+
       final content = textTokens.map((t) => t.value).join('');
       expect(content, equals('user@domain.com or admin@domain.com'));
     });
@@ -161,9 +185,15 @@ void main() {
       // @@ should be escaped to @
       lexer = BladeLexer('Escaped: user@@example.com');
       tokens = lexer.tokenize();
-      text = tokens.where((t) => t.type == TokenType.text).map((t) => t.value).join('');
-      expect(text, equals('Escaped: user@example.com'),
-        reason: '@@ should normalize to @');
+      text = tokens
+          .where((t) => t.type == TokenType.text)
+          .map((t) => t.value)
+          .join('');
+      expect(
+        text,
+        equals('Escaped: user@example.com'),
+        reason: '@@ should normalize to @',
+      );
     });
   });
 
@@ -176,15 +206,15 @@ void main() {
 
     test('@@ in content produces literal @', () {
       final result = parser.parse('<p>Email: admin@@site.com</p>');
-      
+
       expect(result.isSuccess, isTrue);
-      
+
       final html = result.ast!.children.first as HtmlElementNode;
       final textNodes = html.children.whereType<TextNode>();
-      
+
       expect(textNodes, isNotEmpty);
       final textContent = textNodes.map((t) => t.content).join('');
-      
+
       // Should contain admin@site.com (single @)
       expect(textContent, equals('Email: admin@site.com'));
     });

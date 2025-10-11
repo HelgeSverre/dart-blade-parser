@@ -18,7 +18,10 @@ void main() {
       expect(combinedText, equals('@directive this is literal'));
 
       // Should NOT be parsed as directive
-      expect(tokens.any((t) => t.type.toString().contains('directive')), isFalse);
+      expect(
+        tokens.any((t) => t.type.toString().contains('directive')),
+        isFalse,
+      );
     });
 
     test('@@ at end of input', () {
@@ -57,25 +60,33 @@ void main() {
     });
 
     test('@@ in script tags', () {
-      lexer = BladeLexer('<script>\nvar email = "user@@domain.com";\n</script>');
+      lexer = BladeLexer(
+        '<script>\nvar email = "user@@domain.com";\n</script>',
+      );
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
 
       // In raw text context (script tag), @@ should become @
-      final scriptContent = textTokens.where((t) => t.value.contains('email')).firstOrNull;
+      final scriptContent = textTokens
+          .where((t) => t.value.contains('email'))
+          .firstOrNull;
       expect(scriptContent, isNotNull);
     });
 
     test('@@ in style tags', () {
-      lexer = BladeLexer('<style>\n/* Comment with @@ */\n.class { }\n</style>');
+      lexer = BladeLexer(
+        '<style>\n/* Comment with @@ */\n.class { }\n</style>',
+      );
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
       // Style content should be present
-      final styleContent = textTokens.where((t) => t.value.contains('Comment')).firstOrNull;
+      final styleContent = textTokens
+          .where((t) => t.value.contains('Comment'))
+          .firstOrNull;
       expect(styleContent, isNotNull);
     });
 
@@ -180,10 +191,13 @@ void main() {
 
       // Should have escaped echo in text or attribute value tokens
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+      final attrValueTokens = tokens
+          .where((t) => t.type == TokenType.attributeValue)
+          .toList();
 
-      final hasEscapedEcho = textTokens.any((t) => t.value.contains('@{{')) ||
-                             attrValueTokens.any((t) => t.value.contains('@{{'));
+      final hasEscapedEcho =
+          textTokens.any((t) => t.value.contains('@{{')) ||
+          attrValueTokens.any((t) => t.value.contains('@{{'));
       expect(hasEscapedEcho, isTrue);
 
       // Should NOT be parsed as echo
@@ -209,7 +223,9 @@ void main() {
       lexer = BladeLexer('{{-- @{{ \$var }} is escaped --}}');
       final tokens = lexer.tokenize();
 
-      final commentTokens = tokens.where((t) => t.type == TokenType.bladeComment).toList();
+      final commentTokens = tokens
+          .where((t) => t.type == TokenType.bladeComment)
+          .toList();
       expect(commentTokens.length, equals(1));
       expect(commentTokens.first.value, contains('@{{'));
     });

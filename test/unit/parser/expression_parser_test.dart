@@ -75,7 +75,8 @@ void main() {
 
     test('Parse complex nested expression', () {
       final result = parseExpression(
-          '\$user->posts()->where("status", "published")->count() > 0');
+        '\$user->posts()->where("status", "published")->count() > 0',
+      );
       expect(result, isNotEmpty);
       expect(result, contains('->'));
     });
@@ -101,8 +102,9 @@ void main() {
     });
 
     test('Parse complex boolean expression', () {
-      final result =
-          parseExpression('(\$age >= 18 && \$verified) || \$isAdmin');
+      final result = parseExpression(
+        '(\$age >= 18 && \$verified) || \$isAdmin',
+      );
       expect(result, isNotEmpty);
       expect(result, contains('&&'));
       expect(result, contains('||'));

@@ -21,8 +21,11 @@ void main() {
       ''');
 
       // Current bug: Tries to parse '< 10' as HTML tag, will fail
-      expect(result.isSuccess, isTrue,
-          reason: 'Script with < and > should parse successfully');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Script with < and > should parse successfully',
+      );
 
       final script = result.ast!.children
           .whereType<HtmlElementNode>()
@@ -33,19 +36,31 @@ void main() {
       // Script content should be RAW TEXT, not parsed
       // Should have ONE text child containing the entire script
       final textChildren = script.children.whereType<TextNode>();
-      expect(textChildren, isNotEmpty,
-          reason: 'Script should have text content');
+      expect(
+        textChildren,
+        isNotEmpty,
+        reason: 'Script should have text content',
+      );
 
       final scriptContent = textChildren.map((t) => t.content).join();
-      expect(scriptContent, contains('x < 10'),
-          reason: 'Script should preserve < literally');
-      expect(scriptContent, contains('y > 5'),
-          reason: 'Script should preserve > literally');
+      expect(
+        scriptContent,
+        contains('x < 10'),
+        reason: 'Script should preserve < literally',
+      );
+      expect(
+        scriptContent,
+        contains('y > 5'),
+        reason: 'Script should preserve > literally',
+      );
 
       // Should NOT have any HTML children inside script
       final htmlChildren = script.children.whereType<HtmlElementNode>();
-      expect(htmlChildren, isEmpty,
-          reason: 'Script content should not be parsed as HTML');
+      expect(
+        htmlChildren,
+        isEmpty,
+        reason: 'Script content should not be parsed as HTML',
+      );
     });
 
     test('Style with CSS selectors should not parse > as tag', () {
@@ -56,8 +71,11 @@ void main() {
         </style>
       ''');
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Style with > and + should parse successfully');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Style with > and + should parse successfully',
+      );
 
       final style = result.ast!.children
           .whereType<HtmlElementNode>()
@@ -70,13 +88,19 @@ void main() {
       expect(textChildren, isNotEmpty);
 
       final styleContent = textChildren.map((t) => t.content).join();
-      expect(styleContent, contains('div > p'),
-          reason: 'Style should preserve > literally');
+      expect(
+        styleContent,
+        contains('div > p'),
+        reason: 'Style should preserve > literally',
+      );
 
       // Should NOT parse as HTML
       final htmlChildren = style.children.whereType<HtmlElementNode>();
-      expect(htmlChildren, isEmpty,
-          reason: 'Style content should not be parsed as HTML');
+      expect(
+        htmlChildren,
+        isEmpty,
+        reason: 'Style content should not be parsed as HTML',
+      );
     });
 
     test('Script with template literals containing HTML', () {
@@ -97,15 +121,21 @@ void main() {
       final textChildren = script.children.whereType<TextNode>();
       final scriptContent = textChildren.map((t) => t.content).join();
 
-      expect(scriptContent, contains('<div>test</div>'),
-          reason: 'HTML inside template literal should be preserved as text');
+      expect(
+        scriptContent,
+        contains('<div>test</div>'),
+        reason: 'HTML inside template literal should be preserved as text',
+      );
 
       // No nested div element should exist
-      final nestedDivs = script.children
-          .whereType<HtmlElementNode>()
-          .where((e) => e.tagName == 'div');
-      expect(nestedDivs, isEmpty,
-          reason: 'Template literal HTML should not be parsed');
+      final nestedDivs = script.children.whereType<HtmlElementNode>().where(
+        (e) => e.tagName == 'div',
+      );
+      expect(
+        nestedDivs,
+        isEmpty,
+        reason: 'Template literal HTML should not be parsed',
+      );
     });
 
     test('Script with closing tag in string literal', () {
@@ -119,8 +149,11 @@ void main() {
 
       // This is tricky: HTML5 spec requires special handling
       // Naive implementation will close at first </script>
-      expect(result.isSuccess, isTrue,
-          reason: 'Should handle </script> in string correctly');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Should handle </script> in string correctly',
+      );
 
       final script = result.ast!.children
           .whereType<HtmlElementNode>()
@@ -130,8 +163,11 @@ void main() {
       final scriptContent = textChildren.map((t) => t.content).join();
 
       // Should contain the full script, including the alert after the string
-      expect(scriptContent, contains('alert'),
-          reason: 'Should not prematurely close at </script> in string');
+      expect(
+        scriptContent,
+        contains('alert'),
+        reason: 'Should not prematurely close at </script> in string',
+      );
     });
 
     test('Style followed by regular HTML', () {
@@ -144,10 +180,15 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final elements = result.ast!.children.whereType<HtmlElementNode>().toList();
+      final elements = result.ast!.children
+          .whereType<HtmlElementNode>()
+          .toList();
 
-      expect(elements.length, greaterThanOrEqualTo(2),
-          reason: 'Should have style and div as separate elements');
+      expect(
+        elements.length,
+        greaterThanOrEqualTo(2),
+        reason: 'Should have style and div as separate elements',
+      );
 
       final style = elements.firstWhere((e) => e.tagName == 'style');
       final div = elements.firstWhere((e) => e.tagName == 'div');
@@ -156,11 +197,16 @@ void main() {
       expect(div, isNotNull);
 
       // Style and div should be siblings, not nested
-      final styleTextContent =
-          style.children.whereType<TextNode>().map((t) => t.content).join();
+      final styleTextContent = style.children
+          .whereType<TextNode>()
+          .map((t) => t.content)
+          .join();
       expect(styleTextContent, contains('margin: 0'));
-      expect(styleTextContent, isNot(contains('<div')),
-          reason: 'Div should not be inside style');
+      expect(
+        styleTextContent,
+        isNot(contains('<div')),
+        reason: 'Div should not be inside style',
+      );
     });
 
     test('Script with multiple < and > operators', () {
@@ -212,8 +258,11 @@ void main() {
       expect(styleContent, contains('p ~ span'));
       expect(styleContent, contains('div + div'));
 
-      expect(style.children.whereType<HtmlElementNode>(), isEmpty,
-          reason: 'CSS should not be parsed as HTML');
+      expect(
+        style.children.whereType<HtmlElementNode>(),
+        isEmpty,
+        reason: 'CSS should not be parsed as HTML',
+      );
     });
 
     test('Nested script tags (edge case)', () {
@@ -225,8 +274,11 @@ void main() {
       ''');
 
       // Should handle the escaped closing tag
-      expect(result.errors, isEmpty,
-          reason: 'Should handle escaped script tags in content');
+      expect(
+        result.errors,
+        isEmpty,
+        reason: 'Should handle escaped script tags in content',
+      );
     });
 
     test('Script in HTML document structure', () {
@@ -246,17 +298,17 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       // Navigate to script
-      final html = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'html');
+      final html = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'html',
+      );
 
-      final head = html.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'head');
+      final head = html.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'head',
+      );
 
-      final script = head.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'script');
+      final script = head.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'script',
+      );
 
       expect(script, isNotNull);
 

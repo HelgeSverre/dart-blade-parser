@@ -29,14 +29,20 @@ void main() {
       final template = "{{ '<script>alert(1)</script>' }}";
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should parse XSS pattern without crashing');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should parse XSS pattern without crashing',
+      );
 
       final echoNodes = result.ast!.children.whereType<EchoNode>();
       expect(echoNodes.length, equals(1));
       expect(echoNodes.first.expression, equals("'<script>alert(1)</script>'"));
-      expect(echoNodes.first.isRaw, isFalse,
-          reason: 'Standard echo should not be marked as raw');
+      expect(
+        echoNodes.first.isRaw,
+        isFalse,
+        reason: 'Standard echo should not be marked as raw',
+      );
 
       // Verify the entire dangerous pattern is captured as-is
       expect(echoNodes.first.expression, contains('<script>'));
@@ -47,8 +53,11 @@ void main() {
       final template = "{{ '<img src=x onerror=alert(1)>' }}";
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle img onerror pattern');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should handle img onerror pattern',
+      );
 
       final echoNodes = result.ast!.children.whereType<EchoNode>();
       expect(echoNodes.length, equals(1));
@@ -56,16 +65,21 @@ void main() {
       expect(echoNodes.first.expression, contains('alert'));
 
       // Parser should not execute or sanitize - just capture
-      expect(echoNodes.first.expression,
-          equals("'<img src=x onerror=alert(1)>'"));
+      expect(
+        echoNodes.first.expression,
+        equals("'<img src=x onerror=alert(1)>'"),
+      );
     });
 
     test('Parses javascript: protocol XSS pattern', () {
       final template = "{{ 'javascript:alert(document.cookie)' }}";
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle javascript: protocol');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should handle javascript: protocol',
+      );
 
       final echoNodes = result.ast!.children.whereType<EchoNode>();
       expect(echoNodes.length, equals(1));
@@ -73,8 +87,10 @@ void main() {
       expect(echoNodes.first.expression, contains('document.cookie'));
 
       // Verify entire expression captured without modification
-      expect(echoNodes.first.expression,
-          equals("'javascript:alert(document.cookie)'"));
+      expect(
+        echoNodes.first.expression,
+        equals("'javascript:alert(document.cookie)'"),
+      );
     });
   });
 
@@ -89,8 +105,11 @@ void main() {
       final template = r"{{ $id . '; DROP TABLE users; --' }}";
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle SQL injection patterns');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should handle SQL injection patterns',
+      );
 
       final echoNodes = result.ast!.children.whereType<EchoNode>();
       expect(echoNodes.length, equals(1));
@@ -108,8 +127,11 @@ void main() {
 ''';
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle SQL injection in conditionals');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should handle SQL injection in conditionals',
+      );
 
       final directives = result.ast!.children.whereType<DirectiveNode>();
       expect(directives.length, equals(1));
@@ -131,8 +153,11 @@ void main() {
       final template = "@include('../../../etc/passwd')";
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should parse path traversal syntax');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should parse path traversal syntax',
+      );
 
       final directives = result.ast!.children.whereType<DirectiveNode>();
       expect(directives.length, equals(1));
@@ -158,8 +183,11 @@ void main() {
       final template = r'@include($userInput)';
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle variable paths');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should handle variable paths',
+      );
 
       final directives = result.ast!.children.whereType<DirectiveNode>();
       expect(directives.length, equals(1));
@@ -177,48 +205,73 @@ void main() {
       parser = BladeParser();
     });
 
-    test('Handles 10,000 character attribute value without hanging', () {
-      final longValue = 'a' * 10000;
-      final template = '<div class="$longValue">Content</div>';
+    test(
+      'Handles 10,000 character attribute value without hanging',
+      () {
+        final longValue = 'a' * 10000;
+        final template = '<div class="$longValue">Content</div>';
 
-      final stopwatch = Stopwatch()..start();
-      final result = parser.parse(template);
-      stopwatch.stop();
+        final stopwatch = Stopwatch()..start();
+        final result = parser.parse(template);
+        stopwatch.stop();
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle long attributes');
-      expect(stopwatch.elapsed.inSeconds, lessThan(5),
-          reason: 'Should parse in reasonable time');
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: 'Parser should handle long attributes',
+        );
+        expect(
+          stopwatch.elapsed.inSeconds,
+          lessThan(5),
+          reason: 'Should parse in reasonable time',
+        );
 
-      final htmlElements = result.ast!.children.whereType<HtmlElementNode>();
-      expect(htmlElements.length, equals(1));
-      expect(htmlElements.first.attributes['class'], isNotNull);
-      expect(htmlElements.first.attributes['class']!.value!.length,
-          equals(10000));
-    }, timeout: Timeout(Duration(seconds: 10)));
+        final htmlElements = result.ast!.children.whereType<HtmlElementNode>();
+        expect(htmlElements.length, equals(1));
+        expect(htmlElements.first.attributes['class'], isNotNull);
+        expect(
+          htmlElements.first.attributes['class']!.value!.length,
+          equals(10000),
+        );
+      },
+      timeout: Timeout(Duration(seconds: 10)),
+    );
 
-    test('Handles 100,000 character attribute value gracefully', () {
-      final longValue = 'b' * 100000;
-      final template = '<input value="$longValue" />';
+    test(
+      'Handles 100,000 character attribute value gracefully',
+      () {
+        final longValue = 'b' * 100000;
+        final template = '<input value="$longValue" />';
 
-      final stopwatch = Stopwatch()..start();
-      final result = parser.parse(template);
-      stopwatch.stop();
+        final stopwatch = Stopwatch()..start();
+        final result = parser.parse(template);
+        stopwatch.stop();
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle very long attributes');
-      expect(stopwatch.elapsed.inSeconds, lessThan(10),
-          reason: 'Should complete within timeout');
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: 'Parser should handle very long attributes',
+        );
+        expect(
+          stopwatch.elapsed.inSeconds,
+          lessThan(10),
+          reason: 'Should complete within timeout',
+        );
 
-      final htmlElements = result.ast!.children.whereType<HtmlElementNode>();
-      expect(htmlElements.length, equals(1));
-      expect(htmlElements.first.attributes['value'], isNotNull);
-      expect(htmlElements.first.attributes['value']!.value!.length,
-          equals(100000));
+        final htmlElements = result.ast!.children.whereType<HtmlElementNode>();
+        expect(htmlElements.length, equals(1));
+        expect(htmlElements.first.attributes['value'], isNotNull);
+        expect(
+          htmlElements.first.attributes['value']!.value!.length,
+          equals(100000),
+        );
 
-      print(
-          'Parsed 100k character attribute in ${stopwatch.elapsedMilliseconds}ms');
-    }, timeout: Timeout(Duration(seconds: 15)));
+        print(
+          'Parsed 100k character attribute in ${stopwatch.elapsedMilliseconds}ms',
+        );
+      },
+      timeout: Timeout(Duration(seconds: 15)),
+    );
   });
 
   group('Security: Deeply Nested Structures (Stack Overflow Prevention)', () {
@@ -228,100 +281,130 @@ void main() {
       parser = BladeParser();
     });
 
-    test('Handles 500 levels of nested directives without stack overflow', () {
-      final depth = 500;
-      final buffer = StringBuffer();
+    test(
+      'Handles 500 levels of nested directives without stack overflow',
+      () {
+        final depth = 500;
+        final buffer = StringBuffer();
 
-      // Create deeply nested @if directives
-      for (var i = 0; i < depth; i++) {
-        buffer.write('@if(true)\n');
-      }
+        // Create deeply nested @if directives
+        for (var i = 0; i < depth; i++) {
+          buffer.write('@if(true)\n');
+        }
 
-      buffer.write('<p>Deep content</p>\n');
+        buffer.write('<p>Deep content</p>\n');
 
-      for (var i = 0; i < depth; i++) {
-        buffer.write('@endif\n');
-      }
+        for (var i = 0; i < depth; i++) {
+          buffer.write('@endif\n');
+        }
 
-      final template = buffer.toString();
+        final template = buffer.toString();
 
-      final stopwatch = Stopwatch()..start();
-      final result = parser.parse(template);
-      stopwatch.stop();
+        final stopwatch = Stopwatch()..start();
+        final result = parser.parse(template);
+        stopwatch.stop();
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle 500 levels without stack overflow');
-      expect(stopwatch.elapsed.inSeconds, lessThan(10),
-          reason: 'Should parse in reasonable time');
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: 'Parser should handle 500 levels without stack overflow',
+        );
+        expect(
+          stopwatch.elapsed.inSeconds,
+          lessThan(10),
+          reason: 'Should parse in reasonable time',
+        );
 
-      // Verify nesting depth
-      var currentNode = result.ast!.children
-          .whereType<DirectiveNode>()
-          .firstWhere((n) => n.name == 'if');
-
-      var actualDepth = 1;
-      while (currentNode.children.whereType<DirectiveNode>().isNotEmpty) {
-        final nested = currentNode.children
+        // Verify nesting depth
+        var currentNode = result.ast!.children
             .whereType<DirectiveNode>()
-            .where((n) => n.name == 'if')
-            .firstOrNull;
-        if (nested == null) break;
-        currentNode = nested;
-        actualDepth++;
+            .firstWhere((n) => n.name == 'if');
 
-        // Safety limit
-        if (actualDepth > depth + 10) break;
-      }
+        var actualDepth = 1;
+        while (currentNode.children.whereType<DirectiveNode>().isNotEmpty) {
+          final nested = currentNode.children
+              .whereType<DirectiveNode>()
+              .where((n) => n.name == 'if')
+              .firstOrNull;
+          if (nested == null) break;
+          currentNode = nested;
+          actualDepth++;
 
-      expect(actualDepth, greaterThan(depth - 50),
-          reason: 'Should maintain most of the nesting structure');
+          // Safety limit
+          if (actualDepth > depth + 10) break;
+        }
 
-      print('Parsed $actualDepth levels in ${stopwatch.elapsedMilliseconds}ms');
-    }, timeout: Timeout(Duration(seconds: 15)));
+        expect(
+          actualDepth,
+          greaterThan(depth - 50),
+          reason: 'Should maintain most of the nesting structure',
+        );
 
-    test('Handles 1000 levels of nested HTML elements', () {
-      final depth = 1000;
-      final buffer = StringBuffer();
+        print(
+          'Parsed $actualDepth levels in ${stopwatch.elapsedMilliseconds}ms',
+        );
+      },
+      timeout: Timeout(Duration(seconds: 15)),
+    );
 
-      // Create deeply nested HTML
-      for (var i = 0; i < depth; i++) {
-        buffer.write('<div>\n');
-      }
+    test(
+      'Handles 1000 levels of nested HTML elements',
+      () {
+        final depth = 1000;
+        final buffer = StringBuffer();
 
-      buffer.write('<p>Deep HTML</p>\n');
+        // Create deeply nested HTML
+        for (var i = 0; i < depth; i++) {
+          buffer.write('<div>\n');
+        }
 
-      for (var i = 0; i < depth; i++) {
-        buffer.write('</div>\n');
-      }
+        buffer.write('<p>Deep HTML</p>\n');
 
-      final template = buffer.toString();
+        for (var i = 0; i < depth; i++) {
+          buffer.write('</div>\n');
+        }
 
-      final stopwatch = Stopwatch()..start();
-      final result = parser.parse(template);
-      stopwatch.stop();
+        final template = buffer.toString();
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle 1000 HTML levels');
-      expect(stopwatch.elapsed.inSeconds, lessThan(10),
-          reason: 'Should complete within timeout');
+        final stopwatch = Stopwatch()..start();
+        final result = parser.parse(template);
+        stopwatch.stop();
 
-      // Verify nesting depth
-      var currentChildren = result.ast!.children;
-      var htmlDepth = 0;
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: 'Parser should handle 1000 HTML levels',
+        );
+        expect(
+          stopwatch.elapsed.inSeconds,
+          lessThan(10),
+          reason: 'Should complete within timeout',
+        );
 
-      while (currentChildren.whereType<HtmlElementNode>().isNotEmpty) {
-        final element = currentChildren.whereType<HtmlElementNode>().first;
-        currentChildren = element.children;
-        htmlDepth++;
+        // Verify nesting depth
+        var currentChildren = result.ast!.children;
+        var htmlDepth = 0;
 
-        if (htmlDepth > depth + 10) break; // Safety limit
-      }
+        while (currentChildren.whereType<HtmlElementNode>().isNotEmpty) {
+          final element = currentChildren.whereType<HtmlElementNode>().first;
+          currentChildren = element.children;
+          htmlDepth++;
 
-      expect(htmlDepth, greaterThan(depth - 100),
-          reason: 'Should maintain most HTML nesting');
+          if (htmlDepth > depth + 10) break; // Safety limit
+        }
 
-      print('Parsed $htmlDepth HTML levels in ${stopwatch.elapsedMilliseconds}ms');
-    }, timeout: Timeout(Duration(seconds: 15)));
+        expect(
+          htmlDepth,
+          greaterThan(depth - 100),
+          reason: 'Should maintain most HTML nesting',
+        );
+
+        print(
+          'Parsed $htmlDepth HTML levels in ${stopwatch.elapsedMilliseconds}ms',
+        );
+      },
+      timeout: Timeout(Duration(seconds: 15)),
+    );
   });
 
   group('Security: Recursive @include Patterns', () {
@@ -341,12 +424,16 @@ void main() {
 
       final result = parser.parse(templateA);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser handles include syntax without following references');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser handles include syntax without following references',
+      );
 
       final directives = result.ast!.children.whereType<DirectiveNode>();
-      final includeDirectives =
-          directives.where((d) => d.name == 'include').toList();
+      final includeDirectives = directives
+          .where((d) => d.name == 'include')
+          .toList();
 
       expect(includeDirectives.length, equals(1));
       expect(includeDirectives.first.expression, contains('template-b'));
@@ -368,8 +455,11 @@ void main() {
       final template = r'{{ $unusual_chars_123 }}';
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle unusual syntax');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should handle unusual syntax',
+      );
 
       final echoNodes = result.ast!.children.whereType<EchoNode>();
       expect(echoNodes.length, equals(1));
@@ -384,8 +474,11 @@ void main() {
       final template = r'{{ $$variable }}';
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle variable variables');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should handle variable variables',
+      );
 
       final echoNodes = result.ast!.children.whereType<EchoNode>();
       expect(echoNodes.length, equals(1));
@@ -397,8 +490,11 @@ void main() {
       final template = r"{{ $user['special-key'] }}";
       final result = parser.parse(template);
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle special key syntax');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Parser should handle special key syntax',
+      );
 
       final echoNodes = result.ast!.children.whereType<EchoNode>();
       expect(echoNodes.length, equals(1));
@@ -416,13 +512,16 @@ void main() {
       parser = BladeParser();
     });
 
-    test('Handles complex template with multiple security patterns', () {
-      final template = r'''
+    test(
+      'Handles complex template with multiple security patterns',
+      () {
+        final template =
+            r'''
 @if($id == "1 OR 1=1")
     {{ '<script>alert(1)</script>' }}
     <div class="''' +
-          ('a' * 5000) +
-          r'''">
+            ('a' * 5000) +
+            r'''">
         @include('../../../etc/passwd')
         {!! $userInput !!}
         {{ $user['malicious-key'] }}
@@ -431,22 +530,31 @@ void main() {
 @endif
 ''';
 
-      final stopwatch = Stopwatch()..start();
-      final result = parser.parse(template);
-      stopwatch.stop();
+        final stopwatch = Stopwatch()..start();
+        final result = parser.parse(template);
+        stopwatch.stop();
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Parser should handle complex mixed patterns');
-      expect(stopwatch.elapsed.inSeconds, lessThan(5),
-          reason: 'Should parse complex template efficiently');
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: 'Parser should handle complex mixed patterns',
+        );
+        expect(
+          stopwatch.elapsed.inSeconds,
+          lessThan(5),
+          reason: 'Should parse complex template efficiently',
+        );
 
-      // Verify all components are parsed
-      final directives = result.ast!.children.whereType<DirectiveNode>();
-      expect(directives.length, greaterThan(0));
+        // Verify all components are parsed
+        final directives = result.ast!.children.whereType<DirectiveNode>();
+        expect(directives.length, greaterThan(0));
 
-      print(
-          'Parsed complex security template in ${stopwatch.elapsedMilliseconds}ms');
-    }, timeout: Timeout(Duration(seconds: 10)));
+        print(
+          'Parsed complex security template in ${stopwatch.elapsedMilliseconds}ms',
+        );
+      },
+      timeout: Timeout(Duration(seconds: 10)),
+    );
 
     test('Parser remains stable after encountering malicious patterns', () {
       final maliciousTemplates = [
@@ -459,8 +567,11 @@ void main() {
       for (final template in maliciousTemplates) {
         final result = parser.parse(template);
 
-        expect(result.isSuccess, isTrue,
-            reason: 'Parser should remain stable for: $template');
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: 'Parser should remain stable for: $template',
+        );
         expect(result.ast, isNotNull);
       }
 
@@ -468,8 +579,11 @@ void main() {
       final normalTemplate = '<p>Normal content {{ \$var }}</p>';
       final finalResult = parser.parse(normalTemplate);
 
-      expect(finalResult.isSuccess, isTrue,
-          reason: 'Parser should remain functional after malicious input');
+      expect(
+        finalResult.isSuccess,
+        isTrue,
+        reason: 'Parser should remain functional after malicious input',
+      );
     });
   });
 
@@ -491,13 +605,19 @@ void main() {
       final result = parser.parse(template);
 
       // Parser should not crash, though it may report errors
-      expect(result.ast, isNotNull,
-          reason: 'Parser should return AST even with errors');
+      expect(
+        result.ast,
+        isNotNull,
+        reason: 'Parser should return AST even with errors',
+      );
 
       // Should still parse what it can
       final echoNodes = result.ast!.children.whereType<EchoNode>();
-      expect(echoNodes, isNotEmpty,
-          reason: 'Parser should recover and parse valid parts');
+      expect(
+        echoNodes,
+        isNotEmpty,
+        reason: 'Parser should recover and parse valid parts',
+      );
     });
   });
 }

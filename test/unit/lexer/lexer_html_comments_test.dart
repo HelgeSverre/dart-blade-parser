@@ -13,11 +13,15 @@ void main() {
 
       // Expected: htmlComment token
       // Current bug: Treated as text
-      final commentTokens =
-          tokens.where((t) => t.type == TokenType.htmlComment).toList();
+      final commentTokens = tokens
+          .where((t) => t.type == TokenType.htmlComment)
+          .toList();
 
-      expect(commentTokens.length, equals(1),
-          reason: '<!-- --> should produce htmlComment token');
+      expect(
+        commentTokens.length,
+        equals(1),
+        reason: '<!-- --> should produce htmlComment token',
+      );
 
       expect(commentTokens.first.value, contains('This is a comment'));
     });
@@ -26,16 +30,20 @@ void main() {
       lexer = BladeLexer('<!-- TODO: Fix <div> and @if -->');
       final tokens = lexer.tokenize();
 
-      final commentTokens =
-          tokens.where((t) => t.type == TokenType.htmlComment).toList();
+      final commentTokens = tokens
+          .where((t) => t.type == TokenType.htmlComment)
+          .toList();
 
       expect(commentTokens.length, equals(1));
 
       final commentContent = commentTokens.first.value;
       expect(commentContent, contains('TODO'));
       expect(commentContent, contains('<div>'));
-      expect(commentContent, contains('@if'),
-          reason: 'Comment should preserve special chars literally');
+      expect(
+        commentContent,
+        contains('@if'),
+        reason: 'Comment should preserve special chars literally',
+      );
     });
 
     test('Multi-line HTML comment', () {
@@ -48,11 +56,15 @@ void main() {
 
       final tokens = lexer.tokenize();
 
-      final commentTokens =
-          tokens.where((t) => t.type == TokenType.htmlComment).toList();
+      final commentTokens = tokens
+          .where((t) => t.type == TokenType.htmlComment)
+          .toList();
 
-      expect(commentTokens.length, equals(1),
-          reason: 'Multi-line comment should be single token');
+      expect(
+        commentTokens.length,
+        equals(1),
+        reason: 'Multi-line comment should be single token',
+      );
 
       final content = commentTokens.first.value;
       expect(content, contains('Multi-line'));
@@ -63,11 +75,15 @@ void main() {
       lexer = BladeLexer('<!-- First --> text <!-- Second -->');
       final tokens = lexer.tokenize();
 
-      final commentTokens =
-          tokens.where((t) => t.type == TokenType.htmlComment).toList();
+      final commentTokens = tokens
+          .where((t) => t.type == TokenType.htmlComment)
+          .toList();
 
-      expect(commentTokens.length, equals(2),
-          reason: 'Should recognize both comments');
+      expect(
+        commentTokens.length,
+        equals(2),
+        reason: 'Should recognize both comments',
+      );
 
       expect(commentTokens[0].value, contains('First'));
       expect(commentTokens[1].value, contains('Second'));
@@ -81,12 +97,16 @@ void main() {
       lexer = BladeLexer('<!---->');
       final tokens = lexer.tokenize();
 
-      final commentTokens =
-          tokens.where((t) => t.type == TokenType.htmlComment).toList();
+      final commentTokens = tokens
+          .where((t) => t.type == TokenType.htmlComment)
+          .toList();
 
       expect(commentTokens.length, equals(1));
-      expect(commentTokens.first.value, isEmpty,
-          reason: 'Empty comment should have empty value');
+      expect(
+        commentTokens.first.value,
+        isEmpty,
+        reason: 'Empty comment should have empty value',
+      );
     });
 
     test('HTML comment with -- inside (edge case)', () {
@@ -94,8 +114,9 @@ void main() {
       lexer = BladeLexer('<!-- Comment with -- double dash -->');
       final tokens = lexer.tokenize();
 
-      final commentTokens =
-          tokens.where((t) => t.type == TokenType.htmlComment).toList();
+      final commentTokens = tokens
+          .where((t) => t.type == TokenType.htmlComment)
+          .toList();
 
       // Should still parse (even if technically invalid HTML)
       expect(commentTokens, isNotEmpty);
@@ -119,18 +140,24 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
       // Should have CommentNode child
       final comments = div.children.whereType<CommentNode>();
-      expect(comments, isNotEmpty,
-          reason: 'HTML comment should create CommentNode');
+      expect(
+        comments,
+        isNotEmpty,
+        reason: 'HTML comment should create CommentNode',
+      );
 
       final comment = comments.first;
-      expect(comment.isBladeComment, isFalse,
-          reason: 'HTML comment should be marked as non-Blade');
+      expect(
+        comment.isBladeComment,
+        isFalse,
+        reason: 'HTML comment should be marked as non-Blade',
+      );
       expect(comment.content, contains('This is a comment'));
     });
 
@@ -143,12 +170,17 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final comments = result.ast!.children.whereType<CommentNode>().toList();
-      expect(comments.length, equals(2),
-          reason: 'Should have both HTML and Blade comments');
+      expect(
+        comments.length,
+        equals(2),
+        reason: 'Should have both HTML and Blade comments',
+      );
 
       // Find HTML comment
-      final htmlComment =
-          comments.firstWhere((c) => !c.isBladeComment, orElse: () => throw Exception('HTML comment not found'));
+      final htmlComment = comments.firstWhere(
+        (c) => !c.isBladeComment,
+        orElse: () => throw Exception('HTML comment not found'),
+      );
       expect(htmlComment.content, contains('HTML comment'));
 
       // Find Blade comment
@@ -172,8 +204,7 @@ void main() {
 
       // Should NOT have parsed a div element
       final divs = result.ast!.children.whereType<HtmlElementNode>();
-      expect(divs, isEmpty,
-          reason: 'HTML inside comment should not be parsed');
+      expect(divs, isEmpty, reason: 'HTML inside comment should not be parsed');
     });
 
     test('Conditional comments (IE legacy)', () {
@@ -185,8 +216,11 @@ void main() {
 
       // Conditional comments are a special case
       // At minimum, should parse without error
-      expect(result.errors, isEmpty,
-          reason: 'Should handle conditional comments gracefully');
+      expect(
+        result.errors,
+        isEmpty,
+        reason: 'Should handle conditional comments gracefully',
+      );
     });
 
     test('HTML comment in various positions', () {
@@ -207,8 +241,11 @@ void main() {
       final allComments = result.ast!.children.whereType<CommentNode>();
 
       // Should find all comments
-      expect(allComments.length, greaterThanOrEqualTo(2),
-          reason: 'Should recognize multiple comments');
+      expect(
+        allComments.length,
+        greaterThanOrEqualTo(2),
+        reason: 'Should recognize multiple comments',
+      );
     });
   });
 }

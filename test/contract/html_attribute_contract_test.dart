@@ -144,10 +144,16 @@ void main() {
 
     test('Attributes serialize to JSON with correct type field', () {
       final standard = StandardAttribute(name: 'class', value: 'foo');
-      final alpine =
-          AlpineAttribute(name: 'x-data', directive: 'data', value: '{}');
-      final livewire =
-          LivewireAttribute(name: 'wire:click', action: 'click', value: 'save');
+      final alpine = AlpineAttribute(
+        name: 'x-data',
+        directive: 'data',
+        value: '{}',
+      );
+      final livewire = LivewireAttribute(
+        name: 'wire:click',
+        action: 'click',
+        value: 'save',
+      );
 
       final standardJson = standard.toJson();
       final alpineJson = alpine.toJson();

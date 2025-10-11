@@ -29,13 +29,7 @@ void main() {
       final streamingParser = StreamingParser();
 
       // Split a tag across chunks
-      final chunks = [
-        '<div',
-        ' class="test"',
-        '>',
-        'Content',
-        '</div>',
-      ];
+      final chunks = ['<div', ' class="test"', '>', 'Content', '</div>'];
 
       final stream = Stream.fromIterable(chunks);
       final nodes = await streamingParser.parseStreaming(stream).toList();
@@ -46,12 +40,7 @@ void main() {
     test('Streaming parser handles void elements', () async {
       final streamingParser = StreamingParser();
 
-      final chunks = [
-        '<div>',
-        '<br>',
-        '<input type="text">',
-        '</div>',
-      ];
+      final chunks = ['<div>', '<br>', '<input type="text">', '</div>'];
 
       final stream = Stream.fromIterable(chunks);
       final nodes = await streamingParser.parseStreaming(stream).toList();
@@ -65,8 +54,9 @@ void main() {
 
       expect(result.isSuccess, isTrue);
       final div = result.ast!.children[0] as HtmlElementNode;
-      final voidElements =
-          div.children.whereType<HtmlElementNode>().where((e) => e.isVoid);
+      final voidElements = div.children.whereType<HtmlElementNode>().where(
+        (e) => e.isVoid,
+      );
       expect(voidElements, hasLength(2)); // br and input
     });
 
@@ -165,10 +155,7 @@ void main() {
     test('Streaming parser handles self-closing tags', () async {
       final streamingParser = StreamingParser();
 
-      final chunks = [
-        '<div />',
-        '<br />',
-      ];
+      final chunks = ['<div />', '<br />'];
 
       final stream = Stream.fromIterable(chunks);
       final nodes = await streamingParser.parseStreaming(stream).toList();
@@ -195,11 +182,7 @@ void main() {
     test('Streaming parser emits nodes incrementally', () async {
       final streamingParser = StreamingParser();
 
-      final chunks = [
-        '<div>Text1</div>',
-        '<p>Text2</p>',
-        '<span>Text3</span>',
-      ];
+      final chunks = ['<div>Text1</div>', '<p>Text2</p>', '<span>Text3</span>'];
 
       final stream = Stream.fromIterable(chunks);
       var emittedCount = 0;

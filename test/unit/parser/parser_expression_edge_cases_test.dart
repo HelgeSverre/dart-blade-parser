@@ -11,7 +11,9 @@ void main() {
 
     group('Nested Parentheses', () {
       test('Simple nested parentheses', () {
-        final result = parser.parse('@if(((\$x + \$y) * \$z)){{ \$result }}@endif');
+        final result = parser.parse(
+          '@if(((\$x + \$y) * \$z)){{ \$result }}@endif',
+        );
 
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
@@ -22,16 +24,18 @@ void main() {
 
         expect(ifNode.expression, isNotNull);
         expect(ifNode.expression, contains('((\$x + \$y) * \$z)'));
-        expect(ifNode.expression!.split('(').length - 1,
-               ifNode.expression!.split(')').length - 1,
-               reason: 'Parentheses should be balanced');
+        expect(
+          ifNode.expression!.split('(').length - 1,
+          ifNode.expression!.split(')').length - 1,
+          reason: 'Parentheses should be balanced',
+        );
       });
 
       test('Complex nested parentheses with multiple levels', () {
         final result = parser.parse(
           '@if((((\$a && \$b) || (\$c && \$d)) && ((\$e || \$f) && \$g)))\n'
           'Content\n'
-          '@endif'
+          '@endif',
         );
 
         expect(result.isSuccess, isTrue);
@@ -49,8 +53,11 @@ void main() {
         // Verify parentheses are balanced
         final openCount = ifNode.expression!.split('(').length - 1;
         final closeCount = ifNode.expression!.split(')').length - 1;
-        expect(openCount, equals(closeCount),
-               reason: 'All opening parentheses should have matching closing ones');
+        expect(
+          openCount,
+          equals(closeCount),
+          reason: 'All opening parentheses should have matching closing ones',
+        );
       });
 
       test('Unbalanced parentheses detection', () {
@@ -78,9 +85,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains("\$arr['key']"));
       });
@@ -91,9 +96,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains("\$arr['key']"));
         expect(echoNode.expression, contains("['nested']"));
@@ -106,9 +109,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$arr[0]'));
         expect(echoNode.expression, contains('[1]'));
@@ -121,9 +122,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains("\$arr['items']"));
         expect(echoNode.expression, contains('[0]'));
@@ -138,22 +137,20 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$user->profile->name'));
       });
 
       test('Deep property chaining', () {
-        final result = parser.parse('{{ \$user->company->address->street->name }}');
+        final result = parser.parse(
+          '{{ \$user->company->address->street->name }}',
+        );
 
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$user->company'));
         expect(echoNode.expression, contains('->address'));
@@ -167,9 +164,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$user->posts'));
         expect(echoNode.expression, contains('[0]'));
@@ -184,9 +179,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('?'));
         expect(echoNode.expression, contains(':'));
@@ -196,14 +189,14 @@ void main() {
       });
 
       test('Nested ternary operators', () {
-        final result = parser.parse('{{ \$a ? (\$b ? \$c : \$d) : (\$e ? \$f : \$g) }}');
+        final result = parser.parse(
+          '{{ \$a ? (\$b ? \$c : \$d) : (\$e ? \$f : \$g) }}',
+        );
 
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         // Should contain all variables
         expect(echoNode.expression, contains('\$a'));
@@ -217,8 +210,11 @@ void main() {
         // Count ternary operators - should have 3 (one top-level, two nested)
         final questionMarks = '?'.allMatches(echoNode.expression).length;
         final colons = ':'.allMatches(echoNode.expression).length;
-        expect(questionMarks, equals(colons),
-               reason: 'Each ? should have a matching :');
+        expect(
+          questionMarks,
+          equals(colons),
+          reason: 'Each ? should have a matching :',
+        );
       });
     });
 
@@ -229,9 +225,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$x'));
         expect(echoNode.expression, contains('??'));
@@ -245,9 +239,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$x'));
         expect(echoNode.expression, contains('??'));
@@ -265,9 +257,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('Hello'));
         expect(echoNode.expression, contains('.'));
@@ -276,15 +266,13 @@ void main() {
 
       test('Complex concatenation with property access', () {
         final result = parser.parse(
-          "{{ 'Hello ' . \$user->name . ', welcome to ' . \$site->name }}"
+          "{{ 'Hello ' . \$user->name . ', welcome to ' . \$site->name }}",
         );
 
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('Hello'));
         expect(echoNode.expression, contains('\$user->name'));
@@ -300,9 +288,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('strtoupper'));
         expect(echoNode.expression, contains('\$name'));
@@ -310,15 +296,13 @@ void main() {
 
       test('Nested function calls', () {
         final result = parser.parse(
-          "{{ str_replace(',', '.', number_format(\$price, 2)) }}"
+          "{{ str_replace(',', '.', number_format(\$price, 2)) }}",
         );
 
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('str_replace'));
         expect(echoNode.expression, contains('number_format'));
@@ -327,8 +311,11 @@ void main() {
         // Verify parentheses are balanced
         final openCount = echoNode.expression.split('(').length - 1;
         final closeCount = echoNode.expression.split(')').length - 1;
-        expect(openCount, equals(closeCount),
-               reason: 'Function call parentheses should be balanced');
+        expect(
+          openCount,
+          equals(closeCount),
+          reason: 'Function call parentheses should be balanced',
+        );
       });
     });
 
@@ -337,7 +324,7 @@ void main() {
         final result = parser.parse(
           '@php\n'
           '\$callback = function(\$x) { return \$x * 2; };\n'
-          '@endphp'
+          '@endphp',
         );
 
         expect(result.isSuccess, isTrue);
@@ -356,7 +343,7 @@ void main() {
         final result = parser.parse(
           '@php\n'
           '\$fn = function(\$x) use (\$multiplier) { return \$x * \$multiplier; };\n'
-          '@endphp'
+          '@endphp',
         );
 
         expect(result.isSuccess, isTrue);
@@ -375,7 +362,7 @@ void main() {
         final result = parser.parse(
           '@foreach(array_filter(\$items, function(\$item) { return \$item->active; }) as \$item)'
           '{{ \$item->name }}'
-          '@endforeach'
+          '@endforeach',
         );
 
         expect(result.isSuccess, isTrue);
@@ -399,9 +386,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$name'));
         expect(echoNode.expression, contains('=='));
@@ -414,9 +399,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$name'));
         expect(echoNode.expression, contains('=='));
@@ -424,14 +407,14 @@ void main() {
       });
 
       test('Mixed quotes and brackets', () {
-        final result = parser.parse('{{ \$data["key"]["nested"] == \'value\' }}');
+        final result = parser.parse(
+          '{{ \$data["key"]["nested"] == \'value\' }}',
+        );
 
         expect(result.isSuccess, isTrue);
         expect(result.errors, isEmpty);
 
-        final echoNode = result.ast!.children
-            .whereType<EchoNode>()
-            .first;
+        final echoNode = result.ast!.children.whereType<EchoNode>().first;
 
         expect(echoNode.expression, contains('\$data'));
         expect(echoNode.expression, contains('key'));

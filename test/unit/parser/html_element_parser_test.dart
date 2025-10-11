@@ -73,8 +73,9 @@ void main() {
 
     test('Multiple nested matching', () {
       final parser = BladeParser();
-      final result =
-          parser.parse('<div><section><article></article></section></div>');
+      final result = parser.parse(
+        '<div><section><article></article></section></div>',
+      );
 
       expect(result.isSuccess, isTrue);
       final div = result.ast!.children[0] as HtmlElementNode;
@@ -104,13 +105,16 @@ void main() {
         'param',
         'source',
         'track',
-        'wbr'
+        'wbr',
       ];
 
       for (final tag in voidElements) {
         final result = parser.parse('<$tag>');
-        expect(result.isSuccess, isTrue,
-            reason: '<$tag> should parse successfully');
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: '<$tag> should parse successfully',
+        );
 
         final element = result.ast!.children[0] as HtmlElementNode;
         expect(element.tagName, tag);
@@ -181,7 +185,8 @@ void main() {
     test('Attributes with special characters', () {
       final parser = BladeParser();
       final result = parser.parse(
-          '<div data-config="{&quot;key&quot;: &quot;value&quot;}"></div>');
+        '<div data-config="{&quot;key&quot;: &quot;value&quot;}"></div>',
+      );
 
       expect(result.isSuccess, isTrue);
       final element = result.ast!.children[0] as HtmlElementNode;
@@ -320,8 +325,10 @@ void main() {
 
       expect(element.endPosition, isNotNull);
       expect(element.endPosition.line, greaterThanOrEqualTo(1));
-      expect(element.endPosition.column,
-          greaterThan(element.startPosition.column));
+      expect(
+        element.endPosition.column,
+        greaterThan(element.startPosition.column),
+      );
     });
 
     test('Position accuracy for nested elements', () {
@@ -345,8 +352,10 @@ void main() {
 
       expect(element.startPosition, isNotNull);
       expect(element.endPosition, isNotNull);
-      expect(element.endPosition.offset,
-          greaterThan(element.startPosition.offset));
+      expect(
+        element.endPosition.offset,
+        greaterThan(element.startPosition.offset),
+      );
     });
   });
 }

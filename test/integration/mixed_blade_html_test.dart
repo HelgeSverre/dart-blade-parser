@@ -187,8 +187,10 @@ void main() {
       final table = result.ast!.children.whereType<HtmlElementNode>().first;
 
       expect(table.tagName, 'table');
-      expect(table.children.whereType<HtmlElementNode>(),
-          hasLength(2)); // thead, tbody
+      expect(
+        table.children.whereType<HtmlElementNode>(),
+        hasLength(2),
+      ); // thead, tbody
 
       final tbody = table.children.whereType<HtmlElementNode>().skip(1).first;
       expect(tbody.tagName, 'tbody');
@@ -211,8 +213,10 @@ void main() {
       expect(form.tagName, 'form');
       expect(form.attributes['method']!.value, 'POST');
       expect(form.children.whereType<DirectiveNode>(), hasLength(1));
-      expect(form.children.whereType<HtmlElementNode>(),
-          hasLength(2)); // input, button
+      expect(
+        form.children.whereType<HtmlElementNode>(),
+        hasLength(2),
+      ); // input, button
 
       final csrf = form.children.whereType<DirectiveNode>().first;
       expect(csrf.name, 'csrf');

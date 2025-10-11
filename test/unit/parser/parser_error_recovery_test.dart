@@ -21,20 +21,31 @@ void main() {
         ''');
 
         // Should report error about mismatch
-        expect(result.errors, isNotEmpty,
-            reason: 'Mismatched component tags should produce error');
+        expect(
+          result.errors,
+          isNotEmpty,
+          reason: 'Mismatched component tags should produce error',
+        );
 
-        final hasMismatchError = result.errors.any((e) =>
-            e.message.toLowerCase().contains('mismatch') ||
-            e.message.toLowerCase().contains('expected') ||
-            (e.message.contains('alert') && e.message.contains('button')));
+        final hasMismatchError = result.errors.any(
+          (e) =>
+              e.message.toLowerCase().contains('mismatch') ||
+              e.message.toLowerCase().contains('expected') ||
+              (e.message.contains('alert') && e.message.contains('button')),
+        );
 
-        expect(hasMismatchError, isTrue,
-            reason: 'Error should indicate tag mismatch');
+        expect(
+          hasMismatchError,
+          isTrue,
+          reason: 'Error should indicate tag mismatch',
+        );
 
         // Should still generate partial AST
-        expect(result.ast, isNotNull,
-            reason: 'Parser should generate partial AST despite error');
+        expect(
+          result.ast,
+          isNotNull,
+          reason: 'Parser should generate partial AST despite error',
+        );
       });
 
       test('Nested component with mismatch', () {
@@ -45,8 +56,11 @@ void main() {
         ''');
 
         // Should report nested mismatch error
-        expect(result.errors, isNotEmpty,
-            reason: 'Nested mismatch should be caught');
+        expect(
+          result.errors,
+          isNotEmpty,
+          reason: 'Nested mismatch should be caught',
+        );
 
         // AST should still be generated for error recovery
         expect(result.ast, isNotNull);
@@ -61,12 +75,17 @@ void main() {
 
         expect(result.errors, isNotEmpty);
 
-        final hasMismatchError = result.errors.any((e) =>
-            e.message.contains('custom-component') ||
-            e.message.contains('custom-different'));
+        final hasMismatchError = result.errors.any(
+          (e) =>
+              e.message.contains('custom-component') ||
+              e.message.contains('custom-different'),
+        );
 
-        expect(hasMismatchError, isTrue,
-            reason: 'Should catch similar but different component names');
+        expect(
+          hasMismatchError,
+          isTrue,
+          reason: 'Should catch similar but different component names',
+        );
         expect(result.ast, isNotNull);
       });
     });
@@ -78,21 +97,28 @@ void main() {
             <p>Content</p>
         ''');
 
-        expect(result.errors, isNotEmpty,
-            reason: 'Missing @endif should produce error');
+        expect(
+          result.errors,
+          isNotEmpty,
+          reason: 'Missing @endif should produce error',
+        );
 
-        final hasIfError = result.errors.any((e) =>
-            e.message.toLowerCase().contains('unclosed') &&
-            e.message.toLowerCase().contains('if'));
+        final hasIfError = result.errors.any(
+          (e) =>
+              e.message.toLowerCase().contains('unclosed') &&
+              e.message.toLowerCase().contains('if'),
+        );
 
-        expect(hasIfError, isTrue,
-            reason: 'Error should mention unclosed @if');
+        expect(hasIfError, isTrue, reason: 'Error should mention unclosed @if');
 
         // Should still have partial AST with if directive
         expect(result.ast, isNotNull);
         final directives = result.ast!.children.whereType<DirectiveNode>();
-        expect(directives.any((d) => d.name == 'if'), isTrue,
-            reason: 'Partial AST should include if directive');
+        expect(
+          directives.any((d) => d.name == 'if'),
+          isTrue,
+          reason: 'Partial AST should include if directive',
+        );
       });
 
       test('Missing @endforeach', () {
@@ -103,9 +129,11 @@ void main() {
 
         expect(result.errors, isNotEmpty);
 
-        final hasForeachError = result.errors.any((e) =>
-            e.message.toLowerCase().contains('unclosed') &&
-            e.message.toLowerCase().contains('foreach'));
+        final hasForeachError = result.errors.any(
+          (e) =>
+              e.message.toLowerCase().contains('unclosed') &&
+              e.message.toLowerCase().contains('foreach'),
+        );
 
         expect(hasForeachError, isTrue);
         expect(result.ast, isNotNull);
@@ -117,12 +145,17 @@ void main() {
             <p>Section content</p>
         ''');
 
-        expect(result.errors, isNotEmpty,
-            reason: 'Missing @endsection should produce error');
+        expect(
+          result.errors,
+          isNotEmpty,
+          reason: 'Missing @endsection should produce error',
+        );
 
-        final hasSectionError = result.errors.any((e) =>
-            e.message.toLowerCase().contains('unclosed') &&
-            e.message.toLowerCase().contains('section'));
+        final hasSectionError = result.errors.any(
+          (e) =>
+              e.message.toLowerCase().contains('unclosed') &&
+              e.message.toLowerCase().contains('section'),
+        );
 
         expect(hasSectionError, isTrue);
         expect(result.ast, isNotNull);
@@ -140,11 +173,15 @@ void main() {
         expect(result.errors, isNotEmpty);
 
         // Should report the missing @endforeach
-        final hasForeachError = result.errors.any((e) =>
-            e.message.toLowerCase().contains('foreach'));
+        final hasForeachError = result.errors.any(
+          (e) => e.message.toLowerCase().contains('foreach'),
+        );
 
-        expect(hasForeachError, isTrue,
-            reason: 'Should detect missing inner directive closure');
+        expect(
+          hasForeachError,
+          isTrue,
+          reason: 'Should detect missing inner directive closure',
+        );
         expect(result.ast, isNotNull);
       });
     });
@@ -158,8 +195,11 @@ void main() {
 
         // This is tricky - parser might just skip it or error
         // At minimum, should not crash
-        expect(result.ast, isNotNull,
-            reason: 'Parser should handle extra closing directive gracefully');
+        expect(
+          result.ast,
+          isNotNull,
+          reason: 'Parser should handle extra closing directive gracefully',
+        );
 
         // The extra @endif might be treated as text or error token
         // Implementation-specific behavior
@@ -186,8 +226,11 @@ void main() {
           @endforeach
         ''');
 
-        expect(result.ast, isNotNull,
-            reason: 'Should handle orphaned closing directive');
+        expect(
+          result.ast,
+          isNotNull,
+          reason: 'Should handle orphaned closing directive',
+        );
       });
     });
 
@@ -202,8 +245,11 @@ void main() {
         ''');
 
         // Crossed boundaries - @section starts inside @if but ends outside
-        expect(result.errors, isNotEmpty,
-            reason: 'Overlapping directive blocks should produce errors');
+        expect(
+          result.errors,
+          isNotEmpty,
+          reason: 'Overlapping directive blocks should produce errors',
+        );
 
         // Should still generate partial AST
         expect(result.ast, isNotNull);
@@ -218,8 +264,11 @@ void main() {
         ''');
 
         // Wrong closure order
-        expect(result.errors, isNotEmpty,
-            reason: 'Crossed directive boundaries should error');
+        expect(
+          result.errors,
+          isNotEmpty,
+          reason: 'Crossed directive boundaries should error',
+        );
         expect(result.ast, isNotNull);
       });
     });
@@ -233,8 +282,11 @@ void main() {
         ''');
 
         // Should parse successfully - verbatim content is raw
-        expect(result.isSuccess, isTrue,
-            reason: '@verbatim should treat component tags as raw text');
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: '@verbatim should treat component tags as raw text',
+        );
 
         // Content inside verbatim should NOT be parsed as ComponentNode
         final verbatimDirective = result.ast!.children
@@ -242,11 +294,15 @@ void main() {
             .firstWhere((d) => d.name == 'verbatim');
 
         // Children should be text, not components
-        final hasComponentChildren = verbatimDirective.children
-            .any((c) => c is ComponentNode);
+        final hasComponentChildren = verbatimDirective.children.any(
+          (c) => c is ComponentNode,
+        );
 
-        expect(hasComponentChildren, isFalse,
-            reason: 'Components inside @verbatim should not be parsed');
+        expect(
+          hasComponentChildren,
+          isFalse,
+          reason: 'Components inside @verbatim should not be parsed',
+        );
       });
 
       test('Slot outside component should error or be handled', () {
@@ -258,8 +314,11 @@ void main() {
 
         // Slot outside component context
         // Implementation may allow it (parsed as standalone) or error
-        expect(result.ast, isNotNull,
-            reason: 'Should handle slot outside component gracefully');
+        expect(
+          result.ast,
+          isNotNull,
+          reason: 'Should handle slot outside component gracefully',
+        );
 
         // Check if it's parsed as SlotNode
         final hasSlot = result.ast!.children.any((c) => c is SlotNode);
@@ -280,8 +339,11 @@ void main() {
 
         // Numeric slot names might be allowed or disallowed
         // Key is not to crash
-        expect(result.ast, isNotNull,
-            reason: 'Parser should handle numeric slot names');
+        expect(
+          result.ast,
+          isNotNull,
+          reason: 'Parser should handle numeric slot names',
+        );
       });
 
       test('Invalid slot name - empty', () {
@@ -292,8 +354,11 @@ void main() {
         ''');
 
         // Empty slot name after colon
-        expect(result.ast, isNotNull,
-            reason: 'Should handle empty slot name gracefully');
+        expect(
+          result.ast,
+          isNotNull,
+          reason: 'Should handle empty slot name gracefully',
+        );
       });
 
       test('Invalid slot name - starts with dash', () {
@@ -314,8 +379,11 @@ void main() {
 
         // HTML spec: div is not void, but self-closing syntax exists
         // Parser should handle it (either allow or warn)
-        expect(result.ast, isNotNull,
-            reason: 'Should handle self-closing non-void element');
+        expect(
+          result.ast,
+          isNotNull,
+          reason: 'Should handle self-closing non-void element',
+        );
 
         final htmlElements = result.ast!.children.whereType<HtmlElementNode>();
         if (htmlElements.isNotEmpty) {
@@ -349,8 +417,11 @@ void main() {
           <x-other>Content</x-other>
         ''');
 
-        expect(result.ast, isNotNull,
-            reason: 'Should handle mixed self-closing elements');
+        expect(
+          result.ast,
+          isNotNull,
+          reason: 'Should handle mixed self-closing elements',
+        );
 
         // Should have multiple children
         expect(result.ast!.children.length, greaterThan(0));
@@ -367,14 +438,19 @@ void main() {
         ''');
 
         // Missing both @endif and @endforeach
-        expect(result.errors.length, greaterThanOrEqualTo(2),
-            reason: 'Should report multiple errors');
+        expect(
+          result.errors.length,
+          greaterThanOrEqualTo(2),
+          reason: 'Should report multiple errors',
+        );
 
         // Should mention both missing closures
-        final hasIfError = result.errors.any((e) =>
-            e.message.toLowerCase().contains('if'));
-        final hasForeachError = result.errors.any((e) =>
-            e.message.toLowerCase().contains('foreach'));
+        final hasIfError = result.errors.any(
+          (e) => e.message.toLowerCase().contains('if'),
+        );
+        final hasForeachError = result.errors.any(
+          (e) => e.message.toLowerCase().contains('foreach'),
+        );
 
         expect(hasIfError, isTrue);
         expect(hasForeachError, isTrue);
@@ -392,8 +468,11 @@ void main() {
         ''');
 
         // Missing @endif AND mismatched component tags
-        expect(result.errors, isNotEmpty,
-            reason: 'Should catch multiple error types');
+        expect(
+          result.errors,
+          isNotEmpty,
+          reason: 'Should catch multiple error types',
+        );
         expect(result.ast, isNotNull);
       });
 
@@ -412,8 +491,11 @@ void main() {
         // - Missing @endforeach
         // - Missing @endif
         // - Mismatched component tags
-        expect(result.errors.length, greaterThan(0),
-            reason: 'Should report errors from nested structures');
+        expect(
+          result.errors.length,
+          greaterThan(0),
+          reason: 'Should report errors from nested structures',
+        );
         expect(result.ast, isNotNull);
       });
     });

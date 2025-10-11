@@ -14,22 +14,31 @@ void main() {
     test('Simple unquoted attribute value', () {
       final result = parser.parse('<div class=container>Content</div>');
 
-      expect(result.isSuccess, isTrue,
-          reason: 'Unquoted attributes are valid HTML');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: 'Unquoted attributes are valid HTML',
+      );
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
-      expect(div.attributes.containsKey('class'), isTrue,
-          reason: 'Should recognize class attribute');
+      expect(
+        div.attributes.containsKey('class'),
+        isTrue,
+        reason: 'Should recognize class attribute',
+      );
 
       final classAttr = div.attributes['class'];
       expect(classAttr, isNotNull);
 
       // Current bug: value might be null or parsing fails
-      expect(classAttr!.value, equals('container'),
-          reason: 'Unquoted value should be captured');
+      expect(
+        classAttr!.value,
+        equals('container'),
+        reason: 'Unquoted value should be captured',
+      );
     });
 
     test('Numeric unquoted value', () {
@@ -53,20 +62,26 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
-      expect(div.attributes.containsKey('wire:poll'), isTrue,
-          reason: 'Should recognize wire:poll attribute');
+      expect(
+        div.attributes.containsKey('wire:poll'),
+        isTrue,
+        reason: 'Should recognize wire:poll attribute',
+      );
 
       final pollAttr = div.attributes['wire:poll'];
       expect(pollAttr, isNotNull);
       expect(pollAttr, isA<LivewireAttribute>());
 
       // Current bug: unquoted value likely fails
-      expect(pollAttr!.value, equals('500ms'),
-          reason: 'Unquoted Livewire value should work');
+      expect(
+        pollAttr!.value,
+        equals('500ms'),
+        reason: 'Unquoted Livewire value should work',
+      );
     });
 
     test('Alpine.js attribute with unquoted value', () {
@@ -74,9 +89,9 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
       expect(div.attributes.containsKey('x-show'), isTrue);
 
@@ -92,12 +107,15 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
-      expect(div.attributes.length, equals(3),
-          reason: 'Should parse all three unquoted attributes');
+      expect(
+        div.attributes.length,
+        equals(3),
+        reason: 'Should parse all three unquoted attributes',
+      );
 
       expect(div.attributes['id']!.value, equals('main'));
       expect(div.attributes['class']!.value, equals('container'));
@@ -111,9 +129,9 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
       expect(div.attributes.length, equals(4));
 
@@ -122,8 +140,11 @@ void main() {
       expect(div.attributes['data-test']!.value, equals('another'));
 
       // Unquoted attributes should also work
-      expect(div.attributes['id']!.value, equals('unquoted'),
-          reason: 'Unquoted attribute should work alongside quoted');
+      expect(
+        div.attributes['id']!.value,
+        equals('unquoted'),
+        reason: 'Unquoted attribute should work alongside quoted',
+      );
       expect(div.attributes['tabindex']!.value, equals('0'));
     });
 
@@ -132,12 +153,15 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final meta = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'meta');
+      final meta = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'meta',
+      );
 
-      expect(meta.attributes['charset']!.value, equals('utf-8'),
-          reason: 'Unquoted value should include hyphen');
+      expect(
+        meta.attributes['charset']!.value,
+        equals('utf-8'),
+        reason: 'Unquoted value should include hyphen',
+      );
     });
 
     test('Unquoted value stops at whitespace', () {
@@ -145,13 +169,16 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
       // class=container should stop at whitespace before id
-      expect(div.attributes['class']!.value, equals('container'),
-          reason: 'Unquoted value should stop at whitespace');
+      expect(
+        div.attributes['class']!.value,
+        equals('container'),
+        reason: 'Unquoted value should stop at whitespace',
+      );
 
       expect(div.attributes['id']!.value, equals('main'));
     });
@@ -161,12 +188,15 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
-      expect(div.attributes['class']!.value, equals('test'),
-          reason: 'Unquoted value should stop at >');
+      expect(
+        div.attributes['class']!.value,
+        equals('test'),
+        reason: 'Unquoted value should stop at >',
+      );
     });
 
     test('Unquoted value stops at self-close', () {
@@ -178,8 +208,11 @@ void main() {
           .whereType<HtmlElementNode>()
           .firstWhere((e) => e.tagName == 'input');
 
-      expect(input.attributes['type']!.value, equals('text'),
-          reason: 'Unquoted value should stop at />');
+      expect(
+        input.attributes['type']!.value,
+        equals('text'),
+        reason: 'Unquoted value should stop at />',
+      );
     });
 
     test('Unquoted URL value', () {
@@ -192,12 +225,17 @@ void main() {
           .firstWhere((e) => e.tagName == 'a');
 
       // URL should be captured up to tag end or whitespace
-      expect(anchor.attributes['href']!.value, equals('https://example.com'),
-          reason: 'URL in unquoted attribute should work');
+      expect(
+        anchor.attributes['href']!.value,
+        equals('https://example.com'),
+        reason: 'URL in unquoted attribute should work',
+      );
     });
 
     test('Component with unquoted attributes', () {
-      final result = parser.parse('<x-button size=lg variant=primary>Click</x-button>');
+      final result = parser.parse(
+        '<x-button size=lg variant=primary>Click</x-button>',
+      );
 
       if (!result.isSuccess) {
         print('Parser errors: ${result.errors}');
@@ -223,25 +261,36 @@ void main() {
 
       // disabled is boolean (no value)
       expect(input.attributes.containsKey('disabled'), isTrue);
-      expect(input.attributes['disabled']!.value, isNull,
-          reason: 'Boolean attribute should have no value');
+      expect(
+        input.attributes['disabled']!.value,
+        isNull,
+        reason: 'Boolean attribute should have no value',
+      );
 
       // checked has explicit value
-      expect(input.attributes['checked']!.value, equals('true'),
-          reason: 'checked=true should capture "true" as value');
+      expect(
+        input.attributes['checked']!.value,
+        equals('true'),
+        reason: 'checked=true should capture "true" as value',
+      );
     });
 
     test('Unquoted value with underscore', () {
-      final result = parser.parse('<div data-test_value=some_value>Content</div>');
+      final result = parser.parse(
+        '<div data-test_value=some_value>Content</div>',
+      );
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
-      expect(div.attributes['data-test_value']!.value, equals('some_value'),
-          reason: 'Underscores should be allowed in unquoted values');
+      expect(
+        div.attributes['data-test_value']!.value,
+        equals('some_value'),
+        reason: 'Underscores should be allowed in unquoted values',
+      );
     });
 
     test('Unquoted value with period', () {
@@ -249,13 +298,16 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final div = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .firstWhere((e) => e.tagName == 'div');
+      final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
+        (e) => e.tagName == 'div',
+      );
 
       // Periods should be allowed in unquoted values
-      expect(div.attributes['class']!.value, contains('.'),
-          reason: 'Periods should be allowed in unquoted values');
+      expect(
+        div.attributes['class']!.value,
+        contains('.'),
+        reason: 'Periods should be allowed in unquoted values',
+      );
     });
   });
 }

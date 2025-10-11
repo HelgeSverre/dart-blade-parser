@@ -13,7 +13,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.directiveIf), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('😀'));
     });
@@ -24,7 +26,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('🎉'));
     });
@@ -44,7 +48,9 @@ void main() {
       lexer = BladeLexer("{{ '👋🏽' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('👋🏽'));
     });
@@ -59,7 +65,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.directiveIf), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('مرحبا'));
     });
@@ -70,7 +78,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('שלום'));
     });
@@ -99,7 +109,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains(zwj));
     });
@@ -112,7 +124,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains(zwnj));
     });
@@ -122,7 +136,9 @@ void main() {
       lexer = BladeLexer('<div data-value="test${zws}value">Content</div>');
       final tokens = lexer.tokenize();
 
-      final attributeValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+      final attributeValueTokens = tokens
+          .where((t) => t.type == TokenType.attributeValue)
+          .toList();
       expect(attributeValueTokens, isNotEmpty);
       expect(attributeValueTokens.any((t) => t.value.contains(zws)), isTrue);
     });
@@ -139,7 +155,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('café'));
     });
@@ -148,7 +166,9 @@ void main() {
       lexer = BladeLexer("{{ 'Tiếng Việt' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('Tiếng'));
       expect(expressionTokens.first.value, contains('Việt'));
@@ -165,7 +185,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value.isNotEmpty, isTrue);
     });
@@ -175,7 +197,9 @@ void main() {
       lexer = BladeLexer("{{ '𝒜𝒷𝒸' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value.isNotEmpty, isTrue);
     });
@@ -213,7 +237,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('Hello'));
       expect(expressionTokens.first.value, contains('Привет'));
@@ -242,7 +268,9 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.directiveIf), isTrue);
 
-      final expressionTokens = tokens.where((t) => t.type == TokenType.expression).toList();
+      final expressionTokens = tokens
+          .where((t) => t.type == TokenType.expression)
+          .toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('中文'));
       expect(expressionTokens.first.value, contains('Русский'));

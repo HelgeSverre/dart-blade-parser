@@ -24,13 +24,18 @@ void main() {
       // Find the component
       final component = result.ast!.children
           .whereType<ComponentNode>()
-          .firstWhere((c) => c.name == 'card',
-              orElse: () => throw Exception('x-card component not found'));
+          .firstWhere(
+            (c) => c.name == 'card',
+            orElse: () => throw Exception('x-card component not found'),
+          );
 
       // CRITICAL: Component should have a 'header' slot
       // Current bug: Slots not recognized, likely treated as nested component
-      expect(component.slots.containsKey('header'), isTrue,
-          reason: '<x-slot:header> should create a slot named "header"');
+      expect(
+        component.slots.containsKey('header'),
+        isTrue,
+        reason: '<x-slot:header> should create a slot named "header"',
+      );
 
       final headerSlot = component.slots['header'];
       expect(headerSlot, isNotNull);
@@ -56,8 +61,11 @@ void main() {
           .firstWhere((c) => c.name == 'card');
 
       // Should have 'footer' slot
-      expect(component.slots.containsKey('footer'), isTrue,
-          reason: '<x-slot name="footer"> should create slot');
+      expect(
+        component.slots.containsKey('footer'),
+        isTrue,
+        reason: '<x-slot name="footer"> should create slot',
+      );
 
       final footerSlot = component.slots['footer'];
       expect(footerSlot, isNotNull);
@@ -80,8 +88,11 @@ void main() {
           .firstWhere((c) => c.name == 'layout');
 
       // Should have 2 named slots
-      expect(component.slots.length, equals(2),
-          reason: 'Should have header and footer slots');
+      expect(
+        component.slots.length,
+        equals(2),
+        reason: 'Should have header and footer slots',
+      );
 
       expect(component.slots.containsKey('header'), isTrue);
       expect(component.slots.containsKey('footer'), isTrue);
@@ -90,8 +101,11 @@ void main() {
       final nonSlotChildren = component.children
           .where((c) => c is! SlotNode)
           .whereType<HtmlElementNode>();
-      expect(nonSlotChildren, isNotEmpty,
-          reason: 'Non-slot content should be in component children');
+      expect(
+        nonSlotChildren,
+        isNotEmpty,
+        reason: 'Non-slot content should be in component children',
+      );
     });
 
     test('Slot with attributes', () {
@@ -111,8 +125,11 @@ void main() {
       expect(titleSlot, isNotNull);
 
       // Slot should have attributes
-      expect(titleSlot!.attributes, isNotEmpty,
-          reason: 'Slot should preserve its attributes');
+      expect(
+        titleSlot!.attributes,
+        isNotEmpty,
+        reason: 'Slot should preserve its attributes',
+      );
 
       expect(titleSlot.attributes.containsKey('class'), isTrue);
       expect(titleSlot.attributes['class']!.value, equals('font-bold'));
@@ -142,8 +159,11 @@ void main() {
 
       // Slot should have HTML children
       final htmlChildren = headerSlot!.children.whereType<HtmlElementNode>();
-      expect(htmlChildren.length, greaterThanOrEqualTo(2),
-          reason: 'Should have h1 and p elements');
+      expect(
+        htmlChildren.length,
+        greaterThanOrEqualTo(2),
+        reason: 'Should have h1 and p elements',
+      );
 
       final h1 = htmlChildren.firstWhere((e) => e.tagName == 'h1');
       expect(h1, isNotNull);
@@ -175,8 +195,11 @@ void main() {
 
       // Slot should contain the @foreach directive
       final directives = itemsSlot!.children.whereType<DirectiveNode>();
-      expect(directives.any((d) => d.name == 'foreach'), isTrue,
-          reason: 'Slot should contain Blade directives');
+      expect(
+        directives.any((d) => d.name == 'foreach'),
+        isTrue,
+        reason: 'Slot should contain Blade directives',
+      );
     });
 
     test('Empty slot', () {
@@ -196,8 +219,11 @@ void main() {
 
       final actionsSlot = component.slots['actions'];
       expect(actionsSlot, isNotNull);
-      expect(actionsSlot!.children, isEmpty,
-          reason: 'Empty slot should have no children');
+      expect(
+        actionsSlot!.children,
+        isEmpty,
+        reason: 'Empty slot should have no children',
+      );
     });
 
     test('Slot closing tag must match opening', () {
@@ -208,16 +234,24 @@ void main() {
       ''');
 
       // Should report error for mismatched slot tags
-      expect(result.errors, isNotEmpty,
-          reason: 'Mismatched slot tags should produce error');
+      expect(
+        result.errors,
+        isNotEmpty,
+        reason: 'Mismatched slot tags should produce error',
+      );
 
-      final hasMismatchError = result.errors
-          .any((e) => e.message.toLowerCase().contains('header') ||
-              e.message.toLowerCase().contains('footer') ||
-              e.message.toLowerCase().contains('mismatch'));
+      final hasMismatchError = result.errors.any(
+        (e) =>
+            e.message.toLowerCase().contains('header') ||
+            e.message.toLowerCase().contains('footer') ||
+            e.message.toLowerCase().contains('mismatch'),
+      );
 
-      expect(hasMismatchError, isTrue,
-          reason: 'Error should mention mismatched slot tags');
+      expect(
+        hasMismatchError,
+        isTrue,
+        reason: 'Error should mention mismatched slot tags',
+      );
     });
 
     test('Default slot (unnamed content)', () {
@@ -244,8 +278,11 @@ void main() {
           .where((c) => c is! SlotNode)
           .whereType<HtmlElementNode>();
 
-      expect(defaultContent.any((e) => e.tagName == 'p'), isTrue,
-          reason: 'Default content should be in component children');
+      expect(
+        defaultContent.any((e) => e.tagName == 'p'),
+        isTrue,
+        reason: 'Default content should be in component children',
+      );
     });
 
     test('Self-closing slot should work', () {
@@ -261,13 +298,19 @@ void main() {
           .whereType<ComponentNode>()
           .firstWhere((c) => c.name == 'card');
 
-      expect(component.slots.containsKey('divider'), isTrue,
-          reason: 'Self-closing slot should be recognized');
+      expect(
+        component.slots.containsKey('divider'),
+        isTrue,
+        reason: 'Self-closing slot should be recognized',
+      );
 
       final dividerSlot = component.slots['divider'];
       expect(dividerSlot, isNotNull);
-      expect(dividerSlot!.children, isEmpty,
-          reason: 'Self-closing slot should be empty');
+      expect(
+        dividerSlot!.children,
+        isEmpty,
+        reason: 'Self-closing slot should be empty',
+      );
     });
   });
 }

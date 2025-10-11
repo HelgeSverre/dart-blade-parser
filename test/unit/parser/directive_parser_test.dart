@@ -10,8 +10,9 @@ void main() {
     });
 
     test('Parse @if directive with expression', () {
-      final result =
-          parser.parse('@if(\$user->isAdmin())\n  <p>Admin</p>\n@endif');
+      final result = parser.parse(
+        '@if(\$user->isAdmin())\n  <p>Admin</p>\n@endif',
+      );
 
       expect(result.isSuccess, isTrue);
       expect(result.errors, isEmpty);
@@ -31,16 +32,17 @@ void main() {
       ''');
 
       expect(result.isSuccess, isTrue);
-      final ifNode = result.ast!.children
-          .whereType<DirectiveNode>()
-          .firstWhere((n) => n.name == 'if');
+      final ifNode = result.ast!.children.whereType<DirectiveNode>().firstWhere(
+        (n) => n.name == 'if',
+      );
       expect(ifNode.name, equals('if'));
       expect(ifNode.children.length, greaterThan(0));
     });
 
     test('Parse @foreach directive', () {
-      final result = parser
-          .parse('@foreach(\$items as \$item)\n  {{ \$item }}\n@endforeach');
+      final result = parser.parse(
+        '@foreach(\$items as \$item)\n  {{ \$item }}\n@endforeach',
+      );
 
       expect(result.isSuccess, isTrue);
 
@@ -50,8 +52,9 @@ void main() {
     });
 
     test('Parse @for directive', () {
-      final result =
-          parser.parse('@for(\$i = 0; \$i < 10; \$i++)\n  {{ \$i }}\n@endfor');
+      final result = parser.parse(
+        '@for(\$i = 0; \$i < 10; \$i++)\n  {{ \$i }}\n@endfor',
+      );
 
       expect(result.isSuccess, isTrue);
 
@@ -61,8 +64,9 @@ void main() {
     });
 
     test('Parse @while directive', () {
-      final result =
-          parser.parse('@while(\$condition)\n  <p>Loop</p>\n@endwhile');
+      final result = parser.parse(
+        '@while(\$condition)\n  <p>Loop</p>\n@endwhile',
+      );
 
       expect(result.isSuccess, isTrue);
 
@@ -113,8 +117,9 @@ void main() {
     });
 
     test('Detect unclosed @foreach directive', () {
-      final result =
-          parser.parse('@foreach(\$items as \$item)\n  {{ \$item }}');
+      final result = parser.parse(
+        '@foreach(\$items as \$item)\n  {{ \$item }}',
+      );
 
       expect(result.isSuccess, isFalse);
       expect(result.errors, isNotEmpty);
@@ -255,21 +260,25 @@ void main() {
       // Find the unless directive
       final unlessDirective = result.ast!.children
           .whereType<DirectiveNode>()
-          .firstWhere((n) => n.name == 'unless',
-              orElse: () => throw Exception('unless directive not found'));
+          .firstWhere(
+            (n) => n.name == 'unless',
+            orElse: () => throw Exception('unless directive not found'),
+          );
 
       expect(unlessDirective.name, equals('unless'));
       expect(unlessDirective.expression, isNotNull);
 
       // CRITICAL: unless should be a BLOCK directive with children
       // Current bug: treated as inline, children.isEmpty
-      expect(unlessDirective.children.length, greaterThan(0),
-          reason:
-              '@unless should be block directive with children, not inline');
+      expect(
+        unlessDirective.children.length,
+        greaterThan(0),
+        reason: '@unless should be block directive with children, not inline',
+      );
 
       // Should have HTML child
-      final htmlChildren =
-          unlessDirective.children.whereType<HtmlElementNode>();
+      final htmlChildren = unlessDirective.children
+          .whereType<HtmlElementNode>();
       expect(htmlChildren, isNotEmpty);
     });
 
@@ -280,13 +289,20 @@ void main() {
       ''');
 
       // Should have error about unclosed @unless
-      expect(result.errors, isNotEmpty,
-          reason: 'Missing @endunless should produce error');
+      expect(
+        result.errors,
+        isNotEmpty,
+        reason: 'Missing @endunless should produce error',
+      );
 
-      final hasUnlessError = result.errors
-          .any((e) => e.message.toLowerCase().contains('unless'));
-      expect(hasUnlessError, isTrue,
-          reason: 'Error should mention unclosed @unless');
+      final hasUnlessError = result.errors.any(
+        (e) => e.message.toLowerCase().contains('unless'),
+      );
+      expect(
+        hasUnlessError,
+        isTrue,
+        reason: 'Error should mention unclosed @unless',
+      );
     });
 
     test('@php block should have children with raw content', () {
@@ -302,21 +318,31 @@ void main() {
       // Find the php directive
       final phpDirective = result.ast!.children
           .whereType<DirectiveNode>()
-          .firstWhere((n) => n.name == 'php',
-              orElse: () => throw Exception('php directive not found'));
+          .firstWhere(
+            (n) => n.name == 'php',
+            orElse: () => throw Exception('php directive not found'),
+          );
 
       expect(phpDirective.name, equals('php'));
 
       // CRITICAL: @php should be BLOCK directive with children
       // Content should NOT be parsed as Blade/HTML
       // Current bug: treated as inline, or content parsed as Blade
-      expect(phpDirective.children.length, greaterThan(0),
-          reason: '@php should be block directive with raw content');
+      expect(
+        phpDirective.children.length,
+        greaterThan(0),
+        reason: '@php should be block directive with raw content',
+      );
 
       // Content should be raw text, not parsed HTML/Blade
-      final hasHtmlChildren = phpDirective.children.any((c) => c is HtmlElementNode);
-      expect(hasHtmlChildren, isFalse,
-          reason: '@php content should be raw, not parsed as HTML');
+      final hasHtmlChildren = phpDirective.children.any(
+        (c) => c is HtmlElementNode,
+      );
+      expect(
+        hasHtmlChildren,
+        isFalse,
+        reason: '@php content should be raw, not parsed as HTML',
+      );
     });
 
     test('Missing @endphp should report error', () {
@@ -325,13 +351,16 @@ void main() {
           \$x = 1;
       ''');
 
-      expect(result.errors, isNotEmpty,
-          reason: 'Missing @endphp should produce error');
+      expect(
+        result.errors,
+        isNotEmpty,
+        reason: 'Missing @endphp should produce error',
+      );
 
-      final hasPhpError =
-          result.errors.any((e) => e.message.toLowerCase().contains('php'));
-      expect(hasPhpError, isTrue,
-          reason: 'Error should mention unclosed @php');
+      final hasPhpError = result.errors.any(
+        (e) => e.message.toLowerCase().contains('php'),
+      );
+      expect(hasPhpError, isTrue, reason: 'Error should mention unclosed @php');
     });
 
     test('@switch/@case/@default/@endswitch structure', () {
@@ -352,21 +381,30 @@ void main() {
       // Expected: Specialized multi-branch structure
       // Current: Likely fails or incorrectly structured
 
-      expect(result.isSuccess, isTrue,
-          reason: '@switch structure should parse successfully');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: '@switch structure should parse successfully',
+      );
 
       final switchDirective = result.ast!.children
           .whereType<DirectiveNode>()
           .where((n) => n.name == 'switch')
           .firstOrNull;
 
-      expect(switchDirective, isNotNull,
-          reason: '@switch directive should be found');
+      expect(
+        switchDirective,
+        isNotNull,
+        reason: '@switch directive should be found',
+      );
 
       // Should have proper case/default branches
       // (Implementation-specific structure)
-      expect(switchDirective!.children, isNotEmpty,
-          reason: '@switch should contain case/default branches');
+      expect(
+        switchDirective!.children,
+        isNotEmpty,
+        reason: '@switch should contain case/default branches',
+      );
     });
 
     test('@forelse/@empty/@endforelse structure', () {
@@ -381,29 +419,40 @@ void main() {
       // Expected: Special forelse structure with empty branch
       // Current: Unknown/incorrect parsing
 
-      expect(result.isSuccess, isTrue,
-          reason: '@forelse structure should parse successfully');
+      expect(
+        result.isSuccess,
+        isTrue,
+        reason: '@forelse structure should parse successfully',
+      );
 
       final forelseDirective = result.ast!.children
           .whereType<DirectiveNode>()
           .where((n) => n.name == 'forelse')
           .firstOrNull;
 
-      expect(forelseDirective, isNotNull,
-          reason: '@forelse directive should be found');
+      expect(
+        forelseDirective,
+        isNotNull,
+        reason: '@forelse directive should be found',
+      );
 
       // Should have both filled and empty branches
-      expect(forelseDirective!.children, isNotEmpty,
-          reason: '@forelse should contain both branches');
+      expect(
+        forelseDirective!.children,
+        isNotEmpty,
+        reason: '@forelse should contain both branches',
+      );
 
       // Should recognize @empty as part of structure
       final hasEmptyBranch = forelseDirective.children
           .whereType<DirectiveNode>()
           .any((n) => n.name == 'empty');
 
-      expect(hasEmptyBranch, isTrue,
-          reason:
-              '@empty should be a child of the @forelse directive structure');
+      expect(
+        hasEmptyBranch,
+        isTrue,
+        reason: '@empty should be a child of the @forelse directive structure',
+      );
     });
 
     test('Nested @unless directives', () {
@@ -425,11 +474,15 @@ void main() {
       expect(outerUnless.children, isNotEmpty);
 
       // Should have nested unless
-      final nestedUnless =
-          outerUnless.children.whereType<DirectiveNode>().where((n) => n.name == 'unless');
+      final nestedUnless = outerUnless.children
+          .whereType<DirectiveNode>()
+          .where((n) => n.name == 'unless');
 
-      expect(nestedUnless, isNotEmpty,
-          reason: 'Nested @unless should be found in outer @unless children');
+      expect(
+        nestedUnless,
+        isNotEmpty,
+        reason: 'Nested @unless should be found in outer @unless children',
+      );
     });
   });
 }

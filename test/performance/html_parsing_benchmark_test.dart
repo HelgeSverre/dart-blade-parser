@@ -20,15 +20,19 @@ void main() {
       print('Performance: ${linesPerSecond.toStringAsFixed(2)} lines/sec');
       print('Time: ${stopwatch.elapsedMilliseconds}ms');
 
-      expect(linesPerSecond, greaterThanOrEqualTo(1000),
-          reason: 'Parser should handle at least 1000 lines/sec');
+      expect(
+        linesPerSecond,
+        greaterThanOrEqualTo(1000),
+        reason: 'Parser should handle at least 1000 lines/sec',
+      );
     });
 
     test('Parser handles complex mixed Blade/HTML at speed', () {
       final parser = BladeParser();
 
       // Create a realistic template with mixed content (100 iterations)
-      final template = '''
+      final template =
+          '''
         <div class="container">
           @if(\$user->isActive)
             <div class="user-card" x-data="{open: false}">
@@ -57,11 +61,15 @@ void main() {
       final linesPerSecond = lineCount / (stopwatch.elapsedMilliseconds / 1000);
 
       print(
-          'Complex template performance: ${linesPerSecond.toStringAsFixed(2)} lines/sec');
+        'Complex template performance: ${linesPerSecond.toStringAsFixed(2)} lines/sec',
+      );
       print('Lines: $lineCount, Time: ${stopwatch.elapsedMilliseconds}ms');
 
-      expect(linesPerSecond, greaterThanOrEqualTo(1000),
-          reason: 'Parser should maintain speed with complex templates');
+      expect(
+        linesPerSecond,
+        greaterThanOrEqualTo(1000),
+        reason: 'Parser should maintain speed with complex templates',
+      );
     });
 
     test('Parser handles deeply nested HTML efficiently', () {
@@ -86,8 +94,11 @@ void main() {
       print('Nested HTML parsing time: ${stopwatch.elapsedMilliseconds}ms');
 
       // Should complete in reasonable time (< 100ms for 20 levels)
-      expect(stopwatch.elapsedMilliseconds, lessThan(100),
-          reason: 'Deeply nested HTML should parse efficiently');
+      expect(
+        stopwatch.elapsedMilliseconds,
+        lessThan(100),
+        reason: 'Deeply nested HTML should parse efficiently',
+      );
     });
 
     test('Parser handles large number of attributes efficiently', () {
@@ -112,15 +123,19 @@ void main() {
       print('Attribute parsing time: ${stopwatch.elapsedMilliseconds}ms');
 
       // Should complete quickly (< 50ms for 50 attributes)
-      expect(stopwatch.elapsedMilliseconds, lessThan(50),
-          reason: 'Attribute parsing should be efficient');
+      expect(
+        stopwatch.elapsedMilliseconds,
+        lessThan(50),
+        reason: 'Attribute parsing should be efficient',
+      );
     });
 
     test('Parser handles large documents without memory issues', () {
       final parser = BladeParser();
 
       // Create a large template (5000 lines)
-      final template = '''
+      final template =
+          '''
         <div class="container">
           <p class="text">Some content here</p>
           <span class="highlight">Highlighted text</span>
@@ -142,11 +157,15 @@ void main() {
       final linesPerSecond = lineCount / (stopwatch.elapsedMilliseconds / 1000);
 
       print(
-          'Large document: $lineCount lines in ${stopwatch.elapsedMilliseconds}ms');
+        'Large document: $lineCount lines in ${stopwatch.elapsedMilliseconds}ms',
+      );
       print('Performance: ${linesPerSecond.toStringAsFixed(2)} lines/sec');
 
-      expect(linesPerSecond, greaterThanOrEqualTo(1000),
-          reason: 'Parser should maintain speed with large documents');
+      expect(
+        linesPerSecond,
+        greaterThanOrEqualTo(1000),
+        reason: 'Parser should maintain speed with large documents',
+      );
     });
 
     test('No performance regression from baseline', () {
@@ -174,16 +193,19 @@ void main() {
       print('HTML template: ${htmlStopwatch.elapsedMilliseconds}ms');
 
       // HTML parsing should be comparable to Blade parsing (within 2x)
-      expect(htmlStopwatch.elapsedMilliseconds,
-          lessThan(bladeStopwatch.elapsedMilliseconds * 2),
-          reason: 'HTML parsing should not significantly slow down the parser');
+      expect(
+        htmlStopwatch.elapsedMilliseconds,
+        lessThan(bladeStopwatch.elapsedMilliseconds * 2),
+        reason: 'HTML parsing should not significantly slow down the parser',
+      );
     });
 
     test('Void element recognition is fast', () {
       final parser = BladeParser();
 
       // Template with many void elements
-      final template = '''
+      final template =
+          '''
         <br>
         <input type="text">
         <img src="image.jpg">
@@ -202,15 +224,19 @@ void main() {
       print('Void element parsing: ${stopwatch.elapsedMilliseconds}ms');
 
       // Should be very fast (< 100ms for 600 void elements)
-      expect(stopwatch.elapsedMilliseconds, lessThan(100),
-          reason: 'Void element recognition should be O(1)');
+      expect(
+        stopwatch.elapsedMilliseconds,
+        lessThan(100),
+        reason: 'Void element recognition should be O(1)',
+      );
     });
 
     test('Attribute categorization performance', () {
       final parser = BladeParser();
 
       // Template with mixed attribute types
-      final template = '''
+      final template =
+          '''
         <div
           class="container"
           id="app"
@@ -234,8 +260,11 @@ void main() {
       print('Attribute categorization: ${stopwatch.elapsedMilliseconds}ms');
 
       // Should categorize efficiently
-      expect(stopwatch.elapsedMilliseconds, lessThan(200),
-          reason: 'Attribute categorization should be pattern-based and fast');
+      expect(
+        stopwatch.elapsedMilliseconds,
+        lessThan(200),
+        reason: 'Attribute categorization should be pattern-based and fast',
+      );
     });
   });
 }

@@ -11,7 +11,9 @@ void main() {
         lexer = BladeLexer('<a href=http://example.com>Link</a>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('http://example.com'));
       });
@@ -20,7 +22,9 @@ void main() {
         lexer = BladeLexer('<a href=https://example.com>Link</a>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('https://example.com'));
       });
@@ -29,7 +33,9 @@ void main() {
         lexer = BladeLexer('<a href=ftp://files.example.com>FTP</a>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('ftp://files.example.com'));
       });
@@ -38,7 +44,9 @@ void main() {
         lexer = BladeLexer('<a href=mailto:user@example.com>Email</a>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('mailto:user@example.com'));
       });
@@ -47,18 +55,27 @@ void main() {
         lexer = BladeLexer('<a href="javascript:alert(\'test\')">JS</a>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
-        expect(attrValueTokens.first.value, equals('javascript:alert(\'test\')'));
+        expect(attrValueTokens.first.value, equals("javascript:alert('test')"));
       });
 
       test('data: protocol with image in quoted value', () {
-        lexer = BladeLexer('<img src="data:image/png;base64,iVBORw0KGgoAAAANS">');
+        lexer = BladeLexer(
+          '<img src="data:image/png;base64,iVBORw0KGgoAAAANS">',
+        );
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
-        expect(attrValueTokens.first.value, equals('data:image/png;base64,iVBORw0KGgoAAAANS'));
+        expect(
+          attrValueTokens.first.value,
+          equals('data:image/png;base64,iVBORw0KGgoAAAANS'),
+        );
       });
     });
 
@@ -67,7 +84,9 @@ void main() {
         lexer = BladeLexer('<a href=https://example.com:8080>Link</a>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('https://example.com:8080'));
       });
@@ -76,7 +95,9 @@ void main() {
         lexer = BladeLexer('<a href=/docs/guide#section>Link</a>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('/docs/guide#section'));
       });
@@ -85,27 +106,43 @@ void main() {
         lexer = BladeLexer('<a href="/search?q=test&page=1">Search</a>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('/search?q=test&page=1'));
       });
 
       test('URL with path, query, and fragment', () {
-        lexer = BladeLexer('<a href="/api/users?id=123&sort=name#details">Link</a>');
+        lexer = BladeLexer(
+          '<a href="/api/users?id=123&sort=name#details">Link</a>',
+        );
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
-        expect(attrValueTokens.first.value, equals('/api/users?id=123&sort=name#details'));
+        expect(
+          attrValueTokens.first.value,
+          equals('/api/users?id=123&sort=name#details'),
+        );
       });
 
       test('Complex data URI', () {
-        lexer = BladeLexer('<img src="data:text/html;charset=utf-8,<h1>Hello</h1>">');
+        lexer = BladeLexer(
+          '<img src="data:text/html;charset=utf-8,<h1>Hello</h1>">',
+        );
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
-        expect(attrValueTokens.first.value, equals('data:text/html;charset=utf-8,<h1>Hello</h1>'));
+        expect(
+          attrValueTokens.first.value,
+          equals('data:text/html;charset=utf-8,<h1>Hello</h1>'),
+        );
       });
     });
 
@@ -114,7 +151,9 @@ void main() {
         lexer = BladeLexer('<div class=text.lg.bold>Content</div>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('text.lg.bold'));
       });
@@ -123,7 +162,9 @@ void main() {
         lexer = BladeLexer('<div class=text-sm-center>Content</div>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('text-sm-center'));
       });
@@ -132,7 +173,9 @@ void main() {
         lexer = BladeLexer('<div data-test_value=some_value>Content</div>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens.length, greaterThanOrEqualTo(1));
         // Should have at least one unquoted value
         expect(attrValueTokens.any((t) => t.value.contains('_')), isTrue);
@@ -142,7 +185,9 @@ void main() {
         lexer = BladeLexer('<button onclick=handleClick>Click</button>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('handleClick'));
       });
@@ -153,7 +198,9 @@ void main() {
         lexer = BladeLexer('<input tabindex=0>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('0'));
       });
@@ -162,7 +209,9 @@ void main() {
         lexer = BladeLexer('<input maxlength=100>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('100'));
       });
@@ -171,7 +220,9 @@ void main() {
         lexer = BladeLexer('<button disabled=false>Click</button>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('false'));
       });
@@ -180,7 +231,9 @@ void main() {
         lexer = BladeLexer('<input type=checkbox checked=true>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens.length, greaterThanOrEqualTo(2));
         // Should have 'checkbox' and 'true'
         expect(attrValueTokens.any((t) => t.value == 'true'), isTrue);
@@ -192,7 +245,9 @@ void main() {
         lexer = BladeLexer('<div class="">Content</div>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals(''));
       });
@@ -201,7 +256,9 @@ void main() {
         lexer = BladeLexer("<div class=''>Content</div>");
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals(''));
       });
@@ -210,16 +267,20 @@ void main() {
         lexer = BladeLexer("<div title='It\\'s working'>Content</div>");
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
-        expect(attrValueTokens.first.value, equals('It\\\'s working'));
+        expect(attrValueTokens.first.value, equals("It\\'s working"));
       });
 
       test('Double-quoted with escaped quote', () {
         lexer = BladeLexer('<div title="Say \\"hello\\"">Content</div>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, equals('Say \\"hello\\"'));
       });
@@ -230,27 +291,37 @@ void main() {
         lexer = BladeLexer('<div x-text="`Hello \${name}`">Content</div>');
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, contains('Hello'));
         expect(attrValueTokens.first.value, contains('name'));
       });
 
       test('Alpine x-bind with complex expression', () {
-        lexer = BladeLexer('<div x-bind:class="{ active: isActive, disabled: !isEnabled }">Content</div>');
+        lexer = BladeLexer(
+          '<div x-bind:class="{ active: isActive, disabled: !isEnabled }">Content</div>',
+        );
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, contains('active'));
         expect(attrValueTokens.first.value, contains('isActive'));
       });
 
       test('Alpine x-on with arrow function', () {
-        lexer = BladeLexer('<button x-on:click="() => count++">Increment</button>');
+        lexer = BladeLexer(
+          '<button x-on:click="() => count++">Increment</button>',
+        );
         final tokens = lexer.tokenize();
 
-        final attrValueTokens = tokens.where((t) => t.type == TokenType.attributeValue).toList();
+        final attrValueTokens = tokens
+            .where((t) => t.type == TokenType.attributeValue)
+            .toList();
         expect(attrValueTokens, isNotEmpty);
         expect(attrValueTokens.first.value, contains('count++'));
       });

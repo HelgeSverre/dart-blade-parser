@@ -26,12 +26,18 @@ void main() {
       final charsPerSec = totalChars / seconds;
 
       print(
-          'Pure text: ${(charsPerSec / 1000000).toStringAsFixed(2)}M chars/sec');
-      print('  Total: ${totalChars / 1000000}M chars in ${seconds.toStringAsFixed(3)}s');
+        'Pure text: ${(charsPerSec / 1000000).toStringAsFixed(2)}M chars/sec',
+      );
+      print(
+        '  Total: ${totalChars / 1000000}M chars in ${seconds.toStringAsFixed(3)}s',
+      );
 
       // Assert reasonable performance: > 1M chars/sec
-      expect(charsPerSec, greaterThan(1000000),
-          reason: 'Should process > 1M chars/sec for plain text');
+      expect(
+        charsPerSec,
+        greaterThan(1000000),
+        reason: 'Should process > 1M chars/sec for plain text',
+      );
     });
 
     test('Directive-heavy template throughput', () {
@@ -48,9 +54,8 @@ void main() {
       final template = buffer.toString();
 
       // Count actual directives
-      final directiveCount = '@if'
-              .allMatches(template)
-              .length +
+      final directiveCount =
+          '@if'.allMatches(template).length +
           '@foreach'.allMatches(template).length +
           '@endforeach'.allMatches(template).length +
           '@endif'.allMatches(template).length;
@@ -74,13 +79,19 @@ void main() {
       final directivesPerSec = totalDirectives / seconds;
 
       print(
-          'Directive-heavy: ${(directivesPerSec / 1000).toStringAsFixed(2)}K directives/sec');
-      print('  Total: $directiveCount directives processed $iterations times in ${seconds.toStringAsFixed(3)}s');
+        'Directive-heavy: ${(directivesPerSec / 1000).toStringAsFixed(2)}K directives/sec',
+      );
+      print(
+        '  Total: $directiveCount directives processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      );
 
       // Assert reasonable performance: > 5K directives/sec
       // (Directive parsing involves expression parsing which is more complex)
-      expect(directivesPerSec, greaterThan(5000),
-          reason: 'Should process > 5K directives/sec');
+      expect(
+        directivesPerSec,
+        greaterThan(5000),
+        reason: 'Should process > 5K directives/sec',
+      );
     });
 
     test('Complex attribute-heavy HTML throughput', () {
@@ -123,12 +134,18 @@ void main() {
       final elementsPerSec = totalElements / seconds;
 
       print(
-          'Attribute-heavy HTML: ${(elementsPerSec / 1000).toStringAsFixed(2)}K elements/sec');
-      print('  Total: $elementCount elements (10 attrs each) processed $iterations times in ${seconds.toStringAsFixed(3)}s');
+        'Attribute-heavy HTML: ${(elementsPerSec / 1000).toStringAsFixed(2)}K elements/sec',
+      );
+      print(
+        '  Total: $elementCount elements (10 attrs each) processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      );
 
       // Assert reasonable performance: > 5K elements/sec
-      expect(elementsPerSec, greaterThan(5000),
-          reason: 'Should process > 5K complex elements/sec');
+      expect(
+        elementsPerSec,
+        greaterThan(5000),
+        reason: 'Should process > 5K complex elements/sec',
+      );
     });
 
     test('Escape sequence heavy template throughput', () {
@@ -160,17 +177,28 @@ void main() {
       final escapesPerSec = totalEscapes / seconds;
 
       print(
-          'Escape sequences: ${(escapesPerSec / 1000).toStringAsFixed(2)}K escapes/sec');
-      print('  Total: $escapeCount escapes processed $iterations times in ${seconds.toStringAsFixed(3)}s');
+        'Escape sequences: ${(escapesPerSec / 1000).toStringAsFixed(2)}K escapes/sec',
+      );
+      print(
+        '  Total: $escapeCount escapes processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      );
 
       // Assert reasonable performance: > 20K escapes/sec
-      expect(escapesPerSec, greaterThan(20000),
-          reason: 'Should process > 20K escapes/sec (StringBuffer optimization)');
+      expect(
+        escapesPerSec,
+        greaterThan(20000),
+        reason: 'Should process > 20K escapes/sec (StringBuffer optimization)',
+      );
     });
 
     test('Memory usage for large files - linear growth', () {
       // Parse progressively larger files: 10KB, 100KB, 1MB, 10MB
-      final testSizes = [10 * 1024, 100 * 1024, 1 * 1024 * 1024, 10 * 1024 * 1024];
+      final testSizes = [
+        10 * 1024,
+        100 * 1024,
+        1 * 1024 * 1024,
+        10 * 1024 * 1024,
+      ];
       final memoryPerMB = <double>[];
 
       print('Memory usage analysis:');
@@ -198,10 +226,12 @@ void main() {
 
         memoryPerMB.add(memoryPerInputMB);
 
-        print('  ${(size / 1024).toStringAsFixed(0)}KB input: '
-            '${tokens.length} tokens, '
-            '~${estimatedMemoryKB.toStringAsFixed(1)}KB memory, '
-            '~${memoryPerInputMB.toStringAsFixed(2)}MB per MB input');
+        print(
+          '  ${(size / 1024).toStringAsFixed(0)}KB input: '
+          '${tokens.length} tokens, '
+          '~${estimatedMemoryKB.toStringAsFixed(1)}KB memory, '
+          '~${memoryPerInputMB.toStringAsFixed(2)}MB per MB input',
+        );
       }
 
       // Check for linear growth (ratio should be relatively stable)
@@ -213,8 +243,11 @@ void main() {
       print('Memory growth factor: ${growthFactor.toStringAsFixed(2)}x');
 
       // Growth should be close to linear (< 2x variation)
-      expect(growthFactor, lessThan(2.0),
-          reason: 'Memory usage should grow linearly, not exponentially');
+      expect(
+        growthFactor,
+        lessThan(2.0),
+        reason: 'Memory usage should grow linearly, not exponentially',
+      );
     });
 
     test('Mixed content realistic template benchmark', () {
@@ -227,7 +260,9 @@ void main() {
         buffer.writeln('      <h2>{{ \$user->name$i }}</h2>');
         buffer.writeln('      <p>Contact: user$i@@example.com</p>');
         buffer.writeln('      @foreach(\$user->posts$i as \$post)');
-        buffer.writeln('        <article class="post" wire:key="post-{{\$post->id}}">');
+        buffer.writeln(
+          '        <article class="post" wire:key="post-{{\$post->id}}">',
+        );
         buffer.writeln('          <h3>{{\$post->title}}</h3>');
         buffer.writeln('          <button wire:click="like({{\$post->id}})" ');
         buffer.writeln('                  @click="toggle" ');
@@ -263,35 +298,34 @@ void main() {
       final charsPerSec = totalChars / seconds;
       final mbPerSec = (charsPerSec / 1024 / 1024);
 
+      print('Mixed realistic content: ${mbPerSec.toStringAsFixed(2)} MB/sec');
       print(
-          'Mixed realistic content: ${mbPerSec.toStringAsFixed(2)} MB/sec');
-      print('  Template size: ${(template.length / 1024).toStringAsFixed(2)}KB');
+        '  Template size: ${(template.length / 1024).toStringAsFixed(2)}KB',
+      );
       print('  Processed $iterations times in ${seconds.toStringAsFixed(3)}s');
 
       // Assert reasonable performance: > 1MB/sec
-      expect(mbPerSec, greaterThan(1.0),
-          reason: 'Should process > 1MB/sec for realistic mixed content');
+      expect(
+        mbPerSec,
+        greaterThan(1.0),
+        reason: 'Should process > 1MB/sec for realistic mixed content',
+      );
     });
 
     test('Echo statement with nested braces throughput', () {
       // Generate template with complex echo statements containing nested braces
       final buffer = StringBuffer();
       for (var i = 0; i < 1000; i++) {
-        buffer.writeln('{{ \$array[$i][\'key\'][\'nested\'] }}');
+        buffer.writeln("{{ \$array[$i]['key']['nested'] }}");
         buffer.writeln('{!! \$html[$i] !!}');
         buffer.writeln('{{{ \$legacy[$i] }}}');
       }
       final template = buffer.toString();
 
-      final echoCount = '{{'
-              .allMatches(template)
-              .length +
-          '{!!'
-              .allMatches(template)
-              .length +
-          '{{{'
-              .allMatches(template)
-              .length;
+      final echoCount =
+          '{{'.allMatches(template).length +
+          '{!!'.allMatches(template).length +
+          '{{{'.allMatches(template).length;
 
       // Warm-up
       for (var i = 0; i < 3; i++) {
@@ -312,12 +346,18 @@ void main() {
       final echosPerSec = totalEchos / seconds;
 
       print(
-          'Echo statements: ${(echosPerSec / 1000).toStringAsFixed(2)}K echos/sec');
-      print('  Total: $echoCount echo statements processed $iterations times in ${seconds.toStringAsFixed(3)}s');
+        'Echo statements: ${(echosPerSec / 1000).toStringAsFixed(2)}K echos/sec',
+      );
+      print(
+        '  Total: $echoCount echo statements processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      );
 
       // Assert reasonable performance: > 5K echos/sec
-      expect(echosPerSec, greaterThan(5000),
-          reason: 'Should process > 5K echo statements/sec');
+      expect(
+        echosPerSec,
+        greaterThan(5000),
+        reason: 'Should process > 5K echo statements/sec',
+      );
     });
 
     test('Component tags with attributes throughput', () {
@@ -325,7 +365,9 @@ void main() {
       final buffer = StringBuffer();
       for (var i = 0; i < 1000; i++) {
         buffer.writeln('<x-alert type="success" :message="\$msg$i" />');
-        buffer.writeln('<x-button color="primary" size="large" @click="handler$i">');
+        buffer.writeln(
+          '<x-button color="primary" size="large" @click="handler$i">',
+        );
         buffer.writeln('  Click me $i');
         buffer.writeln('</x-button>');
         buffer.writeln('<x-card :title="\$title$i" wire:loading>');
@@ -336,12 +378,9 @@ void main() {
       }
       final template = buffer.toString();
 
-      final componentCount = '<x-'
-              .allMatches(template)
-              .length +
-          '</x-'
-              .allMatches(template)
-              .length;
+      final componentCount =
+          '<x-'.allMatches(template).length +
+          '</x-'.allMatches(template).length;
 
       // Warm-up
       for (var i = 0; i < 3; i++) {
@@ -362,12 +401,18 @@ void main() {
       final componentsPerSec = totalComponents / seconds;
 
       print(
-          'Component tags: ${(componentsPerSec / 1000).toStringAsFixed(2)}K components/sec');
-      print('  Total: $componentCount component tags processed $iterations times in ${seconds.toStringAsFixed(3)}s');
+        'Component tags: ${(componentsPerSec / 1000).toStringAsFixed(2)}K components/sec',
+      );
+      print(
+        '  Total: $componentCount component tags processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      );
 
       // Assert reasonable performance: > 5K components/sec
-      expect(componentsPerSec, greaterThan(5000),
-          reason: 'Should process > 5K component tags/sec');
+      expect(
+        componentsPerSec,
+        greaterThan(5000),
+        reason: 'Should process > 5K component tags/sec',
+      );
     });
   });
 }

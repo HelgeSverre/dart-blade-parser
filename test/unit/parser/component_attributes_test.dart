@@ -26,7 +26,8 @@ void main() {
 
     test('Parse component with multiple attributes', () {
       final result = parser.parse(
-          '<x-button size="lg" variant="primary" disabled>Click</x-button>');
+        '<x-button size="lg" variant="primary" disabled>Click</x-button>',
+      );
 
       expect(result.isSuccess, isTrue);
 
@@ -39,13 +40,16 @@ void main() {
 
       // Boolean attribute
       expect(component.attributes.containsKey('disabled'), isTrue);
-      expect(component.attributes['disabled']!.value,
-          isNull); // No value for boolean attrs
+      expect(
+        component.attributes['disabled']!.value,
+        isNull,
+      ); // No value for boolean attrs
     });
 
     test('Parse component with Alpine.js shorthand attributes', () {
-      final result = parser
-          .parse('<x-modal @click="close" :open="isOpen">Content</x-modal>');
+      final result = parser.parse(
+        '<x-modal @click="close" :open="isOpen">Content</x-modal>',
+      );
 
       expect(result.isSuccess, isTrue);
 
@@ -65,8 +69,9 @@ void main() {
     });
 
     test('Parse component with x-data Alpine attribute', () {
-      final result = parser
-          .parse('<x-dropdown x-data="{ open: false }">Menu</x-dropdown>');
+      final result = parser.parse(
+        '<x-dropdown x-data="{ open: false }">Menu</x-dropdown>',
+      );
 
       expect(result.isSuccess, isTrue);
 
@@ -80,7 +85,8 @@ void main() {
 
     test('Parse component with Livewire wire: attributes', () {
       final result = parser.parse(
-          '<x-form wire:submit="save" wire:model="form.email">Submit</x-form>');
+        '<x-form wire:submit="save" wire:model="form.email">Submit</x-form>',
+      );
 
       expect(result.isSuccess, isTrue);
 
@@ -122,7 +128,9 @@ void main() {
 
       // Livewire with modifier
       expect(
-          component.attributes['wire:loading.delay'], isA<LivewireAttribute>());
+        component.attributes['wire:loading.delay'],
+        isA<LivewireAttribute>(),
+      );
 
       // Alpine event with modifier
       expect(component.attributes['@click.prevent'], isA<AlpineAttribute>());
@@ -144,19 +152,23 @@ void main() {
     });
 
     test('Parse component with quoted attribute containing spaces', () {
-      final result = parser
-          .parse('<x-alert message="This is a long message">Alert</x-alert>');
+      final result = parser.parse(
+        '<x-alert message="This is a long message">Alert</x-alert>',
+      );
 
       expect(result.isSuccess, isTrue);
 
       final component = result.ast!.children.whereType<ComponentNode>().first;
-      expect(component.attributes['message']!.value,
-          equals('This is a long message'));
+      expect(
+        component.attributes['message']!.value,
+        equals('This is a long message'),
+      );
     });
 
     test('Parse component with single-quoted attributes', () {
-      final result =
-          parser.parse("<x-button text='Click me'>Button</x-button>");
+      final result = parser.parse(
+        "<x-button text='Click me'>Button</x-button>",
+      );
 
       expect(result.isSuccess, isTrue);
 
@@ -166,19 +178,23 @@ void main() {
 
     test('Parse component with attributes containing special characters', () {
       final result = parser.parse(
-          '<x-input pattern="[A-Za-z0-9]+" placeholder="Enter code...">Input</x-input>');
+        '<x-input pattern="[A-Za-z0-9]+" placeholder="Enter code...">Input</x-input>',
+      );
 
       expect(result.isSuccess, isTrue);
 
       final component = result.ast!.children.whereType<ComponentNode>().first;
       expect(component.attributes['pattern']!.value, equals('[A-Za-z0-9]+'));
       expect(
-          component.attributes['placeholder']!.value, equals('Enter code...'));
+        component.attributes['placeholder']!.value,
+        equals('Enter code...'),
+      );
     });
 
     test('Component attributes appear in JSON output', () {
-      final result =
-          parser.parse('<x-alert type="warning" dismissible>Alert</x-alert>');
+      final result = parser.parse(
+        '<x-alert type="warning" dismissible>Alert</x-alert>',
+      );
 
       expect(result.isSuccess, isTrue);
 

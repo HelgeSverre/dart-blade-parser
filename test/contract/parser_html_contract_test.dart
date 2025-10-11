@@ -88,14 +88,17 @@ void main() {
     test('Parser categorizes Livewire attributes', () {
       final parser = BladeParser();
       final result = parser.parse(
-          '<button wire:click="save" wire:loading.class="opacity-50"></button>');
+        '<button wire:click="save" wire:loading.class="opacity-50"></button>',
+      );
 
       expect(result.isSuccess, isTrue);
       final element = result.ast!.children[0] as HtmlElementNode;
 
       expect(element.attributes['wire:click'], isA<LivewireAttribute>());
       expect(
-          element.attributes['wire:loading.class'], isA<LivewireAttribute>());
+        element.attributes['wire:loading.class'],
+        isA<LivewireAttribute>(),
+      );
     });
 
     test('Parser distinguishes HTML from Blade components', () {
@@ -163,7 +166,7 @@ void main() {
         'param',
         'source',
         'track',
-        'wbr'
+        'wbr',
       ];
 
       for (final tag in voidElements) {
@@ -295,7 +298,8 @@ void main() {
     test('Parser handles mixed attributes', () {
       final parser = BladeParser();
       final result = parser.parse(
-          '<div class="container" x-data="{}" wire:click="save" disabled></div>');
+        '<div class="container" x-data="{}" wire:click="save" disabled></div>',
+      );
 
       expect(result.isSuccess, isTrue);
       final element = result.ast!.children[0] as HtmlElementNode;
