@@ -1,13 +1,15 @@
 name: blade_parser
 description: A pure Dart parser for Laravel Blade templates supporting directives, components, Alpine.js, and Livewire attributes.
-version: 1.0.1
-repository: https://github.com/your-org/dart-blade-parser
+version: 1.1.0
+repository: https://github.com/HelgeSverre/dart-blade-parser
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   # Zero external parsing dependencies per constitution
+  args: ^2.5.0
+  completion: ^1.0.2
 
 dev_dependencies:
   coverage: ^1.15.0

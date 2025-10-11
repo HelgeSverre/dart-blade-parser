@@ -1,40 +1,40 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:args/args.dart';
 import 'package:blade_parser/blade_parser.dart';
+import 'package:completion/completion.dart' as completion;
 
 void main(List<String> arguments) {
-  bool jsonOutput = false;
-  bool treeOutput = false;
-  bool useStdin = false;
-  String? filePath;
+  // Set up argument parser
+  final argParser = ArgParser()
+    ..addFlag('json', help: 'Output AST as JSON')
+    ..addFlag('tree', help: 'Output AST as tree (default)', defaultsTo: true)
+    ..addFlag('stdin', help: 'Read from stdin')
+    ..addFlag('help', abbr: 'h', help: 'Show this help', negatable: false);
 
-  // Parse arguments
-  for (int i = 0; i < arguments.length; i++) {
-    switch (arguments[i]) {
-      case '--json':
-        jsonOutput = true;
-        break;
-      case '--tree':
-        treeOutput = true;
-        break;
-      case '--stdin':
-        useStdin = true;
-        break;
-      case '--help':
-      case '-h':
-        _printUsage();
-        exit(0);
-      default:
-        if (!arguments[i].startsWith('-')) {
-          filePath = arguments[i];
-        }
-    }
+  // Handle shell completion
+  final argResults = completion.tryArgsCompletion(arguments, argParser);
+
+  // If tryArgsCompletion handled the completion request, exit early
+  if (argResults == null) {
+    return;
   }
 
-  // Default to tree output if neither specified
-  if (!jsonOutput && !treeOutput) {
-    treeOutput = true;
+  // Handle non-completion requests
+  if (argResults.command?.name == 'completion') {
+    return;
   }
+
+  // Show help if requested
+  if (argResults['help'] as bool) {
+    _printUsage(argParser);
+    exit(0);
+  }
+
+  // Get options from parsed arguments
+  final jsonOutput = argResults['json'] as bool;
+  final useStdin = argResults['stdin'] as bool;
+  final filePath = argResults.rest.isNotEmpty ? argResults.rest.first : null;
 
   try {
     String source;
@@ -45,7 +45,7 @@ void main(List<String> arguments) {
       source = File(filePath).readAsStringSync();
     } else {
       stderr.writeln('Error: No input provided');
-      _printUsage();
+      _printUsage(argParser);
       exit(2);
     }
 
@@ -58,11 +58,12 @@ void main(List<String> arguments) {
       }
     }
 
-    if (result.ast != null) {
+    final ast = result.ast;
+    if (ast != null) {
       if (jsonOutput) {
-        stdout.writeln(jsonEncode(result.ast!.toJson()));
+        stdout.writeln(jsonEncode(ast.toJson()));
       } else {
-        _printTree(result.ast!, 0);
+        _printTree(ast, 0);
       }
     }
 
@@ -73,7 +74,7 @@ void main(List<String> arguments) {
   }
 }
 
-void _printUsage() {
+void _printUsage(ArgParser argParser) {
   print('''
 Blade Parser CLI
 
@@ -82,10 +83,11 @@ Usage:
   blade_parser [options] --stdin
 
 Options:
-  --json     Output AST as JSON
-  --tree     Output AST as tree (default)
-  --stdin    Read from stdin
-  --help     Show this help
+${argParser.usage}
+
+Shell Completion:
+  To install shell completion, run:
+    blade_parser completion install
 
 Examples:
   blade_parser --json template.blade.php
