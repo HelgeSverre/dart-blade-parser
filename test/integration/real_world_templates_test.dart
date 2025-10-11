@@ -7,7 +7,7 @@ void main() {
     // 1. JETSTREAM AUTHENTICATION VIEWS - Login Form
     // ==================================================================
     test('Jetstream Login Form with @error, @csrf, validation messages', () {
-      final template = '''
+      const template = '''
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
@@ -119,7 +119,7 @@ void main() {
     test(
       'Jetstream Registration Form with multiple input components and slots',
       () {
-        final template = '''
+        const template = '''
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
@@ -224,7 +224,7 @@ void main() {
     // 3. BREEZE COMPONENTS - Navigation with Authentication Checks
     // ==================================================================
     test('Breeze Navigation Menu with @auth, @guest directives', () {
-      final template = '''
+      const template = '''
 <nav class="bg-white border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -326,7 +326,7 @@ void main() {
     // 4. BREEZE COMPONENTS - Responsive Navigation with Alpine.js
     // ==================================================================
     test('Responsive Navigation with Alpine.js directives', () {
-      final template = '''
+      const template = '''
 <div x-data="{ open: false }">
     <nav class="bg-white border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -444,7 +444,7 @@ void main() {
     // 5. LIVEWIRE FORMS - Form with Validation
     // ==================================================================
     test('Livewire Form with wire:model, wire:submit, wire:loading', () {
-      final template = '''
+      const template = '''
 <div>
     <form wire:submit.prevent="save">
         <div class="mb-4">
@@ -579,7 +579,7 @@ void main() {
     // 6. LIVEWIRE FORMS - Real-time Search with Dynamic Sections
     // ==================================================================
     test('Livewire Real-time Search with Dynamic Results', () {
-      final template = '''
+      const template = '''
 <div wire:poll.5s="refresh">
     <div class="mb-6">
         <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search posts..." class="w-full px-4 py-2 border rounded">
@@ -705,7 +705,7 @@ void main() {
     // 7. ALPINE.JS MODAL - Modal with Transitions
     // ==================================================================
     test('Alpine.js Modal with x-show, x-transition, event handlers', () {
-      final template = '''
+      const template = '''
 <div x-data="{ open: false }">
     <button @click="open = true" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
         Open Modal
@@ -845,7 +845,7 @@ void main() {
     // 8. TAILWIND CSS - Complex Utility Classes and Responsive Design
     // ==================================================================
     test('TailwindCSS Complex Utility Classes with Responsive Variants', () {
-      final template = '''
+      const template = '''
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
@@ -983,7 +983,7 @@ void main() {
     // 9. TEMPLATE INHERITANCE - @extends, @section, @yield, @parent
     // ==================================================================
     test('Template Inheritance with @extends, @section, @yield, @parent', () {
-      final template = '''
+      const template = '''
 @extends('layouts.app')
 
 @section('title', 'Dashboard')
@@ -1149,7 +1149,7 @@ void main() {
     // 10. API DOCUMENTATION - @verbatim, Dynamic Content, Tabs
     // ==================================================================
     test('API Documentation Template with @verbatim and Alpine.js Tabs', () {
-      final template = '''
+      const template = '''
 <div class="api-docs" x-data="{ activeTab: 'overview', activeLang: 'php' }">
     <div class="docs-header">
         <h1>{{ \$endpoint->title }}</h1>

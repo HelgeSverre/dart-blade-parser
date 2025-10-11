@@ -143,7 +143,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, equals('Contact us at admin@example.com'));
     });
 
@@ -161,7 +161,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, equals('@if this is literal text'));
     });
 
@@ -171,7 +171,7 @@ void main() {
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
 
-      final content = textTokens.map((t) => t.value).join('');
+      final content = textTokens.map((t) => t.value).join();
       expect(content, equals('user@domain.com or admin@domain.com'));
     });
 
@@ -188,7 +188,7 @@ void main() {
       text = tokens
           .where((t) => t.type == TokenType.text)
           .map((t) => t.value)
-          .join('');
+          .join();
       expect(
         text,
         equals('Escaped: user@example.com'),
@@ -213,7 +213,7 @@ void main() {
       final textNodes = html.children.whereType<TextNode>();
 
       expect(textNodes, isNotEmpty);
-      final textContent = textNodes.map((t) => t.content).join('');
+      final textContent = textNodes.map((t) => t.content).join();
 
       // Should contain admin@site.com (single @)
       expect(textContent, equals('Email: admin@site.com'));

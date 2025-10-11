@@ -1,0 +1,54 @@
+# Development Documentation (not needed by package users)
+CLAUDE.md
+GEMINI.md
+CLEANUP_SUMMARY.md
+COMPLETION.md
+COMPLETION_REPORT.md
+COVERAGE.md
+COVERAGE_SETUP_SUMMARY.md
+ERROR_RECOVERY_TEST_REPORT.md
+IMPROVEMENT_PLAN.md
+IMPLEMENTATION_STATUS.md
+NEXT_STEPS.md
+POLISH_COMPLETE.md
+QUICK_WINS.md
+TODO.md
+
+# Archives
+archive/
+
+# Feature Specifications
+specs/
+
+# Development Tools
+tool/playground/
+tool/acid/
+
+# Generated API Docs (users generate their own)
+doc/api/
+
+# IDE and OS Files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build Artifacts
+.dart_tool/build/
+
+# Coverage
+coverage/
+*.lcov
+
+# Task Runner
+justfile
+
+# Git Metadata
+.git/
+.gitignore
+
+# Local Settings
+.claude/
+.specify/

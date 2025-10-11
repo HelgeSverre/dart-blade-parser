@@ -14,7 +14,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, equals('@directive this is literal'));
 
       // Should NOT be parsed as directive
@@ -31,7 +31,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, equals('email me at admin@'));
     });
 
@@ -42,7 +42,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       // @@@@ should become @@
       expect(combinedText, equals('test @@example'));
     });
@@ -55,7 +55,7 @@ void main() {
       expect(textTokens, isNotEmpty);
 
       // Inside verbatim, @@ should remain as @@ (literal)
-      final verbatimContent = textTokens.map((t) => t.value).join('');
+      final verbatimContent = textTokens.map((t) => t.value).join();
       expect(verbatimContent, contains('user@@example.com'));
     });
 
@@ -98,7 +98,7 @@ void main() {
       expect(textTokens, isNotEmpty);
 
       // Both escapes should work
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains('@if'));
       expect(combinedText, contains('@{{'));
 
@@ -118,7 +118,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, equals('@{{ \$variable }}'));
 
       // Should NOT be parsed as echo
@@ -132,7 +132,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains('@{{ \$var }}'));
 
       // Should NOT be parsed as echo
@@ -147,7 +147,7 @@ void main() {
       expect(textTokens, isNotEmpty);
 
       // All should be literal text
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains('@{{ \$a }}'));
       expect(combinedText, contains('@{{ \$b }}'));
       expect(combinedText, contains('@{{ \$c }}'));
@@ -163,7 +163,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains('\\"'));
 
       // Should NOT be parsed as echo
@@ -177,7 +177,7 @@ void main() {
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
       expect(textTokens, isNotEmpty);
 
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains('@{{'));
       expect(combinedText, contains('key:'));
 

@@ -38,7 +38,7 @@ void main() {
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains('😀'));
       expect(combinedText, contains('😂'));
       expect(combinedText, contains('😃'));
@@ -90,7 +90,7 @@ void main() {
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains('Hello'));
       expect(combinedText, contains('مرحبا'));
       expect(combinedText, contains('שלום'));
@@ -103,7 +103,7 @@ void main() {
 
     test('Zero-Width Joiner (ZWJ) in text', () {
       // ZWJ is U+200D, used to combine emoji
-      final zwj = '\u200D';
+      const zwj = '\u200D';
       lexer = BladeLexer("{{ '👨$zwj👩$zwj👧' }}");
       final tokens = lexer.tokenize();
 
@@ -118,7 +118,7 @@ void main() {
 
     test('Zero-Width Non-Joiner (ZWNJ) in text', () {
       // ZWNJ is U+200C, used in some languages like Persian
-      final zwnj = '\u200C';
+      const zwnj = '\u200C';
       lexer = BladeLexer("{{ 'می$zwnjخواهم' }}");
       final tokens = lexer.tokenize();
 
@@ -132,7 +132,7 @@ void main() {
     });
 
     test('Zero-Width Space (U+200B) in attributes', () {
-      final zws = '\u200B';
+      const zws = '\u200B';
       lexer = BladeLexer('<div data-value="test${zws}value">Content</div>');
       final tokens = lexer.tokenize();
 
@@ -210,7 +210,7 @@ void main() {
 
     test('BOM (Byte Order Mark) at start', () {
       // BOM is U+FEFF
-      final bom = '\uFEFF';
+      const bom = '\uFEFF';
       lexer = BladeLexer('$bom@if(\$x)');
       final tokens = lexer.tokenize();
 
@@ -219,7 +219,7 @@ void main() {
     });
 
     test('BOM in middle of content', () {
-      final bom = '\uFEFF';
+      const bom = '\uFEFF';
       lexer = BladeLexer('<p>Hello${bom}World</p>');
       final tokens = lexer.tokenize();
 
@@ -252,7 +252,7 @@ void main() {
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains('English'));
       expect(combinedText, contains('Español'));
       expect(combinedText, contains('中文'));

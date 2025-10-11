@@ -162,7 +162,7 @@ void main() {
 
       // Benchmark with multiple iterations
       final stopwatch = Stopwatch()..start();
-      final iterations = 5;
+      const iterations = 5;
       for (var i = 0; i < iterations; i++) {
         final result = parser.parse(template);
         expect(result.ast, isNotNull);
@@ -214,7 +214,7 @@ void main() {
 
       // Benchmark
       final stopwatch = Stopwatch()..start();
-      final iterations = 5;
+      const iterations = 5;
       for (var i = 0; i < iterations; i++) {
         final result = parser.parse(template);
         expect(result.ast, isNotNull);
@@ -381,14 +381,14 @@ void main() {
         final data = entry.value;
         print(
           '${size.toString().padRight(8)}\t'
-          '${((data['memDelta'] as num) / 1024 / 1024).toStringAsFixed(2)}MB\t\t'
-          '${(data['bytesPerLine'] as num).toStringAsFixed(2)}\t\t'
-          '${(data['parseTimeMs'] as num).toStringAsFixed(2)}ms',
+          '${((data['memDelta']!) / 1024 / 1024).toStringAsFixed(2)}MB\t\t'
+          '${(data['bytesPerLine']!).toStringAsFixed(2)}\t\t'
+          '${(data['parseTimeMs']!).toStringAsFixed(2)}ms',
         );
       }
 
       // Verify reasonable memory usage (less than 2KB per line for 100K lines)
-      final largeTestBytes = memoryResults[100000]!['bytesPerLine'] as num;
+      final largeTestBytes = memoryResults[100000]!['bytesPerLine']!;
       expect(
         largeTestBytes,
         lessThan(2000),

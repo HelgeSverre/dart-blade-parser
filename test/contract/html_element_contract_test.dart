@@ -171,8 +171,6 @@ void main() {
         attributes: {
           'class': StandardAttribute(name: 'class', value: 'container'),
         },
-        isSelfClosing: false,
-        isVoid: false,
         startPosition: Position(line: 1, column: 1, offset: 0),
         endPosition: Position(line: 1, column: 20, offset: 19),
         children: [],
@@ -248,8 +246,6 @@ void main() {
       final node = HtmlElementNode(
         tagName: 'div',
         attributes: {'id': StandardAttribute(name: 'id', value: 'test')},
-        isSelfClosing: false,
-        isVoid: false,
         startPosition: Position(line: 1, column: 1, offset: 0),
         endPosition: Position(line: 1, column: 17, offset: 16),
         children: [child],

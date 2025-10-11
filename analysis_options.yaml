@@ -3,6 +3,13 @@ include: package:lints/recommended.yaml
 analyzer:
   exclude:
     - example/**
+    - tool/**
+    - bin/**
+    - archive/**
+    - specs/**
+    - doc/api/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
 
   language:
     strict-casts: true
@@ -16,6 +23,8 @@ analyzer:
     missing_required_param: error
     # Dead code
     dead_code: warning
+    # TODO comments as info
+    todo: info
 
 linter:
   rules:
@@ -30,16 +39,40 @@ linter:
     - avoid_escaping_inner_quotes
     - avoid_multiple_declarations_per_line
 
-
-
     # Design
     - avoid_classes_with_only_static_members
     - avoid_positional_boolean_parameters
     - prefer_final_fields
     - prefer_final_locals
+    - type_annotate_public_apis
+    - provide_deprecation_message
 
     # Performance
     - avoid_function_literals_in_foreach_calls
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - unnecessary_await_in_return
+    - use_string_buffers
+
+    # Error prevention
+    - only_throw_errors
+    - test_types_in_equals
+    - throw_in_finally
+    - cancel_subscriptions
+    - close_sinks
+
+    # Code quality
+    - avoid_redundant_argument_values
+    - avoid_unused_constructor_parameters
+    - cast_nullable_to_non_nullable
+    - no_adjacent_strings_in_list
+    - prefer_void_to_null
+    - use_super_parameters
+
+    # Package health
+    - depend_on_referenced_packages
+    - secure_pubspec_urls
 
     # Documentation
     - public_member_api_docs
+    - comment_references

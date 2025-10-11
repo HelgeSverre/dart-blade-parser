@@ -37,20 +37,5 @@ void main() {
         expect(result.isSuccess, isTrue);
       }
     });
-
-    test('parseStreaming returns Stream<AstNode>', () {
-      final parser = BladeParser();
-      final stream = parser.parseStreaming(Stream.value('test'));
-
-      expect(stream, isA<Stream<AstNode>>());
-    });
-
-    test('parseStreaming can be consumed asynchronously', () async {
-      final parser = BladeParser();
-      final stream = parser.parseStreaming(Stream.value('{{ \$test }}'));
-
-      final nodes = await stream.toList();
-      expect(nodes, isA<List<AstNode>>());
-    });
   });
 }

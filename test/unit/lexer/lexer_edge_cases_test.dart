@@ -80,8 +80,8 @@ void main() {
     });
 
     test('CRLF line endings', () {
-      final templateLF = '@if(\$x)\n  <p>Test</p>\n@endif';
-      final templateCRLF = '@if(\$x)\r\n  <p>Test</p>\r\n@endif';
+      const templateLF = '@if(\$x)\n  <p>Test</p>\n@endif';
+      const templateCRLF = '@if(\$x)\r\n  <p>Test</p>\r\n@endif';
 
       final lexerLF = BladeLexer(templateLF);
       final lexerCRLF = BladeLexer(templateCRLF);

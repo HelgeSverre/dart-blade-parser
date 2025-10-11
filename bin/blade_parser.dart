@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:args/args.dart';
@@ -15,12 +17,7 @@ void main(List<String> arguments) {
   // Handle shell completion
   final argResults = completion.tryArgsCompletion(arguments, argParser);
 
-  // If tryArgsCompletion handled the completion request, exit early
-  if (argResults == null) {
-    return;
-  }
-
-  // Handle non-completion requests
+  // Handle completion requests (tryArgsCompletion exits the process if needed)
   if (argResults.command?.name == 'completion') {
     return;
   }

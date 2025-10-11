@@ -52,28 +52,28 @@ void main() {
     late BladeLexer lexer;
 
     test('Vertical tab (U+000B) in text', () {
-      final vt = '\u000B';
+      const vt = '\u000B';
       lexer = BladeLexer('<p>Line1${vt}Line2</p>');
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains(vt));
     });
 
     test('Form feed (U+000C) in text', () {
-      final ff = '\u000C';
+      const ff = '\u000C';
       lexer = BladeLexer('<p>Page1${ff}Page2</p>');
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains(ff));
     });
 
     test('Multiple special whitespace characters', () {
-      final vt = '\u000B';
-      final ff = '\u000C';
+      const vt = '\u000B';
+      const ff = '\u000C';
       lexer = BladeLexer("{{ 'Test$vt${ff}Content' }}");
       final tokens = lexer.tokenize();
 
@@ -90,17 +90,17 @@ void main() {
     late BladeLexer lexer;
 
     test('Non-breaking space (U+00A0) in text', () {
-      final nbsp = '\u00A0';
+      const nbsp = '\u00A0';
       lexer = BladeLexer('<p>Word1${nbsp}Word2</p>');
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains(nbsp));
     });
 
     test('Non-breaking space in directive expression', () {
-      final nbsp = '\u00A0';
+      const nbsp = '\u00A0';
       lexer = BladeLexer("@if(\$text == 'Hello${nbsp}World')");
       final tokens = lexer.tokenize();
 
@@ -114,7 +114,7 @@ void main() {
     });
 
     test('Non-breaking space in HTML attribute', () {
-      final nbsp = '\u00A0';
+      const nbsp = '\u00A0';
       lexer = BladeLexer(
         '<div title="Value${nbsp}with${nbsp}nbsp">Content</div>',
       );
@@ -131,17 +131,17 @@ void main() {
     late BladeLexer lexer;
 
     test('Zero-width space (U+200B) in text', () {
-      final zwsp = '\u200B';
+      const zwsp = '\u200B';
       lexer = BladeLexer('<p>Before${zwsp}After</p>');
       final tokens = lexer.tokenize();
 
       final textTokens = tokens.where((t) => t.type == TokenType.text).toList();
-      final combinedText = textTokens.map((t) => t.value).join('');
+      final combinedText = textTokens.map((t) => t.value).join();
       expect(combinedText, contains(zwsp));
     });
 
     test('Zero-width space in directive expression', () {
-      final zwsp = '\u200B';
+      const zwsp = '\u200B';
       lexer = BladeLexer("{{ 'Test${zwsp}Value' }}");
       final tokens = lexer.tokenize();
 
@@ -154,7 +154,7 @@ void main() {
 
     test('Zero-width non-breaking space (U+FEFF)', () {
       // U+FEFF is also used as BOM
-      final zwnbsp = '\uFEFF';
+      const zwnbsp = '\uFEFF';
       lexer = BladeLexer("{{ '${zwnbsp}Content' }}");
       final tokens = lexer.tokenize();
 
@@ -278,8 +278,8 @@ void main() {
     });
 
     test('Multiple consecutive whitespace types', () {
-      final nbsp = '\u00A0';
-      final zwsp = '\u200B';
+      const nbsp = '\u00A0';
+      const zwsp = '\u200B';
       lexer = BladeLexer("{{ ' \t$nbsp${zwsp}test' }}");
       final tokens = lexer.tokenize();
 

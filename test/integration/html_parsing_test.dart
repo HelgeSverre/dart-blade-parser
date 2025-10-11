@@ -59,11 +59,11 @@ void main() {
       expect(result.isSuccess, isTrue);
       final div = result.ast!.children.whereType<HtmlElementNode>().first;
 
-      final xData = div.attributes['x-data'] as AlpineAttribute;
+      final xData = div.attributes['x-data']! as AlpineAttribute;
       expect(xData, isNotNull);
       expect(xData.value, '{count: 0}');
 
-      final onClick = div.attributes['@click'] as AlpineAttribute;
+      final onClick = div.attributes['@click']! as AlpineAttribute;
       expect(onClick, isNotNull);
       expect(onClick.value, 'count++');
     });
@@ -78,12 +78,12 @@ void main() {
       expect(result.isSuccess, isTrue);
       final button = result.ast!.children.whereType<HtmlElementNode>().first;
 
-      final wireClick = button.attributes['wire:click'] as LivewireAttribute;
+      final wireClick = button.attributes['wire:click']! as LivewireAttribute;
       expect(wireClick, isNotNull);
       expect(wireClick.value, 'save');
 
       final wireLoading =
-          button.attributes['wire:loading.class'] as LivewireAttribute;
+          button.attributes['wire:loading.class']! as LivewireAttribute;
       expect(wireLoading, isNotNull);
       expect(wireLoading.value, 'opacity-50');
       expect(wireLoading.modifiers, contains('class'));
@@ -132,15 +132,15 @@ void main() {
       expect(result.isSuccess, isTrue);
       final input = result.ast!.children.whereType<HtmlElementNode>().first;
 
-      final disabled = input.attributes['disabled'] as StandardAttribute;
+      final disabled = input.attributes['disabled']! as StandardAttribute;
       expect(disabled, isNotNull);
       expect(disabled.value, isNull);
 
-      final required = input.attributes['required'] as StandardAttribute;
+      final required = input.attributes['required']! as StandardAttribute;
       expect(required, isNotNull);
       expect(required.value, isNull);
 
-      final typeAttr = input.attributes['type'] as StandardAttribute;
+      final typeAttr = input.attributes['type']! as StandardAttribute;
       expect(typeAttr, isNotNull);
       expect(typeAttr.value, 'text');
     });

@@ -71,22 +71,6 @@ class BladeParser {
     return ParseResult(ast: doc, errors: List.unmodifiable(_errors));
   }
 
-  /// Parse a stream (stub for now).
-  Stream<AstNode> parseStreaming(Stream<String> chunks) async* {
-    // Stub implementation
-    final buffer = StringBuffer();
-    await for (final chunk in chunks) {
-      buffer.write(chunk);
-    }
-
-    final result = parse(buffer.toString());
-    if (result.ast != null) {
-      for (final child in result.ast!.children) {
-        yield child;
-      }
-    }
-  }
-
   AstNode? _parseNode() {
     final token = _peek();
 
@@ -336,7 +320,6 @@ class BladeParser {
           startPosition: elseToken.startPosition,
           endPosition: _previous().endPosition,
           name: 'else',
-          expression: null,
           children: elseChildren,
         ),
       );
@@ -502,7 +485,6 @@ class BladeParser {
             startPosition: defaultToken.startPosition,
             endPosition: _previous().endPosition,
             name: 'default',
-            expression: null,
             children: defaultChildren,
           ),
         );
@@ -580,7 +562,6 @@ class BladeParser {
           startPosition: startToken.startPosition,
           endPosition: _previous().endPosition,
           name: 'empty',
-          expression: null,
           children: emptyChildren,
         ),
       );
@@ -1281,7 +1262,6 @@ class BladeParser {
       return HtmlElementNode(
         tagName: tagName,
         attributes: attributes,
-        isSelfClosing: false,
         isVoid: true,
         startPosition: openingTagPos,
         endPosition: endPosition,
@@ -1325,8 +1305,6 @@ class BladeParser {
         return HtmlElementNode(
           tagName: tagName,
           attributes: attributes,
-          isSelfClosing: false,
-          isVoid: false,
           startPosition: openingTagPos,
           endPosition: closingEndPos,
           children: children,
@@ -1356,8 +1334,6 @@ class BladeParser {
     return HtmlElementNode(
       tagName: tagName,
       attributes: attributes,
-      isSelfClosing: false,
-      isVoid: false,
       startPosition: openingTagPos,
       endPosition: endPosition,
       children: children,

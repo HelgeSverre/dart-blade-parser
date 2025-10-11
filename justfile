@@ -127,6 +127,37 @@ deps-outdated:
 publish-check:
     dart pub publish --dry-run
 
+# Lint only lib/ directory (focused library checks)
+lint-lib:
+    dart analyze lib/
+
+# Run dart fix without applying (preview changes)
+fix-dry:
+    dart fix --dry-run
+
+# Count remaining lint issues
+lint-count:
+    @echo "Counting lint issues..."
+    @dart analyze 2>&1 | grep -E "(info|warning|error)" | wc -l | xargs echo "Total issues:"
+
+# Show only errors and warnings (not info)
+lint-strict:
+    @dart analyze 2>&1 | grep -E "(error|warning)" || echo "✅ No errors or warnings!"
+
+# Generate API documentation
+docs:
+    @echo "📚 Generating API documentation..."
+    @dart doc
+    @echo "✅ Documentation generated in doc/api/"
+
+# Full pre-publish check (everything needed before publishing)
+pre-publish: clean deps lint format-check test publish-check
+    @echo "\n✅ All pre-publish checks passed! Ready to publish."
+
+# Quick iteration check (format, fix, test)
+quick-check: format fix test
+    @echo "\n✅ Quick checks passed!"
+
 # Full CI pipeline locally (for passing tests only)
 ci: deps lint format-check
     @echo "\n✅ All CI checks passed!"

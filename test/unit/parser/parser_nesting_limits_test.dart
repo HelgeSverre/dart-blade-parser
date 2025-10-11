@@ -15,7 +15,7 @@ void main() {
 
     test('100 levels of @if nesting', () {
       // Generate deeply nested @if directives
-      final depth = 100;
+      const depth = 100;
       final buffer = StringBuffer();
 
       // Opening @if directives
@@ -71,12 +71,12 @@ void main() {
         isTrue,
         reason: 'Deepest level should contain the HTML content',
       );
-    }, timeout: Timeout(Duration(seconds: 10)));
+    }, timeout: const Timeout(Duration(seconds: 10)),);
 
     test(
       '50 levels of mixed directive nesting (@if + @foreach + @section)',
       () {
-        final depth = 50;
+        const depth = 50;
         final buffer = StringBuffer();
 
         // Alternate between different directive types
@@ -143,14 +143,14 @@ void main() {
           reason: 'Should maintain all $depth levels of nesting',
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
 
     test(
       'Verify correct directive closing at deep nesting levels',
       () {
         // Test that closing directives match correctly even at deep levels
-        final depth = 30;
+        const depth = 30;
         final buffer = StringBuffer();
 
         // Create intentionally varied nesting to test matching
@@ -194,7 +194,7 @@ void main() {
           }
         }
       },
-      timeout: Timeout(Duration(seconds: 5)),
+      timeout: const Timeout(Duration(seconds: 5)),
     );
   });
 
@@ -206,7 +206,7 @@ void main() {
     });
 
     test('50 levels of component nesting', () {
-      final depth = 50;
+      const depth = 50;
       final buffer = StringBuffer();
 
       // Opening tags
@@ -249,12 +249,12 @@ void main() {
         equals(depth),
         reason: 'Should maintain full component nesting depth',
       );
-    }, timeout: Timeout(Duration(seconds: 10)));
+    }, timeout: const Timeout(Duration(seconds: 10)),);
 
     test(
       'Components with slots at multiple nesting levels',
       () {
-        final depth = 20;
+        const depth = 20;
         final buffer = StringBuffer();
 
         // Create nested components, each with a slot
@@ -302,13 +302,13 @@ void main() {
           reason: 'Slots should be recognized at nested levels',
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
 
     test(
       'Mixed component and HTML element nesting',
       () {
-        final depth = 30;
+        const depth = 30;
         final buffer = StringBuffer();
 
         // Alternate between components and HTML
@@ -369,7 +369,7 @@ void main() {
           reason: 'Should maintain most of the nesting structure',
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
   });
 
@@ -383,7 +383,7 @@ void main() {
     test(
       'Directives containing deeply nested components',
       () {
-        final depth = 20;
+        const depth = 20;
         final buffer = StringBuffer();
 
         // Outer layer: directives
@@ -447,13 +447,13 @@ void main() {
           reason: 'Should maintain significant mixed nesting depth',
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
 
     test(
       'Components containing deeply nested directives',
       () {
-        final depth = 20;
+        const depth = 20;
         final buffer = StringBuffer();
 
         // Outer layer: components
@@ -521,7 +521,7 @@ void main() {
           reason: 'Should maintain significant nesting depth',
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
   });
 
@@ -535,7 +535,7 @@ void main() {
     test(
       '100 levels of HTML with directive at deepest level',
       () {
-        final depth = 100;
+        const depth = 100;
         final buffer = StringBuffer();
 
         // Opening tags
@@ -590,13 +590,13 @@ void main() {
           reason: 'Directive should work at deepest HTML level',
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
 
     test(
       'Echo statements at various HTML nesting depths',
       () {
-        final depth = 50;
+        const depth = 50;
         final buffer = StringBuffer();
 
         // Create nested structure with echo at multiple levels
@@ -650,7 +650,7 @@ void main() {
           reason: 'Should find all echo statements at various depths',
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
   });
 
@@ -664,7 +664,7 @@ void main() {
     test(
       'Parsing time should be reasonable for extreme nesting',
       () {
-        final depth = 100;
+        const depth = 100;
         final buffer = StringBuffer();
 
         // Create complex nested structure
@@ -695,7 +695,7 @@ void main() {
 
         print('Parsed $depth levels in ${stopwatch.elapsedMilliseconds}ms');
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
   });
 }

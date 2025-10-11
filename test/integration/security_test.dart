@@ -26,7 +26,7 @@ void main() {
     });
 
     test('Parses script tag injection pattern in echo', () {
-      final template = "{{ '<script>alert(1)</script>' }}";
+      const template = "{{ '<script>alert(1)</script>' }}";
       final result = parser.parse(template);
 
       expect(
@@ -50,7 +50,7 @@ void main() {
     });
 
     test('Parses img onerror XSS pattern in echo', () {
-      final template = "{{ '<img src=x onerror=alert(1)>' }}";
+      const template = "{{ '<img src=x onerror=alert(1)>' }}";
       final result = parser.parse(template);
 
       expect(
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('Parses javascript: protocol XSS pattern', () {
-      final template = "{{ 'javascript:alert(document.cookie)' }}";
+      const template = "{{ 'javascript:alert(document.cookie)' }}";
       final result = parser.parse(template);
 
       expect(
@@ -102,7 +102,7 @@ void main() {
     });
 
     test('Parses SQL injection in echo statement', () {
-      final template = r"{{ $id . '; DROP TABLE users; --' }}";
+      const template = r"{{ $id . '; DROP TABLE users; --' }}";
       final result = parser.parse(template);
 
       expect(
@@ -120,7 +120,7 @@ void main() {
     });
 
     test('Parses SQL injection pattern in @if directive', () {
-      final template = r'''
+      const template = r'''
 @if($id == "1 OR 1=1")
     <p>User found</p>
 @endif
@@ -150,7 +150,7 @@ void main() {
     });
 
     test('Parses path traversal with parent directory references', () {
-      final template = "@include('../../../etc/passwd')";
+      const template = "@include('../../../etc/passwd')";
       final result = parser.parse(template);
 
       expect(
@@ -169,7 +169,7 @@ void main() {
     });
 
     test('Parses config file path traversal', () {
-      final template = "@include('../../config/database')";
+      const template = "@include('../../config/database')";
       final result = parser.parse(template);
 
       expect(result.isSuccess, isTrue);
@@ -180,7 +180,7 @@ void main() {
     });
 
     test('Parses variable include path (potential user input)', () {
-      final template = r'@include($userInput)';
+      const template = r'@include($userInput)';
       final result = parser.parse(template);
 
       expect(
@@ -234,7 +234,7 @@ void main() {
           equals(10000),
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
 
     test(
@@ -270,7 +270,7 @@ void main() {
           'Parsed 100k character attribute in ${stopwatch.elapsedMilliseconds}ms',
         );
       },
-      timeout: Timeout(Duration(seconds: 15)),
+      timeout: const Timeout(Duration(seconds: 15)),
     );
   });
 
@@ -284,7 +284,7 @@ void main() {
     test(
       'Handles 500 levels of nested directives without stack overflow',
       () {
-        final depth = 500;
+        const depth = 500;
         final buffer = StringBuffer();
 
         // Create deeply nested @if directives
@@ -344,13 +344,13 @@ void main() {
           'Parsed $actualDepth levels in ${stopwatch.elapsedMilliseconds}ms',
         );
       },
-      timeout: Timeout(Duration(seconds: 15)),
+      timeout: const Timeout(Duration(seconds: 15)),
     );
 
     test(
       'Handles 1000 levels of nested HTML elements',
       () {
-        final depth = 1000;
+        const depth = 1000;
         final buffer = StringBuffer();
 
         // Create deeply nested HTML
@@ -403,7 +403,7 @@ void main() {
           'Parsed $htmlDepth HTML levels in ${stopwatch.elapsedMilliseconds}ms',
         );
       },
-      timeout: Timeout(Duration(seconds: 15)),
+      timeout: const Timeout(Duration(seconds: 15)),
     );
   });
 
@@ -416,7 +416,7 @@ void main() {
 
     test('Parses circular include references (syntax only)', () {
       // Template A includes B, but parser doesn't follow includes
-      final templateA = r'''
+      const templateA = r'''
 <div>Template A</div>
 @include('template-b')
 <div>End of A</div>
@@ -452,7 +452,7 @@ void main() {
 
     test('Parses unusual characters in echo expressions', () {
       // Test underscore and special characters that don't conflict with braces
-      final template = r'{{ $unusual_chars_123 }}';
+      const template = r'{{ $unusual_chars_123 }}';
       final result = parser.parse(template);
 
       expect(
@@ -471,7 +471,7 @@ void main() {
     });
 
     test('Parses double dollar sign variable reference', () {
-      final template = r'{{ $$variable }}';
+      const template = r'{{ $$variable }}';
       final result = parser.parse(template);
 
       expect(
@@ -487,7 +487,7 @@ void main() {
 
     test('Parses special key access in objects', () {
       // Test array/object access syntax without conflicting braces
-      final template = r"{{ $user['special-key'] }}";
+      const template = r"{{ $user['special-key'] }}";
       final result = parser.parse(template);
 
       expect(
@@ -553,7 +553,7 @@ void main() {
           'Parsed complex security template in ${stopwatch.elapsedMilliseconds}ms',
         );
       },
-      timeout: Timeout(Duration(seconds: 10)),
+      timeout: const Timeout(Duration(seconds: 10)),
     );
 
     test('Parser remains stable after encountering malicious patterns', () {
@@ -576,7 +576,7 @@ void main() {
       }
 
       // Parser should still work after processing all malicious patterns
-      final normalTemplate = '<p>Normal content {{ \$var }}</p>';
+      const normalTemplate = '<p>Normal content {{ \$var }}</p>';
       final finalResult = parser.parse(normalTemplate);
 
       expect(
@@ -595,7 +595,7 @@ void main() {
     });
 
     test('Recovers gracefully from malformed security-sensitive input', () {
-      final template = r'''
+      const template = r'''
 {{ '<script>alert(1)' }}
 <div class="unclosed
 @if($malformed

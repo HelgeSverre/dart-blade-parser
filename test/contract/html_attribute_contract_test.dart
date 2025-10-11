@@ -129,15 +129,15 @@ void main() {
     });
 
     test('StandardAttribute boolean attributes have null value', () {
-      final disabled = StandardAttribute(name: 'disabled', value: null);
+      final disabled = StandardAttribute(name: 'disabled');
       expect(disabled.name, 'disabled');
       expect(disabled.value, isNull);
 
-      final required = StandardAttribute(name: 'required', value: null);
+      final required = StandardAttribute(name: 'required');
       expect(required.name, 'required');
       expect(required.value, isNull);
 
-      final readonly = StandardAttribute(name: 'readonly', value: null);
+      final readonly = StandardAttribute(name: 'readonly');
       expect(readonly.name, 'readonly');
       expect(readonly.value, isNull);
     });
@@ -175,7 +175,7 @@ void main() {
     });
 
     test('Boolean attributes omit value in JSON when null', () {
-      final disabled = StandardAttribute(name: 'disabled', value: null);
+      final disabled = StandardAttribute(name: 'disabled');
       final json = disabled.toJson();
 
       expect(json['type'], 'standard');

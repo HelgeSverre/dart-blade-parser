@@ -1,0 +1,8 @@
+# Minimal linting for development tools
+include: package:lints/core.yaml
+
+linter:
+  rules:
+    - prefer_single_quotes
+    # Development tools can use print for output
+    # They don't need public API documentation

@@ -11,7 +11,6 @@ A pure Dart parser for Laravel Blade templates that tokenizes, parses, and produ
 - ✅ **Error Recovery**: Continue parsing after errors with descriptive messages
 - ✅ **Multiple Error Reporting**: Find all syntax errors in one pass
 - ✅ **JSON Serialization**: Export complete AST to JSON
-- ✅ **Streaming Mode**: Incremental parsing for large files
 - ✅ **Pure Dart**: Zero external dependencies, works on all platforms
 - ✅ **CLI Tool**: Command-line interface for JSON/tree output
 
@@ -135,29 +134,6 @@ void main() {
 }
 ```
 
-### Streaming Mode for Large Files
-
-```dart
-import 'dart:io';
-import 'dart:convert';
-import 'package:blade_parser/blade_parser.dart';
-
-void main() async {
-  final parser = BladeParser();
-  final file = File('large_template.blade.php');
-
-  final stream = file.openRead()
-    .transform(utf8.decoder)
-    .transform(LineSplitter());
-
-  final nodeStream = parser.parseStreaming(stream);
-
-  await for (final node in nodeStream) {
-    print('Parsed node: ${node.runtimeType}');
-  }
-}
-```
-
 ## CLI Usage
 
 Parse Blade templates from the command line:
@@ -171,9 +147,6 @@ $ dart run blade_parser --tree template.blade.php
 
 # Parse from stdin
 $ cat template.blade.php | dart run blade_parser --stdin --json
-
-# Use streaming mode for large files
-$ dart run blade_parser --streaming large_file.blade.php
 ```
 
 ## Performance

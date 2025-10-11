@@ -14,7 +14,7 @@ void main() {
 
       // Benchmark: Run 10 iterations for accurate measurement
       final stopwatch = Stopwatch()..start();
-      final iterations = 10;
+      const iterations = 10;
       for (var i = 0; i < iterations; i++) {
         BladeLexer(text).tokenize();
       }
@@ -67,7 +67,7 @@ void main() {
 
       // Benchmark
       final stopwatch = Stopwatch()..start();
-      final iterations = 10;
+      const iterations = 10;
       for (var i = 0; i < iterations; i++) {
         BladeLexer(template).tokenize();
       }
@@ -113,7 +113,7 @@ void main() {
       }
       final template = buffer.toString();
 
-      final elementCount = 5000;
+      const elementCount = 5000;
 
       // Warm-up
       for (var i = 0; i < 3; i++) {
@@ -122,14 +122,14 @@ void main() {
 
       // Benchmark
       final stopwatch = Stopwatch()..start();
-      final iterations = 10;
+      const iterations = 10;
       for (var i = 0; i < iterations; i++) {
         BladeLexer(template).tokenize();
       }
       stopwatch.stop();
 
       // Calculate throughput
-      final totalElements = elementCount * iterations;
+      const totalElements = elementCount * iterations;
       final seconds = stopwatch.elapsedMilliseconds / 1000;
       final elementsPerSec = totalElements / seconds;
 
@@ -165,7 +165,7 @@ void main() {
 
       // Benchmark
       final stopwatch = Stopwatch()..start();
-      final iterations = 10;
+      const iterations = 10;
       for (var i = 0; i < iterations; i++) {
         BladeLexer(template).tokenize();
       }
@@ -285,7 +285,7 @@ void main() {
 
       // Benchmark
       final stopwatch = Stopwatch()..start();
-      final iterations = 20;
+      const iterations = 20;
       for (var i = 0; i < iterations; i++) {
         final tokens = BladeLexer(template).tokenize();
         expect(tokens.isNotEmpty, isTrue);
@@ -334,7 +334,7 @@ void main() {
 
       // Benchmark
       final stopwatch = Stopwatch()..start();
-      final iterations = 10;
+      const iterations = 10;
       for (var i = 0; i < iterations; i++) {
         BladeLexer(template).tokenize();
       }
@@ -389,7 +389,7 @@ void main() {
 
       // Benchmark
       final stopwatch = Stopwatch()..start();
-      final iterations = 10;
+      const iterations = 10;
       for (var i = 0; i < iterations; i++) {
         BladeLexer(template).tokenize();
       }
