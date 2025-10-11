@@ -1,5 +1,5 @@
-import 'position.dart';
-import 'token_type.dart';
+import 'package:blade_parser/src/lexer/position.dart';
+import 'package:blade_parser/src/lexer/token_type.dart';
 
 /// Represents a lexical token in a Blade template.
 class Token {

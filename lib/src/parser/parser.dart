@@ -1,10 +1,10 @@
-import '../ast/node.dart';
-import '../error/parse_error.dart';
-import '../error/parse_result.dart';
-import '../lexer/lexer.dart';
-import '../lexer/position.dart';
-import '../lexer/token.dart';
-import '../lexer/token_type.dart';
+import 'package:blade_parser/src/ast/node.dart';
+import 'package:blade_parser/src/error/parse_error.dart';
+import 'package:blade_parser/src/error/parse_result.dart';
+import 'package:blade_parser/src/lexer/lexer.dart';
+import 'package:blade_parser/src/lexer/position.dart';
+import 'package:blade_parser/src/lexer/token.dart';
+import 'package:blade_parser/src/lexer/token_type.dart';
 
 /// Parser for Blade templates using recursive descent.
 class BladeParser {
@@ -53,10 +53,9 @@ class BladeParser {
           children.add(node);
         }
       } catch (e) {
-        _errors.add(ParseError(
-          message: e.toString(),
-          position: _peek().startPosition,
-        ));
+        _errors.add(
+          ParseError(message: e.toString(), position: _peek().startPosition),
+        );
         _synchronize();
       }
     }
@@ -69,10 +68,7 @@ class BladeParser {
       children: children,
     );
 
-    return ParseResult(
-      ast: doc,
-      errors: List.unmodifiable(_errors),
-    );
+    return ParseResult(ast: doc, errors: List.unmodifiable(_errors));
   }
 
   /// Parse a stream (stub for now).
@@ -120,7 +116,9 @@ class BladeParser {
         return _parseGenericDirective('env', TokenType.directiveEndenv);
       case TokenType.directiveProduction:
         return _parseGenericDirective(
-            'production', TokenType.directiveEndproduction);
+          'production',
+          TokenType.directiveEndproduction,
+        );
 
       // Validation directives
       case TokenType.directiveError:
@@ -133,7 +131,9 @@ class BladeParser {
       // Component directives
       case TokenType.directiveComponent:
         return _parseGenericDirective(
-            'component', TokenType.directiveEndcomponent);
+          'component',
+          TokenType.directiveEndcomponent,
+        );
 
       // Control flow - paired directives
       case TokenType.directiveUnless:
@@ -157,13 +157,19 @@ class BladeParser {
       case TokenType.directivePhp:
         return _parseGenericDirective('php', TokenType.directiveEndphp);
       case TokenType.directiveVerbatim:
-        return _parseGenericDirective('verbatim', TokenType.directiveEndverbatim);
+        return _parseGenericDirective(
+          'verbatim',
+          TokenType.directiveEndverbatim,
+        );
       case TokenType.directivePush:
         return _parseGenericDirective('push', TokenType.directiveEndpush);
       case TokenType.directivePrepend:
         return _parseGenericDirective('prepend', TokenType.directiveEndprepend);
       case TokenType.directiveFragment:
-        return _parseGenericDirective('fragment', TokenType.directiveEndfragment);
+        return _parseGenericDirective(
+          'fragment',
+          TokenType.directiveEndfragment,
+        );
       case TokenType.directiveSession:
         return _parseGenericDirective('session', TokenType.directiveEndsession);
 
@@ -237,10 +243,9 @@ class BladeParser {
       // Error tokens
       case TokenType.error:
         final token = _advance();
-        _errors.add(ParseError(
-          message: token.value,
-          position: token.startPosition,
-        ));
+        _errors.add(
+          ParseError(message: token.value, position: token.startPosition),
+        );
         return null;
 
       // Text and comments
@@ -281,7 +286,7 @@ class BladeParser {
       TokenType.directiveEndif,
       TokenType.directiveElse,
       TokenType.directiveElseif,
-      TokenType.eof
+      TokenType.eof,
     ])) {
       final node = _parseNode();
       if (node != null) children.add(node);
@@ -297,20 +302,22 @@ class BladeParser {
         TokenType.directiveEndif,
         TokenType.directiveElse,
         TokenType.directiveElseif,
-        TokenType.eof
+        TokenType.eof,
       ])) {
         final node = _parseNode();
         if (node != null) elseifChildren.add(node);
       }
 
       // Add elseif as a nested directive node
-      children.add(DirectiveNode(
-        startPosition: elseifToken.startPosition,
-        endPosition: _previous().endPosition,
-        name: 'elseif',
-        expression: elseifExpression,
-        children: elseifChildren,
-      ));
+      children.add(
+        DirectiveNode(
+          startPosition: elseifToken.startPosition,
+          endPosition: _previous().endPosition,
+          name: 'elseif',
+          expression: elseifExpression,
+          children: elseifChildren,
+        ),
+      );
     }
 
     // Handle @else
@@ -324,22 +331,26 @@ class BladeParser {
       }
 
       // Add else as a nested directive node
-      children.add(DirectiveNode(
-        startPosition: elseToken.startPosition,
-        endPosition: _previous().endPosition,
-        name: 'else',
-        expression: null,
-        children: elseChildren,
-      ));
+      children.add(
+        DirectiveNode(
+          startPosition: elseToken.startPosition,
+          endPosition: _previous().endPosition,
+          name: 'else',
+          expression: null,
+          children: elseChildren,
+        ),
+      );
     }
 
     if (!_check(TokenType.directiveEndif)) {
-      _errors.add(ParseError(
-        message:
-            'Unclosed @if directive starting at line ${startToken.startLine}',
-        position: startToken.startPosition,
-        hint: 'Add @endif to close the conditional block',
-      ));
+      _errors.add(
+        ParseError(
+          message:
+              'Unclosed @if directive starting at line ${startToken.startLine}',
+          position: startToken.startPosition,
+          hint: 'Add @endif to close the conditional block',
+        ),
+      );
     } else {
       _advance();
     }
@@ -364,11 +375,13 @@ class BladeParser {
     }
 
     if (!_check(TokenType.directiveEndforeach)) {
-      _errors.add(ParseError(
-        message: 'Unclosed @foreach directive',
-        position: startToken.startPosition,
-        hint: 'Add @endforeach to close the loop',
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @foreach directive',
+          position: startToken.startPosition,
+          hint: 'Add @endforeach to close the loop',
+        ),
+      );
     } else {
       _advance();
     }
@@ -393,11 +406,13 @@ class BladeParser {
     }
 
     if (!_check(TokenType.directiveEndfor)) {
-      _errors.add(ParseError(
-        message: 'Unclosed @for directive',
-        position: startToken.startPosition,
-        hint: 'Add @endfor to close the loop',
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @for directive',
+          position: startToken.startPosition,
+          hint: 'Add @endfor to close the loop',
+        ),
+      );
     } else {
       _advance();
     }
@@ -422,11 +437,13 @@ class BladeParser {
     }
 
     if (!_check(TokenType.directiveEndwhile)) {
-      _errors.add(ParseError(
-        message: 'Unclosed @while directive',
-        position: startToken.startPosition,
-        hint: 'Add @endwhile to close the loop',
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @while directive',
+          position: startToken.startPosition,
+          hint: 'Add @endwhile to close the loop',
+        ),
+      );
     } else {
       _advance();
     }
@@ -456,19 +473,21 @@ class BladeParser {
           TokenType.directiveCase,
           TokenType.directiveDefault,
           TokenType.directiveEndswitch,
-          TokenType.eof
+          TokenType.eof,
         ])) {
           final node = _parseNode();
           if (node != null) caseChildren.add(node);
         }
 
-        children.add(DirectiveNode(
-          startPosition: caseToken.startPosition,
-          endPosition: _previous().endPosition,
-          name: 'case',
-          expression: caseExpression,
-          children: caseChildren,
-        ));
+        children.add(
+          DirectiveNode(
+            startPosition: caseToken.startPosition,
+            endPosition: _previous().endPosition,
+            name: 'case',
+            expression: caseExpression,
+            children: caseChildren,
+          ),
+        );
       } else if (_check(TokenType.directiveDefault)) {
         final defaultToken = _advance();
         final defaultChildren = <AstNode>[];
@@ -478,13 +497,15 @@ class BladeParser {
           if (node != null) defaultChildren.add(node);
         }
 
-        children.add(DirectiveNode(
-          startPosition: defaultToken.startPosition,
-          endPosition: _previous().endPosition,
-          name: 'default',
-          expression: null,
-          children: defaultChildren,
-        ));
+        children.add(
+          DirectiveNode(
+            startPosition: defaultToken.startPosition,
+            endPosition: _previous().endPosition,
+            name: 'default',
+            expression: null,
+            children: defaultChildren,
+          ),
+        );
       } else {
         // Skip non-case/default content (whitespace, etc.) and continue looking
         final node = _parseNode();
@@ -496,10 +517,12 @@ class BladeParser {
     }
 
     if (!_check(TokenType.directiveEndswitch)) {
-      _errors.add(ParseError(
-        message: 'Unclosed @switch directive',
-        position: startToken.startPosition,
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @switch directive',
+          position: startToken.startPosition,
+        ),
+      );
     } else {
       _advance(); // @endswitch
     }
@@ -521,7 +544,11 @@ class BladeParser {
     final emptyChildren = <AstNode>[];
 
     // Parse loop body
-    while (!_checkAny([TokenType.directiveEmpty, TokenType.directiveEndforelse, TokenType.eof])) {
+    while (!_checkAny([
+      TokenType.directiveEmpty,
+      TokenType.directiveEndforelse,
+      TokenType.eof,
+    ])) {
       final node = _parseNode();
       if (node != null) loopChildren.add(node);
     }
@@ -536,23 +563,27 @@ class BladeParser {
     }
 
     if (!_check(TokenType.directiveEndforelse)) {
-      _errors.add(ParseError(
-        message: 'Unclosed @forelse directive',
-        position: startToken.startPosition,
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @forelse directive',
+          position: startToken.startPosition,
+        ),
+      );
     } else {
       _advance(); // @endforelse
     }
 
     // Add @empty as nested directive if it exists
     if (emptyChildren.isNotEmpty) {
-      loopChildren.add(DirectiveNode(
-        startPosition: startToken.startPosition,
-        endPosition: _previous().endPosition,
-        name: 'empty',
-        expression: null,
-        children: emptyChildren,
-      ));
+      loopChildren.add(
+        DirectiveNode(
+          startPosition: startToken.startPosition,
+          endPosition: _previous().endPosition,
+          name: 'empty',
+          expression: null,
+          children: emptyChildren,
+        ),
+      );
     }
 
     return DirectiveNode(
@@ -580,10 +611,12 @@ class BladeParser {
     }
 
     if (!_check(TokenType.echoClose)) {
-      _errors.add(ParseError(
-        message: 'Unclosed echo statement',
-        position: openToken.startPosition,
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed echo statement',
+          position: openToken.startPosition,
+        ),
+      );
     } else {
       _advance(); // }}
     }
@@ -605,10 +638,12 @@ class BladeParser {
     }
 
     if (!_check(TokenType.rawEchoClose)) {
-      _errors.add(ParseError(
-        message: 'Unclosed raw echo statement',
-        position: openToken.startPosition,
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed raw echo statement',
+          position: openToken.startPosition,
+        ),
+      );
     } else {
       _advance(); // !!}
     }
@@ -630,10 +665,12 @@ class BladeParser {
     }
 
     if (!_check(TokenType.legacyEchoClose)) {
-      _errors.add(ParseError(
-        message: 'Unclosed legacy echo statement',
-        position: openToken.startPosition,
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed legacy echo statement',
+          position: openToken.startPosition,
+        ),
+      );
     } else {
       _advance(); // }}}
     }
@@ -724,10 +761,13 @@ class BladeParser {
 
       // Validate closing tag
       if (!_check(TokenType.componentTagClose)) {
-        _errors.add(ParseError(
-          message: 'Unclosed slot <x-slot${componentName.startsWith('slot:') ? ':$slotName' : ''}>',
-          position: startToken.startPosition,
-        ));
+        _errors.add(
+          ParseError(
+            message:
+                'Unclosed slot <x-slot${componentName.startsWith('slot:') ? ':$slotName' : ''}>',
+            position: startToken.startPosition,
+          ),
+        );
       } else {
         final closingToken = _advance();
         // Closing token is like "</x-slot:header" or "</x-slot"
@@ -736,10 +776,12 @@ class BladeParser {
             : '</x-slot';
 
         if (!closingToken.value.startsWith(expectedClosing)) {
-          _errors.add(ParseError(
-            message: 'Mismatched slot tags',
-            position: closingToken.startPosition,
-          ));
+          _errors.add(
+            ParseError(
+              message: 'Mismatched slot tags',
+              position: closingToken.startPosition,
+            ),
+          );
         }
       }
     }
@@ -781,7 +823,8 @@ class BladeParser {
       AttributeNode attrNode;
 
       // Check token type first for proper classification
-      final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
+      final isAlpineToken =
+          attrToken.type == TokenType.alpineShorthandOn ||
           attrToken.type == TokenType.alpineShorthandBind ||
           attrToken.type == TokenType.alpineData ||
           attrToken.type == TokenType.alpineInit ||
@@ -809,10 +852,10 @@ class BladeParser {
         final directive = attrName.startsWith('x-')
             ? attrName.substring(2)
             : attrName.startsWith('@')
-                ? attrName.substring(1)
-                : attrName.startsWith(':')
-                    ? attrName.substring(1)
-                    : attrName;
+            ? attrName.substring(1)
+            : attrName.startsWith(':')
+            ? attrName.substring(1)
+            : attrName;
 
         attrNode = AlpineAttribute(
           name: attrName,
@@ -832,10 +875,7 @@ class BladeParser {
           value: attrValue,
         );
       } else {
-        attrNode = StandardAttribute(
-          name: attrName,
-          value: attrValue,
-        );
+        attrNode = StandardAttribute(name: attrName, value: attrValue);
       }
 
       attributes[attrName] = attrNode;
@@ -866,23 +906,31 @@ class BladeParser {
       }
 
       if (!_check(TokenType.componentTagClose)) {
-        _errors.add(ParseError(
-          message: 'Unclosed component <x-$componentName>',
-          position: startToken.startPosition,
-          hint: 'Add closing tag </x-$componentName>',
-        ));
+        _errors.add(
+          ParseError(
+            message: 'Unclosed component <x-$componentName>',
+            position: startToken.startPosition,
+            hint: 'Add closing tag </x-$componentName>',
+          ),
+        );
       } else {
         // Validate closing tag matches opening tag
         final closingToken = _advance(); // </x-component>
         // Closing token value is like "</x-alert" (no trailing >)
-        final closingName = closingToken.value.substring(4); // Remove "</x-" prefix
+        final closingName = closingToken.value.substring(
+          4,
+        ); // Remove "</x-" prefix
 
         if (closingName != componentName) {
-          _errors.add(ParseError(
-            message: 'Mismatched component tags: expected </x-$componentName>, found </x-$closingName>',
-            position: closingToken.startPosition,
-            hint: 'Change closing tag to </x-$componentName> or fix opening tag to <x-$closingName>',
-          ));
+          _errors.add(
+            ParseError(
+              message:
+                  'Mismatched component tags: expected </x-$componentName>, found </x-$closingName>',
+              position: closingToken.startPosition,
+              hint:
+                  'Change closing tag to </x-$componentName> or fix opening tag to <x-$closingName>',
+            ),
+          );
         }
       }
     }
@@ -920,11 +968,13 @@ class BladeParser {
     }
 
     if (!_check(closingType)) {
-      _errors.add(ParseError(
-        message: 'Unclosed @$name directive',
-        position: startToken.startPosition,
-        hint: 'Add @end$name to close the block',
-      ));
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @$name directive',
+          position: startToken.startPosition,
+          hint: 'Add @end$name to close the block',
+        ),
+      );
     } else {
       _advance();
     }
@@ -1140,7 +1190,8 @@ class BladeParser {
       AttributeNode attrNode;
 
       // Check token type first for proper classification
-      final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
+      final isAlpineToken =
+          attrToken.type == TokenType.alpineShorthandOn ||
           attrToken.type == TokenType.alpineShorthandBind ||
           attrToken.type == TokenType.alpineData ||
           attrToken.type == TokenType.alpineInit ||
@@ -1158,18 +1209,19 @@ class BladeParser {
           attrToken.type == TokenType.alpineRef ||
           attrToken.type == TokenType.alpineTeleport;
 
-      final isLivewireToken =
-          attrToken.type.toString().startsWith('TokenType.livewire');
+      final isLivewireToken = attrToken.type.toString().startsWith(
+        'TokenType.livewire',
+      );
 
       if (isAlpineToken) {
         // Alpine.js attribute
         final directive = attrName.startsWith('@')
             ? 'on:${attrName.substring(1)}'
             : attrName.startsWith(':')
-                ? 'bind:${attrName.substring(1)}'
-                : attrName.startsWith('x-')
-                    ? attrName.substring(2)
-                    : attrName;
+            ? 'bind:${attrName.substring(1)}'
+            : attrName.startsWith('x-')
+            ? attrName.substring(2)
+            : attrName;
 
         attrNode = AlpineAttribute(
           name: attrName,
@@ -1179,8 +1231,9 @@ class BladeParser {
       } else if (isLivewireToken) {
         // Livewire attribute - parse action and modifiers
         final parts = attrName.split('.');
-        final action =
-            parts[0].startsWith('wire:') ? parts[0].substring(5) : parts[0];
+        final action = parts[0].startsWith('wire:')
+            ? parts[0].substring(5)
+            : parts[0];
         final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
 
         attrNode = LivewireAttribute(
@@ -1191,10 +1244,7 @@ class BladeParser {
         );
       } else {
         // Standard attribute
-        attrNode = StandardAttribute(
-          name: attrName,
-          value: attrValue,
-        );
+        attrNode = StandardAttribute(name: attrName, value: attrValue);
       }
 
       attributes[attrName] = attrNode;
@@ -1297,8 +1347,9 @@ class BladeParser {
 
     // Unclosed tag error (T036)
     _error(
-        'Unclosed <$tagName> at ${openingTagPos.line}:${openingTagPos.column}',
-        openingTagPos);
+      'Unclosed <$tagName> at ${openingTagPos.line}:${openingTagPos.column}',
+      openingTagPos,
+    );
     _tagStack.removeLast(); // Pop from stack
 
     // Return partial AST (T037)
@@ -1315,10 +1366,7 @@ class BladeParser {
 
   /// Report an error (T036)
   void _error(String message, Position position) {
-    _errors.add(ParseError(
-      message: message,
-      position: position,
-    ));
+    _errors.add(ParseError(message: message, position: position));
   }
 }
 

@@ -1,5 +1,5 @@
-import 'token.dart';
-import 'token_type.dart';
+import 'package:blade_parser/src/lexer/token.dart';
+import 'package:blade_parser/src/lexer/token_type.dart';
 
 /// State enum for iterative lexing (no recursion)
 enum _LexerState {
@@ -265,7 +265,10 @@ class BladeLexer {
       }
 
       // Check for HTML comment <!-- ... -->
-      if (ch == '<' && _peekNext() == '!' && _peekAhead(2) == '-' && _peekAhead(3) == '-') {
+      if (ch == '<' &&
+          _peekNext() == '!' &&
+          _peekAhead(2) == '-' &&
+          _peekAhead(3) == '-') {
         if (buffer.isNotEmpty) {
           _emitToken(TokenType.text, buffer.toString());
         }
@@ -311,7 +314,9 @@ class BladeLexer {
       }
 
       // Check for empty tag names (e.g., <> or </>)
-      if (ch == '<' && (_peekNext() == '>' || (_peekNext() == '/' && _peekAhead(2) == '>'))) {
+      if (ch == '<' &&
+          (_peekNext() == '>' ||
+              (_peekNext() == '/' && _peekAhead(2) == '>'))) {
         if (buffer.isNotEmpty) {
           _emitToken(TokenType.text, buffer.toString());
         }
@@ -390,13 +395,13 @@ class BladeLexer {
       final ch = _peek();
 
       if (inSingleQuote) {
-        if (ch == '\'' && _previousChar() != '\\') inSingleQuote = false;
+        if (ch == "'" && _previousChar() != '\\') inSingleQuote = false;
       } else if (inDoubleQuote) {
         if (ch == '"' && _previousChar() != '\\') inDoubleQuote = false;
       } else if (inTemplateLiteral) {
         if (ch == '`' && _previousChar() != '\\') inTemplateLiteral = false;
       } else {
-        if (ch == '\'') inSingleQuote = true;
+        if (ch == "'") inSingleQuote = true;
         if (ch == '"') inDoubleQuote = true;
         if (ch == '`') inTemplateLiteral = true;
 
@@ -685,7 +690,9 @@ class BladeLexer {
           // End of echo
           if (_position > exprStart) {
             _emitToken(
-                TokenType.expression, input.substring(exprStart, _position));
+              TokenType.expression,
+              input.substring(exprStart, _position),
+            );
           }
           _advance(); // }
           _advance(); // }
@@ -722,7 +729,9 @@ class BladeLexer {
       if (_peek() == '!' && _peekNext() == '!' && _peekAhead(2) == '}') {
         if (_position > exprStart) {
           _emitToken(
-              TokenType.expression, input.substring(exprStart, _position));
+            TokenType.expression,
+            input.substring(exprStart, _position),
+          );
         }
         _advance(); // !
         _advance(); // !
@@ -758,7 +767,9 @@ class BladeLexer {
       if (_peek() == '}' && _peekNext() == '}' && _peekAhead(2) == '}') {
         if (_position > exprStart) {
           _emitToken(
-              TokenType.expression, input.substring(exprStart, _position));
+            TokenType.expression,
+            input.substring(exprStart, _position),
+          );
         }
         _advance(); // }
         _advance(); // }
@@ -1073,7 +1084,9 @@ class BladeLexer {
         if (ch == '/' && _peekNext() == '>') break;
 
         // Stop at invalid characters for unquoted values (HTML5 spec)
-        if (ch == '"' || ch == "'" || ch == '=' || ch == '<' || ch == '`') break;
+        if (ch == '"' || ch == "'" || ch == '=' || ch == '<' || ch == '`') {
+          break;
+        }
 
         _advance();
       }
@@ -1132,16 +1145,18 @@ class BladeLexer {
   bool _isAlphaNumeric(String ch) => _isAlpha(ch) || _isDigit(ch);
 
   void _emitToken(TokenType type, String value) {
-    _tokens.add(Token(
-      type: type,
-      value: value,
-      startLine: _startLine,
-      startColumn: _startColumn,
-      endLine: _line,
-      endColumn: _column,
-      startOffset: _start,
-      endOffset: _position,
-    ));
+    _tokens.add(
+      Token(
+        type: type,
+        value: value,
+        startLine: _startLine,
+        startColumn: _startColumn,
+        endLine: _line,
+        endColumn: _column,
+        startOffset: _start,
+        endOffset: _position,
+      ),
+    );
   }
 
   /// Map directive name to token type - ALL 75+ DIRECTIVES

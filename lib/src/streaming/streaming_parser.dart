@@ -1,6 +1,6 @@
 import 'dart:async';
-import '../ast/node.dart';
-import '../parser/parser.dart';
+import 'package:blade_parser/src/ast/node.dart';
+import 'package:blade_parser/src/parser/parser.dart';
 
 /// Streaming parser for incremental parsing of large Blade templates.
 ///

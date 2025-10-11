@@ -9,11 +9,7 @@ class Position {
   /// 0-based character offset from file start
   final int offset;
 
-  Position({
-    required this.line,
-    required this.column,
-    required this.offset,
-  }) {
+  Position({required this.line, required this.column, required this.offset}) {
     if (line < 1) throw ArgumentError('line must be >= 1');
     if (column < 1) throw ArgumentError('column must be >= 1');
     if (offset < 0) throw ArgumentError('offset must be >= 0');
@@ -35,8 +31,8 @@ class Position {
       'Position(line: $line, column: $column, offset: $offset)';
 
   Map<String, dynamic> toJson() => {
-        'line': line,
-        'column': column,
-        'offset': offset,
-      };
+    'line': line,
+    'column': column,
+    'offset': offset,
+  };
 }

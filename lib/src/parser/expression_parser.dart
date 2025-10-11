@@ -1,5 +1,5 @@
-import '../lexer/token.dart';
-import '../lexer/token_type.dart';
+import 'package:blade_parser/src/lexer/token.dart';
+import 'package:blade_parser/src/lexer/token_type.dart';
 
 /// Pratt parser for PHP expressions within Blade templates.
 ///
@@ -256,7 +256,7 @@ class ExpressionParser {
       '>>',
       '.',
       '?',
-      ':'
+      ':',
     ].contains(value);
   }
 

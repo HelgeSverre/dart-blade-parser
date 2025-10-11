@@ -1,4 +1,4 @@
-import 'node.dart';
+import 'package:blade_parser/src/ast/node.dart';
 
 /// Base class for recursive AST visitors.
 /// Provides default traversal logic for all node types.

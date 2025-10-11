@@ -1,5 +1,5 @@
-import 'node.dart';
-import 'visitor.dart';
+import 'package:blade_parser/src/ast/node.dart';
+import 'package:blade_parser/src/ast/visitor.dart';
 
 /// Visitor that serializes an AST to JSON.
 /// This is an alternative to calling toJson() directly on nodes.

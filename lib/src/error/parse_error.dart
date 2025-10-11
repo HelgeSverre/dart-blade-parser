@@ -1,10 +1,7 @@
-import '../lexer/position.dart';
+import 'package:blade_parser/src/lexer/position.dart';
 
 /// Error severity levels.
-enum ErrorSeverity {
-  error,
-  warning,
-}
+enum ErrorSeverity { error, warning }
 
 /// Represents a parsing error.
 class ParseError {
@@ -26,7 +23,8 @@ class ParseError {
   String toString() {
     final buffer = StringBuffer();
     buffer.write(
-        '[$severity] $message at line ${position.line}, column ${position.column}');
+      '[$severity] $message at line ${position.line}, column ${position.column}',
+    );
     if (hint != null) {
       buffer.write('\nHint: $hint');
     }

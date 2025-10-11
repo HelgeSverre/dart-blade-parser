@@ -158,7 +158,6 @@ enum TokenType {
   componentSelfClose, // />
   componentSlotOpen, // <x-slot:
   componentSlotClose, // </x-slot>
-
   // HTML Elements
   htmlTagOpen, // < (for HTML elements, not components)
   htmlTagName, // Tag name after <
@@ -166,7 +165,6 @@ enum TokenType {
   htmlSelfClose, // />
   htmlClosingTagStart, // </
   htmlClosingTagEnd, // > (after closing tag name)
-
   // Alpine.js Attributes
   alpineData,
   alpineInit,
@@ -185,7 +183,6 @@ enum TokenType {
   alpineTeleport,
   alpineShorthandBind, // :attribute
   alpineShorthandOn, // @event
-
   // Livewire Attributes
   livewireClick,
   livewireSubmit,
@@ -225,7 +222,6 @@ enum TokenType {
   stringLiteral,
   numberLiteral,
   attributeValue, // Attribute value (without quotes)
-
   // Structural
   bladeComment, // {{-- --}}
   htmlComment, // <!-- -->

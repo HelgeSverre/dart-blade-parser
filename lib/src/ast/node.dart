@@ -1,4 +1,4 @@
-import '../lexer/position.dart';
+import 'package:blade_parser/src/lexer/position.dart';
 
 /// Base class for all AST nodes.
 sealed class AstNode {
@@ -49,13 +49,10 @@ final class DocumentNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'document',
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-        'children': children.map((c) => c.toJson()).toList(),
-      };
+    'type': 'document',
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+    'children': children.map((c) => c.toJson()).toList(),
+  };
 }
 
 /// Directive node (@if, @foreach, etc.).
@@ -86,15 +83,12 @@ final class DirectiveNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'directive',
-        'name': name,
-        if (expression != null) 'expression': expression,
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-        'children': children.map((c) => c.toJson()).toList(),
-      };
+    'type': 'directive',
+    'name': name,
+    if (expression != null) 'expression': expression,
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+    'children': children.map((c) => c.toJson()).toList(),
+  };
 }
 
 /// Echo node ({{ }}, {!! !!}).
@@ -124,14 +118,11 @@ final class EchoNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'echo',
-        'expression': expression,
-        'isRaw': isRaw,
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-      };
+    'type': 'echo',
+    'expression': expression,
+    'isRaw': isRaw,
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+  };
 }
 
 /// Text node.
@@ -159,13 +150,10 @@ final class TextNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'text',
-        'content': content,
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-      };
+    'type': 'text',
+    'content': content,
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+  };
 }
 
 /// Attribute node sealed class hierarchy
@@ -184,29 +172,25 @@ final class StandardAttribute extends AttributeNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'standard',
-        'name': name,
-        if (value != null) 'value': value,
-      };
+    'type': 'standard',
+    'name': name,
+    if (value != null) 'value': value,
+  };
 }
 
 /// Alpine.js attribute (x-data, x-show, @click, etc.)
 final class AlpineAttribute extends AttributeNode {
   final String directive;
 
-  AlpineAttribute({
-    required super.name,
-    required this.directive,
-    super.value,
-  });
+  AlpineAttribute({required super.name, required this.directive, super.value});
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'alpine',
-        'name': name,
-        'directive': directive,
-        if (value != null) 'value': value,
-      };
+    'type': 'alpine',
+    'name': name,
+    'directive': directive,
+    if (value != null) 'value': value,
+  };
 }
 
 /// Livewire attribute (wire:click, wire:model, etc.)
@@ -223,12 +207,12 @@ final class LivewireAttribute extends AttributeNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'livewire',
-        'name': name,
-        'action': action,
-        'modifiers': modifiers,
-        if (value != null) 'value': value,
-      };
+    'type': 'livewire',
+    'name': name,
+    'action': action,
+    'modifiers': modifiers,
+    if (value != null) 'value': value,
+  };
 }
 
 /// Component node (<x-component>)
@@ -263,17 +247,14 @@ final class ComponentNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'component',
-        'name': name,
-        'attributes': attributes.map((k, v) => MapEntry(k, v.toJson())),
-        'slots': slots.map((k, v) => MapEntry(k, v.toJson())),
-        'isSelfClosing': isSelfClosing,
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-        'children': children.map((c) => c.toJson()).toList(),
-      };
+    'type': 'component',
+    'name': name,
+    'attributes': attributes.map((k, v) => MapEntry(k, v.toJson())),
+    'slots': slots.map((k, v) => MapEntry(k, v.toJson())),
+    'isSelfClosing': isSelfClosing,
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+    'children': children.map((c) => c.toJson()).toList(),
+  };
 }
 
 /// Slot node for component slots
@@ -304,15 +285,12 @@ final class SlotNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'slot',
-        'name': name,
-        'attributes': attributes.map((k, v) => MapEntry(k, v.toJson())),
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-        'children': children.map((c) => c.toJson()).toList(),
-      };
+    'type': 'slot',
+    'name': name,
+    'attributes': attributes.map((k, v) => MapEntry(k, v.toJson())),
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+    'children': children.map((c) => c.toJson()).toList(),
+  };
 }
 
 /// HTML element node
@@ -347,17 +325,14 @@ final class HtmlElementNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'htmlElement',
-        'tagName': tagName,
-        'attributes': attributes.map((k, v) => MapEntry(k, v.toJson())),
-        'isSelfClosing': isSelfClosing,
-        'isVoid': isVoid,
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-        'children': children.map((c) => c.toJson()).toList(),
-      };
+    'type': 'htmlElement',
+    'tagName': tagName,
+    'attributes': attributes.map((k, v) => MapEntry(k, v.toJson())),
+    'isSelfClosing': isSelfClosing,
+    'isVoid': isVoid,
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+    'children': children.map((c) => c.toJson()).toList(),
+  };
 }
 
 /// Comment node (Blade or HTML)
@@ -387,14 +362,11 @@ final class CommentNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'comment',
-        'content': content,
-        'isBladeComment': isBladeComment,
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-      };
+    'type': 'comment',
+    'content': content,
+    'isBladeComment': isBladeComment,
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+  };
 }
 
 /// Error node for parse errors
@@ -424,12 +396,9 @@ final class ErrorNode extends AstNode {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'error',
-        'error': error,
-        if (partialContent != null) 'partialContent': partialContent,
-        'position': {
-          'start': startPosition.toJson(),
-          'end': endPosition.toJson(),
-        },
-      };
+    'type': 'error',
+    'error': error,
+    if (partialContent != null) 'partialContent': partialContent,
+    'position': {'start': startPosition.toJson(), 'end': endPosition.toJson()},
+  };
 }
