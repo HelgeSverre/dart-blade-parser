@@ -442,8 +442,13 @@ class BladeLexer {
 
     final prev = _position > 0 ? input[_position - 1] : '\x00';
 
-    // @ preceded by alphanumeric or dot = likely email address or domain
+    // @ preceded by alphanumeric or dot = could be email address OR directive
+    // We need to look ahead to disambiguate
     if (_isAlphaNumeric(prev) || prev == '.') {
+      // Peek ahead to see if what follows @ is a known Blade directive
+      if (_isKnownDirectiveAhead()) {
+        return true; // It's a directive like "Hello@endif"
+      }
       return false; // Email address like user@example.com
     }
 
@@ -471,6 +476,41 @@ class BladeLexer {
 
     // Otherwise treat as directive
     return true;
+  }
+
+  /// Look ahead from current @ position to see if a known directive follows
+  bool _isKnownDirectiveAhead() {
+    // We're at @, peek ahead to get the directive name
+    int pos = _position + 1; // Skip the @
+    final nameStart = pos;
+
+    // Collect alphanumeric characters (directive name)
+    while (pos < input.length && _isAlphaNumericAt(pos)) {
+      pos++;
+    }
+
+    if (pos == nameStart) {
+      return false; // No name after @
+    }
+
+    final name = input.substring(nameStart, pos);
+
+    // Check if this matches a known directive name
+    return _isKnownDirectiveName(name);
+  }
+
+  /// Check if a character at a specific position is alphanumeric
+  bool _isAlphaNumericAt(int position) {
+    if (position >= input.length) return false;
+    final ch = input[position];
+    return (ch.codeUnitAt(0) >= 48 && ch.codeUnitAt(0) <= 57) || // 0-9
+        (ch.codeUnitAt(0) >= 65 && ch.codeUnitAt(0) <= 90) || // A-Z
+        (ch.codeUnitAt(0) >= 97 && ch.codeUnitAt(0) <= 122); // a-z
+  }
+
+  /// Check if a name is a known Blade directive
+  bool _isKnownDirectiveName(String name) {
+    return _directiveNameToType(name) != TokenType.identifier;
   }
 
   /// Check if current position is inside a quoted attribute value
