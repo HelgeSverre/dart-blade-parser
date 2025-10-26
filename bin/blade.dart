@@ -21,7 +21,7 @@ void main(List<String> arguments) async {
     ..addFlag('help', abbr: 'h', help: 'Show this help', negatable: false);
 
   // Add parse subcommand
-  final parseCommand = argParser.addCommand('parse')
+  argParser.addCommand('parse')
     ..addFlag('json', help: 'Output AST as JSON')
     ..addFlag('tree', help: 'Output AST as tree (default)', defaultsTo: true)
     ..addFlag('stdin', help: 'Read from stdin')
@@ -33,7 +33,7 @@ void main(List<String> arguments) async {
     );
 
   // Add format subcommand
-  final formatCommand = argParser.addCommand('format')
+  argParser.addCommand('format')
     ..addFlag(
       'write',
       abbr: 'w',
