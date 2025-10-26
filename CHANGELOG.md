@@ -5,6 +5,30 @@ All notable changes to the Blade Parser project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Unified `blade` CLI:** Consolidated `blade_parser` and `blade_formatter` into a single ergonomic `blade` CLI with subcommands
+  - `blade parse [options] <file>` - Parse Blade templates to AST
+  - `blade format [options] <files>` - Format Blade templates with consistent style
+  - Improved ergonomics: shorter command name, clear subcommand structure
+  - Comprehensive help system: `blade --help`, `blade parse --help`, `blade format --help`
+
+### Changed
+
+- **BREAKING:** CLI command structure changed from separate executables to unified subcommands
+  - Old: `dart run blade_parser` → New: `dart run blade parse`
+  - Old: `dart run blade_formatter` → New: `dart run blade format`
+- Configuration file renamed from `.blade-format.json` to `.blade.json` for consistency
+- All justfile commands updated to use new CLI structure
+- All documentation updated with new command examples
+
+### Removed
+
+- **BREAKING:** Removed `blade_parser` and `blade_formatter` separate executables
+  - Functionality moved to `blade parse` and `blade format` subcommands
+
 ## [1.1.0] - 2025-10-10
 
 ### Added
