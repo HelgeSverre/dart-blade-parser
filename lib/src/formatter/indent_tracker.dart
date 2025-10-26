@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'formatter_config.dart';
+import 'package:blade_parser/src/formatter/formatter_config.dart';
 
 /// Tracks and manages indentation level during formatting.
 ///

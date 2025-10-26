@@ -1,6 +1,5 @@
 import 'package:blade_parser/blade_parser.dart';
-import 'formatter_config.dart';
-import 'formatter_visitor.dart';
+import 'package:blade_parser/src/formatter/formatter_visitor.dart';
 
 /// Main formatter class for Blade templates.
 ///

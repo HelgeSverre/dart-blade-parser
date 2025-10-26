@@ -9,7 +9,6 @@ class FormatterConfig {
   /// Whether to use spaces or tabs for indentation.
   final IndentStyle indentStyle;
 
-
   /// Whether to format PHP expressions inside Blade syntax.
   ///
   /// When `false`, preserves PHP expressions as-is inside:
@@ -56,9 +55,8 @@ class FormatterConfig {
   factory FormatterConfig.fromMap(Map<String, dynamic> map) {
     return FormatterConfig(
       indentSize: map['indent_size'] as int? ?? 4,
-      indentStyle: map['indent_style'] == 'tabs'
-          ? IndentStyle.tabs
-          : IndentStyle.spaces,
+      indentStyle:
+          map['indent_style'] == 'tabs' ? IndentStyle.tabs : IndentStyle.spaces,
       formatPhpExpressions: map['format_php_expressions'] as bool? ?? false,
       maxLineLength: map['max_line_length'] as int? ?? 120,
       quoteStyle: _parseQuoteStyle(map['quote_style'] as String?),

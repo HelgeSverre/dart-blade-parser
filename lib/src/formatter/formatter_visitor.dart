@@ -1,6 +1,6 @@
 import 'package:blade_parser/src/ast/node.dart';
-import 'formatter_config.dart';
-import 'indent_tracker.dart';
+import 'package:blade_parser/src/formatter/formatter_config.dart';
+import 'package:blade_parser/src/formatter/indent_tracker.dart';
 
 /// Visitor that traverses an AST and generates formatted Blade template output.
 ///
@@ -108,7 +108,7 @@ class FormatterVisitor implements AstVisitor<String> {
     'stack',
     'break',
     'continue',
-    'empty',  // Can be both, but often inline in context
+    'empty', // Can be both, but often inline in context
   };
 
   FormatterVisitor(this.config) : _indent = IndentTracker(config);
@@ -378,8 +378,9 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Check if component has content (slots or non-whitespace children)
     final hasContent = node.slots.isNotEmpty ||
-        node.children.any((child) =>
-            child is! TextNode || child.content.trim().isNotEmpty);
+        node.children.any(
+          (child) => child is! TextNode || child.content.trim().isNotEmpty,
+        );
 
     // Self-closing if no content
     if (!hasContent) {
@@ -490,11 +491,7 @@ class FormatterVisitor implements AstVisitor<String> {
     // Write opening slot tag
     _output.write(_indent.current);
 
-    if (node.name != null) {
-      _output.write('<x-slot:${node.name}');
-    } else {
-      _output.write('<x-slot');
-    }
+    _output.write('<x-slot:${node.name}');
 
     // Write attributes if present
     if (node.attributes.isNotEmpty) {
@@ -578,7 +575,8 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Add spacing between block directives (but not before closing directives)
     if (current is DirectiveNode && _blockDirectives.contains(current.name)) {
-      return next is! DirectiveNode; // Don't add space before @endif, @endforeach, etc.
+      return next
+          is! DirectiveNode; // Don't add space before @endif, @endforeach, etc.
     }
 
     return false;
