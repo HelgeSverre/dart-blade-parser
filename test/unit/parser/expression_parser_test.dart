@@ -109,5 +109,181 @@ void main() {
       expect(result, contains('&&'));
       expect(result, contains('||'));
     });
+
+    // Additional test coverage
+
+    test('Parse array literal', () {
+      final result = parseExpression('[1, 2, 3]');
+      expect(result, contains('['));
+      expect(result, contains(']'));
+      expect(result, contains(','));
+    });
+
+    test('Parse empty array literal', () {
+      final result = parseExpression('[]');
+      expect(result, contains('[]'));
+    });
+
+    test('Parse nested array literal', () {
+      final result = parseExpression('[1, [2, 3], 4]');
+      expect(result, contains('['));
+      expect(result, contains(']'));
+    });
+
+    test('Parse bitwise AND operator', () {
+      final result = parseExpression('\$flags & 0x0F');
+      expect(result, contains('&'));
+    });
+
+    test('Parse bitwise OR operator', () {
+      final result = parseExpression('\$a | \$b');
+      expect(result, contains('|'));
+    });
+
+    test('Parse bitwise XOR operator', () {
+      final result = parseExpression('\$a ^ \$b');
+      expect(result, contains('^'));
+    });
+
+    test('Parse bitwise NOT operator', () {
+      final result = parseExpression('~\$flags');
+      expect(result, contains('~'));
+    });
+
+    test('Parse left shift operator', () {
+      final result = parseExpression('\$value << 2');
+      expect(result, contains('<<'));
+    });
+
+    test('Parse right shift operator', () {
+      final result = parseExpression('\$value >> 2');
+      expect(result, contains('>>'));
+    });
+
+    test('Parse spaceship operator', () {
+      final result = parseExpression('\$a <=> \$b');
+      expect(result, contains('<=>'));
+    });
+
+    test('Parse unary minus', () {
+      final result = parseExpression('-\$count');
+      expect(result, contains('-'));
+    });
+
+    test('Parse unary plus', () {
+      final result = parseExpression('+\$count');
+      expect(result, contains('+'));
+    });
+
+    test('Parse true literal', () {
+      final result = parseExpression('true');
+      expect(result, contains('true'));
+    });
+
+    test('Parse false literal', () {
+      final result = parseExpression('false');
+      expect(result, contains('false'));
+    });
+
+    test('Parse null literal', () {
+      final result = parseExpression('null');
+      expect(result, contains('null'));
+    });
+
+    test('Parse empty function call', () {
+      final result = parseExpression('doSomething()');
+      expect(result, contains('doSomething()'));
+    });
+
+    test('Parse function call with multiple arguments', () {
+      final result = parseExpression('func(\$a, \$b, "test")');
+      expect(result, contains('func('));
+      expect(result, contains('\$a'));
+      expect(result, contains('\$b'));
+      expect(result, contains('"test"'));
+    });
+
+    test('Parse power operator', () {
+      final result = parseExpression('\$x ** 2');
+      expect(result, contains('**'));
+    });
+
+    test('Parse modulo operator', () {
+      final result = parseExpression('\$a % \$b');
+      expect(result, contains('%'));
+    });
+
+    test('Parse division operator', () {
+      final result = parseExpression('\$a / \$b');
+      expect(result, contains('/'));
+    });
+
+    test('Parse concatenation operator', () {
+      final result = parseExpression('\$firstName . \$lastName');
+      expect(result, contains('.'));
+    });
+
+    test('Parse strict equality', () {
+      final result = parseExpression('\$a === \$b');
+      expect(result, contains('==='));
+    });
+
+    test('Parse strict inequality', () {
+      final result = parseExpression('\$a !== \$b');
+      expect(result, contains('!=='));
+    });
+
+    test('Parse less than or equal', () {
+      final result = parseExpression('\$a <= \$b');
+      expect(result, contains('<='));
+    });
+
+    test('Parse greater than or equal', () {
+      final result = parseExpression('\$a >= \$b');
+      expect(result, contains('>='));
+    });
+
+    test('Parse logical "and" keyword', () {
+      final result = parseExpression('\$a and \$b');
+      expect(result, contains('and'));
+    });
+
+    test('Parse logical "or" keyword', () {
+      final result = parseExpression('\$a or \$b');
+      expect(result, contains('or'));
+    });
+
+    test('Parse chained method calls', () {
+      final result = parseExpression('\$user->profile()->settings()->get()');
+      expect(result, contains('->profile()'));
+      expect(result, contains('->settings()'));
+      expect(result, contains('->get()'));
+    });
+
+    test('Parse nested array access', () {
+      final result = parseExpression('\$matrix[0][1]');
+      expect(result, contains('[0]'));
+      expect(result, contains('[1]'));
+    });
+
+    test('Parse mixed array and method access', () {
+      final result = parseExpression('\$obj->items[0]->name');
+      expect(result, contains('->items'));
+      expect(result, contains('[0]'));
+      expect(result, contains('->name'));
+    });
+
+    test('Parse single quoted string', () {
+      final result = parseExpression("'hello'");
+      expect(result, contains("'hello'"));
+    });
+
+    test('Parse complex ternary with nested expressions', () {
+      final result = parseExpression('\$x > 0 ? \$x * 2 : \$x / 2');
+      expect(result, contains('?'));
+      expect(result, contains(':'));
+      expect(result, contains('*'));
+      expect(result, contains('/'));
+    });
   });
 }

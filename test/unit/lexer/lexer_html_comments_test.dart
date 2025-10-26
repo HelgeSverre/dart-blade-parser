@@ -13,9 +13,8 @@ void main() {
 
       // Expected: htmlComment token
       // Current bug: Treated as text
-      final commentTokens = tokens
-          .where((t) => t.type == TokenType.htmlComment)
-          .toList();
+      final commentTokens =
+          tokens.where((t) => t.type == TokenType.htmlComment).toList();
 
       expect(
         commentTokens.length,
@@ -30,9 +29,8 @@ void main() {
       lexer = BladeLexer('<!-- TODO: Fix <div> and @if -->');
       final tokens = lexer.tokenize();
 
-      final commentTokens = tokens
-          .where((t) => t.type == TokenType.htmlComment)
-          .toList();
+      final commentTokens =
+          tokens.where((t) => t.type == TokenType.htmlComment).toList();
 
       expect(commentTokens.length, equals(1));
 
@@ -56,9 +54,8 @@ void main() {
 
       final tokens = lexer.tokenize();
 
-      final commentTokens = tokens
-          .where((t) => t.type == TokenType.htmlComment)
-          .toList();
+      final commentTokens =
+          tokens.where((t) => t.type == TokenType.htmlComment).toList();
 
       expect(
         commentTokens.length,
@@ -75,9 +72,8 @@ void main() {
       lexer = BladeLexer('<!-- First --> text <!-- Second -->');
       final tokens = lexer.tokenize();
 
-      final commentTokens = tokens
-          .where((t) => t.type == TokenType.htmlComment)
-          .toList();
+      final commentTokens =
+          tokens.where((t) => t.type == TokenType.htmlComment).toList();
 
       expect(
         commentTokens.length,
@@ -97,9 +93,8 @@ void main() {
       lexer = BladeLexer('<!---->');
       final tokens = lexer.tokenize();
 
-      final commentTokens = tokens
-          .where((t) => t.type == TokenType.htmlComment)
-          .toList();
+      final commentTokens =
+          tokens.where((t) => t.type == TokenType.htmlComment).toList();
 
       expect(commentTokens.length, equals(1));
       expect(
@@ -114,9 +109,8 @@ void main() {
       lexer = BladeLexer('<!-- Comment with -- double dash -->');
       final tokens = lexer.tokenize();
 
-      final commentTokens = tokens
-          .where((t) => t.type == TokenType.htmlComment)
-          .toList();
+      final commentTokens =
+          tokens.where((t) => t.type == TokenType.htmlComment).toList();
 
       // Should still parse (even if technically invalid HTML)
       expect(commentTokens, isNotEmpty);
@@ -141,8 +135,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       // Should have CommentNode child
       final comments = div.children.whereType<CommentNode>();

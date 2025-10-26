@@ -33,8 +33,8 @@ void main() {
 
       expect(result.isSuccess, isTrue);
       final ifNode = result.ast!.children.whereType<DirectiveNode>().firstWhere(
-        (n) => n.name == 'if',
-      );
+            (n) => n.name == 'if',
+          );
       expect(ifNode.name, equals('if'));
       expect(ifNode.children.length, greaterThan(0));
     });
@@ -258,12 +258,11 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       // Find the unless directive
-      final unlessDirective = result.ast!.children
-          .whereType<DirectiveNode>()
-          .firstWhere(
-            (n) => n.name == 'unless',
-            orElse: () => throw Exception('unless directive not found'),
-          );
+      final unlessDirective =
+          result.ast!.children.whereType<DirectiveNode>().firstWhere(
+                (n) => n.name == 'unless',
+                orElse: () => throw Exception('unless directive not found'),
+              );
 
       expect(unlessDirective.name, equals('unless'));
       expect(unlessDirective.expression, isNotNull);
@@ -277,8 +276,8 @@ void main() {
       );
 
       // Should have HTML child
-      final htmlChildren = unlessDirective.children
-          .whereType<HtmlElementNode>();
+      final htmlChildren =
+          unlessDirective.children.whereType<HtmlElementNode>();
       expect(htmlChildren, isNotEmpty);
     });
 
@@ -316,12 +315,11 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       // Find the php directive
-      final phpDirective = result.ast!.children
-          .whereType<DirectiveNode>()
-          .firstWhere(
-            (n) => n.name == 'php',
-            orElse: () => throw Exception('php directive not found'),
-          );
+      final phpDirective =
+          result.ast!.children.whereType<DirectiveNode>().firstWhere(
+                (n) => n.name == 'php',
+                orElse: () => throw Exception('php directive not found'),
+              );
 
       expect(phpDirective.name, equals('php'));
 

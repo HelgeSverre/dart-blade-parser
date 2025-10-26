@@ -21,8 +21,8 @@ void main() {
       );
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       expect(
         div.attributes.containsKey('class'),
@@ -63,8 +63,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       expect(
         div.attributes.containsKey('wire:poll'),
@@ -90,8 +90,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       expect(div.attributes.containsKey('x-show'), isTrue);
 
@@ -108,8 +108,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       expect(
         div.attributes.length,
@@ -130,8 +130,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       expect(div.attributes.length, equals(4));
 
@@ -154,8 +154,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final meta = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'meta',
-      );
+            (e) => e.tagName == 'meta',
+          );
 
       expect(
         meta.attributes['charset']!.value,
@@ -170,8 +170,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       // class=container should stop at whitespace before id
       expect(
@@ -189,8 +189,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       expect(
         div.attributes['class']!.value,
@@ -283,8 +283,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       expect(
         div.attributes['data-test_value']!.value,
@@ -299,8 +299,8 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       final div = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
 
       // Periods should be allowed in unquoted values
       expect(

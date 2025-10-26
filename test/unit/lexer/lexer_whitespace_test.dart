@@ -14,9 +14,8 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.directiveIf), isTrue);
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains('\t'));
     });
@@ -39,9 +38,8 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.directiveForeach), isTrue);
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       // Expression should contain both spaces and tabs
       expect(expressionTokens.first.value.length, greaterThan(0));
@@ -77,9 +75,8 @@ void main() {
       lexer = BladeLexer("{{ 'Test$vt${ff}Content' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains(vt));
       expect(expressionTokens.first.value, contains(ff));
@@ -106,9 +103,8 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.directiveIf), isTrue);
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains(nbsp));
     });
@@ -120,9 +116,8 @@ void main() {
       );
       final tokens = lexer.tokenize();
 
-      final attributeValueTokens = tokens
-          .where((t) => t.type == TokenType.attributeValue)
-          .toList();
+      final attributeValueTokens =
+          tokens.where((t) => t.type == TokenType.attributeValue).toList();
       expect(attributeValueTokens.any((t) => t.value.contains(nbsp)), isTrue);
     });
   });
@@ -145,9 +140,8 @@ void main() {
       lexer = BladeLexer("{{ 'Test${zwsp}Value' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains(zwsp));
     });
@@ -158,9 +152,8 @@ void main() {
       lexer = BladeLexer("{{ '${zwnbsp}Content' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
     });
   });
@@ -229,9 +222,8 @@ void main() {
       lexer = BladeLexer('<div class="test   ">Content</div>');
       final tokens = lexer.tokenize();
 
-      final attributeValueTokens = tokens
-          .where((t) => t.type == TokenType.attributeValue)
-          .toList();
+      final attributeValueTokens =
+          tokens.where((t) => t.type == TokenType.attributeValue).toList();
       expect(attributeValueTokens, isNotEmpty);
       // Trailing spaces should be preserved in attribute value
       expect(attributeValueTokens.first.value, endsWith('   '));
@@ -243,9 +235,8 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       // Leading spaces should be preserved
       expect(expressionTokens.first.value, startsWith('   '));
@@ -257,9 +248,8 @@ void main() {
 
       expect(tokens.any((t) => t.type == TokenType.echoOpen), isTrue);
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       // Trailing spaces should be preserved
       expect(expressionTokens.first.value, endsWith('   '));
@@ -283,9 +273,8 @@ void main() {
       lexer = BladeLexer("{{ ' \t$nbsp${zwsp}test' }}");
       final tokens = lexer.tokenize();
 
-      final expressionTokens = tokens
-          .where((t) => t.type == TokenType.expression)
-          .toList();
+      final expressionTokens =
+          tokens.where((t) => t.type == TokenType.expression).toList();
       expect(expressionTokens.length, equals(1));
       expect(expressionTokens.first.value, contains(' '));
       expect(expressionTokens.first.value, contains('\t'));

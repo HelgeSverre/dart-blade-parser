@@ -13,65 +13,69 @@ void main() {
       parser = BladeParser();
     });
 
-    test('100 levels of @if nesting', () {
-      // Generate deeply nested @if directives
-      const depth = 100;
-      final buffer = StringBuffer();
+    test(
+      '100 levels of @if nesting',
+      () {
+        // Generate deeply nested @if directives
+        const depth = 100;
+        final buffer = StringBuffer();
 
-      // Opening @if directives
-      for (var i = 0; i < depth; i++) {
-        buffer.write('@if(true)\n');
-      }
+        // Opening @if directives
+        for (var i = 0; i < depth; i++) {
+          buffer.write('@if(true)\n');
+        }
 
-      // Content at deepest level
-      buffer.write('<p>Deep content</p>\n');
+        // Content at deepest level
+        buffer.write('<p>Deep content</p>\n');
 
-      // Closing @endif directives
-      for (var i = 0; i < depth; i++) {
-        buffer.write('@endif\n');
-      }
+        // Closing @endif directives
+        for (var i = 0; i < depth; i++) {
+          buffer.write('@endif\n');
+        }
 
-      final template = buffer.toString();
+        final template = buffer.toString();
 
-      // Parse should succeed without stack overflow
-      final result = parser.parse(template);
+        // Parse should succeed without stack overflow
+        final result = parser.parse(template);
 
-      expect(
-        result.isSuccess,
-        isTrue,
-        reason: 'Parser should handle 100 levels of nesting',
-      );
-      expect(result.errors, isEmpty);
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: 'Parser should handle 100 levels of nesting',
+        );
+        expect(result.errors, isEmpty);
 
-      // Verify nesting depth by traversing AST
-      var currentNode = result.ast!.children
-          .whereType<DirectiveNode>()
-          .firstWhere((n) => n.name == 'if');
-
-      var actualDepth = 1;
-      while (currentNode.children.whereType<DirectiveNode>().isNotEmpty) {
-        final nested = currentNode.children
+        // Verify nesting depth by traversing AST
+        var currentNode = result.ast!.children
             .whereType<DirectiveNode>()
             .firstWhere((n) => n.name == 'if');
-        currentNode = nested;
-        actualDepth++;
-      }
 
-      expect(
-        actualDepth,
-        equals(depth),
-        reason: 'AST should maintain all $depth levels of nesting',
-      );
+        var actualDepth = 1;
+        while (currentNode.children.whereType<DirectiveNode>().isNotEmpty) {
+          final nested = currentNode.children
+              .whereType<DirectiveNode>()
+              .firstWhere((n) => n.name == 'if');
+          currentNode = nested;
+          actualDepth++;
+        }
 
-      // Verify content exists at deepest level
-      final deepestChildren = currentNode.children;
-      final hasHtmlContent = deepestChildren.any((c) => c is HtmlElementNode);
-      expect(
-        hasHtmlContent,
-        isTrue,
-        reason: 'Deepest level should contain the HTML content',
-      );
-    }, timeout: const Timeout(Duration(seconds: 10)),);
+        expect(
+          actualDepth,
+          equals(depth),
+          reason: 'AST should maintain all $depth levels of nesting',
+        );
+
+        // Verify content exists at deepest level
+        final deepestChildren = currentNode.children;
+        final hasHtmlContent = deepestChildren.any((c) => c is HtmlElementNode);
+        expect(
+          hasHtmlContent,
+          isTrue,
+          reason: 'Deepest level should contain the HTML content',
+        );
+      },
+      timeout: const Timeout(Duration(seconds: 10)),
+    );
 
     test(
       '50 levels of mixed directive nesting (@if + @foreach + @section)',
@@ -177,8 +181,8 @@ void main() {
 
         // Verify AST structure is complete
         var node = result.ast!.children.whereType<DirectiveNode>().firstWhere(
-          (n) => n.name == 'if',
-        );
+              (n) => n.name == 'if',
+            );
 
         for (var i = 0; i < depth; i++) {
           expect(node.name, equals('if'));
@@ -205,51 +209,55 @@ void main() {
       parser = BladeParser();
     });
 
-    test('50 levels of component nesting', () {
-      const depth = 50;
-      final buffer = StringBuffer();
+    test(
+      '50 levels of component nesting',
+      () {
+        const depth = 50;
+        final buffer = StringBuffer();
 
-      // Opening tags
-      for (var i = 0; i < depth; i++) {
-        buffer.write('<x-level$i>\n');
-      }
+        // Opening tags
+        for (var i = 0; i < depth; i++) {
+          buffer.write('<x-level$i>\n');
+        }
 
-      buffer.write('<p>Core content</p>\n');
+        buffer.write('<p>Core content</p>\n');
 
-      // Closing tags (in reverse order)
-      for (var i = depth - 1; i >= 0; i--) {
-        buffer.write('</x-level$i>\n');
-      }
+        // Closing tags (in reverse order)
+        for (var i = depth - 1; i >= 0; i--) {
+          buffer.write('</x-level$i>\n');
+        }
 
-      final template = buffer.toString();
-      final result = parser.parse(template);
+        final template = buffer.toString();
+        final result = parser.parse(template);
 
-      expect(
-        result.isSuccess,
-        isTrue,
-        reason: 'Parser should handle 50 levels of component nesting',
-      );
-      expect(result.errors, isEmpty);
+        expect(
+          result.isSuccess,
+          isTrue,
+          reason: 'Parser should handle 50 levels of component nesting',
+        );
+        expect(result.errors, isEmpty);
 
-      // Traverse component tree
-      var currentChildren = result.ast!.children;
-      var componentDepth = 0;
+        // Traverse component tree
+        var currentChildren = result.ast!.children;
+        var componentDepth = 0;
 
-      while (currentChildren.whereType<ComponentNode>().isNotEmpty) {
-        final component = currentChildren.whereType<ComponentNode>().first;
-        currentChildren = component.children;
-        componentDepth++;
+        while (currentChildren.whereType<ComponentNode>().isNotEmpty) {
+          final component = currentChildren.whereType<ComponentNode>().first;
+          currentChildren = component.children;
+          componentDepth++;
 
-        // Safety limit
-        if (componentDepth > depth + 10) break;
-      }
+          // Safety limit
+          if (componentDepth > depth + 10) break;
+        }
 
-      expect(
-        componentDepth,
-        equals(depth),
-        reason: 'Should maintain full component nesting depth',
-      );
-    }, timeout: const Timeout(Duration(seconds: 10)),);
+        expect(
+          componentDepth,
+          equals(depth),
+          reason: 'Should maintain full component nesting depth',
+        );
+      },
+      timeout: const Timeout(Duration(seconds: 10)),
+    );
 
     test(
       'Components with slots at multiple nesting levels',
@@ -282,11 +290,9 @@ void main() {
         var currentChildren = result.ast!.children;
         var levelsWithSlots = 0;
 
-        for (
-          var i = 0;
-          i < depth && currentChildren.whereType<ComponentNode>().isNotEmpty;
-          i++
-        ) {
+        for (var i = 0;
+            i < depth && currentChildren.whereType<ComponentNode>().isNotEmpty;
+            i++) {
           final component = currentChildren.whereType<ComponentNode>().first;
 
           if (component.slots.containsKey('header')) {
@@ -418,9 +424,8 @@ void main() {
         var mixedDepth = 0;
         while (mixedDepth < depth && currentNode.children.isNotEmpty) {
           // Should find component within directive
-          final component = currentNode.children
-              .whereType<ComponentNode>()
-              .firstOrNull;
+          final component =
+              currentNode.children.whereType<ComponentNode>().firstOrNull;
           expect(
             component,
             isNotNull,
@@ -430,9 +435,8 @@ void main() {
           if (component == null) break;
 
           // Navigate deeper - next directive is inside the component
-          final nextDirective = component.children
-              .whereType<DirectiveNode>()
-              .firstOrNull;
+          final nextDirective =
+              component.children.whereType<DirectiveNode>().firstOrNull;
           if (nextDirective != null && nextDirective.name == 'if') {
             currentNode = nextDirective;
             mixedDepth++;
@@ -485,9 +489,8 @@ void main() {
 
         while (nestingLevel < depth && currentChildren.isNotEmpty) {
           // Should find component
-          final component = currentChildren
-              .whereType<ComponentNode>()
-              .firstOrNull;
+          final component =
+              currentChildren.whereType<ComponentNode>().firstOrNull;
           if (component != null) {
             // Component should contain directive
             final hasDirective = component.children.any(
@@ -501,9 +504,8 @@ void main() {
             );
 
             // Navigate to directive's children
-            final directive = component.children
-                .whereType<DirectiveNode>()
-                .firstOrNull;
+            final directive =
+                component.children.whereType<DirectiveNode>().firstOrNull;
             if (directive != null) {
               currentChildren = directive.children;
               nestingLevel++;

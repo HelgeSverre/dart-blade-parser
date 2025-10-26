@@ -12,9 +12,8 @@ void main() {
       final tokens = lexer.tokenize();
 
       // Find the attribute value token
-      final attrValueTokens = tokens
-          .where((t) => t.type == TokenType.attributeValue)
-          .toList();
+      final attrValueTokens =
+          tokens.where((t) => t.type == TokenType.attributeValue).toList();
 
       // The value should be 'foo' and stop before '<'
       expect(
@@ -33,9 +32,8 @@ void main() {
       lexer = BladeLexer('<a href=https://example.com>Link</a>');
       final tokens = lexer.tokenize();
 
-      final attrValueTokens = tokens
-          .where((t) => t.type == TokenType.attributeValue)
-          .toList();
+      final attrValueTokens =
+          tokens.where((t) => t.type == TokenType.attributeValue).toList();
 
       expect(attrValueTokens, isNotEmpty);
       expect(
@@ -50,9 +48,8 @@ void main() {
       lexer = BladeLexer('<div data-test=abc123-_.xyz:8080/path>Content</div>');
       final tokens = lexer.tokenize();
 
-      final attrValueTokens = tokens
-          .where((t) => t.type == TokenType.attributeValue)
-          .toList();
+      final attrValueTokens =
+          tokens.where((t) => t.type == TokenType.attributeValue).toList();
 
       expect(attrValueTokens, isNotEmpty);
       expect(
@@ -78,9 +75,8 @@ void main() {
       for (final testCase in testCases) {
         lexer = BladeLexer(testCase.$1);
         final tokens = lexer.tokenize();
-        final attrValueTokens = tokens
-            .where((t) => t.type == TokenType.attributeValue)
-            .toList();
+        final attrValueTokens =
+            tokens.where((t) => t.type == TokenType.attributeValue).toList();
 
         if (attrValueTokens.isNotEmpty) {
           expect(

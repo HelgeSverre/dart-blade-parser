@@ -15,9 +15,8 @@ void main() {
       // Current bug: Text '@' + echo tokens for '{{ $variable }}'
 
       // Filter out EOF token
-      final nonEofTokens = tokens
-          .where((t) => t.type != TokenType.eof)
-          .toList();
+      final nonEofTokens =
+          tokens.where((t) => t.type != TokenType.eof).toList();
 
       // Should be exactly one text token
       expect(
@@ -40,9 +39,8 @@ void main() {
       lexer = BladeLexer("@{{ \$array['key'] }}");
       final tokens = lexer.tokenize();
 
-      final nonEofTokens = tokens
-          .where((t) => t.type != TokenType.eof)
-          .toList();
+      final nonEofTokens =
+          tokens.where((t) => t.type != TokenType.eof).toList();
 
       expect(nonEofTokens.length, equals(1));
       expect(nonEofTokens.first.type, equals(TokenType.text));

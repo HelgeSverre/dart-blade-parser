@@ -188,9 +188,8 @@ void main() {
         expect(result.errors, isEmpty);
 
         // Verify component structure
-        final guestLayout = result.ast!.children
-            .whereType<ComponentNode>()
-            .first;
+        final guestLayout =
+            result.ast!.children.whereType<ComponentNode>().first;
         expect(guestLayout.name, equals('guest-layout'));
 
         // Verify multiple input components
@@ -295,15 +294,13 @@ void main() {
 
       // Verify @auth directive
       final directives = _findNodesRecursive<DirectiveNode>(result.ast!);
-      final authDirective = directives
-          .where((d) => d.name == 'auth')
-          .firstOrNull;
+      final authDirective =
+          directives.where((d) => d.name == 'auth').firstOrNull;
       expect(authDirective, isNotNull);
 
       // Verify @guest directive
-      final guestDirective = directives
-          .where((d) => d.name == 'guest')
-          .firstOrNull;
+      final guestDirective =
+          directives.where((d) => d.name == 'guest').firstOrNull;
       expect(guestDirective, isNotNull);
 
       // Verify dropdown component with named slots
@@ -419,12 +416,12 @@ void main() {
       expect(toggleButton, isNotNull);
 
       // Verify :class bindings
-      final classBindings = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where(
-            (e) => e.attributes.values.any(
-              (attr) => attr is AlpineAttribute && attr.name == ':class',
-            ),
-          );
+      final classBindings =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) => e.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == ':class',
+        ),
+      );
       expect(classBindings.length, greaterThan(0));
 
       // Verify @auth directive
@@ -520,12 +517,11 @@ void main() {
       expect(forms, hasLength(1));
       final form = forms.first;
 
-      final wireSubmit = form.attributes.values
-          .whereType<LivewireAttribute>()
-          .firstWhere(
-            (attr) => attr.action == 'submit',
-            orElse: () => throw StateError('No wire:submit found'),
-          );
+      final wireSubmit =
+          form.attributes.values.whereType<LivewireAttribute>().firstWhere(
+                (attr) => attr.action == 'submit',
+                orElse: () => throw StateError('No wire:submit found'),
+              );
       expect(wireSubmit.modifiers, contains('prevent'));
 
       // Verify wire:model variations
@@ -545,10 +541,10 @@ void main() {
       // Verify wire:loading attributes
       final wireLoadingElements =
           _findNodesRecursive<HtmlElementNode>(result.ast!).where(
-            (e) => e.attributes.values.any(
-              (attr) => attr is LivewireAttribute && attr.action == 'loading',
-            ),
-          );
+        (e) => e.attributes.values.any(
+          (attr) => attr is LivewireAttribute && attr.action == 'loading',
+        ),
+      );
       expect(wireLoadingElements.length, greaterThan(1));
 
       // Verify @error directives
@@ -564,14 +560,14 @@ void main() {
       expect(foreachDirectives, hasLength(1));
 
       // Verify wire:click
-      final wireClickButtons = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where(
-            (e) =>
-                e.tagName == 'button' &&
-                e.attributes.values.any(
-                  (attr) => attr is LivewireAttribute && attr.action == 'click',
-                ),
-          );
+      final wireClickButtons =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) =>
+            e.tagName == 'button' &&
+            e.attributes.values.any(
+              (attr) => attr is LivewireAttribute && attr.action == 'click',
+            ),
+      );
       expect(wireClickButtons, isNotEmpty);
     });
 
@@ -686,12 +682,12 @@ void main() {
       expect(keyDivs, hasLength(1));
 
       // Verify wire:target
-      final targetElements = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where(
-            (e) => e.attributes.values.any(
-              (attr) => attr is LivewireAttribute && attr.action == 'target',
-            ),
-          );
+      final targetElements =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) => e.attributes.values.any(
+          (attr) => attr is LivewireAttribute && attr.action == 'target',
+        ),
+      );
       expect(targetElements.length, greaterThan(2));
 
       // Verify nested @if/@else
@@ -800,40 +796,39 @@ void main() {
       expect(clickButtons.length, greaterThan(2));
 
       // Verify x-show directives
-      final xShowElements = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where(
-            (e) => e.attributes.values.any(
-              (attr) => attr is AlpineAttribute && attr.name == 'x-show',
-            ),
-          );
+      final xShowElements =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) => e.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == 'x-show',
+        ),
+      );
       expect(xShowElements.length, greaterThan(2));
 
       // Verify x-transition directives (may be parsed as standard attributes)
       final xTransitionElements =
           _findNodesRecursive<HtmlElementNode>(result.ast!).where(
-            (e) => e.attributes.values.any(
-              (attr) => attr.name.contains('transition'),
-            ),
-          );
+        (e) => e.attributes.values.any(
+          (attr) => attr.name.contains('transition'),
+        ),
+      );
       expect(xTransitionElements.length, greaterThan(0));
 
       // Verify @keydown.escape.window
-      final escapeHandlers = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where(
-            (e) => e.attributes.values.any(
-              (attr) =>
-                  attr is AlpineAttribute && attr.name.contains('keydown'),
-            ),
-          );
+      final escapeHandlers =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) => e.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name.contains('keydown'),
+        ),
+      );
       expect(escapeHandlers, hasLength(1));
 
       // Verify @click.away
       final clickAwayElements =
           _findNodesRecursive<HtmlElementNode>(result.ast!).where(
-            (e) => e.attributes.values.any(
-              (attr) => attr is AlpineAttribute && attr.name == '@click.away',
-            ),
-          );
+        (e) => e.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == '@click.away',
+        ),
+      );
       expect(clickAwayElements, hasLength(1));
 
       // Verify echo statements for dynamic content
@@ -1070,9 +1065,8 @@ void main() {
       final directives = _findNodesRecursive<DirectiveNode>(result.ast!);
 
       // Verify @extends
-      final extendsDirective = directives
-          .where((d) => d.name == 'extends')
-          .firstOrNull;
+      final extendsDirective =
+          directives.where((d) => d.name == 'extends').firstOrNull;
       expect(extendsDirective, isNotNull);
       expect(extendsDirective!.expression, contains('layouts.app'));
 
@@ -1391,12 +1385,12 @@ if response.status_code == 200:
       expect(xShowDivs.length, greaterThan(5));
 
       // Verify :class bindings
-      final classBindings = _findNodesRecursive<HtmlElementNode>(result.ast!)
-          .where(
-            (e) => e.attributes.values.any(
-              (attr) => attr is AlpineAttribute && attr.name == ':class',
-            ),
-          );
+      final classBindings =
+          _findNodesRecursive<HtmlElementNode>(result.ast!).where(
+        (e) => e.attributes.values.any(
+          (attr) => attr is AlpineAttribute && attr.name == ':class',
+        ),
+      );
       expect(classBindings.length, greaterThan(3));
 
       // Verify @verbatim sections

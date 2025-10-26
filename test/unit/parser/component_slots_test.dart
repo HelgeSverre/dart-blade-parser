@@ -22,12 +22,11 @@ void main() {
       expect(result.isSuccess, isTrue);
 
       // Find the component
-      final component = result.ast!.children
-          .whereType<ComponentNode>()
-          .firstWhere(
-            (c) => c.name == 'card',
-            orElse: () => throw Exception('x-card component not found'),
-          );
+      final component =
+          result.ast!.children.whereType<ComponentNode>().firstWhere(
+                (c) => c.name == 'card',
+                orElse: () => throw Exception('x-card component not found'),
+              );
 
       // CRITICAL: Component should have a 'header' slot
       // Current bug: Slots not recognized, likely treated as nested component

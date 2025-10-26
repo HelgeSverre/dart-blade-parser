@@ -31,8 +31,7 @@ void main() {
       final parser = BladeParser();
 
       // Create a realistic template with mixed content (100 iterations)
-      final template =
-          '''
+      final template = '''
         <div class="container">
           @if(\$user->isActive)
             <div class="user-card" x-data="{open: false}">
@@ -134,8 +133,7 @@ void main() {
       final parser = BladeParser();
 
       // Create a large template (5000 lines)
-      final template =
-          '''
+      final template = '''
         <div class="container">
           <p class="text">Some content here</p>
           <span class="highlight">Highlighted text</span>
@@ -204,8 +202,7 @@ void main() {
       final parser = BladeParser();
 
       // Template with many void elements
-      final template =
-          '''
+      final template = '''
         <br>
         <input type="text">
         <img src="image.jpg">
@@ -235,8 +232,7 @@ void main() {
       final parser = BladeParser();
 
       // Template with mixed attribute types
-      final template =
-          '''
+      final template = '''
         <div
           class="container"
           id="app"

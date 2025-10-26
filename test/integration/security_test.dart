@@ -431,9 +431,8 @@ void main() {
       );
 
       final directives = result.ast!.children.whereType<DirectiveNode>();
-      final includeDirectives = directives
-          .where((d) => d.name == 'include')
-          .toList();
+      final includeDirectives =
+          directives.where((d) => d.name == 'include').toList();
 
       expect(includeDirectives.length, equals(1));
       expect(includeDirectives.first.expression, contains('template-b'));
@@ -515,8 +514,7 @@ void main() {
     test(
       'Handles complex template with multiple security patterns',
       () {
-        final template =
-            r'''
+        final template = r'''
 @if($id == "1 OR 1=1")
     {{ '<script>alert(1)</script>' }}
     <div class="''' +

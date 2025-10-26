@@ -132,12 +132,11 @@ void main() {
       // Ideally, should normalize to lowercase and match (like HTML)
       if (result.errors.isEmpty) {
         // If no error, names should have been normalized
-        final component = result.ast!.children
-            .whereType<ComponentNode>()
-            .firstWhere(
-              (c) => c.name == 'alert',
-              orElse: () => throw Exception('Component not found'),
-            );
+        final component =
+            result.ast!.children.whereType<ComponentNode>().firstWhere(
+                  (c) => c.name == 'alert',
+                  orElse: () => throw Exception('Component not found'),
+                );
 
         expect(
           component.name,

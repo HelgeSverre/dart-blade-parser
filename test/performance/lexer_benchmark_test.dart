@@ -54,8 +54,7 @@ void main() {
       final template = buffer.toString();
 
       // Count actual directives
-      final directiveCount =
-          '@if'.allMatches(template).length +
+      final directiveCount = '@if'.allMatches(template).length +
           '@foreach'.allMatches(template).length +
           '@endforeach'.allMatches(template).length +
           '@endif'.allMatches(template).length;
@@ -218,7 +217,7 @@ void main() {
         // Int: 8 bytes each
         final estimatedMemoryPerToken =
             tokens.fold<int>(0, (sum, token) => sum + token.value.length * 2) +
-            (tokens.length * 6 * 8); // 6 ints per token
+                (tokens.length * 6 * 8); // 6 ints per token
 
         final estimatedMemoryKB = estimatedMemoryPerToken / 1024;
         final inputSizeMB = size / (1024 * 1024);
@@ -322,8 +321,7 @@ void main() {
       }
       final template = buffer.toString();
 
-      final echoCount =
-          '{{'.allMatches(template).length +
+      final echoCount = '{{'.allMatches(template).length +
           '{!!'.allMatches(template).length +
           '{{{'.allMatches(template).length;
 
@@ -378,8 +376,7 @@ void main() {
       }
       final template = buffer.toString();
 
-      final componentCount =
-          '<x-'.allMatches(template).length +
+      final componentCount = '<x-'.allMatches(template).length +
           '</x-'.allMatches(template).length;
 
       // Warm-up

@@ -129,8 +129,8 @@ void main() {
 
       // No nested div element should exist
       final nestedDivs = script.children.whereType<HtmlElementNode>().where(
-        (e) => e.tagName == 'div',
-      );
+            (e) => e.tagName == 'div',
+          );
       expect(
         nestedDivs,
         isEmpty,
@@ -180,9 +180,8 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      final elements = result.ast!.children
-          .whereType<HtmlElementNode>()
-          .toList();
+      final elements =
+          result.ast!.children.whereType<HtmlElementNode>().toList();
 
       expect(
         elements.length,
@@ -197,10 +196,8 @@ void main() {
       expect(div, isNotNull);
 
       // Style and div should be siblings, not nested
-      final styleTextContent = style.children
-          .whereType<TextNode>()
-          .map((t) => t.content)
-          .join();
+      final styleTextContent =
+          style.children.whereType<TextNode>().map((t) => t.content).join();
       expect(styleTextContent, contains('margin: 0'));
       expect(
         styleTextContent,
@@ -299,23 +296,21 @@ void main() {
 
       // Navigate to script
       final html = result.ast!.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'html',
-      );
+            (e) => e.tagName == 'html',
+          );
 
       final head = html.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'head',
-      );
+            (e) => e.tagName == 'head',
+          );
 
       final script = head.children.whereType<HtmlElementNode>().firstWhere(
-        (e) => e.tagName == 'script',
-      );
+            (e) => e.tagName == 'script',
+          );
 
       expect(script, isNotNull);
 
-      final scriptContent = script.children
-          .whereType<TextNode>()
-          .map((t) => t.content)
-          .join();
+      final scriptContent =
+          script.children.whereType<TextNode>().map((t) => t.content).join();
 
       expect(scriptContent, contains('x < 10'));
 
