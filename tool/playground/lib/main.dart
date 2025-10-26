@@ -258,7 +258,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
     return Chip(
       avatar: const Icon(
-        Icons.speed,
+        Icons.timer,
         size: 16,
         color: Colors.blue,
       ),
