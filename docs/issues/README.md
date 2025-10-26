@@ -30,5 +30,5 @@ After publishing, either:
 ## Current Drafts
 
 - **`unknown-directive-handling.md`** - How should the parser handle custom/unknown Blade directives?
-  - Status: Ready for review
-  - Labels: `decision-needed`, `enhancement`
+  - Status: ✅ Posted as [Issue #1](https://github.com/HelgeSverre/dart-blade-parser/issues/1)
+  - Labels: `enhancement`

@@ -1,5 +1,9 @@
 # [DECISION] How should the parser handle unknown/custom Blade directives?
 
+> **Posted to GitHub:** https://github.com/HelgeSverre/dart-blade-parser/issues/1
+>
+> This is the original draft. See the GitHub issue for updates and discussion.
+
 ## Problem Statement
 
 The parser currently **silently discards** unknown Blade directives (like `@ifaasdf` or legitimate custom directives like `@datetime`). This behavior is problematic because:
