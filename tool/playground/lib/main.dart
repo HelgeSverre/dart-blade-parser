@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:blade_parser/blade_parser.dart';
 
 void main() {
@@ -131,32 +132,52 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                 onSelected: _loadExample,
                 itemBuilder: (context) => [
                   const PopupMenuItem(
-                    value: 'simple',
+                    value: '01-simple-echo',
                     child: Text('Simple Echo'),
                   ),
                   const PopupMenuItem(
-                    value: 'control',
+                    value: '02-control-structures',
                     child: Text('Control Structures'),
                   ),
                   const PopupMenuItem(
-                    value: 'components',
+                    value: '03-components-slots',
                     child: Text('Components & Slots'),
                   ),
                   const PopupMenuItem(
-                    value: 'alpine',
-                    child: Text('Alpine.js Attributes'),
+                    value: '04-alpine-js',
+                    child: Text('Alpine.js'),
                   ),
                   const PopupMenuItem(
-                    value: 'nested',
+                    value: '05-livewire',
+                    child: Text('Livewire'),
+                  ),
+                  const PopupMenuItem(
+                    value: '06-template-inheritance',
+                    child: Text('Template Inheritance'),
+                  ),
+                  const PopupMenuItem(
+                    value: '07-nested-directives',
                     child: Text('Nested Directives'),
                   ),
                   const PopupMenuItem(
-                    value: 'verbatim',
+                    value: '08-alpine-faq',
+                    child: Text('Alpine FAQ Accordion'),
+                  ),
+                  const PopupMenuItem(
+                    value: '09-component-form',
+                    child: Text('Component Form'),
+                  ),
+                  const PopupMenuItem(
+                    value: '10-livewire-layout',
+                    child: Text('Livewire Dashboard'),
+                  ),
+                  const PopupMenuItem(
+                    value: '11-verbatim-blocks',
                     child: Text('Verbatim Blocks'),
                   ),
                   const PopupMenuItem(
-                    value: 'errors',
-                    child: Text('Multiple Errors'),
+                    value: '12-errors-example',
+                    child: Text('Error Example'),
                   ),
                 ],
               ),
@@ -353,69 +374,15 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
     return buffer.toString();
   }
 
-  void _loadExample(String example) {
-    final templates = {
-      'simple': '{{ \$user->name }}',
-      'control': '''<div class="dashboard">
-    @foreach(\$widgets as \$widget)
-        @if(\$widget->isVisible())
-            <div class="widget">
-                <h3>{{ \$widget->title }}</h3>
-                <p>{{ \$widget->content }}</p>
-            </div>
-        @endif
-    @endforeach
-
-    @while(\$count > 0)
-        <p>Count: {{ \$count }}</p>
-    @endwhile
-</div>''',
-      'components': '''<x-card class="shadow-lg">
-    <x-slot:header>
-        <h2>Card Title</h2>
-    </x-slot>
-
-    <p>Card content goes here</p>
-
-    <x-slot:footer>
-        <button>Action</button>
-    </x-slot>
-</x-card>''',
-      'alpine': '''<div x-data="{ open: false }" class="dropdown">
-    <button @click="open = !open">Toggle</button>
-    <div x-show="open" x-transition>
-        <a href="#" :class="{ 'active': isActive }">Link</a>
-    </div>
-</div>''',
-      'nested': '''@if(\$level1)
-    @if(\$level2)
-        @if(\$level3)
-            @if(\$level4)
-                @if(\$level5)
-                    <p>5 levels deep!</p>
-                @endif
-            @endif
-        @endif
-    @endif
-@endif''',
-      'verbatim': '''@verbatim
-    {{ This should not be parsed }}
-    {!! Also literal !!}
-    @if(\$test)
-        This directive is literal too
-    @endif
-@endverbatim''',
-      'errors': '''@if(\$condition)
-    <p>Content</p>
-    <!-- Missing @endif -->
-
-{{ \$unclosed
-
-@foreach(\$items as \$item)
-    {{ \$item }}
-    <!-- Missing @endforeach -->''',
-    };
-
-    _controller.text = templates[example] ?? '';
+  Future<void> _loadExample(String example) async {
+    try {
+      final content = await rootBundle.loadString(
+        'assets/examples/$example.blade.php',
+      );
+      _controller.text = content;
+    } catch (e) {
+      // If asset fails to load, show error message
+      _controller.text = '// Error loading example: $e';
+    }
   }
 }
