@@ -90,11 +90,9 @@ _(No medium priority issues at this time)_
 1. ✅ **Refactor `_lexText` to use a `StringBuffer`** - COMPLETED
    - Solved token fragmentation issue for `@@` escapes
    - Improved lexer robustness and performance
-   
 2. ✅ **Fix "Unquoted URL Attribute Values Fail"** - COMPLETED
    - Re-implemented fix for unquoted URLs with colons
    - All URL parsing tests passing
-   
 3. ✅ **Fix "Empty Tag Name Validation"** - COMPLETED
    - Lexer now detects and reports empty tag names
    - `isSuccess` correctly returns false when errors exist
@@ -103,52 +101,99 @@ _(No medium priority issues at this time)_
 
 ## 📋 Pending Tasks
 
+### Formatter & Linter - In Progress
+
+**Completed:**
+- ✅ Core formatter infrastructure (config, visitor, indent tracker)
+- ✅ Main formatter class with format() and needsFormatting()
+- ✅ 28 formatter unit tests + 13 idempotency tests (all passing)
+- ✅ Test fixtures (8 messy Blade files for integration testing)
+- ✅ Justfile commands (format-fixtures, reset-fixtures, show-format-diff)
+- ✅ Removed directiveSpacing feature (produces invalid Blade syntax)
+
+**Next Steps:**
+
+1. **Build CLI Tool** - High Priority (1-2 days)
+   - Create `bin/blade_formatter.dart` with proper argument parsing
+   - Add glob pattern support (`**/*.blade.php`)
+   - Implement `--check` mode for CI/CD (exit code 1 if changes needed)
+   - Implement `--write` flag to write changes
+   - Add `--config` flag to load YAML configuration
+   - Support stdin/stdout mode
+   - Estimated effort: 6-8 hours
+
+2. **Linting Rule System** - High Priority (2-3 days)
+   - Design YAML-based configuration (`.blade-lint.yaml`)
+   - Implement base LintRule interface
+   - Create RuleRegistry for rule management
+   - Add 3 security rules (no-unescaped-user-input, require-csrf-forms, no-dangerous-alpine-html)
+   - Add 4 style rules (consistent-indentation, no-trailing-whitespace, max-line-length, consistent-quote-style)
+   - Add 3 best practice rules (prefer-forelse, no-nested-ternary, component-prop-types)
+   - Estimated effort: 12-16 hours
+
+3. **Auto-Fix System** - Medium Priority (1 day)
+   - Implement safe auto-fix for linting violations
+   - Add `--fix` flag to CLI
+   - Support unsafe fixes with `--unsafe-fixes` flag
+   - Estimated effort: 4-6 hours
+
+4. **Documentation** - Medium Priority (1 day)
+   - Create `docs/FORMATTER.md` with all formatting rules
+   - Create `docs/LINTER_RULES.md` with all linting rules and examples
+   - Add configuration examples
+   - Document each rule with before/after examples
+   - Estimated effort: 4-6 hours
+
+5. **Prettier Plugin** - Future Enhancement
+   - Research integration strategies (CLI wrapper vs dart2js vs LSP)
+   - Implement adapter for Prettier API
+   - Publish as npm package
+   - Estimated effort: 1-2 weeks
+
+6. **VS Code Extension** - Future Enhancement
+   - Format on save
+   - Real-time linting with diagnostics
+   - Quick fixes for linting violations
+   - Hover documentation for directives
+   - Estimated effort: 2-3 weeks
+
 ### High Priority - Quick Wins (Code Cleanup)
+
 1. ✂️ **Remove unused variable `tagStartPos`** - 2 min
    - File: `lib/src/lexer/lexer.dart:861`
-   
 2. ✂️ **Remove unused variable `attrStart`** - 2 min
    - File: `lib/src/lexer/lexer.dart:949`
-   
 3. ✂️ **Remove unused method `_peekWord`** - 2 min
    - File: `lib/src/lexer/lexer.dart:1093`
-   
 4. ✂️ **Remove unused variable `startToken`** - 2 min
    - File: `lib/src/parser/parser.dart:1072`
 
 5. 🗑️ **Delete old HTML reports** - 1 min
    - Files: `my_report.html`, `test_report.html`
-   
-6. 📝 **Add *.html to .gitignore** - 1 min
+6. 📝 **Add \*.html to .gitignore** - 1 min
 
 ### Medium Priority - Polish & Cleanup
+
 7. **Remove unnecessary null assertions in tests** - 5 min
    - 7 instances across test files
-   
 8. **Remove unused test variables** - 3 min
    - 3 instances in test files
-   
 9. **Add explicit type arguments** - 10 min
    - 13 places (List<dynamic>, Map<dynamic, dynamic>)
-   
 10. **Fix Future.delayed type inference** - 30 min
     - 6 instances in examples and tests
-    
 11. **Fix asFuture type inference** - 15 min
     - 2 instances in examples
-    
 12. **Update CHANGELOG.md** - 15 min
     - Add v1.0.1 entry with today's fixes
-    
 13. **Archive outdated STATUS.md** - 5 min
     - Move to archive/, keep IMPLEMENTATION_STATUS.md
-    
 14. **Update version to 1.0.1** - 5 min
     - File: `pubspec.yaml`
-    
 15. **Commit changes and prepare release** - 30 min
 
 ### Low Priority - Future Enhancements
+
 16. **Improve `_isDirectiveContext()`** - Optional enhancement
     - Consider adding quote-aware tag detection
     - Handle @ inside CSS/JavaScript strings more robustly
@@ -170,6 +215,7 @@ _(No medium priority issues at this time)_
 ## 📊 Current Status
 
 **Test Suite Statistics:**
+
 - 📊 **Total tests:** 532
 - ✅ **Passing:** 530 (99.6%)
 - ⚠️ **Failing:** 2 (both marked "EXPECTED TO FAIL")
@@ -177,6 +223,7 @@ _(No medium priority issues at this time)_
   - Streaming incremental (feature not implemented)
 
 **Working Well:**
+
 - ✅ All 75+ Blade directives
 - ✅ Component parsing with slots (both syntaxes)
 - ✅ HTML elements (void elements, attributes, nesting)
@@ -191,6 +238,7 @@ _(No medium priority issues at this time)_
 - ✅ Whitespace handling (tabs, NBSP, mixed line endings) ✨ NEW
 
 **Known Limitations:**
+
 - ⚠️ True streaming (stub implementation only - planned for v2.0)
 - ⚠️ Component error positions could be more precise (cosmetic issue)
 
