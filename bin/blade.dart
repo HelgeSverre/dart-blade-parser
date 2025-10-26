@@ -12,8 +12,12 @@ const String version = '1.1.0';
 void main(List<String> arguments) async {
   // Set up main argument parser with subcommands
   final argParser = ArgParser()
-    ..addFlag('version',
-        abbr: 'v', help: 'Show version', negatable: false)
+    ..addFlag(
+      'version',
+      abbr: 'v',
+      help: 'Show version',
+      negatable: false,
+    )
     ..addFlag('help', abbr: 'h', help: 'Show this help', negatable: false);
 
   // Add parse subcommand
@@ -21,33 +25,51 @@ void main(List<String> arguments) async {
     ..addFlag('json', help: 'Output AST as JSON')
     ..addFlag('tree', help: 'Output AST as tree (default)', defaultsTo: true)
     ..addFlag('stdin', help: 'Read from stdin')
-    ..addFlag('help', abbr: 'h', help: 'Show help for parse command', negatable: false);
+    ..addFlag('help',
+        abbr: 'h', help: 'Show help for parse command', negatable: false);
 
   // Add format subcommand
   final formatCommand = argParser.addCommand('format')
-    ..addFlag('write',
-        abbr: 'w',
-        help: 'Write formatted output back to files (default: stdout)')
-    ..addFlag('check',
-        abbr: 'c',
-        help: 'Check if files need formatting (exit code 1 if any do)',
-        negatable: false)
-    ..addOption('config',
-        help: 'Path to configuration file (.blade.json)')
-    ..addOption('indent-size',
-        help: 'Number of spaces for indentation', defaultsTo: '4')
-    ..addOption('indent-style',
-        help: "Use 'spaces' or 'tabs'",
-        allowed: ['spaces', 'tabs'],
-        defaultsTo: 'spaces')
-    ..addOption('quote-style',
-        help: "Quote style: 'single', 'double', or 'preserve'",
-        allowed: ['single', 'double', 'preserve'],
-        defaultsTo: 'preserve')
-    ..addFlag('stdin',
-        help: 'Read from stdin, write to stdout', negatable: false)
+    ..addFlag(
+      'write',
+      abbr: 'w',
+      help: 'Write formatted output back to files (default: stdout)',
+    )
+    ..addFlag(
+      'check',
+      abbr: 'c',
+      help: 'Check if files need formatting (exit code 1 if any do)',
+      negatable: false,
+    )
+    ..addOption(
+      'config',
+      help: 'Path to configuration file (.blade.json)',
+    )
+    ..addOption(
+      'indent-size',
+      help: 'Number of spaces for indentation',
+      defaultsTo: '4',
+    )
+    ..addOption(
+      'indent-style',
+      help: "Use 'spaces' or 'tabs'",
+      allowed: ['spaces', 'tabs'],
+      defaultsTo: 'spaces',
+    )
+    ..addOption(
+      'quote-style',
+      help: "Quote style: 'single', 'double', or 'preserve'",
+      allowed: ['single', 'double', 'preserve'],
+      defaultsTo: 'preserve',
+    )
+    ..addFlag(
+      'stdin',
+      help: 'Read from stdin, write to stdout',
+      negatable: false,
+    )
     ..addFlag('verbose', abbr: 'v', help: 'Verbose output')
-    ..addFlag('help', abbr: 'h', help: 'Show help for format command', negatable: false);
+    ..addFlag('help',
+        abbr: 'h', help: 'Show help for format command', negatable: false);
 
   try {
     // Handle shell completion
@@ -254,7 +276,8 @@ Future<void> _handleFormatCommand(ArgResults command) async {
 
     if (useStdin && (checkMode || writeMode)) {
       stderr.writeln(
-          'Error: Cannot use --stdin with --check or --write flags');
+        'Error: Cannot use --stdin with --check or --write flags',
+      );
       exit(2);
     }
 
@@ -322,7 +345,8 @@ Future<void> _handleFormatCommand(ArgResults command) async {
       print('  Total files: ${files.length}');
       if (checkMode) {
         print('  Needs formatting: $needsFormatting');
-        print('  Already formatted: ${files.length - needsFormatting - errors}');
+        print(
+            '  Already formatted: ${files.length - needsFormatting - errors}');
       } else {
         print('  Formatted: $formatted');
         print('  Unchanged: ${files.length - formatted - errors}');
@@ -403,7 +427,8 @@ Future<FormatFileResult> _formatFile(
     if (result.hasErrors) {
       stderr.writeln('${file.path}: Parse errors:');
       for (final error in result.errors) {
-        stderr.writeln('  ${error.position.line}:${error.position.column} - ${error.message}');
+        stderr.writeln(
+            '  ${error.position.line}:${error.position.column} - ${error.message}');
       }
       return FormatFileResult.error;
     }
@@ -422,7 +447,7 @@ Future<FormatFileResult> _formatFile(
     }
 
     if (writeMode) {
-      await file.writeAsString(result.formatted!);
+      await file.writeAsString(result.formatted);
       if (verbose) {
         print('${file.path}: Formatted');
       }
@@ -455,7 +480,8 @@ Future<void> _formatStdin(BladeFormatter formatter) async {
   } on FormatterException catch (e) {
     stderr.writeln('Parse errors:');
     for (final error in e.parseErrors) {
-      stderr.writeln('  ${error.position.line}:${error.position.column} - ${error.message}');
+      stderr.writeln(
+          '  ${error.position.line}:${error.position.column} - ${error.message}');
     }
     exit(1);
   } catch (e) {
@@ -606,10 +632,10 @@ Future<FormatterConfig> _loadConfig(ArgResults argResults) async {
 
       if (configPath.endsWith('.json')) {
         configMap = jsonDecode(contents) as Map<String, dynamic>;
-      } else if (configPath.endsWith('.yaml') ||
-          configPath.endsWith('.yml')) {
+      } else if (configPath.endsWith('.yaml') || configPath.endsWith('.yml')) {
         stderr.writeln(
-            'Error: YAML configuration not yet supported. Use JSON or CLI flags.');
+          'Error: YAML configuration not yet supported. Use JSON or CLI flags.',
+        );
         exit(2);
       } else {
         // Try JSON by default
