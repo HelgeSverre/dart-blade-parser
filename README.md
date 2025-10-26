@@ -47,6 +47,7 @@ cat template.blade.php | dart run blade format --stdin         # Format from std
 
 # Format with custom options
 dart run blade format template.blade.php --indent-size 2 --indent-style tabs
+dart run blade format template.blade.php --directive-spacing none --slot-formatting block
 dart run blade format templates/ --config .blade.json --write
 
 # Show help
@@ -69,6 +70,8 @@ dart run blade format --help
 - `--indent-size <n>`: Number of spaces for indentation (default: 4)
 - `--indent-style <style>`: Use 'spaces' or 'tabs' (default: spaces)
 - `--quote-style <style>`: Quote style - 'single', 'double', or 'preserve' (default: preserve)
+- `--directive-spacing <style>`: Directive spacing - 'between_blocks', 'none', or 'preserve' (default: between_blocks)
+- `--slot-formatting <style>`: Slot formatting - 'compact' or 'block' (default: compact)
 - `--stdin`: Format from standard input
 - `--verbose` or `-v`: Verbose output with file-by-file progress
 
@@ -333,13 +336,31 @@ The formatter produces deterministic, idempotent output: `format(format(x)) == f
 
 ```dart
 final config = FormatterConfig(
-  indentSize: 2,                    // Default: 4
-  indentStyle: IndentStyle.spaces,  // or IndentStyle.tabs
-  quoteStyle: QuoteStyle.preserve,  // or QuoteStyle.single, QuoteStyle.double
+  indentSize: 2,                              // Default: 4
+  indentStyle: IndentStyle.spaces,            // or IndentStyle.tabs
+  quoteStyle: QuoteStyle.preserve,            // or QuoteStyle.single, QuoteStyle.double
+  directiveSpacing: DirectiveSpacing.betweenBlocks,  // Default: betweenBlocks
+  slotFormatting: SlotFormatting.compact,     // Default: compact
 );
 
 final formatter = BladeFormatter(config: config);
 ```
+
+**Configuration Options:**
+
+- `indentSize`: Number of spaces per indent level (default: 4)
+- `indentStyle`: Use `IndentStyle.spaces` or `IndentStyle.tabs` (default: spaces)
+- `quoteStyle`: How to format attribute quotes
+  - `QuoteStyle.preserve`: Keep original quote style (default)
+  - `QuoteStyle.single`: Convert to single quotes
+  - `QuoteStyle.double`: Convert to double quotes
+- `directiveSpacing`: Control blank lines between Blade directives
+  - `DirectiveSpacing.betweenBlocks`: Add blank line between closing and opening directives (default)
+  - `DirectiveSpacing.none`: No blank lines between directives (compact)
+  - `DirectiveSpacing.preserve`: Preserve blank lines as written (future)
+- `slotFormatting`: Control formatting style for component slots
+  - `SlotFormatting.compact`: Smart detection - compact for simple slots (default)
+  - `SlotFormatting.block`: Always use block formatting with extra blank lines
 
 ### API
 
@@ -369,13 +390,18 @@ if (formatter.needsFormatting(source)) {
 
 - Configurable indentation (size and style: spaces or tabs)
 - Smart inline vs block formatting (simple content stays inline)
-- Normalizes attribute quoting
+- Configurable directive spacing (blank lines between directives)
+- Configurable slot formatting (compact vs block style)
+- Normalizes attribute quoting (single, double, or preserve)
 - Preserves boolean attributes
+- Preserves line breaks between echo statements
 - Adds final newline
 - Spacing between top-level blocks
 - Guaranteed idempotency (verified with 13 idempotency tests)
 
-### Before/After Example
+### Before/After Examples
+
+#### Basic Formatting
 
 **Before:**
 
@@ -397,6 +423,59 @@ if (formatter.needsFormatting(source)) {
         <p>Hello</p>
     @endif
 </div>
+```
+
+#### Directive Spacing
+
+**With `DirectiveSpacing.betweenBlocks` (default):**
+
+```blade
+@foreach($users as $user)
+    <p>{{ $user->name }}</p>
+@endforeach
+
+@while($count > 0)
+    <p>Count: {{ $count }}</p>
+@endwhile
+```
+
+**With `DirectiveSpacing.none`:**
+
+```blade
+@foreach($users as $user)
+    <p>{{ $user->name }}</p>
+@endforeach
+@while($count > 0)
+    <p>Count: {{ $count }}</p>
+@endwhile
+```
+
+#### Slot Formatting
+
+**With `SlotFormatting.compact` (default):**
+
+```blade
+<x-card>
+    <x-slot:header>
+        <h2>Card Title</h2>
+    </x-slot>
+
+    <p>Card content</p>
+</x-card>
+```
+
+**With `SlotFormatting.block`:**
+
+```blade
+<x-card>
+    <x-slot:header>
+
+        <h2>Card Title</h2>
+
+    </x-slot>
+
+    <p>Card content</p>
+</x-card>
 ```
 
 ## Architecture

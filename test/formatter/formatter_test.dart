@@ -621,6 +621,298 @@ void main() {
         expect(result, contains('<div>'));
         expect(result, contains('<p>Content</p>'));
       });
+
+      test('preserves blank lines between directives', () {
+        const input = '''
+@extends('layouts.app')
+
+@section('title', 'Page Title')
+
+@section('content')
+    <h1>Main Content</h1>
+
+    @push('scripts')
+        <script src="/page-script.js"></script>
+    @endpush
+
+    @include('partials.sidebar')
+@endsection
+
+@section('footer')
+    @parent
+    <p>Additional footer content</p>
+@endsection
+''';
+
+        final result = formatter.format(input);
+
+        // Should preserve blank lines between top-level directives
+        expect(result, contains('@extends(\'layouts.app\')\n\n@section(\'title\','));
+        expect(result, contains('Page Title\')\n\n@section(\'content\')'));
+        expect(result, contains('@endsection\n\n@section(\'footer\')'));
+      });
+
+      test('keeps inline text and echo on same line', () {
+        const input = '<p>Count: {{ \$count }}</p>';
+        const expected = '<p>Count: {{ \$count }}</p>\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('keeps multiple inline elements together', () {
+        const input = '''
+@while(\$count > 0)
+    <p>Count: {{ \$count }}</p>
+@endwhile
+''';
+        const expected = '@while(\$count > 0)\n'
+            '    <p>Count: {{ \$count }}</p>\n'
+            '@endwhile\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('preserves line breaks between echo statements in div', () {
+        const input = '''
+<div>
+    {{ \$user->name }}
+    {!! \$html !!}
+</div>
+''';
+        const expected = '<div>\n'
+            '    {{ \$user->name }}\n'
+            '    {!! \$html !!}\n'
+            '</div>\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('keeps single line with text and echo inline', () {
+        const input = '<p>Name: {{ \$user->name }}</p>';
+        const expected = '<p>Name: {{ \$user->name }}</p>\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+    });
+
+    group('directive spacing', () {
+      test('adds blank line between ending and opening directives (default)', () {
+        const input = '''
+@foreach(\$items as \$item)
+    <p>{{ \$item }}</p>
+@endforeach
+@while(\$count > 0)
+    <p>Count: {{ \$count }}</p>
+@endwhile
+''';
+        const expected = '@foreach(\$items as \$item)\n'
+            '    <p>{{ \$item }}</p>\n'
+            '@endforeach\n'
+            '\n'
+            '@while(\$count > 0)\n'
+            '    <p>Count: {{ \$count }}</p>\n'
+            '@endwhile\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('adds blank line between @endif and @foreach', () {
+        const input = '''
+@if(\$condition)
+    <p>Text</p>
+@endif
+@foreach(\$items as \$item)
+    <p>{{ \$item }}</p>
+@endforeach
+''';
+        const expected = '@if(\$condition)\n'
+            '    <p>Text</p>\n'
+            '@endif\n'
+            '\n'
+            '@foreach(\$items as \$item)\n'
+            '    <p>{{ \$item }}</p>\n'
+            '@endforeach\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('no blank line with DirectiveSpacing.none config', () {
+        final compactFormatter = BladeFormatter(
+          config: const FormatterConfig(directiveSpacing: DirectiveSpacing.none),
+        );
+
+        const input = '''
+@foreach(\$items as \$item)
+    <p>{{ \$item }}</p>
+@endforeach
+@while(\$count > 0)
+    <p>Count: {{ \$count }}</p>
+@endwhile
+''';
+        const expected = '@foreach(\$items as \$item)\n'
+            '    <p>{{ \$item }}</p>\n'
+            '@endforeach\n'
+            '@while(\$count > 0)\n'
+            '    <p>Count: {{ \$count }}</p>\n'
+            '@endwhile\n';
+
+        final result = compactFormatter.format(input);
+        expect(result, expected);
+      });
+
+      test('no blank line between opening directive and its content', () {
+        const input = '''
+@if(\$user)
+    <p>Hello</p>
+@endif
+''';
+        const expected = '@if(\$user)\n'
+            '    <p>Hello</p>\n'
+            '@endif\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('blank line between nested ending and sibling opening', () {
+        const input = '''
+<div>
+    @foreach(\$users as \$user)
+        @if(\$user->isActive())
+            <p>{{ \$user->name }}</p>
+        @endif
+    @endforeach
+    @while(\$count > 0)
+        <p>{{ \$count }}</p>
+    @endwhile
+</div>
+''';
+        const expected = '<div>\n'
+            '    @foreach(\$users as \$user)\n'
+            '        @if(\$user->isActive())\n'
+            '            <p>{{ \$user->name }}</p>\n'
+            '        @endif\n'
+            '    @endforeach\n'
+            '\n'
+            '    @while(\$count > 0)\n'
+            '        <p>{{ \$count }}</p>\n'
+            '    @endwhile\n'
+            '</div>\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+    });
+
+    group('slot formatting', () {
+      test('formats simple slot compactly (default)', () {
+        const input = '''
+<x-card class="shadow-lg">
+    <x-slot:header>
+        <h2>Card Title</h2>
+    </x-slot>
+
+    <p>Card content goes here</p>
+
+    <x-slot:footer>
+        <button>Action</button>
+    </x-slot>
+</x-card>
+''';
+        const expected = '<x-card class="shadow-lg">\n'
+            '    <x-slot:header>\n'
+            '        <h2>Card Title</h2>\n'
+            '    </x-slot>\n'
+            '    <x-slot:footer>\n'
+            '        <button>Action</button>\n'
+            '    </x-slot>\n'
+            '    <p>Card content goes here</p>\n'
+            '</x-card>\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('formats slot with multiple elements as block', () {
+        const input = '''
+<x-card>
+    <x-slot:body>
+        <p>First paragraph</p>
+        <p>Second paragraph</p>
+    </x-slot>
+</x-card>
+''';
+        const expected = '<x-card>\n'
+            '    <x-slot:body>\n'
+            '        <p>First paragraph</p>\n'
+            '\n'
+            '        <p>Second paragraph</p>\n'
+            '    </x-slot>\n'
+            '</x-card>\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('formats slot with block config always uses block formatting', () {
+        final blockFormatter = BladeFormatter(
+          config: const FormatterConfig(slotFormatting: SlotFormatting.block),
+        );
+
+        const input = '''
+<x-card>
+    <x-slot:header>
+        <h2>Title</h2>
+    </x-slot>
+</x-card>
+''';
+        // Block formatting adds extra blank lines after opening and before closing
+        const expected = '<x-card>\n'
+            '    <x-slot:header>\n'
+            '\n'
+            '        <h2>Title</h2>\n'
+            '\n'
+            '    </x-slot>\n'
+            '</x-card>\n';
+
+        final result = blockFormatter.format(input);
+        expect(result, expected);
+      });
+
+      test('formats empty slot', () {
+        const input = '<x-card><x-slot:empty></x-slot></x-card>';
+        // Note: Empty slots currently don't output closing tags
+        const expected = '<x-card>\n'
+            '    <x-slot:empty>\n'
+            '</x-card>\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
+
+      test('formats slot with attributes', () {
+        const input = '''
+<x-card>
+    <x-slot:header class="font-bold">
+        <h2>Title</h2>
+    </x-slot>
+</x-card>
+''';
+        const expected = '<x-card>\n'
+            '    <x-slot:header class="font-bold">\n'
+            '        <h2>Title</h2>\n'
+            '    </x-slot>\n'
+            '</x-card>\n';
+
+        final result = formatter.format(input);
+        expect(result, expected);
+      });
     });
 
     group('empty and minimal files', () {

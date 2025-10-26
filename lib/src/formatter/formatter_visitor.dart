@@ -111,6 +111,30 @@ class FormatterVisitor implements AstVisitor<String> {
     'empty', // Can be both, but often inline in context
   };
 
+  /// Blade directives that are ending tags (close block directives).
+  static const Set<String> _endingDirectives = {
+    'endif',
+    'endunless',
+    'endforeach',
+    'endforelse',
+    'endfor',
+    'endwhile',
+    'endswitch',
+    'endauth',
+    'endguest',
+    'endcan',
+    'endcannot',
+    'endcanany',
+    'endenv',
+    'endproduction',
+    'endsection',
+    'endpush',
+    'endprepend',
+    'endonce',
+    'endphp',
+    'endverbatim',
+  };
+
   FormatterVisitor(this.config) : _indent = IndentTracker(config);
 
   /// Formats the AST and returns the formatted string.
@@ -149,8 +173,16 @@ class FormatterVisitor implements AstVisitor<String> {
     for (var i = 0; i < node.children.length; i++) {
       final child = node.children[i];
 
-      // Skip whitespace-only text nodes at document level
+      // Handle whitespace-only text nodes that represent blank lines
       if (child is TextNode && child.content.trim().isEmpty) {
+        // Count the number of newlines in this text node
+        final newlineCount = '\n'.allMatches(child.content).length;
+
+        // If there are 2+ newlines, it represents intentional blank line(s)
+        // Preserve one blank line (we already have one from previous element's writeln)
+        if (newlineCount >= 2 && !_output.toString().endsWith('\n\n')) {
+          _output.writeln();
+        }
         continue;
       }
 
@@ -158,8 +190,17 @@ class FormatterVisitor implements AstVisitor<String> {
 
       // Add spacing between top-level elements
       if (i < node.children.length - 1) {
-        final next = node.children[i + 1];
-        if (_needsSpacingBetween(child, next)) {
+        // Find the next meaningful (non-whitespace) node
+        AstNode? nextMeaningful;
+        for (var j = i + 1; j < node.children.length; j++) {
+          final candidate = node.children[j];
+          if (candidate is! TextNode || candidate.content.trim().isNotEmpty) {
+            nextMeaningful = candidate;
+            break;
+          }
+        }
+
+        if (nextMeaningful != null && _needsSpacingBetween(child, nextMeaningful)) {
           _output.writeln();
         }
       }
@@ -221,8 +262,9 @@ class FormatterVisitor implements AstVisitor<String> {
       _indent.decrease();
     }
 
-    // Write closing directive if this is a block directive
-    if (isBlock && _hasClosingDirective(node.name)) {
+    // Write closing directive if this is a block directive with children
+    // Inline directives (like @section('title', 'value')) don't get closing tags
+    if (isBlock && node.children.isNotEmpty && _hasClosingDirective(node.name)) {
       _output.write(_indent.current);
       _output.write('@end${node.name}');
       _output.writeln();
@@ -326,23 +368,62 @@ class FormatterVisitor implements AstVisitor<String> {
           .where((c) => c is! TextNode || c.content.trim().isNotEmpty)
           .toList();
 
-      // Check if we can keep content inline (single meaningful child)
-      final canKeepInline = meaningfulChildren.length == 1 &&
-          (_isSimpleTextNode(meaningfulChildren.first) ||
-              _isSimpleEchoNode(meaningfulChildren.first));
+      // Check if we can keep content inline
+      // Allow inline if: single simple child, or multiple children that are all inline-safe
+      // BUT: if there are newlines in whitespace between meaningful children, don't inline
+      var canKeepInline = meaningfulChildren.isNotEmpty &&
+          meaningfulChildren.every((child) =>
+              _isSimpleTextNode(child) || _isSimpleEchoNode(child));
+
+      // Check for newlines between meaningful children
+      if (canKeepInline && meaningfulChildren.length > 1) {
+        // Look for newlines in whitespace text nodes between meaningful children
+        for (var i = 0; i < node.children.length - 1; i++) {
+          final child = node.children[i];
+          // If this is a meaningful child, check if the next nodes contain newlines
+          if (meaningfulChildren.contains(child)) {
+            // Check following whitespace nodes until we hit another meaningful child
+            for (var j = i + 1; j < node.children.length; j++) {
+              final next = node.children[j];
+              if (meaningfulChildren.contains(next)) {
+                break; // Found next meaningful child
+              }
+              // Check if this whitespace node contains a newline
+              if (next is TextNode && next.content.contains('\n')) {
+                canKeepInline = false;
+                break;
+              }
+            }
+            if (!canKeepInline) break;
+          }
+        }
+      }
 
       if (canKeepInline) {
         // Keep simple content inline
-        final child = meaningfulChildren.first;
-        if (child is TextNode) {
-          _output.write(child.content.trim());
-        } else if (child is EchoNode) {
-          if (child.isRaw) {
-            _output.write('{!! ${child.expression} !!}');
-          } else {
-            _output.write('{{ ${child.expression} }}');
+        // Build the inline content, preserving spaces between elements
+        final inlineContent = StringBuffer();
+        for (var i = 0; i < meaningfulChildren.length; i++) {
+          final child = meaningfulChildren[i];
+          if (child is TextNode) {
+            // For text nodes, trim leading space on first, trailing on last
+            var text = child.content;
+            if (i == 0) {
+              text = text.trimLeft();
+            }
+            if (i == meaningfulChildren.length - 1) {
+              text = text.trimRight();
+            }
+            inlineContent.write(text);
+          } else if (child is EchoNode) {
+            if (child.isRaw) {
+              inlineContent.write('{!! ${child.expression} !!}');
+            } else {
+              inlineContent.write('{{ ${child.expression} }}');
+            }
           }
         }
+        _output.write(inlineContent.toString());
         _output.write('</${node.tagName}>');
         _output.writeln();
         return '';
@@ -364,8 +445,17 @@ class FormatterVisitor implements AstVisitor<String> {
 
         // Add spacing between children if needed
         if (i < node.children.length - 1) {
-          final next = node.children[i + 1];
-          if (_needsSpacingBetween(child, next)) {
+          // Find the next meaningful (non-whitespace) node
+          AstNode? nextMeaningful;
+          for (var j = i + 1; j < node.children.length; j++) {
+            final candidate = node.children[j];
+            if (candidate is! TextNode || candidate.content.trim().isNotEmpty) {
+              nextMeaningful = candidate;
+              break;
+            }
+          }
+
+          if (nextMeaningful != null && _needsSpacingBetween(child, nextMeaningful)) {
             _output.writeln();
           }
         }
@@ -533,25 +623,93 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     _output.write('>');
-    _output.writeln();
 
     // Format children
-    if (node.children.isNotEmpty) {
-      _indent.increase();
+    if (node.children.isEmpty) {
+      _output.writeln();
+      return '';
+    }
 
-      for (var i = 0; i < node.children.length; i++) {
-        final child = node.children[i];
-        child.accept(this);
+    // Check if we should use compact formatting
+    final useCompactFormatting = config.slotFormatting == SlotFormatting.compact;
 
-        if (i < node.children.length - 1) {
-          final next = node.children[i + 1];
-          if (_needsSpacingBetween(child, next)) {
-            _output.writeln();
+    if (useCompactFormatting) {
+      // Filter out whitespace-only text nodes for inline check
+      final meaningfulChildren = node.children
+          .where((c) => c is! TextNode || c.content.trim().isNotEmpty)
+          .toList();
+
+      // Check if we can format compactly (single meaningful child without newlines)
+      final canFormatCompact = meaningfulChildren.length == 1 &&
+          (meaningfulChildren.first is! TextNode ||
+              !(meaningfulChildren.first as TextNode).content.contains('\n'));
+
+      if (canFormatCompact) {
+        // Compact formatting: no extra newlines
+        _output.writeln();
+        _indent.increase();
+
+        for (final child in node.children) {
+          // Skip whitespace-only text nodes at start/end
+          if (child is TextNode && child.content.trim().isEmpty) {
+            continue;
           }
+          child.accept(this);
         }
+
+        _indent.decrease();
+        _output.write(_indent.current);
+        _output.write('</x-slot>');
+        _output.writeln();
+        return '';
+      }
+    }
+
+    // Block formatting (either SlotFormatting.block config, or complex content with compact config)
+    final useBlockWithExtraNewlines = config.slotFormatting == SlotFormatting.block;
+
+    _output.writeln();
+
+    if (useBlockWithExtraNewlines) {
+      // Add extra newline after opening tag (old block behavior)
+      _output.writeln();
+    }
+
+    _indent.increase();
+
+    for (var i = 0; i < node.children.length; i++) {
+      final child = node.children[i];
+
+      // Skip whitespace-only text nodes in block mode
+      if (child is TextNode && child.content.trim().isEmpty) {
+        continue;
       }
 
-      _indent.decrease();
+      child.accept(this);
+
+      // Add spacing between children if needed
+      if (i < node.children.length - 1) {
+        // Find the next meaningful (non-whitespace) node
+        AstNode? nextMeaningful;
+        for (var j = i + 1; j < node.children.length; j++) {
+          final candidate = node.children[j];
+          if (candidate is! TextNode || candidate.content.trim().isNotEmpty) {
+            nextMeaningful = candidate;
+            break;
+          }
+        }
+
+        if (nextMeaningful != null && _needsSpacingBetween(child, nextMeaningful)) {
+          _output.writeln();
+        }
+      }
+    }
+
+    _indent.decrease();
+
+    if (useBlockWithExtraNewlines) {
+      // Add extra newline before closing tag (old block behavior)
+      _output.writeln();
     }
 
     // Write closing tag
@@ -598,10 +756,28 @@ class FormatterVisitor implements AstVisitor<String> {
       return true;
     }
 
-    // Add spacing between block directives (but not before closing directives)
+    // Handle directive spacing based on configuration
+    if (current is DirectiveNode && next is DirectiveNode) {
+      // Check if we should add spacing between block directives
+      if (config.directiveSpacing == DirectiveSpacing.betweenBlocks) {
+        // Add blank line between two block-level directives
+        // Current directive has just finished (including its @end tag if it has one)
+        // Next directive is about to start
+        final isCurrentBlock = _blockDirectives.contains(current.name);
+        final isNextBlock = _blockDirectives.contains(next.name) ||
+            _inlineDirectives.contains(next.name);
+
+        if (isCurrentBlock && isNextBlock) {
+          return true;
+        }
+      }
+      // For DirectiveSpacing.none or preserve, don't add spacing
+      return false;
+    }
+
+    // Add spacing between block directives and non-directives
     if (current is DirectiveNode && _blockDirectives.contains(current.name)) {
-      return next
-          is! DirectiveNode; // Don't add space before @endif, @endforeach, etc.
+      return next is! DirectiveNode;
     }
 
     return false;
