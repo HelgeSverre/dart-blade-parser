@@ -311,7 +311,8 @@ void main() {
       expect(result.stdout.toString(), contains('Found 2 file(s)'));
     });
 
-    test('deduplicates files when same file matches multiple patterns', () async {
+    test('deduplicates files when same file matches multiple patterns',
+        () async {
       final testFile = File(path.join(tempDir.path, 'test.blade.php'));
       testFile.writeAsStringSync('<div>{{  \$user  }}</div>');
 
@@ -488,7 +489,8 @@ void main() {
       expect(result.stdout.toString(), contains('Formatted:'));
     });
 
-    test('shows "Already formatted" message for unchanged files with --verbose', () async {
+    test('shows "Already formatted" message for unchanged files with --verbose',
+        () async {
       final testFile = File(path.join(tempDir.path, 'test.blade.php'));
       testFile.writeAsStringSync('<div>{{ \$user }}</div>\n');
 
@@ -533,7 +535,8 @@ void main() {
   group('CLI - Format Command - Error Handling', () {
     test('reports parse errors with line and column numbers', () async {
       final testFile = File(path.join(tempDir.path, 'test.blade.php'));
-      testFile.writeAsStringSync('@if(\$condition)\n<p>Test</p>'); // Missing @endif
+      testFile
+          .writeAsStringSync('@if(\$condition)\n<p>Test</p>'); // Missing @endif
 
       final result = await Process.run(
         'dart',

@@ -11,7 +11,8 @@ void main() {
     });
 
     test('Laravel 4 Master Layout with @section...@show', () {
-      final file = File('test/fixtures/legacy/laravel4-master-layout.blade.php');
+      final file =
+          File('test/fixtures/legacy/laravel4-master-layout.blade.php');
       final template = file.readAsStringSync();
 
       final result = parser.parse(template);
@@ -29,7 +30,8 @@ void main() {
         expect(
           section.closedBy,
           equals('show'),
-          reason: 'Laravel 4 sections should use @show to define default content',
+          reason:
+              'Laravel 4 sections should use @show to define default content',
         );
       }
 
@@ -83,13 +85,14 @@ void main() {
       final forms = htmlElements.where((e) => e.tagName == 'form');
       expect(forms.length, equals(1));
 
-      final inputs =
-          htmlElements.where((e) => e.tagName == 'input').toList();
-      expect(inputs.length, greaterThan(2), reason: 'Should have multiple input fields');
+      final inputs = htmlElements.where((e) => e.tagName == 'input').toList();
+      expect(inputs.length, greaterThan(2),
+          reason: 'Should have multiple input fields');
     });
 
     test('Laravel 5.0 Auth Register Template', () {
-      final file = File('test/fixtures/legacy/laravel5-auth-register.blade.php');
+      final file =
+          File('test/fixtures/legacy/laravel5-auth-register.blade.php');
       final template = file.readAsStringSync();
 
       final result = parser.parse(template);
@@ -111,12 +114,14 @@ void main() {
     });
 
     test('Section with @overwrite (deprecated Laravel 4.x/5.x)', () {
-      final file = File('test/fixtures/legacy/section-with-overwrite.blade.php');
+      final file =
+          File('test/fixtures/legacy/section-with-overwrite.blade.php');
       final template = file.readAsStringSync();
 
       final result = parser.parse(template);
 
-      expect(result.errors, isEmpty, reason: 'Should parse legacy @overwrite without errors');
+      expect(result.errors, isEmpty,
+          reason: 'Should parse legacy @overwrite without errors');
 
       // Find all sections
       final sections = _findAllDirectives(result.ast!, 'section');
@@ -137,7 +142,8 @@ void main() {
       expect(showSection.expression, contains('sidebar'));
 
       // Find sections closed with @endsection
-      final endsectionSections = sections.where((s) => s.closedBy == 'endsection');
+      final endsectionSections =
+          sections.where((s) => s.closedBy == 'endsection');
       expect(endsectionSections.length, equals(2)); // title and content
 
       // Verify all three closing tag types are represented
@@ -206,20 +212,25 @@ void main() {
       expect(ifNode.closedBy, isNull, reason: '@if should not have closedBy');
 
       // Test @foreach/@endforeach
-      final foreachResult = parser.parse("@foreach(\$items as \$item)Item@endforeach");
-      final foreachNode = _findAllDirectives(foreachResult.ast!, 'foreach').first;
-      expect(foreachNode.closedBy, isNull, reason: '@foreach should not have closedBy');
+      final foreachResult =
+          parser.parse("@foreach(\$items as \$item)Item@endforeach");
+      final foreachNode =
+          _findAllDirectives(foreachResult.ast!, 'foreach').first;
+      expect(foreachNode.closedBy, isNull,
+          reason: '@foreach should not have closedBy');
 
       // Test @unless/@endunless
       final unlessResult = parser.parse("@unless(\$hide)Show@endunless");
       final unlessNode = _findAllDirectives(unlessResult.ast!, 'unless').first;
-      expect(unlessNode.closedBy, isNull, reason: '@unless should not have closedBy');
+      expect(unlessNode.closedBy, isNull,
+          reason: '@unless should not have closedBy');
     });
 
     test('Unclosed section error message mentions all closing options', () {
       final result = parser.parse("@section('test')Content");
 
-      expect(result.errors, isNotEmpty, reason: 'Should have error for unclosed section');
+      expect(result.errors, isNotEmpty,
+          reason: 'Should have error for unclosed section');
 
       final error = result.errors.first;
       expect(error.message, contains('Unclosed @section directive'));

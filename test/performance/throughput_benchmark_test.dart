@@ -232,8 +232,8 @@ void main() {
 
       BenchmarkFormatter.printResult(
         label: 'Throughput',
-        metric:
-            BenchmarkFormatter.formatThroughput(componentsPerSec, 'components/sec'),
+        metric: BenchmarkFormatter.formatThroughput(
+            componentsPerSec, 'components/sec'),
         context: 'Average parse time: ${BenchmarkFormatter.formatTime(avgMs)}',
       );
 

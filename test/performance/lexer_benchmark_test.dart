@@ -29,7 +29,8 @@ void main() {
       BenchmarkFormatter.printResult(
         label: 'Pure text throughput',
         metric: BenchmarkFormatter.formatThroughput(charsPerSec, 'chars/sec'),
-        context: 'Total: ${totalChars / 1000000}M chars in ${seconds.toStringAsFixed(3)}s',
+        context:
+            'Total: ${totalChars / 1000000}M chars in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 1M chars/sec
@@ -79,8 +80,10 @@ void main() {
 
       BenchmarkFormatter.printResult(
         label: 'Directive-heavy throughput',
-        metric: BenchmarkFormatter.formatThroughput(directivesPerSec, 'directives/sec'),
-        context: 'Total: $directiveCount directives processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+        metric: BenchmarkFormatter.formatThroughput(
+            directivesPerSec, 'directives/sec'),
+        context:
+            'Total: $directiveCount directives processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 5K directives/sec
@@ -133,8 +136,10 @@ void main() {
 
       BenchmarkFormatter.printResult(
         label: 'Attribute-heavy HTML',
-        metric: BenchmarkFormatter.formatThroughput(elementsPerSec, 'elements/sec'),
-        context: 'Total: $elementCount elements (10 attrs each) processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+        metric:
+            BenchmarkFormatter.formatThroughput(elementsPerSec, 'elements/sec'),
+        context:
+            'Total: $elementCount elements (10 attrs each) processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 5K elements/sec
@@ -175,8 +180,10 @@ void main() {
 
       BenchmarkFormatter.printResult(
         label: 'Escape sequences',
-        metric: BenchmarkFormatter.formatThroughput(escapesPerSec, 'escapes/sec'),
-        context: 'Total: $escapeCount escapes processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+        metric:
+            BenchmarkFormatter.formatThroughput(escapesPerSec, 'escapes/sec'),
+        context:
+            'Total: $escapeCount escapes processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 20K escapes/sec
@@ -297,7 +304,8 @@ void main() {
       BenchmarkFormatter.printResult(
         label: 'Mixed realistic content',
         metric: '${mbPerSec.toStringAsFixed(2)} MB/sec',
-        context: 'Template size: ${(template.length / 1024).toStringAsFixed(2)}KB, processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+        context:
+            'Template size: ${(template.length / 1024).toStringAsFixed(2)}KB, processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 1MB/sec
@@ -343,7 +351,8 @@ void main() {
       BenchmarkFormatter.printResult(
         label: 'Echo statements',
         metric: BenchmarkFormatter.formatThroughput(echosPerSec, 'echos/sec'),
-        context: 'Total: $echoCount echo statements processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+        context:
+            'Total: $echoCount echo statements processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 5K echos/sec
@@ -395,8 +404,10 @@ void main() {
 
       BenchmarkFormatter.printResult(
         label: 'Component tags',
-        metric: BenchmarkFormatter.formatThroughput(componentsPerSec, 'components/sec'),
-        context: 'Total: $componentCount component tags processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+        metric: BenchmarkFormatter.formatThroughput(
+            componentsPerSec, 'components/sec'),
+        context:
+            'Total: $componentCount component tags processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 5K components/sec

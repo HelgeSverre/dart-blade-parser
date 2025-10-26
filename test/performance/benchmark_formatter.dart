@@ -20,7 +20,8 @@ class BenchmarkFormatter {
   }
 
   /// Print a metric with label and value
-  static void printMetric(String label, String value, {bool highlight = false}) {
+  static void printMetric(String label, String value,
+      {bool highlight = false}) {
     final color = highlight ? _green : _blue;
     final prefix = highlight ? '→' : '•';
     print('$color$prefix $_bold$label:$_reset $color$value$_reset');
