@@ -1,12 +1,13 @@
 # Blade Parser
 
-A pure Dart parser for Laravel Blade templates that tokenizes, parses, and produces a traversable AST supporting complete Blade directive syntax, Alpine.js attributes, Livewire attributes, echo statements, and components.
+A pure Dart parser for Laravel Blade templates that tokenizes, parses, and produces a traversable AST supporting
+complete Blade directive syntax, Alpine.js attributes, Livewire attributes, echo statements, and components.
 
 ## Features
 
 - ✅ **Complete Blade Syntax**: 75+ directives (@if, @foreach, @section, @component, etc.)
 - ✅ **Component Support**: Full `<x-component>` tag parsing with slots and attributes
-- ✅ **Alpine.js Integration**: Parse x-data, x-show, @click, :bind and other Alpine.js attributes
+- ✅ **Alpine.js Integration**: Parse x-data, x-show, @click, :bind and other Alpine.js attribute
 - ✅ **Livewire Support**: Parse wire:click, wire:model with modifiers
 - ✅ **Error Recovery**: Continue parsing after errors with descriptive messages
 - ✅ **Multiple Error Reporting**: Find all syntax errors in one pass
@@ -24,7 +25,8 @@ dependencies:
 ```
 
 Then run:
-```bash
+
+```shell
 dart pub get
 ```
 
@@ -138,15 +140,42 @@ void main() {
 
 Parse Blade templates from the command line:
 
-```bash
+```shell
 # Parse file to JSON
-$ dart run blade_parser --json template.blade.php > ast.json
+dart run blade_parser --json template.blade.php > ast.json
 
 # Parse file to human-readable tree
-$ dart run blade_parser --tree template.blade.php
+dart run blade_parser --tree template.blade.php
 
 # Parse from stdin
-$ cat template.blade.php | dart run blade_parser --stdin --json
+cat template.blade.php | dart run blade_parser --stdin --json
+```
+
+### Exploring Test Fixtures
+
+View the AST of large test fixtures to understand complex template structures:
+
+```shell
+# View large template as tree
+dart run blade_parser test/fixtures/valid/large_template.blade.php
+
+# Export large template to JSON
+dart run blade_parser --json test/fixtures/valid/large_template.blade.php > large.json
+
+# View Alpine.js fixture
+dart run blade_parser test/fixtures/alpine/02-faq.blade.php
+
+# Export Alpine.js fixture to JSON
+dart run blade_parser --json test/fixtures/alpine/02-faq.blade.php > faq.json
+
+# View all components in a fixture
+dart run blade_parser test/fixtures/valid/components.blade.php
+
+# View nested directives
+dart run blade_parser test/fixtures/valid/nested_directives.blade.php
+
+# Pretty-print any fixture as JSON with jq (if installed)
+dart run blade_parser --json test/fixtures/valid/large_template.blade.php | jq
 ```
 
 ## Performance
@@ -159,6 +188,7 @@ $ cat template.blade.php | dart run blade_parser --stdin --json
 ## Platform Support
 
 Works on all Dart platforms:
+
 - Flutter (iOS, Android, Web, Desktop)
 - Dart CLI
 - Dart Web (dart2js)
@@ -172,7 +202,7 @@ Works on all Dart platforms:
 
 ## Development
 
-```bash
+```shell
 # Run tests
 dart test
 
@@ -189,6 +219,7 @@ dart doc
 ## Contributing
 
 Contributions are welcome! Please ensure:
+
 - All tests pass
 - Code follows Dart style guidelines
 - New features include tests

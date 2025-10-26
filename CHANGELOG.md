@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-10-10
 
 ### Added
+
 - **Code Coverage Infrastructure:** Added comprehensive code coverage setup using `just` commands
   - `just coverage`: Run tests with coverage collection
   - `just coverage-html`: Generate interactive HTML coverage reports
@@ -23,18 +24,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Justfile Commands:** Added pre-publish, quick-check, lint-count, docs, and other developer workflow commands
 
 ### Changed
+
 - **Analysis Configuration:** Restructured linting to exclude development directories (tool/, bin/, example/)
 - **Code Quality:** Reduced lint warnings from 473 to manageable levels with appropriate directory-specific exemptions
 - Build system improvements with just coverage commands
 - Enhanced development workflow with coverage tooling and linting infrastructure
 
 ### Fixed
+
 - **Publishing Issues:** Resolved all `dart pub publish` validation warnings
 - **Directory Exclusions:** Properly excluded tool/, specs/, archive/, and coverage/ from package distribution
 - **CLI Linting:** Added appropriate exemptions for print statements in CLI tools and development utilities
 - **Component Validation Test:** Adjusted error position expectation to match actual behavior
 
 ### Removed
+
 - **Streaming Parser:** Removed non-functional streaming parser implementation (was buffering entire input, not truly incremental)
   - Removed `lib/src/streaming/streaming_parser.dart`
   - Removed `test/unit/streaming/` test directory
@@ -45,15 +49,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.1] - 2025-10-10
 
 ### Fixed
+
 - **Empty tag name validation:** Lexer now properly detects and reports empty HTML tags (`<>` and `</>`) as errors
 - **Token fragmentation:** Refactored `_lexText()` to use `StringBuffer`, eliminating fragmented text tokens from `@@` escapes
 - **Unquoted URL attributes:** Fixed parsing of URLs with colons in unquoted attribute values (e.g., `href=https://example.com`)
 
 ### Changed
+
 - Improved performance with StringBuffer-based text lexing
 - Enhanced error reporting for malformed HTML
 
 ### Code Quality
+
 - Removed 4 unused variables from core library
 - Removed 1 unused method from lexer
 - Fixed 7 unnecessary null assertions in tests
@@ -62,12 +69,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced linter warnings from 577 to ~513
 
 ### Tests
+
 - Test suite: 530 tests passing
 - 100% pass rate (all tests passing after adjustments)
 
 ## [1.0.0] - 2025-10-05
 
 ### Added
+
 - **Core Parser Implementation**
   - Complete Blade template tokenization with state machine lexer
   - Recursive descent parser with error recovery
@@ -138,27 +147,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Research documentation for implementation decisions
 
 ### Implementation Status
+
 - ✅ 67/78 planned tasks completed
 - ✅ All core functionality working
 - ✅ All contract and integration tests passing
 - ⚠️ Advanced features (Pratt parser, HTML parsing) have basic implementations
 
 ### Known Limitations
+
 - Expression parsing uses basic tokenization (not full Pratt parser)
 - HTML element parsing is minimal (treats as text nodes)
 - Component attribute parsing is basic (no Alpine.js/Livewire in components yet)
 - Legacy echo {{{ }}} tokenization not fully implemented
 
 ### Breaking Changes
+
 None - initial release
 
 ### Performance
+
 - Lexer: >10,000 tokens/sec
 - Parser: >1,000 lines/sec on typical templates
 - Memory: <100MB for 5,000 line templates
 - Nesting: <10% slowdown at 20 levels deep
 
 ### Dependencies
+
 - Dart SDK: >=3.0.0 <4.0.0
 - test: ^1.24.0 (dev dependency)
 - lints: ^2.1.0 (dev dependency)
@@ -166,6 +180,7 @@ None - initial release
 ## [Unreleased]
 
 ### Planned
+
 - Full Pratt parser implementation for PHP expressions
 - Complete HTML element parsing with Alpine.js/Livewire attributes
 - Additional directive support (@can, @cannot, @php, @verbatim improvements)
@@ -177,6 +192,7 @@ None - initial release
 ---
 
 **Legend**:
+
 - ✅ Implemented and tested
 - ⚠️ Basic implementation (works but not optimal)
 - 🚧 In progress
