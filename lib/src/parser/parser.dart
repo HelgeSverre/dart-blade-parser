@@ -181,8 +181,8 @@ class BladeParser {
       case TokenType.directiveDd:
       case TokenType.directiveDump:
       case TokenType.directiveParent:
-      case TokenType.directiveShow:
-      case TokenType.directiveOverwrite:
+      // Note: directiveShow and directiveOverwrite are section closing tags only
+      // They are handled in _parseSection() and should not be parsed as standalone
       case TokenType.directiveStack:
       case TokenType.directiveHasSection:
       case TokenType.directiveSectionMissing:
@@ -759,11 +759,12 @@ class BladeParser {
         const genericClosing = '</x-slot'; // Generic closing is always valid
 
         // Accept either the specific closing tag or the generic </x-slot>
-        if (!closingToken.value.startsWith(expectedClosing) &&
-            !closingToken.value.startsWith(genericClosing)) {
+        if (closingToken.value != expectedClosing &&
+            closingToken.value != genericClosing) {
           _errors.add(
             ParseError(
-              message: 'Mismatched slot tags',
+              message:
+                  'Mismatched slot tags: expected $expectedClosing but got ${closingToken.value}',
               position: closingToken.startPosition,
             ),
           );
@@ -994,28 +995,39 @@ class BladeParser {
         children: [],
       );
     } else {
-      // Block syntax - requires @endsection or @show
+      // Block syntax - requires @endsection, @show, or @overwrite (legacy)
       final children = <AstNode>[];
 
-      while (!_checkAny(
-            [TokenType.directiveEndsection, TokenType.directiveShow],
-          ) &&
+      while (!_checkAny([
+            TokenType.directiveEndsection,
+            TokenType.directiveShow,
+            TokenType.directiveOverwrite, // Legacy Laravel 4.x/5.x support
+          ]) &&
           !_check(TokenType.eof)) {
         final node = _parseNode();
         if (node != null) children.add(node);
       }
 
-      if (!_checkAny(
-        [TokenType.directiveEndsection, TokenType.directiveShow],
-      )) {
+      String? closedBy;
+      if (!_checkAny([
+        TokenType.directiveEndsection,
+        TokenType.directiveShow,
+        TokenType.directiveOverwrite,
+      ])) {
         _errors.add(
           ParseError(
             message: 'Unclosed @section directive',
             position: startToken.startPosition,
-            hint: 'Add @endsection or @show to close the block',
+            hint:
+                'Add @endsection, @show, or @overwrite (deprecated) to close the block',
           ),
         );
       } else {
+        // Capture which closing tag was used (strip @ prefix)
+        final closingToken = _peek();
+        closedBy = closingToken.value.startsWith('@')
+            ? closingToken.value.substring(1)
+            : closingToken.value;
         _advance();
       }
 
@@ -1025,6 +1037,7 @@ class BladeParser {
         name: 'section',
         expression: expression,
         children: children,
+        closedBy: closedBy,
       );
     }
   }
