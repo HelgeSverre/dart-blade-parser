@@ -43,16 +43,37 @@ git commit -m "Deploy playground"
 git push
 ```
 
-## Quick Deploy with Vercel
+## Deploying to Vercel
+
+### Option 1: Vercel CLI (Recommended)
 
 ```bash
-# Install Vercel CLI
+# Install Vercel CLI (if not already installed)
 npm i -g vercel
 
-# Deploy from build/web directory
-cd build/web
+# From the playground directory (tool/playground)
 vercel --prod
 ```
+
+The `vercel.json` configuration handles everything automatically:
+- Installs Flutter dependencies
+- Builds the web app
+- Configures routing for SPA
+- Sets up caching for optimal performance
+
+### Option 2: Vercel Dashboard
+
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) and import your repository
+3. Set the root directory to `tool/playground`
+4. Vercel will auto-detect the configuration from `vercel.json`
+5. Deploy!
+
+### Option 3: Deploy Button
+
+Add this to your main README to enable one-click deployment:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/dart-blade-parser&project-name=blade-playground&repository-name=blade-playground&root-directory=tool/playground)
 
 ## Development Tips
 

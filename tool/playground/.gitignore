@@ -1,0 +1,19 @@
+# Build outputs
+build/
+.dart_tool/
+
+# Flutter/Pub
+.packages
+pubspec.lock
+
+# Vercel
+.vercel
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db

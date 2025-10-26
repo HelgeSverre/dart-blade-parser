@@ -1,0 +1,18 @@
+# Dart/Flutter files
+.dart_tool/
+.packages
+pubspec.lock
+
+# Build artifacts (will be rebuilt by Vercel)
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
