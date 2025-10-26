@@ -25,8 +25,12 @@ void main(List<String> arguments) async {
     ..addFlag('json', help: 'Output AST as JSON')
     ..addFlag('tree', help: 'Output AST as tree (default)', defaultsTo: true)
     ..addFlag('stdin', help: 'Read from stdin')
-    ..addFlag('help',
-        abbr: 'h', help: 'Show help for parse command', negatable: false);
+    ..addFlag(
+      'help',
+      abbr: 'h',
+      help: 'Show help for parse command',
+      negatable: false,
+    );
 
   // Add format subcommand
   final formatCommand = argParser.addCommand('format')
@@ -68,8 +72,12 @@ void main(List<String> arguments) async {
       negatable: false,
     )
     ..addFlag('verbose', abbr: 'v', help: 'Verbose output')
-    ..addFlag('help',
-        abbr: 'h', help: 'Show help for format command', negatable: false);
+    ..addFlag(
+      'help',
+      abbr: 'h',
+      help: 'Show help for format command',
+      negatable: false,
+    );
 
   try {
     // Handle shell completion
@@ -346,7 +354,8 @@ Future<void> _handleFormatCommand(ArgResults command) async {
       if (checkMode) {
         print('  Needs formatting: $needsFormatting');
         print(
-            '  Already formatted: ${files.length - needsFormatting - errors}');
+          '  Already formatted: ${files.length - needsFormatting - errors}',
+        );
       } else {
         print('  Formatted: $formatted');
         print('  Unchanged: ${files.length - formatted - errors}');
@@ -428,7 +437,8 @@ Future<FormatFileResult> _formatFile(
       stderr.writeln('${file.path}: Parse errors:');
       for (final error in result.errors) {
         stderr.writeln(
-            '  ${error.position.line}:${error.position.column} - ${error.message}');
+          '  ${error.position.line}:${error.position.column} - ${error.message}',
+        );
       }
       return FormatFileResult.error;
     }
@@ -481,7 +491,8 @@ Future<void> _formatStdin(BladeFormatter formatter) async {
     stderr.writeln('Parse errors:');
     for (final error in e.parseErrors) {
       stderr.writeln(
-          '  ${error.position.line}:${error.position.column} - ${error.message}');
+        '  ${error.position.line}:${error.position.column} - ${error.message}',
+      );
     }
     exit(1);
   } catch (e) {

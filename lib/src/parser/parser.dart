@@ -998,14 +998,16 @@ class BladeParser {
       final children = <AstNode>[];
 
       while (!_checkAny(
-              [TokenType.directiveEndsection, TokenType.directiveShow]) &&
+            [TokenType.directiveEndsection, TokenType.directiveShow],
+          ) &&
           !_check(TokenType.eof)) {
         final node = _parseNode();
         if (node != null) children.add(node);
       }
 
       if (!_checkAny(
-          [TokenType.directiveEndsection, TokenType.directiveShow])) {
+        [TokenType.directiveEndsection, TokenType.directiveShow],
+      )) {
         _errors.add(
           ParseError(
             message: 'Unclosed @section directive',
