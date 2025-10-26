@@ -7,6 +7,9 @@ build/
 *.js.deps
 *.js.map
 
+# Compiled binaries (use build/ folder instead)
+blade-parser
+
 # IDE
 .idea/
 .vscode/
@@ -15,7 +18,7 @@ build/
 *~
 
 # Test reports
-test/acid/reports/*.html
+tool/acid/reports/*.html
 *.html
 
 # Local settings
@@ -28,3 +31,11 @@ Thumbs.db
 # Coverage
 coverage/
 *.lcov
+
+# Archived Documentation (historical, not actively maintained)
+archive/
+
+# Feature Specifications (excluded from package)
+specs/
+
+doc/

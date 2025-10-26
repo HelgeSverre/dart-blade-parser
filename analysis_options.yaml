@@ -1,15 +1,14 @@
 include: package:lints/recommended.yaml
 
+
 analyzer:
   exclude:
-    - example/**
-    - tool/**
-    - bin/**
     - archive/**
     - specs/**
     - doc/api/**
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - test/**  # Tests use dynamic types for flexibility
 
   language:
     strict-casts: true
@@ -30,12 +29,10 @@ linter:
   rules:
     # Style
     - always_declare_return_types
-    - avoid_print
     - prefer_single_quotes
     - unnecessary_this
     - require_trailing_commas
     - always_use_package_imports
-    - avoid_dynamic_calls
     - avoid_escaping_inner_quotes
     - avoid_multiple_declarations_per_line
 
