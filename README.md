@@ -27,47 +27,43 @@ dart pub get
 
 ### CLI Commands
 
-Parse and format Blade templates from the command line:
+Parse and format Blade templates from the command line using the unified `blade` CLI:
 
 ```shell
-# Parse file to JSON (full AST structure)
-dart run blade_parser --json template.blade.php
+# Parse commands
+dart run blade parse template.blade.php                        # Parse to tree (default)
+dart run blade parse template.blade.php --json                 # Parse to JSON (full AST)
+cat template.blade.php | dart run blade parse --stdin          # Parse from stdin
+echo "@if(\$user) Hello @endif" | dart run blade parse --stdin
 
-# Parse to tree (default, human-readable)
-dart run blade_parser template.blade.php
-dart run blade_parser --tree template.blade.php
+# Format commands
+dart run blade format template.blade.php                       # Print formatted to stdout
+dart run blade format templates/ --write                       # Format all files in directory
+dart run blade format "templates/**/*.blade.php" --write       # Format with glob pattern
+dart run blade format templates/ --check                       # Check formatting (CI mode)
+cat template.blade.php | dart run blade format --stdin         # Format from stdin
 
-# Parse from stdin (useful in pipes)
-cat template.blade.php | dart run blade_parser --stdin
-echo "@if(\$user) Hello @endif" | dart run blade_parser --stdin
-
-# Format templates with blade_formatter CLI
-dart run blade_formatter template.blade.php                    # Print to stdout
-dart run blade_formatter templates/ --write                     # Format all files in directory
-dart run blade_formatter "templates/**/*.blade.php" --write     # Format with glob pattern
-dart run blade_formatter templates/ --check                     # Check formatting (CI mode)
-cat template.blade.php | dart run blade_formatter --stdin      # Format from stdin
-
-# Format with options
-dart run blade_formatter template.blade.php --indent-size 2 --indent-style tabs
-dart run blade_formatter templates/ --config .blade-format.json --write
+# Format with custom options
+dart run blade format template.blade.php --indent-size 2 --indent-style tabs
+dart run blade format templates/ --config .blade.json --write
 
 # Show help
-dart run blade_parser --help
-dart run blade_formatter --help
+dart run blade --help
+dart run blade parse --help
+dart run blade format --help
 ```
 
-**Parser Output Formats:**
+**Parse Command Options:**
 
 - `--tree` (default): Human-readable tree structure with node types and positions
 - `--json`: Complete AST as JSON for programmatic processing
 - `--stdin`: Read from standard input instead of a file
 
-**Formatter Options:**
+**Format Command Options:**
 
 - `--write` or `-w`: Write formatted output back to files (default is stdout)
 - `--check` or `-c`: Check if files need formatting without modifying them (for CI/CD)
-- `--config <path>`: Load configuration from JSON file
+- `--config <path>`: Load configuration from JSON file (.blade.json)
 - `--indent-size <n>`: Number of spaces for indentation (default: 4)
 - `--indent-style <style>`: Use 'spaces' or 'tabs' (default: spaces)
 - `--quote-style <style>`: Quote style - 'single', 'double', or 'preserve' (default: preserve)
@@ -118,7 +114,7 @@ just bench
 # Measures throughput, memory usage, and nesting depth
 ```
 
-**Formatter & Template Formatting:**
+**Formatting:**
 
 ```shell
 # Format templates in a directory

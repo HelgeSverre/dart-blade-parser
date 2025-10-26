@@ -105,20 +105,20 @@ acid:
     @echo "🧪 Running acid tests..."
     @cd tool/acid && dart acid_test.dart --format=both --open
 
-# Format templates using blade_formatter CLI
+# Format templates using blade CLI
 format-templates PATH:
     @echo "🎨 Formatting Blade templates..."
-    dart run bin/blade_formatter.dart {{ PATH }} --write --verbose
+    dart run bin/blade.dart format {{ PATH }} --write --verbose
 
 # Check if templates need formatting (for CI)
 check-templates PATH:
     @echo "🔍 Checking Blade template formatting..."
-    dart run bin/blade_formatter.dart {{ PATH }} --check
+    dart run bin/blade.dart format {{ PATH }} --check
 
 # Format test fixtures (for testing the formatter)
 format-fixtures:
     @echo "🎨 Formatting test fixtures..."
-    dart run bin/blade_formatter.dart "test/fixtures/format/*.blade.php" --write --verbose
+    dart run bin/blade.dart format "test/fixtures/format/*.blade.php" --write --verbose
 
 # Reset test fixtures to their original messy state
 reset-fixtures:
@@ -130,8 +130,8 @@ reset-fixtures:
 show-format-diff:
     @echo "📊 Showing formatting changes..."
     @echo "\n=== 01-basic-messy.blade.php ==="
-    @dart run tool/format_file.dart test/fixtures/format/01-basic-messy.blade.php | diff -u test/fixtures/format/01-basic-messy.blade.php - || true
+    @dart run bin/blade.dart format test/fixtures/format/01-basic-messy.blade.php | diff -u test/fixtures/format/01-basic-messy.blade.php - || true
     @echo "\n=== 02-indentation-chaos.blade.php ==="
-    @dart run tool/format_file.dart test/fixtures/format/02-indentation-chaos.blade.php | diff -u test/fixtures/format/02-indentation-chaos.blade.php - || true
+    @dart run bin/blade.dart format test/fixtures/format/02-indentation-chaos.blade.php | diff -u test/fixtures/format/02-indentation-chaos.blade.php - || true
     @echo "\n=== 03-whitespace-hell.blade.php ==="
-    @dart run tool/format_file.dart test/fixtures/format/03-whitespace-hell.blade.php | diff -u test/fixtures/format/03-whitespace-hell.blade.php - || true
+    @dart run bin/blade.dart format test/fixtures/format/03-whitespace-hell.blade.php | diff -u test/fixtures/format/03-whitespace-hell.blade.php - || true

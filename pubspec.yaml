@@ -13,8 +13,7 @@ dependencies:
   path: ^1.9.0
 
 executables:
-  blade_parser:
-  blade_formatter:
+  blade:
 
 dev_dependencies:
   coverage: ^1.15.0

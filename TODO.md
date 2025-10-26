@@ -123,6 +123,15 @@ _(No medium priority issues at this time)_
   - ✅ Added to pubspec.yaml as executable
   - ✅ Justfile commands: `format-templates`, `check-templates`
   - ✅ Documentation in README.md with examples
+- ✅ **Unified CLI** (COMPLETED 2025-10-26)
+  - ✅ Consolidated `blade_parser` and `blade_formatter` into single `blade` CLI
+  - ✅ Subcommand structure: `blade parse` and `blade format`
+  - ✅ Created `bin/blade.dart` with ArgParser subcommand routing
+  - ✅ Removed old `bin/blade_parser.dart` and `bin/blade_formatter.dart`
+  - ✅ Updated `pubspec.yaml` to single `blade` executable
+  - ✅ Updated all documentation (README.md) with new command structure
+  - ✅ Updated justfile commands to use new CLI
+  - ✅ Ergonomic improvements: shorter command name, clear subcommands
 
 **Next Steps:**
 
