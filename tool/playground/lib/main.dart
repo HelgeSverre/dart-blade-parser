@@ -58,6 +58,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   );
 
   ParseResult? _result;
+  Duration? _parseDuration;
   String _selectedTab = 'json';
 
   final _parser = BladeParser();
@@ -70,8 +71,13 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   }
 
   void _parse() {
+    final stopwatch = Stopwatch()..start();
+    final result = _parser.parse(_controller.text);
+    stopwatch.stop();
+
     setState(() {
-      _result = _parser.parse(_controller.text);
+      _result = result;
+      _parseDuration = stopwatch.elapsed;
     });
   }
 
@@ -192,6 +198,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               _buildTabButton('Tree', 'tree'),
               _buildTabButton('Errors', 'errors'),
               const Spacer(),
+              if (_parseDuration != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _buildTimingChip(),
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: _buildStatusChip(),
@@ -234,6 +245,28 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       backgroundColor: hasErrors
           ? Colors.red.withOpacity(0.2)
           : Colors.green.withOpacity(0.2),
+    );
+  }
+
+  Widget _buildTimingChip() {
+    if (_parseDuration == null) {
+      return const SizedBox.shrink();
+    }
+
+    final milliseconds = _parseDuration!.inMicroseconds / 1000.0;
+    final formattedTime = milliseconds.toStringAsFixed(2);
+
+    return Chip(
+      avatar: const Icon(
+        Icons.speed,
+        size: 16,
+        color: Colors.blue,
+      ),
+      label: Text(
+        '${formattedTime}ms',
+        style: const TextStyle(fontSize: 12),
+      ),
+      backgroundColor: Colors.blue.withOpacity(0.2),
     );
   }
 
