@@ -756,7 +756,7 @@ class BladeParser {
         final expectedClosing = componentName.startsWith('slot:')
             ? '</x-slot:$slotName'
             : '</x-slot';
-        final genericClosing = '</x-slot'; // Generic closing is always valid
+        const genericClosing = '</x-slot'; // Generic closing is always valid
 
         // Accept either the specific closing tag or the generic </x-slot>
         if (!closingToken.value.startsWith(expectedClosing) &&
@@ -997,13 +997,15 @@ class BladeParser {
       // Block syntax - requires @endsection or @show
       final children = <AstNode>[];
 
-      while (!_checkAny([TokenType.directiveEndsection, TokenType.directiveShow]) &&
+      while (!_checkAny(
+              [TokenType.directiveEndsection, TokenType.directiveShow]) &&
           !_check(TokenType.eof)) {
         final node = _parseNode();
         if (node != null) children.add(node);
       }
 
-      if (!_checkAny([TokenType.directiveEndsection, TokenType.directiveShow])) {
+      if (!_checkAny(
+          [TokenType.directiveEndsection, TokenType.directiveShow])) {
         _errors.add(
           ParseError(
             message: 'Unclosed @section directive',
