@@ -1,19 +1,12 @@
 # Blade Parser
 
-A pure Dart parser for Laravel Blade templates that tokenizes, parses, and produces a traversable AST supporting
-complete Blade directive syntax, Alpine.js attributes, Livewire attributes, echo statements, and components.
+A pure Dart parser for Laravel Blade templates. Produces a typed AST with full support for Blade directives, components, Alpine.js, and Livewire attributes. Includes robust error recovery, JSON serialization, and an idempotent formatter.
 
-## Features
+## Overview
 
-- ✅ **Complete Blade Syntax**: 75+ directives (@if, @foreach, @section, @component, etc.)
-- ✅ **Component Support**: Full `<x-component>` tag parsing with slots and attributes
-- ✅ **Alpine.js Integration**: Parse x-data, x-show, @click, :bind and other Alpine.js attribute
-- ✅ **Livewire Support**: Parse wire:click, wire:model with modifiers
-- ✅ **Error Recovery**: Continue parsing after errors with descriptive messages
-- ✅ **Multiple Error Reporting**: Find all syntax errors in one pass
-- ✅ **JSON Serialization**: Export complete AST to JSON
-- ✅ **Pure Dart**: Zero external dependencies, works on all platforms
-- ✅ **CLI Tool**: Command-line interface for JSON/tree output
+This library tokenizes and parses Blade templates into a traversable abstract syntax tree. It handles the full complexity of modern Blade templates including nested directives, component slots, Alpine.js event handlers, and Livewire wire:model bindings.
+
+Unlike simple regex-based approaches, this parser uses an iterative state machine lexer and recursive descent parser that correctly handles context-aware parsing: emails vs directives, quoted attributes, raw text elements (`<script>`, `<style>`), and verbatim blocks.
 
 ## Installation
 
@@ -21,10 +14,10 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  blade_parser: ^1.0.0
+  blade_parser: ^1.1.0
 ```
 
-Then run:
+Then install:
 
 ```shell
 dart pub get
@@ -32,199 +25,115 @@ dart pub get
 
 ## Quick Start
 
-### Basic Parsing
+### CLI Commands
 
-```dart
-import 'package:blade_parser/blade_parser.dart';
-
-void main() {
-  final parser = BladeParser();
-  final result = parser.parse('''
-    <div>
-      @if(\$user->isAdmin())
-        <p>Welcome, admin!</p>
-      @else
-        <p>Welcome, {{ \$user->name }}!</p>
-      @endif
-    </div>
-  ''');
-
-  if (result.isSuccess) {
-    print('Parsed successfully!');
-    print('AST has ${result.ast!.children.length} top-level nodes');
-  } else {
-    for (final error in result.errors) {
-      print('Error at line ${error.position.line}: ${error.message}');
-    }
-  }
-}
-```
-
-### Traverse AST with Visitor Pattern
-
-```dart
-import 'package:blade_parser/blade_parser.dart';
-
-class DirectiveCounter extends RecursiveAstVisitor<void> {
-  int count = 0;
-
-  @override
-  void visitDirective(DirectiveNode node) {
-    count++;
-    print('Found @${node.name} at line ${node.startPosition.line}');
-    super.visitDirective(node);
-  }
-
-  @override
-  void defaultVisit(AstNode node) {}
-}
-
-void main() {
-  final parser = BladeParser();
-  final result = parser.parse('''
-    @foreach(\$users as \$user)
-      @if(\$user->active)
-        <p>{{ \$user->name }}</p>
-      @endif
-    @endforeach
-  ''');
-
-  final visitor = DirectiveCounter();
-  result.ast!.accept(visitor);
-  print('Total directives: ${visitor.count}');
-}
-```
-
-### Export AST to JSON
-
-```dart
-import 'dart:convert';
-import 'package:blade_parser/blade_parser.dart';
-
-void main() {
-  final parser = BladeParser();
-  final result = parser.parse('<x-alert type="success">Done!</x-alert>');
-
-  final json = result.ast!.toJson();
-  print(JsonEncoder.withIndent('  ').convert(json));
-}
-```
-
-### Error Handling
-
-```dart
-import 'package:blade_parser/blade_parser.dart';
-
-void main() {
-  final parser = BladeParser();
-  final result = parser.parse('''
-    @if(\$condition)
-      <p>Content</p>
-      <!-- Missing @endif -->
-  ''');
-
-  for (final error in result.errors) {
-    print('Error: ${error.message}');
-    print('Location: line ${error.position.line}, column ${error.position.column}');
-    if (error.hint != null) {
-      print('Hint: ${error.hint}');
-    }
-  }
-
-  // Partial AST still available for analysis
-  print('Partial AST has ${result.ast!.children.length} nodes');
-}
-```
-
-## CLI Usage
-
-Parse Blade templates from the command line:
+Parse and format Blade templates from the command line:
 
 ```shell
 # Parse file to JSON
-dart run blade_parser --json template.blade.php > ast.json
+dart run blade_parser --json template.blade.php
 
-# Parse file to human-readable tree
+# Parse to tree (default)
+dart run blade_parser template.blade.php
 dart run blade_parser --tree template.blade.php
 
 # Parse from stdin
-cat template.blade.php | dart run blade_parser --stdin --json
+cat template.blade.php | dart run blade_parser --stdin
+
+# Format a file (show output)
+dart run tool/format_file.dart template.blade.php
+
+# Format and write back to file
+dart run tool/format_file.dart template.blade.php --write
+
+# Show help
+dart run blade_parser --help
 ```
 
-### Exploring Test Fixtures
+### Development Commands
 
-View the AST of large test fixtures to understand complex template structures:
+Common `just` commands for development:
 
 ```shell
-# View large template as tree
-dart run blade_parser test/fixtures/valid/large_template.blade.php
+# Run all tests
+just test
 
-# Export large template to JSON
-dart run blade_parser --json test/fixtures/valid/large_template.blade.php > large.json
+# Run specific test file
+just test-file test/unit/parser/parser_test.dart
 
-# View Alpine.js fixture
-dart run blade_parser test/fixtures/alpine/02-faq.blade.php
+# Run tests matching pattern
+just test-name "directive"
 
-# Export Alpine.js fixture to JSON
-dart run blade_parser --json test/fixtures/alpine/02-faq.blade.php > faq.json
+# Generate coverage report
+just coverage
 
-# View all components in a fixture
-dart run blade_parser test/fixtures/valid/components.blade.php
+# Generate HTML coverage and open in browser
+just coverage-html
 
-# View nested directives
-dart run blade_parser test/fixtures/valid/nested_directives.blade.php
+# Lint code
+just lint
 
-# Pretty-print any fixture as JSON with jq (if installed)
-dart run blade_parser --json test/fixtures/valid/large_template.blade.php | jq
+# Format code and apply fixes
+just fix
+
+# Run all checks (lint + format + test)
+just check
+
+# Run benchmarks
+just bench
+
+# Format test fixtures (messy Blade files)
+just format-fixtures
+
+# Reset test fixtures to messy state
+just reset-fixtures
+
+# Show formatting changes without writing
+just show-format-diff
+
+# Generate API documentation
+just docs
+
+# Compile CLI to binary
+just compile
+
+# Cross-compile for multiple platforms
+just cross-compile
+
+# Run playground (Flutter web app)
+just playground
+
+# Run acid test suite (parse all fixtures)
+just acid
 ```
 
-## Performance
+See [justfile](justfile) for complete command reference.
 
-- **Throughput**: ≥1000 lines/sec on typical hardware
-- **Memory**: <100MB for files under 5000 lines
-- **Latency**: <10 seconds for 10,000 line files
-- **Nesting**: No degradation up to 20 levels deep
+## Features
 
-## Platform Support
+- 75+ Blade directives (@if, @foreach, @section, @component, @auth, @livewireStyles, etc.)
+- Blade components (`<x-alert>`) with named and default slots
+- Alpine.js attributes (x-data, x-show, @click, :bind) with modifier parsing
+- Livewire attributes (wire:click, wire:model.live) with full modifier support
+- Echo statements ({{ }}, {!! !!}, {{{ }}})
+- Multiple error reporting with positions and hints
+- Error recovery continues parsing after syntax errors
+- Visitor pattern for AST traversal
+- JSON serialization for interoperability
+- Zero external parsing dependencies
+- Idempotent formatter with configurable style
+- 110+ test fixtures (8,000+ lines) covering real-world and synthetic cases
 
-Works on all Dart platforms:
+## Use Cases
 
-- Flutter (iOS, Android, Web, Desktop)
-- Dart CLI
-- Dart Web (dart2js)
+**Formatter**: Standardize indentation, normalize spacing, tidy attribute quoting. The included formatter is idempotent and deterministic.
 
-## Documentation
+**Linter**: Build static analysis tools to enforce style rules, security policies (flag raw echoes, require `@csrf`), or best practices (prefer `@forelse`, limit nesting depth).
 
-- [API Documentation](https://pub.dev/documentation/blade_parser/latest/)
-- [Quickstart Guide](specs/001-create-a-laravel/quickstart.md)
-- [Data Model](specs/001-create-a-laravel/data-model.md)
-- [Parser API Contract](specs/001-create-a-laravel/contracts/parser-api.md)
+**Code Search & Refactoring**: Find and rename components, migrate directive patterns, or transform attributes with AST-safe operations.
 
-## Development
+**CI/CD Quality Gates**: Parse all templates in CI to catch syntax errors before deployment. Use format checking to enforce consistent code style.
 
-```shell
-# Run tests
-dart test
+**Documentation & Metrics**: Generate component usage catalogs, directive frequency reports, or include/extends dependency graphs.
 
-# Analyze code
-dart analyze
-
-# Format code
-dart format .
-
-# Generate documentation
-dart doc
-```
-
-## Contributing
-
-Contributions are welcome! Please ensure:
-
-- All tests pass
-- Code follows Dart style guidelines
-- New features include tests
-- Documentation is updated
-
-## License
-
-MIT License - see LICENSE file for details
+**IDE Integration**: Foundation for editor tooling like syntax highlighting, structure outline, go-to-definition, and on-save formatting.
