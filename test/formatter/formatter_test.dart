@@ -30,7 +30,8 @@ void main() {
       });
 
       test('formats nested directives', () {
-        const input = '@if(\$user)\n@if(\$user->isAdmin())\n<p>Admin</p>\n@endif\n@endif';
+        const input =
+            '@if(\$user)\n@if(\$user->isAdmin())\n<p>Admin</p>\n@endif\n@endif';
         const expected = '@if(\$user)\n'
             '    @if(\$user->isAdmin())\n'
             '        <p>Admin</p>\n'
@@ -58,7 +59,8 @@ void main() {
       });
 
       test('formats foreach loop', () {
-        const input = '@foreach(\$users as \$user)\n<p>{{\$user->name}}</p>\n@endforeach';
+        const input =
+            '@foreach(\$users as \$user)\n<p>{{\$user->name}}</p>\n@endforeach';
         const expected = '@foreach(\$users as \$user)\n'
             '    <p>{{ \$user->name }}</p>\n'
             '@endforeach\n';
@@ -68,7 +70,8 @@ void main() {
       });
 
       test('formats mixed HTML and Blade', () {
-        const input = '<div class="container">\n@if(\$user)\n<p>{{\$user->name}}</p>\n@endif\n</div>';
+        const input =
+            '<div class="container">\n@if(\$user)\n<p>{{\$user->name}}</p>\n@endif\n</div>';
         const expected = '<div class="container">\n'
             '    @if(\$user)\n'
             '        <p>{{ \$user->name }}</p>\n'
@@ -111,7 +114,8 @@ void main() {
       });
 
       test('handles deep nesting', () {
-        const input = '@if(\$a)\n@if(\$b)\n@if(\$c)\n<p>deep</p>\n@endif\n@endif\n@endif';
+        const input =
+            '@if(\$a)\n@if(\$b)\n@if(\$c)\n<p>deep</p>\n@endif\n@endif\n@endif';
         const expected = '@if(\$a)\n'
             '    @if(\$b)\n'
             '        @if(\$c)\n'
@@ -124,7 +128,6 @@ void main() {
         expect(result, expected);
       });
     });
-
 
     group('text handling', () {
       test('preserves text content', () {

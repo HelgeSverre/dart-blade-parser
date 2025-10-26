@@ -33,8 +33,7 @@ void main() {
       });
 
       test('nested directives', () {
-        expectIdempotent(
-            '@if(\$a)\n@if(\$b)\n<p>deep</p>\n@endif\n@endif');
+        expectIdempotent('@if(\$a)\n@if(\$b)\n<p>deep</p>\n@endif\n@endif');
       });
 
       test('component', () {
@@ -194,7 +193,6 @@ void main() {
         expect(formatted2, formatted1);
         expect(formatted1, contains('\t<p>test</p>'));
       });
-
     });
   });
 }
