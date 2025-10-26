@@ -301,8 +301,8 @@ class HtmlReporter {
     final passRateClass = coverage.passRate >= 90
         ? 'success'
         : coverage.passRate >= 70
-        ? 'warning'
-        : 'danger';
+            ? 'warning'
+            : 'danger';
 
     return '''
 <div class="summary">
@@ -373,20 +373,19 @@ class HtmlReporter {
     final categories = byCategory.keys.toList()
       ..sort((a, b) => a.displayName.compareTo(b.displayName));
 
-    final rows = categories
-        .map((category) {
-          final categoryResults = byCategory[category]!;
-          final passed = categoryResults.where((r) => r.passed).length;
-          final total = categoryResults.length;
-          final passRate = (passed / total) * 100;
+    final rows = categories.map((category) {
+      final categoryResults = byCategory[category]!;
+      final passed = categoryResults.where((r) => r.passed).length;
+      final total = categoryResults.length;
+      final passRate = (passed / total) * 100;
 
-          final rowClass = passRate == 100
-              ? 'success'
-              : passRate >= 50
+      final rowClass = passRate == 100
+          ? 'success'
+          : passRate >= 50
               ? 'warning'
               : 'danger';
 
-          return '''
+      return '''
 <tr class="$rowClass">
     <td><strong>${category.displayName}</strong></td>
     <td align="right">$total</td>
@@ -395,8 +394,7 @@ class HtmlReporter {
     <td align="right">${passRate.toStringAsFixed(1)}%</td>
 </tr>
 ''';
-        })
-        .join('\n');
+    }).join('\n');
 
     return '''
 <section>
@@ -423,8 +421,7 @@ class HtmlReporter {
     final tokenRows = coverage.tokensByUsage
         .take(20)
         .map(
-          (entry) =>
-              '''
+          (entry) => '''
 <tr>
     <td>${entry.key.name}</td>
     <td align="right"><strong>${entry.value}</strong></td>
@@ -436,8 +433,7 @@ class HtmlReporter {
     final directiveRows = coverage.directivesByUsage
         .take(20)
         .map(
-          (entry) =>
-              '''
+          (entry) => '''
 <tr>
     <td>@${entry.key}</td>
     <td align="right"><strong>${entry.value}</strong></td>
@@ -495,21 +491,20 @@ class HtmlReporter {
 ''';
     }
 
-    final failureCards = failures
-        .map((failure) {
-          final errorsList = failure.errors
-              .take(5)
-              .map(
-                (error) =>
-                    '<div class="error-list-item">${_escapeHtml(error.message)}</div>',
-              )
-              .join('\n');
+    final failureCards = failures.map((failure) {
+      final errorsList = failure.errors
+          .take(5)
+          .map(
+            (error) =>
+                '<div class="error-list-item">${_escapeHtml(error.message)}</div>',
+          )
+          .join('\n');
 
-          final moreErrors = failure.errors.length > 5
-              ? '<div class="error-list-item">... ${failure.errors.length - 5} more errors omitted</div>'
-              : '';
+      final moreErrors = failure.errors.length > 5
+          ? '<div class="error-list-item">... ${failure.errors.length - 5} more errors omitted</div>'
+          : '';
 
-          return '''
+      return '''
 <div class="failure-details">
     <div class="failure-title">[FAIL] ${_escapeHtml(failure.fixture.relativePath)}</div>
     ${failure.failureReason != null ? '<div class="failure-reason">${_escapeHtml(failure.failureReason!)}</div>' : ''}
@@ -522,8 +517,7 @@ class HtmlReporter {
     ''' : ''}
 </div>
 ''';
-        })
-        .join('\n');
+    }).join('\n');
 
     return '''
 <section>
@@ -534,12 +528,11 @@ class HtmlReporter {
   }
 
   String _buildDetailedResults(List<TestResult> results) {
-    final rows = results
-        .map((result) {
-          final status = result.passed ? 'PASS' : 'FAIL';
-          final rowClass = result.passed ? '' : 'danger';
+    final rows = results.map((result) {
+      final status = result.passed ? 'PASS' : 'FAIL';
+      final rowClass = result.passed ? '' : 'danger';
 
-          return '''
+      return '''
 <tr class="$rowClass">
     <td>${_escapeHtml(result.fixture.relativePath)}</td>
     <td>${result.fixture.category.displayName}</td>
@@ -550,8 +543,7 @@ class HtmlReporter {
     <td align="right">${_formatTime(result.totalTimeMs)}</td>
 </tr>
 ''';
-        })
-        .join('\n');
+    }).join('\n');
 
     return '''
 <section>

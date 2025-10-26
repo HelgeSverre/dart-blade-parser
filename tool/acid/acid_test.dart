@@ -1,38 +1,73 @@
 import 'dart:io';
-import 'utils/fixture_scanner.dart';
+
+import 'package:args/args.dart';
+
 import 'acid_runner.dart';
 import 'reporters/console_reporter.dart';
 import 'reporters/html_reporter.dart';
+import 'utils/fixture_scanner.dart';
 
 /// Main entry point for the Blade Parser Acid Test.
 ///
 /// Usage:
-///   dart test/acid/acid_test.dart [--format=console|html|both] [--output=path]
+///   dart tool/acid/acid_test.dart [options]
 ///
 /// Options:
-///   --format=console  Print colored console output (default)
-///   --format=html     Generate HTML report only
-///   --format=both     Generate both console and HTML output
-///   --output=path     Custom path for HTML report (default: test/acid/reports/acid_test_report_TIMESTAMP.html)
+///   -f, --format=<type>    Output format: console, html, or both (default: console)
+///   -o, --output=<path>    Custom path for HTML report
+///       --open             Open the HTML report automatically after generation
+///   -h, --help             Show this help message
 void main(List<String> args) async {
-  // Parse command-line arguments
-  var format = 'console';
-  String? outputPath;
-
-  for (final arg in args) {
-    if (arg.startsWith('--format=')) {
-      format = arg.substring('--format='.length);
-    } else if (arg.startsWith('--output=')) {
-      outputPath = arg.substring('--output='.length);
-    }
-  }
-
-  if (!['console', 'html', 'both'].contains(format)) {
-    print(
-      'Error: Invalid format "$format". Must be one of: console, html, both',
+  // Set up argument parser
+  final parser = ArgParser()
+    ..addOption(
+      'format',
+      abbr: 'f',
+      defaultsTo: 'console',
+      allowed: ['console', 'html', 'both'],
+      help: 'Output format',
+      allowedHelp: {
+        'console': 'Print colored console output',
+        'html': 'Generate HTML report only',
+        'both': 'Generate both console and HTML output',
+      },
+    )
+    ..addOption('output', abbr: 'o', help: 'Custom path for HTML report')
+    ..addFlag(
+      'open',
+      help: 'Open the HTML report automatically after generation',
+      defaultsTo: false,
+    )
+    ..addFlag(
+      'help',
+      abbr: 'h',
+      help: 'Show this help message',
+      negatable: false,
     );
+
+  // Parse arguments
+  ArgResults argResults;
+  try {
+    argResults = parser.parse(args);
+  } on FormatException catch (e) {
+    print('Error: ${e.message}\n');
+    print(parser.usage);
     exit(2);
   }
+
+  // Show help if requested
+  if (argResults.flag('help')) {
+    print('Blade Parser Acid Test\n');
+    print('Usage: dart tool/acid/acid_test.dart [options]\n');
+    print('Options:');
+    print(parser.usage);
+    exit(0);
+  }
+
+  // Extract parsed values
+  final format = argResults.option('format')!;
+  var outputPath = argResults.option('output');
+  final openReport = argResults.flag('open');
 
   // Determine fixtures path
   final scriptPath = Platform.script.toFilePath();
@@ -66,15 +101,13 @@ void main(List<String> args) async {
 
   if (format == 'html' || format == 'both') {
     // Determine output path
-    final timestamp = DateTime.now()
-        .toIso8601String()
-        .replaceAll(':', '-')
-        .split('.')[0];
+    final timestamp =
+        DateTime.now().toIso8601String().replaceAll(':', '-').split('.')[0];
     outputPath ??=
-        '$projectRoot/tools/acid/reports/acid_test_report_$timestamp.html';
+        '$projectRoot/tool/acid/reports/acid_test_report_$timestamp.html';
 
     // Ensure reports directory exists
-    final reportsDir = Directory('$projectRoot/tools/acid/reports');
+    final reportsDir = Directory('$projectRoot/tool/acid/reports');
     if (!reportsDir.existsSync()) {
       reportsDir.createSync(recursive: true);
     }
@@ -84,6 +117,17 @@ void main(List<String> args) async {
 
     print('📄 HTML report generated: $outputPath');
     print('');
+
+    if (openReport) {
+      // Open the report in the default browser
+      if (Platform.isWindows) {
+        Process.run('start', [outputPath], runInShell: true);
+      } else if (Platform.isMacOS) {
+        Process.run('open', [outputPath]);
+      } else if (Platform.isLinux) {
+        Process.run('xdg-open', [outputPath]);
+      }
+    }
   }
 
   // Exit with appropriate code

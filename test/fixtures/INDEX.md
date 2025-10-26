@@ -26,25 +26,31 @@ Complete catalog of all test fixtures for the dart-blade-parser project.
 ### By Category
 
 #### Small (1-20 lines)
+
 - `small/01-checkbox.blade.php` (1 line)
 - `small/02-footer.blade.php` (16 lines)
 
 #### Medium (20-50 lines)
+
 - `medium/01-tooltip.blade.php` (27 lines)
 - `medium/02-select-button.blade.php` (47 lines)
 
 #### Large (50+ lines)
+
 - `large/01-pagination.blade.php` (178 lines)
 
 #### Livewire Examples
+
 - `livewire/01-layout.blade.php` (68 lines)
 - `livewire/02-examples.blade.php` (55 lines)
 
 #### Alpine.js Examples
+
 - `alpine/01-billing.blade.php` (115 lines)
 - `alpine/02-faq.blade.php` (55 lines)
 
 #### Component Examples
+
 - `components/01-form.blade.php` (29 lines)
 - `components/02-billing.blade.php` (171 lines)
 
@@ -61,6 +67,7 @@ Complete catalog of all test fixtures for the dart-blade-parser project.
 ### By Category
 
 #### 1. Blade Directives (45 files, ~2,300 lines)
+
 **Location**: `synthetic/01-blade-directives/`
 
 - **Control Structures** (5 files) - @if, @unless, @switch, @isset, @empty
@@ -73,18 +80,21 @@ Complete catalog of all test fixtures for the dart-blade-parser project.
 - **Forms** (1 file) - @csrf, @method
 
 #### 2. Livewire (8 files, ~350 lines)
+
 **Location**: `synthetic/02-livewire/`
 
 - **Actions** (4 files) - wire:click, wire:submit, wire:keydown, modifiers
 - **Data Binding** (4 files) - wire:model with all modifiers
 
 #### 3. Alpine.js (8 files, ~450 lines)
+
 **Location**: `synthetic/03-alpine/`
 
 - **Data & Reactivity** (5 files) - x-data, x-init, x-effect, stores
 - **Events** (3 files) - x-on/@, modifiers, keyboard shortcuts
 
 #### 4. Combinations (23 files, ~2,900 lines)
+
 **Location**: `synthetic/04-combinations/`
 
 - **Level 1 - Simple** (10 files, 30-50 lines) - 2 features
@@ -93,6 +103,7 @@ Complete catalog of all test fixtures for the dart-blade-parser project.
 - **Level 4 - Comprehensive** (2 files, 150-400+ lines) - 10+ features
 
 #### 5. Edge Cases (6 files, ~350 lines)
+
 **Location**: `synthetic/05-edge-cases/`
 
 - **Nesting** (2 files) - Deep nesting, mixed directives
@@ -107,44 +118,44 @@ Complete catalog of all test fixtures for the dart-blade-parser project.
 
 ### Blade Directives Covered
 
-| Category | Directives | Test Files |
-|----------|-----------|------------|
-| **Control Structures** | @if, @elseif, @else, @endif, @unless, @endunless, @isset, @empty, @switch, @case, @default, @endswitch | 5 |
-| **Loops** | @foreach, @endforeach, @forelse, @empty, @endforelse, @for, @endfor, @while, @endwhile, @continue, @break | 6 |
-| **Inheritance** | @extends, @section, @endsection, @yield, @parent, @show | 3 |
-| **Includes** | @include, @includeIf, @includeWhen, @includeUnless, @includeFirst, @each | 4 |
-| **Stacks** | @push, @endpush, @prepend, @endprepend, @stack, @once | 2 |
-| **Components** | <x-component>, @props, @aware, slots, $attributes | 5 |
-| **Auth** | @auth, @guest, @can, @cannot, @canany | 2 |
-| **Forms** | @csrf, @method | 1 |
+| Category               | Directives                                                                                                | Test Files |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- | ---------- |
+| **Control Structures** | @if, @elseif, @else, @endif, @unless, @endunless, @isset, @empty, @switch, @case, @default, @endswitch    | 5          |
+| **Loops**              | @foreach, @endforeach, @forelse, @empty, @endforelse, @for, @endfor, @while, @endwhile, @continue, @break | 6          |
+| **Inheritance**        | @extends, @section, @endsection, @yield, @parent, @show                                                   | 3          |
+| **Includes**           | @include, @includeIf, @includeWhen, @includeUnless, @includeFirst, @each                                  | 4          |
+| **Stacks**             | @push, @endpush, @prepend, @endprepend, @stack, @once                                                     | 2          |
+| **Components**         | <x-component>, @props, @aware, slots, $attributes                                                         | 5          |
+| **Auth**               | @auth, @guest, @can, @cannot, @canany                                                                     | 2          |
+| **Forms**              | @csrf, @method                                                                                            | 1          |
 
 **Total Blade Coverage**: 40+ directives across 28 isolated tests + 23 combination tests
 
 ### Livewire Attributes Covered
 
-| Category | Attributes | Test Files |
-|----------|-----------|------------|
-| **Actions** | wire:click, wire:submit, wire:keydown, wire:keyup, event modifiers | 4 |
-| **Data Binding** | wire:model (.live, .blur, .debounce, .number, .boolean, .lazy, .defer) | 4 |
-| **Loading** | wire:loading, wire:target | 0* |
-| **Polling** | wire:poll | 0* |
-| **Special** | wire:init, wire:dirty, wire:offline, wire:confirm, wire:key, wire:navigate | 0* |
+| Category         | Attributes                                                                 | Test Files |
+| ---------------- | -------------------------------------------------------------------------- | ---------- |
+| **Actions**      | wire:click, wire:submit, wire:keydown, wire:keyup, event modifiers         | 4          |
+| **Data Binding** | wire:model (.live, .blur, .debounce, .number, .boolean, .lazy, .defer)     | 4          |
+| **Loading**      | wire:loading, wire:target                                                  | 0\*        |
+| **Polling**      | wire:poll                                                                  | 0\*        |
+| **Special**      | wire:init, wire:dirty, wire:offline, wire:confirm, wire:key, wire:navigate | 0\*        |
 
 **Total Livewire Coverage**: 15+ attributes across 8 tests (+ combination tests)
-_*Pending generation_
+_\*Pending generation_
 
 ### Alpine.js Directives Covered
 
-| Category | Directives | Test Files |
-|----------|-----------|------------|
-| **Data** | x-data, x-init, x-effect, Alpine.store() | 5 |
-| **Events** | x-on/@, modifiers (.prevent, .stop, .debounce, .throttle), keyboard | 3 |
-| **Rendering** | x-show, x-if, x-for, x-transition | 0* |
-| **Binding** | x-bind/:, x-model, x-modelable | 0* |
-| **Utilities** | x-ref, x-cloak, x-teleport, x-ignore | 0* |
+| Category      | Directives                                                          | Test Files |
+| ------------- | ------------------------------------------------------------------- | ---------- |
+| **Data**      | x-data, x-init, x-effect, Alpine.store()                            | 5          |
+| **Events**    | x-on/@, modifiers (.prevent, .stop, .debounce, .throttle), keyboard | 3          |
+| **Rendering** | x-show, x-if, x-for, x-transition                                   | 0\*        |
+| **Binding**   | x-bind/:, x-model, x-modelable                                      | 0\*        |
+| **Utilities** | x-ref, x-cloak, x-teleport, x-ignore                                | 0\*        |
 
 **Total Alpine Coverage**: 10+ directives across 8 tests (+ combination tests)
-_*Pending generation_
+_\*Pending generation_
 
 ---
 
@@ -212,11 +223,13 @@ for (final level in levels) {
 ## File Organization Principles
 
 ### Real-World Fixtures
+
 - **Organized by**: Size, feature set (Livewire, Alpine, Components)
 - **Purpose**: Integration testing, real-world patterns
 - **Naming**: Descriptive (e.g., `billing.blade.php`, `pagination.blade.php`)
 
 ### Synthetic Fixtures
+
 - **Organized by**: Feature category, complexity level
 - **Purpose**: Systematic testing, parser validation
 - **Naming**: Sequential (e.g., `01-if-basic.blade.php`, `02-data-table.blade.php`)
@@ -226,12 +239,14 @@ for (final level in levels) {
 ## Quality Metrics
 
 ### Real-World Files
+
 - ✅ From 6 production Laravel applications
 - ✅ Exclude vendor/node_modules files
 - ✅ Cover Blade, Livewire, Alpine.js, components
 - ✅ Size range: 1-178 lines
 
 ### Synthetic Files
+
 - ✅ Systematically generated with parallel agents
 - ✅ Non-trivial examples (realistic scenarios)
 - ✅ Progressive complexity (simple → comprehensive)
@@ -244,6 +259,7 @@ for (final level in levels) {
 ## Coverage Gaps (Future Work)
 
 ### Features Not Yet Tested
+
 - [ ] Alpine.js rendering (x-show, x-if, x-for, x-transition)
 - [ ] Alpine.js binding (x-bind variations, x-model)
 - [ ] Alpine.js utilities (x-ref, x-cloak, x-teleport)
@@ -254,6 +270,7 @@ for (final level in levels) {
 - [ ] HTML attribute directives (@class, @style, @checked, @selected, @disabled)
 
 ### Additional Edge Cases Needed
+
 - [ ] Unicode and emoji content
 - [ ] Different line endings (CRLF vs LF)
 - [ ] Very large files (5000+ lines)
@@ -265,15 +282,15 @@ for (final level in levels) {
 
 ## Statistics
 
-| Metric | Real-World | Synthetic | Total |
-|--------|-----------|-----------|-------|
-| **Files** | 12 | 73 | 85 |
-| **Lines** | ~762 | 6,568 | ~7,330 |
-| **Features Covered** | All major | 60+ isolated | 60+ |
-| **Complexity Levels** | Varied | 4 levels | All |
-| **Blade Directives** | Mixed | 40+ | 40+ |
-| **Livewire Attrs** | Mixed | 15+ | 15+ |
-| **Alpine Directives** | Mixed | 10+ | 10+ |
+| Metric                | Real-World | Synthetic    | Total  |
+| --------------------- | ---------- | ------------ | ------ |
+| **Files**             | 12         | 73           | 85     |
+| **Lines**             | ~762       | 6,568        | ~7,330 |
+| **Features Covered**  | All major  | 60+ isolated | 60+    |
+| **Complexity Levels** | Varied     | 4 levels     | All    |
+| **Blade Directives**  | Mixed      | 40+          | 40+    |
+| **Livewire Attrs**    | Mixed      | 15+          | 15+    |
+| **Alpine Directives** | Mixed      | 10+          | 10+    |
 
 ---
 

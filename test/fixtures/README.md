@@ -16,14 +16,14 @@ fixtures/
 
 ## File Statistics
 
-| Category    | Files | Size Range | Features |
-|-------------|-------|------------|----------|
-| small       | 2     | 1-16 lines | Basic directives, simple components |
-| medium      | 2     | 27-47 lines | Nested structures, slots |
-| large       | 1     | 178 lines | Complex pagination with multiple directives |
-| livewire    | 2     | 55-68 lines | wire:click, wire:model, wire:loading |
-| alpine      | 2     | 55-115 lines | x-data, x-show, @click, Alpine expressions |
-| components  | 2     | 29-171 lines | Blade components with attributes and slots |
+| Category   | Files | Size Range   | Features                                    |
+| ---------- | ----- | ------------ | ------------------------------------------- |
+| small      | 2     | 1-16 lines   | Basic directives, simple components         |
+| medium     | 2     | 27-47 lines  | Nested structures, slots                    |
+| large      | 1     | 178 lines    | Complex pagination with multiple directives |
+| livewire   | 2     | 55-68 lines  | wire:click, wire:model, wire:loading        |
+| alpine     | 2     | 55-115 lines | x-data, x-show, @click, Alpine expressions  |
+| components | 2     | 29-171 lines | Blade components with attributes and slots  |
 
 ## Coverage
 
@@ -41,6 +41,7 @@ These fixtures cover:
 ## Source Projects
 
 Files sourced from real Laravel applications:
+
 - chatflow
 - reflow
 - boatflow
@@ -63,6 +64,7 @@ These fixtures should be used for:
 ## Adding New Fixtures
 
 When adding fixtures, ensure:
+
 - No sensitive data (credentials, API keys, personal information)
 - Representative of real-world usage patterns
 - Diverse syntax coverage

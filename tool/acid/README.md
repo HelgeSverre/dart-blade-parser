@@ -5,6 +5,7 @@ A comprehensive test tool that parses all fixture files and reports the results.
 ## Purpose
 
 The Acid Test is a diagnostic tool (not a regular test suite) that:
+
 - Scans all Blade template fixtures in `test/fixtures/`
 - Attempts to parse each one
 - Reports successes, failures, and parsing statistics
@@ -36,6 +37,7 @@ dart tools/acid/acid_test.dart --format=html --output=reports/my_report.html
 ## Output
 
 The tool provides:
+
 - **Console Output**: Color-coded results showing which fixtures passed/failed
 - **HTML Report**: Detailed interactive report with:
   - Overall statistics

@@ -9,7 +9,6 @@ class ConsoleReporter {
   static const _green = '\x1B[32m';
   static const _red = '\x1B[31m';
   static const _yellow = '\x1B[33m';
-  static const _blue = '\x1B[34m';
   static const _gray = '\x1B[90m';
   static const _bold = '\x1B[1m';
   static const _cyan = '\x1B[36m';
@@ -44,8 +43,8 @@ class ConsoleReporter {
     final passRateColor = coverage.passRate >= 90
         ? _green
         : coverage.passRate >= 70
-        ? _yellow
-        : _red;
+            ? _yellow
+            : _red;
 
     print('$_bold📊 SUMMARY$_reset');
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -90,14 +89,14 @@ class ConsoleReporter {
       final statusIcon = passRate == 100
           ? '$_green✅$_reset'
           : passRate >= 50
-          ? '$_yellow⚠️$_reset'
-          : '$_red❌$_reset';
+              ? '$_yellow⚠️$_reset'
+              : '$_red❌$_reset';
 
       final rateColor = passRate == 100
           ? _green
           : passRate >= 50
-          ? _yellow
-          : _red;
+              ? _yellow
+              : _red;
 
       final categoryName = category.displayName.padRight(15);
 
@@ -116,14 +115,14 @@ class ConsoleReporter {
     final tokenColor = coverage.tokenCoveragePercent >= 50
         ? _green
         : coverage.tokenCoveragePercent >= 25
-        ? _yellow
-        : _red;
+            ? _yellow
+            : _red;
 
     final directiveColor = coverage.directiveCoveragePercent >= 50
         ? _green
         : coverage.directiveCoveragePercent >= 25
-        ? _yellow
-        : _red;
+            ? _yellow
+            : _red;
 
     print(
       '  Token Types:      ${coverage.tokenTypesCovered}/~200 tested ($tokenColor${coverage.tokenCoveragePercent.toStringAsFixed(1)}%$_reset)',

@@ -56,6 +56,7 @@ synthetic/
 ### 1. Blade Directives (45 files, ~2,300 lines)
 
 #### Control Structures (5 files)
+
 - `01-if-basic.blade.php` - @if/@elseif/@else with role-based content
 - `02-unless.blade.php` - @unless for auth and feature flags
 - `03-switch-case.blade.php` - @switch for user role rendering
@@ -63,6 +64,7 @@ synthetic/
 - `05-if-nested.blade.php` - Deep nesting (3-4 levels)
 
 #### Loops (6 files)
+
 - `01-foreach-basic.blade.php` - Product grid iteration
 - `02-foreach-loop-variable.blade.php` - $loop properties usage
 - `03-forelse.blade.php` - Collection with empty state
@@ -71,21 +73,25 @@ synthetic/
 - `06-loop-control.blade.php` - @continue/@break
 
 #### Template Inheritance (3 files)
+
 - `01-extends-sections.blade.php` - Layout inheritance
 - `02-yield-parent.blade.php` - @parent to extend sections
 - `03-section-show.blade.php` - Default overridable content
 
 #### Includes (4 files)
+
 - `01-include-basic.blade.php` - Partial inclusion with data
 - `02-include-if-when-unless.blade.php` - Conditional includes
 - `03-include-first.blade.php` - Fallback templates
 - `04-each.blade.php` - Collection rendering
 
 #### Stacks (2 files)
+
 - `01-push-prepend-stack.blade.php` - Asset management
 - `02-once.blade.php` - Duplicate prevention
 
 #### Components (5 files)
+
 - `01-component-basic.blade.php` - Basic component usage
 - `02-component-props.blade.php` - @props with defaults
 - `03-component-slots.blade.php` - Named slots
@@ -93,10 +99,12 @@ synthetic/
 - `05-dynamic-component.blade.php` - Runtime selection
 
 #### Auth (2 files)
+
 - `01-auth-guest.blade.php` - Authentication checks
 - `02-can-cannot.blade.php` - Authorization gates
 
 #### Forms (1 file)
+
 - `01-csrf-method.blade.php` - CSRF and method spoofing
 
 ---
@@ -104,12 +112,14 @@ synthetic/
 ### 2. Livewire (8 files, ~350 lines)
 
 #### Actions (4 files)
+
 - `01-wire-click.blade.php` - Click handlers with parameters
 - `02-wire-submit.blade.php` - Form submission
 - `03-wire-keydown.blade.php` - Keyboard shortcuts
 - `04-event-modifiers.blade.php` - .prevent, .stop, .debounce, .throttle
 
 #### Data Binding (4 files)
+
 - `01-wire-model-basic.blade.php` - Various input types
 - `02-wire-model-live.blade.php` - Real-time updates
 - `03-wire-model-debounce.blade.php` - Debounced search
@@ -120,6 +130,7 @@ synthetic/
 ### 3. Alpine.js (8 files, ~450 lines)
 
 #### Data & Reactivity (5 files)
+
 - `01-x-data-basic.blade.php` - Reactive properties
 - `02-x-init.blade.php` - Initialization hooks
 - `03-x-effect.blade.php` - Reactive watchers
@@ -127,6 +138,7 @@ synthetic/
 - `05-alpine-store.blade.php` - Global state
 
 #### Events (3 files)
+
 - `01-x-on-basic.blade.php` - Event handling
 - `02-x-on-modifiers.blade.php` - Event modifiers
 - `03-x-on-keyboard.blade.php` - Keyboard events
@@ -136,7 +148,9 @@ synthetic/
 ### 4. Combinations (23 files, ~2,900 lines)
 
 #### Level 1 - Simple (10 files, 30-50 lines each)
+
 Two features combined:
+
 - @if + {{ }} echo
 - @foreach + <x-component>
 - @if + wire:click
@@ -149,7 +163,9 @@ Two features combined:
 - @auth + x-bind
 
 #### Level 2 - Moderate (8 files, 50-80 lines each)
+
 3-4 features with realistic interaction:
+
 - @foreach + <x-card> + wire:key + wire:click
 - @if + x-data + wire:model.live + @error
 - @forelse + wire:loading + x-transition
@@ -160,13 +176,17 @@ Two features combined:
 - @switch + <x-component> + wire:model + x-show
 
 #### Level 3 - Complex (3 files, 80-120 lines each)
+
 5-7 features in complete page scenarios:
+
 - **Dashboard** - Real-time stats with polling and charts
 - **Data Table** - Sortable/filterable with bulk actions
 - **Modal Form** - Complex validation and file upload
 
 #### Level 4 - Comprehensive (2 files, 150-200+ lines)
+
 10+ features, production-quality pages:
+
 - **Admin Panel** - Full dashboard with auth, authorization, real-time updates (353 lines)
 - **E-commerce Checkout** - Multi-step flow with cart, payment, validation (413 lines)
 
@@ -175,14 +195,17 @@ Two features combined:
 ### 5. Edge Cases (6 files, ~350 lines)
 
 #### Nesting (2 files)
+
 - `01-deep-nesting-if.blade.php` - 10 levels of @if nesting
 - `02-mixed-nesting.blade.php` - Mixed directives 7 levels deep
 
 #### Malformed (2 files)
+
 - `01-unclosed-if.blade.php` - Missing @endif (valid: false)
 - `02-unclosed-foreach.blade.php` - Missing @endforeach (valid: false)
 
 #### Conflicts (2 files)
+
 - `01-alpine-blade-at-symbol.blade.php` - Alpine @ vs Blade @
 - `02-verbatim-blade-syntax.blade.php` - @verbatim block handling
 
@@ -209,6 +232,7 @@ Each test file includes YAML frontmatter:
 ## Usage Patterns
 
 ### For Parser Development
+
 ```dart
 // Load test file
 final testFile = File('test/fixtures/synthetic/01-blade-directives/control-structures/01-if-basic.blade.php');
@@ -221,6 +245,7 @@ expect(result.ast, isNotNull);
 ```
 
 ### For Benchmarking
+
 ```dart
 // Test parsing performance
 final files = Directory('test/fixtures/synthetic/04-combinations/level-4-comprehensive/')
@@ -235,6 +260,7 @@ for (final file in files) {
 ```
 
 ### For Feature Coverage
+
 ```dart
 // Verify all Blade directives are supported
 final directives = [
@@ -252,14 +278,14 @@ for (final directive in directives) {
 
 ## Coverage Matrix
 
-| Feature Category | Test Files | Line Coverage | Complexity Levels |
-|-----------------|------------|---------------|-------------------|
-| Blade Directives | 45 | ~2,300 | Basic → Complex |
-| Livewire | 8 | ~350 | Basic → Moderate |
-| Alpine.js | 8 | ~450 | Basic → Moderate |
-| Combinations | 23 | ~2,900 | Simple → Comprehensive |
-| Edge Cases | 6 | ~350 | Malformed, Nesting, Conflicts |
-| **Total** | **73** | **~6,568** | **All Levels** |
+| Feature Category | Test Files | Line Coverage | Complexity Levels             |
+| ---------------- | ---------- | ------------- | ----------------------------- |
+| Blade Directives | 45         | ~2,300        | Basic → Complex               |
+| Livewire         | 8          | ~350          | Basic → Moderate              |
+| Alpine.js        | 8          | ~450          | Basic → Moderate              |
+| Combinations     | 23         | ~2,900        | Simple → Comprehensive        |
+| Edge Cases       | 6          | ~350          | Malformed, Nesting, Conflicts |
+| **Total**        | **73**     | **~6,568**    | **All Levels**                |
 
 ---
 
@@ -280,11 +306,13 @@ All synthetic tests meet these criteria:
 ## Validation Status
 
 ### Syntax Verified
+
 - ✅ All files with `valid: true` are syntactically correct Blade templates
 - ✅ Malformed files (`valid: false`) intentionally invalid for error recovery testing
 - ✅ No vendor/framework files included (100% custom-generated)
 
 ### Coverage Gaps (Future Additions)
+
 - Alpine.js rendering directives (x-show, x-if, x-for, x-transition)
 - Alpine.js binding (x-bind shorthand, x-model variations)
 - Alpine.js utilities (x-ref, x-cloak, x-teleport)
@@ -299,27 +327,32 @@ All synthetic tests meet these criteria:
 ## Generation Methodology
 
 ### Phase 1: Research
+
 - Web research on Blade, Livewire, Alpine.js syntax (comprehensive catalogs)
 - Identified 80+ Blade directives, 40+ Livewire attributes, 18 Alpine directives
 
 ### Phase 2: Isolated Features
+
 - Generated single-feature tests for core functionality
 - Non-trivial examples (no `foo`/`bar` placeholders)
 - Realistic business logic and UI patterns
 
 ### Phase 3: Systematic Combinations
+
 - Level 1: 2 features (common pairs)
 - Level 2: 3-4 features (realistic page sections)
 - Level 3: 5-7 features (complete pages)
 - Level 4: 10+ features (production applications)
 
 ### Phase 4: Edge Cases
+
 - Deep nesting (parser stress test)
 - Malformed syntax (error recovery)
 - Syntax conflicts (Alpine @ vs Blade @)
 - Boundary conditions
 
 ### Phase 5: Validation & Documentation
+
 - Metadata generation
 - Coverage analysis
 - Index creation
