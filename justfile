@@ -176,3 +176,19 @@ pre-publish: clean deps lint test publish-check
 playground:
     @echo "🎮 Running playground..."
     @cd tool/playground && fvm flutter pub get && fvm flutter run -d chrome
+
+# Build playground for web
+[group('dev')]
+build-playground:
+    @echo "🔨 Building playground for web..."
+    @cd tool/playground && fvm flutter build web --release --wasm && cd ../..
+    @echo "📋 Copying vercel.json to build output..."
+    @cp tool/playground/web/vercel.json tool/playground/build/web/
+    @echo "✅ Playground built: tool/playground/build/web/"
+
+# Deploy playground to Vercel
+[group('dev')]
+deploy-playground: build-playground
+    @echo "🚀 Deploying playground to Vercel..."
+    @cd tool/playground/build/web && vercel --prod
+    @echo "✅ Playground deployed!"
