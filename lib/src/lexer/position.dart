@@ -31,8 +31,8 @@ class Position {
       'Position(line: $line, column: $column, offset: $offset)';
 
   Map<String, dynamic> toJson() => {
-    'line': line,
-    'column': column,
-    'offset': offset,
-  };
+        'line': line,
+        'column': column,
+        'offset': offset,
+      };
 }

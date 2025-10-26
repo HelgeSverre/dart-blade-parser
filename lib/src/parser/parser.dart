@@ -110,7 +110,7 @@ class BladeParser {
 
       // Section directives
       case TokenType.directiveSection:
-        return _parseGenericDirective('section', TokenType.directiveEndsection);
+        return _parseSectionDirective();
 
       // Component directives
       case TokenType.directiveComponent:
@@ -752,11 +752,15 @@ class BladeParser {
       } else {
         final closingToken = _advance();
         // Closing token is like "</x-slot:header" or "</x-slot"
+        // For named slots (e.g., <x-slot:title>), both </x-slot:title> and </x-slot> are valid
         final expectedClosing = componentName.startsWith('slot:')
             ? '</x-slot:$slotName'
             : '</x-slot';
+        final genericClosing = '</x-slot'; // Generic closing is always valid
 
-        if (!closingToken.value.startsWith(expectedClosing)) {
+        // Accept either the specific closing tag or the generic </x-slot>
+        if (!closingToken.value.startsWith(expectedClosing) &&
+            !closingToken.value.startsWith(genericClosing)) {
           _errors.add(
             ParseError(
               message: 'Mismatched slot tags',
@@ -804,8 +808,7 @@ class BladeParser {
       AttributeNode attrNode;
 
       // Check token type first for proper classification
-      final isAlpineToken =
-          attrToken.type == TokenType.alpineShorthandOn ||
+      final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
           attrToken.type == TokenType.alpineShorthandBind ||
           attrToken.type == TokenType.alpineData ||
           attrToken.type == TokenType.alpineInit ||
@@ -833,10 +836,10 @@ class BladeParser {
         final directive = attrName.startsWith('x-')
             ? attrName.substring(2)
             : attrName.startsWith('@')
-            ? attrName.substring(1)
-            : attrName.startsWith(':')
-            ? attrName.substring(1)
-            : attrName;
+                ? attrName.substring(1)
+                : attrName.startsWith(':')
+                    ? attrName.substring(1)
+                    : attrName;
 
         attrNode = AlpineAttribute(
           name: attrName,
@@ -967,6 +970,109 @@ class BladeParser {
       expression: expression,
       children: children,
     );
+  }
+
+  /// Parse @section directive - handles both inline and block syntax.
+  /// Inline: @section('title', 'value') - self-closing
+  /// Block: @section('content') ... @endsection
+  DirectiveNode _parseSectionDirective() {
+    final startToken = _advance();
+    final expression = _extractExpression();
+
+    // Check if this is inline syntax (2 arguments with comma)
+    // Inline: @section('title', 'value')
+    // Block: @section('content')
+    final isInline = expression != null && _hasComma(expression);
+
+    if (isInline) {
+      // Inline syntax - no closing tag needed
+      return DirectiveNode(
+        startPosition: startToken.startPosition,
+        endPosition: _previous().endPosition,
+        name: 'section',
+        expression: expression,
+        children: [],
+      );
+    } else {
+      // Block syntax - requires @endsection or @show
+      final children = <AstNode>[];
+
+      while (!_checkAny([TokenType.directiveEndsection, TokenType.directiveShow]) &&
+          !_check(TokenType.eof)) {
+        final node = _parseNode();
+        if (node != null) children.add(node);
+      }
+
+      if (!_checkAny([TokenType.directiveEndsection, TokenType.directiveShow])) {
+        _errors.add(
+          ParseError(
+            message: 'Unclosed @section directive',
+            position: startToken.startPosition,
+            hint: 'Add @endsection or @show to close the block',
+          ),
+        );
+      } else {
+        _advance();
+      }
+
+      return DirectiveNode(
+        startPosition: startToken.startPosition,
+        endPosition: _previous().endPosition,
+        name: 'section',
+        expression: expression,
+        children: children,
+      );
+    }
+  }
+
+  /// Check if an expression contains a comma (outside of quotes/brackets)
+  /// to determine if it's inline syntax with 2 arguments.
+  bool _hasComma(String expr) {
+    int depth = 0; // Track parentheses/bracket depth
+    bool inSingleQuote = false;
+    bool inDoubleQuote = false;
+    bool escaped = false;
+
+    for (int i = 0; i < expr.length; i++) {
+      final char = expr[i];
+
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+
+      if (char == '\\') {
+        escaped = true;
+        continue;
+      }
+
+      // Track quote state
+      if (char == "'" && !inDoubleQuote) {
+        inSingleQuote = !inSingleQuote;
+        continue;
+      }
+      if (char == '"' && !inSingleQuote) {
+        inDoubleQuote = !inDoubleQuote;
+        continue;
+      }
+
+      // Skip if inside quotes
+      if (inSingleQuote || inDoubleQuote) continue;
+
+      // Track nesting depth
+      if (char == '(' || char == '[' || char == '{') {
+        depth++;
+      } else if (char == ')' || char == ']' || char == '}') {
+        depth--;
+      }
+
+      // Found comma at top level (depth == 1 for outer parens)
+      if (char == ',' && depth == 1) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /// Parse inline directive (no closing tag).
@@ -1171,8 +1277,7 @@ class BladeParser {
       AttributeNode attrNode;
 
       // Check token type first for proper classification
-      final isAlpineToken =
-          attrToken.type == TokenType.alpineShorthandOn ||
+      final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
           attrToken.type == TokenType.alpineShorthandBind ||
           attrToken.type == TokenType.alpineData ||
           attrToken.type == TokenType.alpineInit ||
@@ -1191,18 +1296,18 @@ class BladeParser {
           attrToken.type == TokenType.alpineTeleport;
 
       final isLivewireToken = attrToken.type.toString().startsWith(
-        'TokenType.livewire',
-      );
+            'TokenType.livewire',
+          );
 
       if (isAlpineToken) {
         // Alpine.js attribute
         final directive = attrName.startsWith('@')
             ? 'on:${attrName.substring(1)}'
             : attrName.startsWith(':')
-            ? 'bind:${attrName.substring(1)}'
-            : attrName.startsWith('x-')
-            ? attrName.substring(2)
-            : attrName;
+                ? 'bind:${attrName.substring(1)}'
+                : attrName.startsWith('x-')
+                    ? attrName.substring(2)
+                    : attrName;
 
         attrNode = AlpineAttribute(
           name: attrName,
@@ -1212,9 +1317,8 @@ class BladeParser {
       } else if (isLivewireToken) {
         // Livewire attribute - parse action and modifiers
         final parts = attrName.split('.');
-        final action = parts[0].startsWith('wire:')
-            ? parts[0].substring(5)
-            : parts[0];
+        final action =
+            parts[0].startsWith('wire:') ? parts[0].substring(5) : parts[0];
         final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
 
         attrNode = LivewireAttribute(
