@@ -1,3 +1,5 @@
+import 'package:blade_parser/blade_parser.dart' show RecursiveAstVisitor;
+import 'package:blade_parser/src/ast/visitor.dart' show RecursiveAstVisitor;
 import 'package:blade_parser/src/lexer/position.dart';
 
 /// Base class for all AST (Abstract Syntax Tree) nodes.
