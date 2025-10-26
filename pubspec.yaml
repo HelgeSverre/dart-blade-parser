@@ -10,6 +10,11 @@ dependencies:
   # Zero external parsing dependencies per constitution
   args: ^2.5.0
   completion: ^1.0.2
+  path: ^1.9.0
+
+executables:
+  blade_parser:
+  blade_formatter:
 
 dev_dependencies:
   coverage: ^1.15.0

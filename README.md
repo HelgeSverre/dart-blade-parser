@@ -41,21 +41,38 @@ dart run blade_parser --tree template.blade.php
 cat template.blade.php | dart run blade_parser --stdin
 echo "@if(\$user) Hello @endif" | dart run blade_parser --stdin
 
-# Format a file (show output)
-dart run tool/format_file.dart template.blade.php
+# Format templates with blade_formatter CLI
+dart run blade_formatter template.blade.php                    # Print to stdout
+dart run blade_formatter templates/ --write                     # Format all files in directory
+dart run blade_formatter "templates/**/*.blade.php" --write     # Format with glob pattern
+dart run blade_formatter templates/ --check                     # Check formatting (CI mode)
+cat template.blade.php | dart run blade_formatter --stdin      # Format from stdin
 
-# Format and write back to file
-dart run tool/format_file.dart template.blade.php --write
+# Format with options
+dart run blade_formatter template.blade.php --indent-size 2 --indent-style tabs
+dart run blade_formatter templates/ --config .blade-format.json --write
 
 # Show help
 dart run blade_parser --help
+dart run blade_formatter --help
 ```
 
-**Output Formats:**
+**Parser Output Formats:**
 
 - `--tree` (default): Human-readable tree structure with node types and positions
 - `--json`: Complete AST as JSON for programmatic processing
 - `--stdin`: Read from standard input instead of a file
+
+**Formatter Options:**
+
+- `--write` or `-w`: Write formatted output back to files (default is stdout)
+- `--check` or `-c`: Check if files need formatting without modifying them (for CI/CD)
+- `--config <path>`: Load configuration from JSON file
+- `--indent-size <n>`: Number of spaces for indentation (default: 4)
+- `--indent-style <style>`: Use 'spaces' or 'tabs' (default: spaces)
+- `--quote-style <style>`: Quote style - 'single', 'double', or 'preserve' (default: preserve)
+- `--stdin`: Format from standard input
+- `--verbose` or `-v`: Verbose output with file-by-file progress
 
 ### Development Commands
 
@@ -101,9 +118,15 @@ just bench
 # Measures throughput, memory usage, and nesting depth
 ```
 
-**Formatter Testing:**
+**Formatter & Template Formatting:**
 
 ```shell
+# Format templates in a directory
+just format-templates templates/
+
+# Check if templates need formatting (CI mode)
+just check-templates templates/
+
 # Format test fixtures (messy Blade files)
 just format-fixtures
 

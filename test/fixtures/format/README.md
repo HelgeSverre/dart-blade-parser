@@ -6,6 +6,7 @@ used for testing the formatter.
 ## Purpose
 
 These files are committed in their "messy" state and serve as:
+
 - **Integration tests** for the formatter
 - **Visual regression tests** to ensure formatting is consistent
 - **Real-world examples** of formatting issues the formatter should fix
@@ -13,16 +14,19 @@ These files are committed in their "messy" state and serve as:
 ## Usage
 
 ### Format the fixtures:
+
 ```bash
 just format-fixtures
 ```
 
 ### Reset to original messy state:
+
 ```bash
 just reset-fixtures
 ```
 
 ### View formatting changes without writing:
+
 ```bash
 just show-format-diff
 ```

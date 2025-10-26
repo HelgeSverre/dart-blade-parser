@@ -104,23 +104,32 @@ _(No medium priority issues at this time)_
 ### Formatter & Linter - In Progress
 
 **Completed:**
+
 - ✅ Core formatter infrastructure (config, visitor, indent tracker)
 - ✅ Main formatter class with format() and needsFormatting()
 - ✅ 28 formatter unit tests + 13 idempotency tests (all passing)
 - ✅ Test fixtures (8 messy Blade files for integration testing)
 - ✅ Justfile commands (format-fixtures, reset-fixtures, show-format-diff)
 - ✅ Removed directiveSpacing feature (produces invalid Blade syntax)
+- ✅ **CLI Tool** (COMPLETED 2025-10-26)
+  - ✅ Created `bin/blade_formatter.dart` with full argument parsing
+  - ✅ Glob pattern support (`**/*.blade.php`, directories, individual files)
+  - ✅ `--check` mode for CI/CD with proper exit codes
+  - ✅ `--write` flag for in-place formatting
+  - ✅ `--config` flag for JSON configuration files
+  - ✅ stdin/stdout mode support
+  - ✅ `--verbose` flag for detailed output
+  - ✅ `--indent-size`, `--indent-style`, `--quote-style` CLI overrides
+  - ✅ Added to pubspec.yaml as executable
+  - ✅ Justfile commands: `format-templates`, `check-templates`
+  - ✅ Documentation in README.md with examples
 
 **Next Steps:**
 
-1. **Build CLI Tool** - High Priority (1-2 days)
-   - Create `bin/blade_formatter.dart` with proper argument parsing
-   - Add glob pattern support (`**/*.blade.php`)
-   - Implement `--check` mode for CI/CD (exit code 1 if changes needed)
-   - Implement `--write` flag to write changes
-   - Add `--config` flag to load YAML configuration
-   - Support stdin/stdout mode
-   - Estimated effort: 6-8 hours
+1. **YAML Configuration Support** - Medium Priority (2-3 hours)
+   - Add `yaml` package dependency
+   - Support `.blade-format.yaml` configuration files
+   - Estimated effort: 2-3 hours
 
 2. **Linting Rule System** - High Priority (2-3 days)
    - Design YAML-based configuration (`.blade-lint.yaml`)

@@ -105,18 +105,20 @@ acid:
     @echo "🧪 Running acid tests..."
     @cd tool/acid && dart acid_test.dart --format=both --open
 
+# Format templates using blade_formatter CLI
+format-templates PATH:
+    @echo "🎨 Formatting Blade templates..."
+    dart run bin/blade_formatter.dart {{ PATH }} --write --verbose
+
+# Check if templates need formatting (for CI)
+check-templates PATH:
+    @echo "🔍 Checking Blade template formatting..."
+    dart run bin/blade_formatter.dart {{ PATH }} --check
+
 # Format test fixtures (for testing the formatter)
 format-fixtures:
     @echo "🎨 Formatting test fixtures..."
-    dart run tool/format_file.dart test/fixtures/format/01-basic-messy.blade.php --write
-    dart run tool/format_file.dart test/fixtures/format/02-indentation-chaos.blade.php --write
-    dart run tool/format_file.dart test/fixtures/format/03-whitespace-hell.blade.php --write
-    dart run tool/format_file.dart test/fixtures/format/04-nested-directives-ugly.blade.php --write
-    dart run tool/format_file.dart test/fixtures/format/05-components-messy.blade.php --write
-    dart run tool/format_file.dart test/fixtures/format/06-mixed-content.blade.php --write
-    dart run tool/format_file.dart test/fixtures/format/07-real-world-mess.blade.php --write
-    dart run tool/format_file.dart test/fixtures/format/08-edge-cases.blade.php --write
-    @echo "✅ Test fixtures formatted"
+    dart run bin/blade_formatter.dart "test/fixtures/format/*.blade.php" --write --verbose
 
 # Reset test fixtures to their original messy state
 reset-fixtures:
