@@ -119,12 +119,6 @@ just bench
 **Formatting:**
 
 ```shell
-# Format templates in a directory
-just format-templates templates/
-
-# Check if templates need formatting (CI mode)
-just check-templates templates/
-
 # Format test fixtures (messy Blade files)
 just format-fixtures
 
