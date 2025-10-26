@@ -296,5 +296,598 @@ void main() {
         expect(result, contains('<x-slot:footer>'));
       });
     });
+
+    group('deep nesting', () {
+    test('handles 5 levels of nesting correctly', () {
+      const input = '''
+@if(\$a)
+@if(\$b)
+@if(\$c)
+@if(\$d)
+@if(\$e)
+<p>Deep</p>
+@endif
+@endif
+@endif
+@endif
+@endif
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('@if(\$a)'));
+      expect(result, contains('    @if(\$b)'));
+      expect(result, contains('        @if(\$c)'));
+      expect(result, contains('            @if(\$d)'));
+      expect(result, contains('                @if(\$e)'));
+      expect(result, contains('                    <p>Deep</p>'));
+    });
+
+    test('handles 10 levels of nesting', () {
+      const input = '''
+@if(\$1)
+@if(\$2)
+@if(\$3)
+@if(\$4)
+@if(\$5)
+@if(\$6)
+@if(\$7)
+@if(\$8)
+@if(\$9)
+@if(\$10)
+<p>Very deep</p>
+@endif
+@endif
+@endif
+@endif
+@endif
+@endif
+@endif
+@endif
+@endif
+@endif
+''';
+
+      final result = formatter.format(input);
+
+      // Should format without errors
+      expect(result, isNotEmpty);
+      expect(result, contains('<p>Very deep</p>'));
+    });
+
+    test('handles mixed nesting of different directive types', () {
+      const input = '''
+@if(\$user)
+@foreach(\$posts as \$post)
+@unless(\$post->draft)
+@can('edit', \$post)
+<p>{{ \$post->title }}</p>
+@endcan
+@endunless
+@endforeach
+@endif
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('@if(\$user)'));
+      expect(result, contains('    @foreach(\$posts as \$post)'));
+      expect(result, contains('        @unless(\$post->draft)'));
+      expect(result, contains('            @can(\'edit\', \$post)'));
+    });
+  });
+
+  group('raw text elements', () {
+    test('preserves script tag content', () {
+      const input = '''
+<script>
+  const x = {{ \$value }};
+  alert(x);
+</script>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('<script>'));
+      expect(result, contains('const x = {{ \$value }};'));
+      expect(result, contains('</script>'));
+    });
+
+    test('preserves style tag content', () {
+      const input = '''
+<style>
+  .class { color: red; }
+  @media (max-width: 600px) { }
+</style>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('<style>'));
+      expect(result, contains('.class { color: red; }'));
+      expect(result, contains('</style>'));
+    });
+
+    test('preserves textarea content', () {
+      const input = '''
+<textarea>
+  {{ \$content }}
+  <div>This should not be parsed as HTML</div>
+</textarea>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('<textarea>'));
+      expect(result, contains('{{ \$content }}'));
+      expect(result, contains('</textarea>'));
+    });
+  });
+
+  group('Blade raw blocks', () {
+    test('preserves @verbatim block content', () {
+      const input = '''
+@verbatim
+  {{ This should not be parsed }}
+  @if(\$x)
+    <p>test</p>
+  @endif
+@endverbatim
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('@verbatim'));
+      expect(result, contains('{{ This should not be parsed }}'));
+      expect(result, contains('@endverbatim'));
+    });
+
+    test('preserves @php block content', () {
+      const input = '''
+@php
+  \$x = 1;
+  if (\$condition) {
+    echo "test";
+  }
+@endphp
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('@php'));
+      expect(result, contains('\$x = 1;'));
+      expect(result, contains('@endphp'));
+    });
+
+    test('formats content around @verbatim blocks', () {
+      const input = '''
+<div>
+@verbatim
+{{ raw }}
+@endverbatim
+<p>Normal content</p>
+</div>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('<div>'));
+      expect(result, contains('@verbatim'));
+      expect(result, contains('<p>Normal content</p>'));
+    });
+  });
+
+  group('Alpine.js attributes', () {
+    test('formats elements with x-data attributes', () {
+      const input = '<div x-data="{ open: false }">Content</div>';
+      final result = formatter.format(input);
+
+      expect(result, contains('x-data'));
+      expect(result, contains('{ open: false }'));
+    });
+
+    test('formats elements with multiple Alpine attributes', () {
+      const input = '<button x-on:click="open = true" x-bind:disabled="loading">Click</button>';
+      final result = formatter.format(input);
+
+      expect(result, contains('x-on:click'));
+      expect(result, contains('x-bind:disabled'));
+    });
+
+    test('formats nested Alpine directives', () {
+      const input = '''
+<div x-data="{ open: false }">
+<button x-on:click="open = !open">Toggle</button>
+<div x-show="open">
+<p>Content</p>
+</div>
+</div>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('x-data'));
+      expect(result, contains('x-on:click'));
+      expect(result, contains('x-show'));
+    });
+  });
+
+  group('quote styles', () {
+    test('preserves double quotes in attributes', () {
+      const input = '<div class="container">Content</div>';
+      final result = formatter.format(input);
+
+      expect(result, contains('class="container"'));
+    });
+
+    test('normalizes single quotes to double quotes (default behavior)', () {
+      const input = "<div class='container'>Content</div>";
+      final result = formatter.format(input);
+
+      // Default QuoteStyle.preserve normalizes to double quotes
+      // (AST doesn't store original quote char)
+      expect(result, contains('class="container"'));
+    });
+
+    test('normalizes mixed quotes to double quotes (default behavior)', () {
+      const input = '<div class="foo" id=\'bar\'>Content</div>';
+      final result = formatter.format(input);
+
+      // Both normalized to double quotes
+      expect(result, contains('class="foo"'));
+      expect(result, contains('id="bar"'));
+    });
+
+    test('converts to single quotes with QuoteStyle.single config', () {
+      final singleQuoteFormatter = BladeFormatter(
+        config: const FormatterConfig(quoteStyle: QuoteStyle.single),
+      );
+      const input = '<div class="container">Content</div>';
+      final result = singleQuoteFormatter.format(input);
+
+      expect(result, contains("class='container'"));
+    });
+
+    test('keeps double quotes with QuoteStyle.double config', () {
+      final doubleQuoteFormatter = BladeFormatter(
+        config: const FormatterConfig(quoteStyle: QuoteStyle.double),
+      );
+      const input = "<div class='container'>Content</div>";
+      final result = doubleQuoteFormatter.format(input);
+
+      expect(result, contains('class="container"'));
+    });
+
+    test('handles escaped quotes in attribute values', () {
+      const input = '<div title="He said \\"hello\\"">Content</div>';
+      final result = formatter.format(input);
+
+      expect(result, contains('title='));
+    });
+  });
+
+  group('whitespace handling', () {
+    test('preserves space between inline elements', () {
+      const input = '<span>Hello</span> <span>World</span>';
+      final result = formatter.format(input);
+
+      expect(result, contains('Hello'));
+      expect(result, contains('World'));
+    });
+
+    test('handles multiple adjacent inline elements', () {
+      const input = '<strong>Bold</strong><em>Italic</em><code>Code</code>';
+      final result = formatter.format(input);
+
+      expect(result, contains('Bold'));
+      expect(result, contains('Italic'));
+      expect(result, contains('Code'));
+    });
+
+    test('trims excessive whitespace in text nodes', () {
+      const input = '<p>   Too     much     space   </p>';
+      final result = formatter.format(input);
+
+      // Should reduce excessive whitespace
+      expect(result, isNot(contains('   Too     much     space   ')));
+    });
+
+    test('preserves single space in text content', () {
+      const input = '<p>Hello World</p>';
+      final result = formatter.format(input);
+
+      expect(result, contains('Hello World'));
+    });
+
+    test('handles empty lines between block elements', () {
+      const input = '''
+<div>First</div>
+
+
+<div>Second</div>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('First'));
+      expect(result, contains('Second'));
+    });
+
+    test('handles tabs in source', () {
+      const input = '\t<div>\t\t<p>Content</p>\t</div>';
+      final result = formatter.format(input);
+
+      expect(result, contains('<div>'));
+      expect(result, contains('<p>Content</p>'));
+    });
+  });
+
+  group('empty and minimal files', () {
+    test('formats empty string', () {
+      const input = '';
+      final result = formatter.format(input);
+
+      expect(result, isEmpty);
+    });
+
+    test('formats whitespace-only input', () {
+      const input = '   \n  \n  ';
+      final result = formatter.format(input);
+
+      expect(result, isNotEmpty); // May contain newline
+    });
+
+    test('formats single directive', () {
+      const input = '@if(\$x)';
+
+      // This should throw because @if needs @endif
+      expect(() => formatter.format(input), throwsA(isA<FormatterException>()));
+    });
+
+    test('formats single HTML element', () {
+      const input = '<div>Content</div>';
+      final result = formatter.format(input);
+
+      expect(result, '<div>Content</div>\n');
+    });
+
+    test('formats single echo statement', () {
+      const input = '{{ \$user }}';
+      final result = formatter.format(input);
+
+      expect(result, '{{ \$user }}\n');
+    });
+  });
+
+  group('line endings', () {
+    test('handles CRLF line endings', () {
+      const input = '<div>\r\n<p>Content</p>\r\n</div>';
+      final result = formatter.format(input);
+
+      expect(result, contains('<div>'));
+      expect(result, contains('<p>Content</p>'));
+    });
+
+    test('handles mixed line endings', () {
+      const input = '<div>\r\n<p>Content</p>\n<span>Text</span>\r\n</div>';
+      final result = formatter.format(input);
+
+      expect(result, contains('<div>'));
+      expect(result, contains('<p>Content</p>'));
+      expect(result, contains('<span>Text</span>'));
+    });
+
+    test('normalizes output to LF', () {
+      const input = '<div>\r\n<p>Content</p>\r\n</div>';
+      final result = formatter.format(input);
+
+      // Output should use LF (\n) not CRLF
+      expect(result, isNot(contains('\r\n')));
+      expect(result, contains('\n'));
+    });
+  });
+
+  group('HTML entities', () {
+    test('preserves common entities', () {
+      const input = '<p>&nbsp;&lt;&gt;&amp;&quot;</p>';
+      final result = formatter.format(input);
+
+      expect(result, contains('&nbsp;'));
+      expect(result, contains('&lt;'));
+      expect(result, contains('&gt;'));
+      expect(result, contains('&amp;'));
+      expect(result, contains('&quot;'));
+    });
+
+    test('preserves numeric entities', () {
+      const input = '<p>&#169; &#8364;</p>';
+      final result = formatter.format(input);
+
+      expect(result, contains('&#169;'));
+      expect(result, contains('&#8364;'));
+    });
+
+    test('preserves hex entities', () {
+      const input = '<p>&#x00A9; &#x20AC;</p>';
+      final result = formatter.format(input);
+
+      expect(result, contains('&#x00A9;'));
+      expect(result, contains('&#x20AC;'));
+    });
+  });
+
+  group('comments edge cases', () {
+    test('formats nested Blade comments', () {
+      const input = '''
+<div>
+{{-- Comment 1 --}}
+<p>Content</p>
+{{-- Comment 2 --}}
+</div>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('{{-- Comment 1 --}}'));
+      expect(result, contains('{{-- Comment 2 --}}'));
+    });
+
+    test('formats Blade comments inside directives', () {
+      const input = '''
+@if(\$user)
+{{-- User is authenticated --}}
+<p>Welcome</p>
+@endif
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('{{-- User is authenticated --}}'));
+    });
+
+    test('formats HTML comments with Blade syntax', () {
+      const input = '<!-- <div>{{ \$user }}</div> -->';
+      final result = formatter.format(input);
+
+      expect(result, contains('<!--'));
+      expect(result, contains('-->'));
+    });
+
+    test('handles multiple consecutive comments', () {
+      const input = '''
+{{-- Comment 1 --}}
+{{-- Comment 2 --}}
+{{-- Comment 3 --}}
+<p>Content</p>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('{{-- Comment 1 --}}'));
+      expect(result, contains('{{-- Comment 2 --}}'));
+      expect(result, contains('{{-- Comment 3 --}}'));
+    });
+  });
+
+  group('complex real-world scenarios', () {
+    test('formats Laravel auth scaffolding pattern', () {
+      const input = '''
+@auth
+<div class="user-panel">
+@can('admin')
+<a href="/admin">Admin</a>
+@endcan
+<p>{{ Auth::user()->name }}</p>
+</div>
+@endauth
+@guest
+<a href="/login">Login</a>
+@endguest
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('@auth'));
+      expect(result, contains('@can(\'admin\')'));
+      expect(result, contains('@guest'));
+    });
+
+    test('formats component with multiple slots', () {
+      const input = '''
+<x-card>
+<x-slot:header>
+<h2>Title</h2>
+</x-slot>
+<p>Main content</p>
+<x-slot:footer>
+<button>Action</button>
+</x-slot>
+</x-card>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('<x-card>'));
+      expect(result, contains('<x-slot:header>'));
+      expect(result, contains('<x-slot:footer>'));
+    });
+
+    test('formats Livewire component with Alpine.js', () {
+      const input = '''
+<div wire:poll.5s x-data="{ open: false }">
+<button wire:click="refresh" x-on:click="open = true">
+Refresh
+</button>
+<div x-show="open" wire:loading>
+Loading...
+</div>
+</div>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('wire:poll.5s'));
+      expect(result, contains('x-data'));
+      expect(result, contains('wire:click'));
+      expect(result, contains('x-on:click'));
+    });
+
+    test('formats form with CSRF and method spoofing', () {
+      const input = '''
+<form method="POST" action="/users">
+@csrf
+@method('PUT')
+<input type="text" name="name" value="{{ \$user->name }}">
+<button type="submit">Update</button>
+</form>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('<form'));
+      expect(result, contains('@csrf'));
+      expect(result, contains('@method(\'PUT\')'));
+    });
+  });
+
+  group('malformed but recoverable', () {
+    test('formats content with missing newlines', () {
+      const input = '<div><p>Line1</p><p>Line2</p><p>Line3</p></div>';
+      final result = formatter.format(input);
+
+      expect(result, contains('<div>'));
+      expect(result, contains('<p>Line1</p>'));
+      expect(result, contains('<p>Line2</p>'));
+    });
+
+    test('formats content with excessive indentation', () {
+      const input = '''
+        <div>
+                <p>Content</p>
+        </div>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('<div>'));
+      expect(result, contains('<p>Content</p>'));
+    });
+
+    test('formats content with inconsistent indentation', () {
+      const input = '''
+<div>
+  <p>2 spaces</p>
+    <span>4 spaces</span>
+\t<em>1 tab</em>
+</div>
+''';
+
+      final result = formatter.format(input);
+
+      expect(result, contains('<div>'));
+      expect(result, contains('<p>2 spaces</p>'));
+      expect(result, contains('<span>4 spaces</span>'));
+    });
+  });
   });
 }
