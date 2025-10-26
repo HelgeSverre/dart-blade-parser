@@ -179,7 +179,25 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     value: '12-errors-example',
                     child: Text('Error Example'),
                   ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: '13-messy-control-structures',
+                    child: Text('Messy Control Structures'),
+                  ),
+                  const PopupMenuItem(
+                    value: '14-messy-livewire-alpine',
+                    child: Text('Messy Livewire + Alpine'),
+                  ),
+                  const PopupMenuItem(
+                    value: '15-messy-components-slots',
+                    child: Text('Messy Components & Slots'),
+                  ),
                 ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.auto_fix_high, size: 20),
+                tooltip: 'Format Code',
+                onPressed: _controller.text.isEmpty ? null : _formatCode,
               ),
             ],
           ),
@@ -332,7 +350,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
     final indent = '  ' * depth;
     final buffer = StringBuffer();
 
-    buffer.writeln('$indent${node.runtimeType}');
+    // Use toJson()['type'] instead of runtimeType to avoid minification in production builds
+    final nodeType = node.toJson()['type'] as String;
+    final capitalizedType = nodeType[0].toUpperCase() + nodeType.substring(1);
+    buffer.writeln('$indent$capitalizedType');
 
     if (node is DirectiveNode) {
       buffer.writeln('$indent  name: @${node.name}');
@@ -372,6 +393,28 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       buffer.writeln();
     }
     return buffer.toString();
+  }
+
+  void _formatCode() {
+    final formatter = BladeFormatter();
+    final result = formatter.formatWithResult(_controller.text);
+
+    if (result.isSuccess) {
+      _controller.text = result.formatted;
+    } else if (result.hasErrors) {
+      // Show formatting errors in the errors tab
+      setState(() {
+        _selectedTab = 'errors';
+        _result = ParseResult(
+          ast: DocumentNode(
+            startPosition: Position(line: 1, column: 1, offset: 0),
+            endPosition: Position(line: 1, column: 1, offset: 0),
+            children: [],
+          ),
+          errors: result.errors,
+        );
+      });
+    }
   }
 
   Future<void> _loadExample(String example) async {
