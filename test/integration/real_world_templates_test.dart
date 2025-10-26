@@ -1112,9 +1112,12 @@ void main() {
       final yieldDirectives = directives.where((d) => d.name == 'yield');
       expect(yieldDirectives, hasLength(1));
 
-      // Verify @show
-      final showDirectives = directives.where((d) => d.name == 'show');
-      expect(showDirectives, hasLength(1));
+      // Verify @section('widgets') is closed by @show (not @endsection)
+      final widgetsSection = sectionDirectives.firstWhere(
+        (d) => d.expression?.contains('widgets') == true,
+        orElse: () => throw Exception('widgets section not found'),
+      );
+      expect(widgetsSection.closedBy, equals('show'));
 
       // Verify @push
       final pushDirectives = directives.where((d) => d.name == 'push');

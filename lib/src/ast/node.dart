@@ -145,12 +145,24 @@ final class DirectiveNode extends AstNode {
   /// `$user->isAdmin()`. May be null for directives without expressions.
   final String? expression;
 
+  /// The closing directive name for block directives, if applicable.
+  ///
+  /// For `@section` directives, this captures how the section was closed:
+  /// - `'endsection'` for standard `@endsection` closing
+  /// - `'show'` for `@show` (close and immediately yield)
+  /// - `'overwrite'` for legacy `@overwrite` (deprecated in Laravel 7+)
+  ///
+  /// Null for directives without closing tags or inline directives.
+  final String? closedBy;
+
   /// Creates a new directive node.
   ///
   /// [startPosition] and [endPosition] define the directive's location.
   /// [name] is the directive name without the @ prefix.
   /// [expression] is the optional directive arguments/expression.
   /// [children] contains nodes within block directives (e.g., within @if/@endif).
+  /// [closedBy] is the closing directive name (e.g., 'endsection', 'show') for
+  /// directives like `@section` that have multiple ways to close.
   DirectiveNode({
     required this.startPosition,
     required this.endPosition,
@@ -158,6 +170,7 @@ final class DirectiveNode extends AstNode {
     required this.name,
     this.expression,
     required this.children,
+    this.closedBy,
   });
 
   @override
@@ -168,6 +181,7 @@ final class DirectiveNode extends AstNode {
         'type': 'directive',
         'name': name,
         if (expression != null) 'expression': expression,
+        if (closedBy != null) 'closedBy': closedBy,
         'position': {
           'start': startPosition.toJson(),
           'end': endPosition.toJson(),

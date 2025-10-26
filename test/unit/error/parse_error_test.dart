@@ -1,5 +1,7 @@
 import 'package:test/test.dart';
+import 'package:blade_parser/src/ast/node.dart';
 import 'package:blade_parser/src/error/parse_error.dart';
+import 'package:blade_parser/src/error/parse_result.dart';
 import 'package:blade_parser/src/lexer/position.dart';
 
 void main() {
