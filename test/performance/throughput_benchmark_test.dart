@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:blade_parser/blade_parser.dart';
+import 'benchmark_formatter.dart';
 
 void main() {
   group('Performance Benchmarks - Throughput', () {
@@ -133,7 +134,7 @@ void main() {
     });
 
     test('100K line template throughput', () {
-      print('\n=== 100K Line Template Benchmark ===');
+      BenchmarkFormatter.printHeader('100K Line Template Benchmark');
 
       // Generate large template with mixed content
       final lines = <String>[];
@@ -152,7 +153,10 @@ void main() {
       }
       final template = lines.join('\n');
 
-      print('Template size: ${template.length} bytes, 100000 lines');
+      BenchmarkFormatter.printMetrics({
+        'Template size': BenchmarkFormatter.formatMemory(template.length),
+        'Line count': '100,000 lines',
+      });
 
       // Warm-up iterations
       print('Warming up...');
@@ -172,10 +176,10 @@ void main() {
       final avgMs = stopwatch.elapsedMilliseconds / iterations;
       final linesPerSec = (100000 / (avgMs / 1000)).round();
 
-      print('Average parse time: ${avgMs.toStringAsFixed(2)}ms');
-      print('Throughput: ${linesPerSec.toStringAsFixed(0)} lines/sec');
-      print(
-        'Memory: ~${(template.length / 1024 / 1024).toStringAsFixed(2)} MB template',
+      BenchmarkFormatter.printResult(
+        label: 'Throughput',
+        metric: BenchmarkFormatter.formatThroughput(linesPerSec, 'lines/sec'),
+        context: 'Average parse time: ${BenchmarkFormatter.formatTime(avgMs)}',
       );
 
       expect(
@@ -186,7 +190,7 @@ void main() {
     });
 
     test('10K component instances throughput', () {
-      print('\n=== 10K Component Instances Benchmark ===');
+      BenchmarkFormatter.printHeader('10K Component Instances Benchmark');
 
       // Generate template with 10,000 component instances
       final lines = <String>[];
@@ -203,8 +207,10 @@ void main() {
       }
       final template = lines.join('\n');
 
-      print('Template size: ${template.length} bytes');
-      print('Component instances: 10000');
+      BenchmarkFormatter.printMetrics({
+        'Template size': BenchmarkFormatter.formatMemory(template.length),
+        'Component instances': '10,000',
+      });
 
       // Warm-up
       print('Warming up...');
@@ -224,9 +230,11 @@ void main() {
       final avgMs = stopwatch.elapsedMilliseconds / iterations;
       final componentsPerSec = (10000 / (avgMs / 1000)).round();
 
-      print('Average parse time: ${avgMs.toStringAsFixed(2)}ms');
-      print(
-        'Throughput: ${componentsPerSec.toStringAsFixed(0)} components/sec',
+      BenchmarkFormatter.printResult(
+        label: 'Throughput',
+        metric:
+            BenchmarkFormatter.formatThroughput(componentsPerSec, 'components/sec'),
+        context: 'Average parse time: ${BenchmarkFormatter.formatTime(avgMs)}',
       );
 
       expect(
@@ -237,7 +245,7 @@ void main() {
     });
 
     test('1000 nested levels - extreme nesting', () {
-      print('\n=== 1000 Nested Levels Benchmark ===');
+      BenchmarkFormatter.printHeader('1000 Nested Levels Benchmark');
 
       // Generate template with 1000 levels of nesting
       final buffer = StringBuffer();
@@ -271,9 +279,11 @@ void main() {
       final template = buffer.toString();
       final lineCount = template.split('\n').length;
 
-      print('Template size: ${template.length} bytes');
-      print('Lines: $lineCount');
-      print('Nesting depth: 1000 levels');
+      BenchmarkFormatter.printMetrics({
+        'Template size': BenchmarkFormatter.formatMemory(template.length),
+        'Lines': lineCount.toString(),
+        'Nesting depth': '1,000 levels',
+      });
 
       // Warm-up
       print('Warming up...');
@@ -288,7 +298,11 @@ void main() {
 
       expect(result.ast, isNotNull);
 
-      print('Parse time: ${stopwatch.elapsedMilliseconds}ms');
+      BenchmarkFormatter.printResult(
+        label: 'Parse time',
+        metric: BenchmarkFormatter.formatTime(stopwatch.elapsedMilliseconds),
+        context: 'No stack overflow with 1000 nested levels',
+      );
 
       expect(
         stopwatch.elapsedMilliseconds,
@@ -296,11 +310,10 @@ void main() {
         reason:
             'Should parse extreme nesting in < 2000ms, took ${stopwatch.elapsedMilliseconds}ms',
       );
-      print('SUCCESS: No stack overflow with 1000 nested levels');
     });
 
     test('Memory profiling & GC pressure', () {
-      print('\n=== Memory Profiling Benchmark ===');
+      BenchmarkFormatter.printHeader('Memory Profiling Benchmark');
 
       final sizes = [100, 1000, 10000, 100000];
       final memoryResults = <int, Map<String, num>>{};
@@ -374,18 +387,24 @@ void main() {
         print('  Parse time: ${avgMs.toStringAsFixed(2)}ms');
       }
 
-      print('\n=== Memory Summary ===');
-      print('Size\t\tMem Delta\tBytes/Line\tParse Time');
-      for (final entry in memoryResults.entries) {
-        final size = entry.key;
-        final data = entry.value;
-        print(
-          '${size.toString().padRight(8)}\t'
-          '${((data['memDelta']!) / 1024 / 1024).toStringAsFixed(2)}MB\t\t'
-          '${(data['bytesPerLine']!).toStringAsFixed(2)}\t\t'
-          '${(data['parseTimeMs']!).toStringAsFixed(2)}ms',
-        );
-      }
+      BenchmarkFormatter.printHeader('Memory Summary');
+      BenchmarkFormatter.printTable(
+        headers: ['Lines', 'Memory Delta', 'Bytes/Line', 'Parse Time'],
+        rows: memoryResults.entries.map((entry) {
+          final size = entry.key;
+          final data = entry.value;
+          final memDelta = data['memDelta']!;
+          final memStr = memDelta >= 0
+              ? BenchmarkFormatter.formatMemory(memDelta)
+              : '-${BenchmarkFormatter.formatMemory(memDelta.abs())}';
+          return [
+            size.toString(),
+            memStr,
+            '${(data['bytesPerLine']!).toStringAsFixed(2)} B/line',
+            BenchmarkFormatter.formatTime(data['parseTimeMs']!),
+          ];
+        }).toList(),
+      );
 
       // Verify reasonable memory usage (less than 2KB per line for 100K lines)
       final largeTestBytes = memoryResults[100000]!['bytesPerLine']!;

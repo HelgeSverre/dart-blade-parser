@@ -121,6 +121,29 @@ class FormatterVisitor implements AstVisitor<String> {
     return _output.toString();
   }
 
+  /// Formats an attribute value with the appropriate quote style.
+  ///
+  /// Handles escaping and quote style conversion based on config.quoteStyle.
+  String _formatAttributeValue(String value) {
+    final quote = switch (config.quoteStyle) {
+      QuoteStyle.single => "'",
+      QuoteStyle.double => '"',
+      QuoteStyle.preserve => '"', // Default to double quotes
+    };
+
+    // Escape quotes in the value if needed
+    String escaped = value;
+    if (config.quoteStyle == QuoteStyle.single) {
+      // Escape single quotes, unescape double quotes if they were escaped
+      escaped = value.replaceAll(r"\'", "'").replaceAll("'", r"\'");
+    } else {
+      // Escape double quotes, unescape single quotes if they were escaped
+      escaped = value.replaceAll(r'\"', '"').replaceAll('"', r'\"');
+    }
+
+    return '$quote$escaped$quote';
+  }
+
   @override
   String visitDocument(DocumentNode node) {
     for (var i = 0; i < node.children.length; i++) {
@@ -144,7 +167,13 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Ensure file ends with newline
     final outputStr = _output.toString();
-    if (outputStr.isNotEmpty && !outputStr.endsWith('\n')) {
+    if (outputStr.isEmpty) {
+      // If document had children (even if just whitespace), add newline
+      // If document was truly empty, keep output empty
+      if (node.children.isNotEmpty) {
+        _output.writeln();
+      }
+    } else if (!outputStr.endsWith('\n')) {
       _output.writeln();
     }
 
@@ -154,7 +183,6 @@ class FormatterVisitor implements AstVisitor<String> {
   @override
   String visitDirective(DirectiveNode node) {
     final isBlock = _blockDirectives.contains(node.name);
-    final isInline = _inlineDirectives.contains(node.name);
 
     // Write the directive opening
     _output.write(_indent.current);
@@ -265,7 +293,6 @@ class FormatterVisitor implements AstVisitor<String> {
   String visitHtmlElement(HtmlElementNode node) {
     final tagName = node.tagName.toLowerCase();
     final isVoid = _voidElements.contains(tagName);
-    final isInline = _inlineElements.contains(tagName);
 
     // Write opening tag
     _output.write(_indent.current);
@@ -279,8 +306,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
         if (attr.value != null) {
           _output.write('=');
-          // Always quote attribute values for consistency
-          _output.write('"${attr.value}"');
+          _output.write(_formatAttributeValue(attr.value!));
         }
       }
     }
@@ -370,8 +396,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
         if (attr.value != null) {
           _output.write('=');
-          // Always quote attribute values for consistency
-          _output.write('"${attr.value}"');
+          _output.write(_formatAttributeValue(attr.value!));
         }
       }
     }

@@ -1,5 +1,6 @@
 import 'package:blade_parser/blade_parser.dart';
 import 'package:test/test.dart';
+import 'benchmark_formatter.dart';
 
 void main() {
   group('Lexer Performance Benchmarks', () {
@@ -25,11 +26,10 @@ void main() {
       final seconds = stopwatch.elapsedMilliseconds / 1000;
       final charsPerSec = totalChars / seconds;
 
-      print(
-        'Pure text: ${(charsPerSec / 1000000).toStringAsFixed(2)}M chars/sec',
-      );
-      print(
-        '  Total: ${totalChars / 1000000}M chars in ${seconds.toStringAsFixed(3)}s',
+      BenchmarkFormatter.printResult(
+        label: 'Pure text throughput',
+        metric: BenchmarkFormatter.formatThroughput(charsPerSec, 'chars/sec'),
+        context: 'Total: ${totalChars / 1000000}M chars in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 1M chars/sec
@@ -77,11 +77,10 @@ void main() {
       final seconds = stopwatch.elapsedMilliseconds / 1000;
       final directivesPerSec = totalDirectives / seconds;
 
-      print(
-        'Directive-heavy: ${(directivesPerSec / 1000).toStringAsFixed(2)}K directives/sec',
-      );
-      print(
-        '  Total: $directiveCount directives processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      BenchmarkFormatter.printResult(
+        label: 'Directive-heavy throughput',
+        metric: BenchmarkFormatter.formatThroughput(directivesPerSec, 'directives/sec'),
+        context: 'Total: $directiveCount directives processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 5K directives/sec
@@ -132,11 +131,10 @@ void main() {
       final seconds = stopwatch.elapsedMilliseconds / 1000;
       final elementsPerSec = totalElements / seconds;
 
-      print(
-        'Attribute-heavy HTML: ${(elementsPerSec / 1000).toStringAsFixed(2)}K elements/sec',
-      );
-      print(
-        '  Total: $elementCount elements (10 attrs each) processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      BenchmarkFormatter.printResult(
+        label: 'Attribute-heavy HTML',
+        metric: BenchmarkFormatter.formatThroughput(elementsPerSec, 'elements/sec'),
+        context: 'Total: $elementCount elements (10 attrs each) processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 5K elements/sec
@@ -175,11 +173,10 @@ void main() {
       final seconds = stopwatch.elapsedMilliseconds / 1000;
       final escapesPerSec = totalEscapes / seconds;
 
-      print(
-        'Escape sequences: ${(escapesPerSec / 1000).toStringAsFixed(2)}K escapes/sec',
-      );
-      print(
-        '  Total: $escapeCount escapes processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      BenchmarkFormatter.printResult(
+        label: 'Escape sequences',
+        metric: BenchmarkFormatter.formatThroughput(escapesPerSec, 'escapes/sec'),
+        context: 'Total: $escapeCount escapes processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 20K escapes/sec
@@ -297,11 +294,11 @@ void main() {
       final charsPerSec = totalChars / seconds;
       final mbPerSec = (charsPerSec / 1024 / 1024);
 
-      print('Mixed realistic content: ${mbPerSec.toStringAsFixed(2)} MB/sec');
-      print(
-        '  Template size: ${(template.length / 1024).toStringAsFixed(2)}KB',
+      BenchmarkFormatter.printResult(
+        label: 'Mixed realistic content',
+        metric: '${mbPerSec.toStringAsFixed(2)} MB/sec',
+        context: 'Template size: ${(template.length / 1024).toStringAsFixed(2)}KB, processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
-      print('  Processed $iterations times in ${seconds.toStringAsFixed(3)}s');
 
       // Assert reasonable performance: > 1MB/sec
       expect(
@@ -343,11 +340,10 @@ void main() {
       final seconds = stopwatch.elapsedMilliseconds / 1000;
       final echosPerSec = totalEchos / seconds;
 
-      print(
-        'Echo statements: ${(echosPerSec / 1000).toStringAsFixed(2)}K echos/sec',
-      );
-      print(
-        '  Total: $echoCount echo statements processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      BenchmarkFormatter.printResult(
+        label: 'Echo statements',
+        metric: BenchmarkFormatter.formatThroughput(echosPerSec, 'echos/sec'),
+        context: 'Total: $echoCount echo statements processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 5K echos/sec
@@ -397,11 +393,10 @@ void main() {
       final seconds = stopwatch.elapsedMilliseconds / 1000;
       final componentsPerSec = totalComponents / seconds;
 
-      print(
-        'Component tags: ${(componentsPerSec / 1000).toStringAsFixed(2)}K components/sec',
-      );
-      print(
-        '  Total: $componentCount component tags processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      BenchmarkFormatter.printResult(
+        label: 'Component tags',
+        metric: BenchmarkFormatter.formatThroughput(componentsPerSec, 'components/sec'),
+        context: 'Total: $componentCount component tags processed $iterations times in ${seconds.toStringAsFixed(3)}s',
       );
 
       // Assert reasonable performance: > 5K components/sec
