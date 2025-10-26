@@ -83,16 +83,16 @@ pre-publish: clean deps lint test publish-check
 compile:
     @echo "🔧 Compiling for current platform..."
     @mkdir -p build
-    @dart compile exe bin/blade_parser.dart -o build/blade-parser
-    @echo "✅ Compilation completed: build/blade-parser"
+    @dart compile exe bin/blade.dart -o build/blade
+    @echo "✅ Compilation completed: build/blade"
 
 # Cross-compile for multiple platforms
 cross-compile:
     @echo "🔧 Cross-compiling for multiple platforms..."
     @mkdir -p build
-    @dart compile exe bin/blade_parser.dart -o build/blade-linux-x64 --target-os linux --target-arch x64
-    @dart compile exe bin/blade_parser.dart -o build/blade-linux-arm64 --target-os linux --target-arch arm64
-    @dart compile exe bin/blade_parser.dart -o build/blade-macos-arm64 --target-os macos --target-arch arm64
+    @dart compile exe bin/blade.dart -o build/blade-linux-x64 --target-os linux --target-arch x64
+    @dart compile exe bin/blade.dart -o build/blade-linux-arm64 --target-os linux --target-arch arm64
+    @dart compile exe bin/blade.dart -o build/blade-macos-arm64 --target-os macos --target-arch arm64
     @echo "✅ Cross-compilation completed. Binaries are in the build/ directory."
 
 # Run the playground demo
