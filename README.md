@@ -2,9 +2,7 @@
 
 [![Playground](https://img.shields.io/badge/Try_Playground-Live-blue?style=for-the-badge)](http://dart-blade-parser-playground.vercel.app/)
 
-> **⚠️ Experimental - Work in Progress**
->
-> This project is currently under active development and is **not production-ready**. The API may change without notice, and there may be bugs or incomplete features. Use at your own risk in production environments.
+> **Note:** This project is stable and production-ready. The core parser and formatter are well-tested with 984 tests covering edge cases, performance, and real-world scenarios. API breaking changes will follow semantic versioning.
 
 A pure Dart parser for Laravel Blade templates. Produces a typed AST with full support for Blade directives, components, Alpine.js, and Livewire attributes. Includes robust error recovery, JSON serialization, and an idempotent formatter.
 
@@ -192,7 +190,7 @@ See [justfile](justfile) for complete command reference and additional options.
 - JSON serialization for interoperability
 - Zero external parsing dependencies
 - Idempotent formatter with configurable style
-- 112 test fixtures (17,500+ lines) covering real-world and synthetic cases
+- 112 test fixtures (17,500+ lines) with 984 tests covering real-world and synthetic cases
 
 ## Use Cases
 
@@ -345,6 +343,9 @@ final config = FormatterConfig(
   quoteStyle: QuoteStyle.preserve,            // or QuoteStyle.single, QuoteStyle.double
   directiveSpacing: DirectiveSpacing.betweenBlocks,  // Default: betweenBlocks
   slotFormatting: SlotFormatting.compact,     // Default: compact
+  maxLineLength: 120,                         // Default: 120
+  wrapAttributes: WrapAttributes.auto,        // Default: auto
+  attributeSort: AttributeSort.none,          // Default: none
 );
 
 final formatter = BladeFormatter(config: config);
@@ -361,10 +362,19 @@ final formatter = BladeFormatter(config: config);
 - `directiveSpacing`: Control blank lines between Blade directives
   - `DirectiveSpacing.betweenBlocks`: Add blank line between closing and opening directives (default)
   - `DirectiveSpacing.none`: No blank lines between directives (compact)
-  - `DirectiveSpacing.preserve`: Preserve blank lines as written (future)
+  - `DirectiveSpacing.preserve`: Preserve blank lines as written
 - `slotFormatting`: Control formatting style for component slots
   - `SlotFormatting.compact`: Smart detection - compact for simple slots (default)
   - `SlotFormatting.block`: Always use block formatting with extra blank lines
+- `maxLineLength`: Maximum line length before wrapping attributes (default: 120)
+- `wrapAttributes`: Control when to wrap attributes to multiple lines
+  - `WrapAttributes.auto`: Wrap when line exceeds maxLineLength (default)
+  - `WrapAttributes.always`: Always wrap multiple attributes to separate lines
+  - `WrapAttributes.never`: Never wrap attributes
+- `attributeSort`: Control attribute sorting order
+  - `AttributeSort.none`: Preserve original order (default)
+  - `AttributeSort.alphabetical`: Sort attributes alphabetically
+  - `AttributeSort.byType`: Sort by type (HTML → data-* → Alpine → Livewire → other)
 
 ### API
 
@@ -397,11 +407,14 @@ if (formatter.needsFormatting(source)) {
 - Configurable directive spacing (blank lines between directives)
 - Configurable slot formatting (compact vs block style)
 - Normalizes attribute quoting (single, double, or preserve)
+- **Line wrapping** - Wrap long attribute lists when exceeding maxLineLength
+- **Multi-line attributes** - Format attributes one per line when wrapping
+- **Attribute sorting** - Sort alphabetically or by type (HTML, data-*, Alpine, Livewire)
 - Preserves boolean attributes
 - Preserves line breaks between echo statements
 - Adds final newline
 - Spacing between top-level blocks
-- Guaranteed idempotency (verified with 13 idempotency tests)
+- Guaranteed idempotency (verified with idempotency tests)
 
 ### Before/After Examples
 
@@ -480,6 +493,42 @@ if (formatter.needsFormatting(source)) {
 
     <p>Card content</p>
 </x-card>
+```
+
+#### Attribute Wrapping
+
+**With `WrapAttributes.auto` (default) and line exceeds `maxLineLength`:**
+
+**Before:**
+
+```blade
+<x-button type="submit" class="btn btn-primary" wire:click="save" wire:loading.attr="disabled">Save</x-button>
+```
+
+**After:**
+
+```blade
+<x-button
+    type="submit"
+    class="btn btn-primary"
+    wire:click="save"
+    wire:loading.attr="disabled">Save</x-button>
+```
+
+#### Attribute Sorting
+
+**With `AttributeSort.byType`:**
+
+**Before:**
+
+```blade
+<input wire:model="email" x-on:blur="validate" data-testid="email" type="email" class="form-input" id="email">
+```
+
+**After (sorted by type: HTML → data-* → Alpine → Livewire):**
+
+```blade
+<input class="form-input" id="email" type="email" data-testid="email" x-on:blur="validate" wire:model="email">
 ```
 
 ## Architecture
