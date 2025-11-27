@@ -39,36 +39,6 @@ class FormatterVisitor implements AstVisitor<String> {
     'wbr',
   };
 
-  /// HTML inline elements that should not force line breaks.
-  static const Set<String> _inlineElements = {
-    'a',
-    'abbr',
-    'b',
-    'bdi',
-    'bdo',
-    'br',
-    'cite',
-    'code',
-    'data',
-    'dfn',
-    'em',
-    'i',
-    'kbd',
-    'mark',
-    'q',
-    's',
-    'samp',
-    'small',
-    'span',
-    'strong',
-    'sub',
-    'sup',
-    'time',
-    'u',
-    'var',
-    'wbr',
-  };
-
   /// Blade directives that are block-level (require children).
   static const Set<String> _blockDirectives = {
     'if',
@@ -118,30 +88,6 @@ class FormatterVisitor implements AstVisitor<String> {
     'break',
     'continue',
     'empty', // Can be both, but often inline in context
-  };
-
-  /// Blade directives that are ending tags (close block directives).
-  static const Set<String> _endingDirectives = {
-    'endif',
-    'endunless',
-    'endforeach',
-    'endforelse',
-    'endfor',
-    'endwhile',
-    'endswitch',
-    'endauth',
-    'endguest',
-    'endcan',
-    'endcannot',
-    'endcanany',
-    'endenv',
-    'endproduction',
-    'endsection',
-    'endpush',
-    'endprepend',
-    'endonce',
-    'endphp',
-    'endverbatim',
   };
 
   /// Standard HTML attributes that should appear first when sorting by type.
