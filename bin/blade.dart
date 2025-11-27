@@ -259,7 +259,10 @@ enum FormatFileResult {
   needsFormatting,
   formatted,
   unchanged,
-  error,
+  error;
+
+  bool get isSuccess => this != error;
+  bool get requiresAction => this == needsFormatting || this == formatted;
 }
 
 Future<void> _handleFormatCommand(ArgResults command) async {

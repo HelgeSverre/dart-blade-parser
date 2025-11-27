@@ -169,7 +169,55 @@ _(No medium priority issues at this time)_
    - Add before/after examples for wrapping and sorting ✅
    - Create `docs/FORMATTER.md` with all formatting rules (future)
 
-**Future Enhancements:**
+**Completed - Quick Wins (2025-11-27):**
+
+1. ✅ **Ignore Comments** - COMPLETED
+   - `{{-- blade-formatter:off --}}` / `{{-- blade-formatter:on --}}`
+   - `<!-- blade-formatter:off -->` / `<!-- blade-formatter:on -->`
+   - Preserve original source text verbatim in ignored sections
+   - Support both Blade and HTML comment syntax
+   - Also supports `format:off` / `format:on` short syntax
+
+2. ✅ **Closing Tag Style** - COMPLETED
+   - Option to put `>` on new line when wrapping attributes
+   - `ClosingBracketStyle.sameLine` (default): `class="foo">`
+   - `ClosingBracketStyle.newLine`: `class="foo"\n>`
+
+3. ✅ **Self-closing Tag Normalization** - COMPLETED
+   - `SelfClosingStyle.preserve` (default): Keep as-is
+   - `SelfClosingStyle.always`: Convert empty `<div></div>` to `<div />`
+   - `SelfClosingStyle.never`: Convert `<div />` to `<div></div>`
+   - Apply to components and non-void HTML elements
+
+**Future Enhancements - Formatter:**
+
+- **EditorConfig Integration** (2-3 hours)
+  - Read indent_size, indent_style from .editorconfig
+  - Fall back to .blade.json if present
+
+- **Format Range** (3-4 hours)
+  - Format only a selection/range instead of whole file
+  - Useful for editor integrations
+
+- **Trailing Comma in Attributes** (1-2 hours)
+  - Option to add trailing comma when attributes are wrapped
+
+**Future Enhancements - Linter:**
+
+- **Linter Rules** (1-2 days)
+  - Require @csrf in forms
+  - Warn on raw echo `{!! !!}` usage (security)
+  - Check max nesting depth
+  - Enforce consistent component naming
+  - Detect unclosed directives
+
+- **Unused Slot Detection** (3-4 hours)
+  - Warn when a slot is defined but never filled
+
+- **Component Prop Validation** (4-6 hours)
+  - Check that required props are passed to components
+
+**Future Enhancements - Integrations:**
 
 - **Prettier Plugin** (1-2 weeks)
   - Research integration strategies (CLI wrapper vs dart2js vs LSP)
@@ -181,10 +229,17 @@ _(No medium priority issues at this time)_
   - Configuration file support
   - Hover documentation for directives
   - Status bar integration
+  - Diagnostics panel for linter warnings
 
-- **EditorConfig Integration** (1 day)
-  - Read indent_size, indent_style from .editorconfig
-  - Fall back to .blade.json if present
+**Future Enhancements - Analysis:**
+
+- **Include/Extends Graph** (4-6 hours)
+  - Build dependency tree of template relationships
+  - Visualize @extends and @include chains
+
+- **Component Discovery** (1 day)
+  - Analyze project to catalog all components and their props
+  - Generate documentation from @props directives
 
 ### High Priority - Quick Wins (Code Cleanup)
 
@@ -245,11 +300,11 @@ _(No medium priority issues at this time)_
 
 **Test Suite Statistics:**
 
-- 📊 **Total tests:** 984
-- ✅ **Passing:** 984 (100%)
+- 📊 **Total tests:** 1235
+- ✅ **Passing:** 1235 (100%)
 - Test breakdown:
   - Parser/Lexer tests: ~600
-  - Formatter tests: ~250 (edge cases, regression, Livewire, performance, wrapping, sorting)
+  - Formatter tests: ~490 (edge cases, regression, Livewire, performance, wrapping, sorting, closing style, self-closing, ignore comments, stress, chaos, idempotency)
   - Integration tests: ~100
   - Performance benchmarks: ~40
 
@@ -271,6 +326,9 @@ _(No medium priority issues at this time)_
 - ✅ **CLI tool (`blade parse`, `blade format`)**
 - ✅ **Line wrapping** (wrap attributes when line exceeds maxLineLength)
 - ✅ **Attribute sorting** (alphabetical or by type)
+- ✅ **Closing bracket style** (same line or new line)
+- ✅ **Self-closing normalization** (preserve, always, never)
+- ✅ **Ignore comments** (blade-formatter:off/on)
 
 **Known Limitations:**
 

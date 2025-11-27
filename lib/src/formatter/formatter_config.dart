@@ -37,6 +37,12 @@ class FormatterConfig {
   /// Controls how to sort attributes on HTML elements and components.
   final AttributeSort attributeSort;
 
+  /// Controls where the closing bracket appears when attributes are wrapped.
+  final ClosingBracketStyle closingBracketStyle;
+
+  /// Controls how empty elements are formatted (self-closing vs explicit close).
+  final SelfClosingStyle selfClosingStyle;
+
   /// Creates a formatter configuration.
   const FormatterConfig({
     this.indentSize = 4,
@@ -48,6 +54,8 @@ class FormatterConfig {
     this.slotFormatting = SlotFormatting.compact,
     this.wrapAttributes = WrapAttributes.auto,
     this.attributeSort = AttributeSort.none,
+    this.closingBracketStyle = ClosingBracketStyle.sameLine,
+    this.selfClosingStyle = SelfClosingStyle.preserve,
   });
 
   /// Creates a default formatter configuration.
@@ -72,146 +80,39 @@ class FormatterConfig {
   factory FormatterConfig.fromMap(Map<String, dynamic> map) {
     return FormatterConfig(
       indentSize: map['indent_size'] as int? ?? 4,
-      indentStyle:
-          map['indent_style'] == 'tabs' ? IndentStyle.tabs : IndentStyle.spaces,
+      indentStyle: IndentStyle.fromString(map['indent_style'] as String?),
       formatPhpExpressions: map['format_php_expressions'] as bool? ?? false,
       maxLineLength: map['max_line_length'] as int? ?? 120,
-      quoteStyle: _parseQuoteStyle(map['quote_style'] as String?),
+      quoteStyle: QuoteStyle.fromString(map['quote_style'] as String?),
       directiveSpacing:
-          _parseDirectiveSpacing(map['directive_spacing'] as String?),
-      slotFormatting: _parseSlotFormatting(map['slot_formatting'] as String?),
-      wrapAttributes: _parseWrapAttributes(map['wrap_attributes'] as String?),
-      attributeSort: _parseAttributeSort(map['attribute_sort'] as String?),
+          DirectiveSpacing.fromString(map['directive_spacing'] as String?),
+      slotFormatting:
+          SlotFormatting.fromString(map['slot_formatting'] as String?),
+      wrapAttributes:
+          WrapAttributes.fromString(map['wrap_attributes'] as String?),
+      attributeSort: AttributeSort.fromString(map['attribute_sort'] as String?),
+      closingBracketStyle:
+          ClosingBracketStyle.fromString(map['closing_bracket_style'] as String?),
+      selfClosingStyle:
+          SelfClosingStyle.fromString(map['self_closing_style'] as String?),
     );
-  }
-
-  static QuoteStyle _parseQuoteStyle(String? style) {
-    switch (style) {
-      case 'single':
-        return QuoteStyle.single;
-      case 'double':
-        return QuoteStyle.double;
-      default:
-        return QuoteStyle.preserve;
-    }
-  }
-
-  static DirectiveSpacing _parseDirectiveSpacing(String? spacing) {
-    switch (spacing) {
-      case 'none':
-        return DirectiveSpacing.none;
-      case 'between_blocks':
-        return DirectiveSpacing.betweenBlocks;
-      case 'preserve':
-        return DirectiveSpacing.preserve;
-      default:
-        return DirectiveSpacing.betweenBlocks;
-    }
-  }
-
-  static SlotFormatting _parseSlotFormatting(String? formatting) {
-    switch (formatting) {
-      case 'block':
-        return SlotFormatting.block;
-      case 'compact':
-        return SlotFormatting.compact;
-      default:
-        return SlotFormatting.compact;
-    }
-  }
-
-  static WrapAttributes _parseWrapAttributes(String? wrap) {
-    switch (wrap) {
-      case 'always':
-        return WrapAttributes.always;
-      case 'never':
-        return WrapAttributes.never;
-      case 'auto':
-        return WrapAttributes.auto;
-      default:
-        return WrapAttributes.auto;
-    }
-  }
-
-  static AttributeSort _parseAttributeSort(String? sort) {
-    switch (sort) {
-      case 'alphabetical':
-        return AttributeSort.alphabetical;
-      case 'by_type':
-        return AttributeSort.byType;
-      case 'none':
-        return AttributeSort.none;
-      default:
-        return AttributeSort.none;
-    }
   }
 
   /// Converts this configuration to a map.
   Map<String, dynamic> toMap() {
     return {
       'indent_size': indentSize,
-      'indent_style': indentStyle == IndentStyle.tabs ? 'tabs' : 'spaces',
+      'indent_style': indentStyle.value,
       'format_php_expressions': formatPhpExpressions,
       'max_line_length': maxLineLength,
-      'quote_style': _quoteStyleToString(quoteStyle),
-      'directive_spacing': _directiveSpacingToString(directiveSpacing),
-      'slot_formatting': _slotFormattingToString(slotFormatting),
-      'wrap_attributes': _wrapAttributesToString(wrapAttributes),
-      'attribute_sort': _attributeSortToString(attributeSort),
+      'quote_style': quoteStyle.value,
+      'directive_spacing': directiveSpacing.value,
+      'slot_formatting': slotFormatting.value,
+      'wrap_attributes': wrapAttributes.value,
+      'attribute_sort': attributeSort.value,
+      'closing_bracket_style': closingBracketStyle.value,
+      'self_closing_style': selfClosingStyle.value,
     };
-  }
-
-  String _quoteStyleToString(QuoteStyle style) {
-    switch (style) {
-      case QuoteStyle.single:
-        return 'single';
-      case QuoteStyle.double:
-        return 'double';
-      case QuoteStyle.preserve:
-        return 'preserve';
-    }
-  }
-
-  String _directiveSpacingToString(DirectiveSpacing spacing) {
-    switch (spacing) {
-      case DirectiveSpacing.none:
-        return 'none';
-      case DirectiveSpacing.betweenBlocks:
-        return 'between_blocks';
-      case DirectiveSpacing.preserve:
-        return 'preserve';
-    }
-  }
-
-  String _slotFormattingToString(SlotFormatting formatting) {
-    switch (formatting) {
-      case SlotFormatting.block:
-        return 'block';
-      case SlotFormatting.compact:
-        return 'compact';
-    }
-  }
-
-  String _wrapAttributesToString(WrapAttributes wrap) {
-    switch (wrap) {
-      case WrapAttributes.always:
-        return 'always';
-      case WrapAttributes.never:
-        return 'never';
-      case WrapAttributes.auto:
-        return 'auto';
-    }
-  }
-
-  String _attributeSortToString(AttributeSort sort) {
-    switch (sort) {
-      case AttributeSort.alphabetical:
-        return 'alphabetical';
-      case AttributeSort.byType:
-        return 'by_type';
-      case AttributeSort.none:
-        return 'none';
-    }
   }
 
   @override
@@ -233,22 +134,40 @@ class FormatterConfig {
 /// Style of indentation to use.
 enum IndentStyle {
   /// Use spaces for indentation.
-  spaces,
+  spaces('spaces'),
 
   /// Use tab characters for indentation.
-  tabs,
+  tabs('tabs');
+
+  final String value;
+  const IndentStyle(this.value);
+
+  static IndentStyle fromString(String? s) => switch (s) {
+        'tabs' => tabs,
+        _ => spaces,
+      };
 }
 
 /// Preferred quote style for HTML attributes.
 enum QuoteStyle {
   /// Prefer single quotes: `<div class='foo'>`
-  single,
+  single('single', "'"),
 
   /// Prefer double quotes: `<div class="foo">`
-  double,
+  double('double', '"'),
 
   /// Preserve the original quote style used in the source.
-  preserve,
+  preserve('preserve', '"');
+
+  final String value;
+  final String quoteChar;
+  const QuoteStyle(this.value, this.quoteChar);
+
+  static QuoteStyle fromString(String? s) => switch (s) {
+        'single' => single,
+        'double' => double,
+        _ => preserve,
+      };
 }
 
 /// Controls spacing between Blade directives.
@@ -260,7 +179,7 @@ enum DirectiveSpacing {
   /// @endforeach
   /// @while($count > 0)
   /// ```
-  none,
+  none('none'),
 
   /// Add blank line between closing and opening directives.
   ///
@@ -273,13 +192,23 @@ enum DirectiveSpacing {
   ///
   /// @while($count > 0)
   /// ```
-  betweenBlocks,
+  betweenBlocks('between_blocks'),
 
   /// Preserve blank lines as written in the source.
   ///
   /// The formatter will not add or remove blank lines between directives.
   /// This option gives full control to the developer.
-  preserve,
+  preserve('preserve');
+
+  final String value;
+  const DirectiveSpacing(this.value);
+
+  static DirectiveSpacing fromString(String? s) => switch (s) {
+        'none' => none,
+        'between_blocks' => betweenBlocks,
+        'preserve' => preserve,
+        _ => betweenBlocks,
+      };
 }
 
 /// Controls formatting style for component slots.
@@ -294,7 +223,7 @@ enum SlotFormatting {
   ///
   /// </x-slot>
   /// ```
-  block,
+  block('block'),
 
   /// Smart formatting - compact for simple slots, block for complex slots.
   ///
@@ -315,7 +244,15 @@ enum SlotFormatting {
   ///     <p>Second paragraph</p>
   /// </x-slot>
   /// ```
-  compact,
+  compact('compact');
+
+  final String value;
+  const SlotFormatting(this.value);
+
+  static SlotFormatting fromString(String? s) => switch (s) {
+        'block' => block,
+        _ => compact,
+      };
 }
 
 /// Controls when to wrap attributes to multiple lines.
@@ -329,7 +266,7 @@ enum WrapAttributes {
   ///     id="main"
   ///     data-value="123">
   /// ```
-  always,
+  always('always'),
 
   /// Never wrap attributes - keep on single line regardless of length.
   ///
@@ -337,25 +274,34 @@ enum WrapAttributes {
   /// ```blade
   /// <div class="container" id="main" data-value="123">
   /// ```
-  never,
+  never('never'),
 
   /// Automatically wrap when line exceeds maxLineLength.
   ///
   /// This is the default behavior. When the opening tag (including all
   /// attributes) would exceed maxLineLength, attributes are wrapped
   /// to multiple lines.
-  auto,
+  auto('auto');
+
+  final String value;
+  const WrapAttributes(this.value);
+
+  static WrapAttributes fromString(String? s) => switch (s) {
+        'always' => always,
+        'never' => never,
+        _ => auto,
+      };
 }
 
 /// Controls how to sort attributes on HTML elements and components.
 enum AttributeSort {
   /// Do not sort attributes - preserve original order.
-  none,
+  none('none'),
 
   /// Sort attributes alphabetically by name.
   ///
   /// Example: class, data-value, id, type
-  alphabetical,
+  alphabetical('alphabetical'),
 
   /// Sort attributes by type/category:
   /// 1. Standard HTML attributes (id, class, type, name, etc.)
@@ -365,5 +311,79 @@ enum AttributeSort {
   /// 5. Other attributes
   ///
   /// Within each category, attributes are sorted alphabetically.
-  byType,
+  byType('by_type');
+
+  final String value;
+  const AttributeSort(this.value);
+
+  static AttributeSort fromString(String? s) => switch (s) {
+        'alphabetical' => alphabetical,
+        'by_type' => byType,
+        _ => none,
+      };
+}
+
+/// Controls where the closing bracket appears when attributes are wrapped.
+enum ClosingBracketStyle {
+  /// Closing bracket on same line as last attribute (default).
+  ///
+  /// Example:
+  /// ```blade
+  /// <div
+  ///     class="container"
+  ///     id="main">
+  /// ```
+  sameLine('same_line'),
+
+  /// Closing bracket on its own line.
+  ///
+  /// Example:
+  /// ```blade
+  /// <div
+  ///     class="container"
+  ///     id="main"
+  /// >
+  /// ```
+  newLine('new_line');
+
+  final String value;
+  const ClosingBracketStyle(this.value);
+
+  static ClosingBracketStyle fromString(String? s) => switch (s) {
+        'new_line' => newLine,
+        _ => sameLine,
+      };
+}
+
+/// Controls how empty elements are formatted (self-closing vs explicit close).
+enum SelfClosingStyle {
+  /// Preserve the original style from the source.
+  ///
+  /// Self-closing elements remain self-closing, explicit closes remain explicit.
+  preserve('preserve'),
+
+  /// Convert empty elements to self-closing syntax.
+  ///
+  /// Example: `<div></div>` becomes `<div />`
+  ///
+  /// Does not apply to void elements (img, br, input, etc.) which are
+  /// always self-closing.
+  always('always'),
+
+  /// Convert self-closing elements to explicit close syntax.
+  ///
+  /// Example: `<div />` becomes `<div></div>`
+  ///
+  /// Does not apply to void elements (img, br, input, etc.) which are
+  /// always self-closing.
+  never('never');
+
+  final String value;
+  const SelfClosingStyle(this.value);
+
+  static SelfClosingStyle fromString(String? s) => switch (s) {
+        'always' => always,
+        'never' => never,
+        _ => preserve,
+      };
 }

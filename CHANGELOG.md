@@ -37,6 +37,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Configurable Slot Formatting:** Control formatting style for component slots
   - `SlotFormatting.compact` (default): Smart detection for simple vs complex slots
   - `SlotFormatting.block`: Always use block formatting with extra newlines
+- **Closing Bracket Style:** Control `>` placement when attributes are wrapped
+  - `ClosingBracketStyle.sameLine` (default): Keep `>` on same line as last attribute
+  - `ClosingBracketStyle.newLine`: Put `>` on its own line
+- **Self-closing Tag Normalization:** Control empty element formatting style
+  - `SelfClosingStyle.preserve` (default): Keep original style
+  - `SelfClosingStyle.always`: Convert empty elements to self-closing (`<div />`)
+  - `SelfClosingStyle.never`: Convert self-closing to explicit close (`<div></div>`)
+- **Ignore Comments:** Disable formatting for specific sections
+  - Use `{{-- blade-formatter:off --}}` / `{{-- blade-formatter:on --}}` (Blade comments)
+  - Use `<!-- blade-formatter:off -->` / `<!-- blade-formatter:on -->` (HTML comments)
+  - Also supports `format:off` / `format:on` short syntax
+  - Case-insensitive matching
+- **Additional Test Coverage:** Added 251 new formatter tests
+  - `formatter_closing_style_test.dart` (16 tests): Closing bracket style
+  - `formatter_self_closing_test.dart` (22 tests): Self-closing normalization
+  - `formatter_ignore_comments_test.dart` (19 tests): Ignore comments feature
+  - `formatter_stress_test.dart` (46 tests): Extreme whitespace, deep nesting, attribute soup, unicode
+  - `formatter_chaos_test.dart` (37 tests): Copy-paste chaos, multi-developer styles, tool-generated code
+  - `formatter_idempotency_stress_test.dart` (111 tests): Comprehensive idempotency verification across all formatter features
 
 ### Changed
 
@@ -46,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration file renamed from `.blade-format.json` to `.blade.json` for consistency
 - All justfile commands updated to use new CLI structure
 - All documentation updated with new command examples
-- Test suite expanded from 792 to 984 tests (100% passing)
+- Test suite expanded from 792 to 1235 tests (all passing)
 
 ### Removed
 

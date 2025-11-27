@@ -81,14 +81,10 @@ enum FixtureCategory {
   synthetic,
   other;
 
-  String get displayName {
-    switch (this) {
-      case FixtureCategory.edgeCases:
-        return 'edge_cases';
-      default:
-        return name;
-    }
-  }
+  String get displayName => switch (this) {
+        FixtureCategory.edgeCases => 'edge_cases',
+        _ => name,
+      };
 
   /// Should this category be expected to parse successfully?
   bool get shouldSucceed {

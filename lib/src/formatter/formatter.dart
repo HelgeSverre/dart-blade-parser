@@ -52,7 +52,8 @@ class BladeFormatter {
     }
 
     // Use the visitor to format the AST
-    final visitor = FormatterVisitor(config);
+    // Pass the original source for ignore comment support
+    final visitor = FormatterVisitor(config, source: source);
     return visitor.format(result.ast!);
   }
 

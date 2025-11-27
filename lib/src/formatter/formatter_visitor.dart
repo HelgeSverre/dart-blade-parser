@@ -12,6 +12,15 @@ class FormatterVisitor implements AstVisitor<String> {
   final IndentTracker _indent;
   final StringBuffer _output = StringBuffer();
 
+  /// Original source for raw output in ignored sections.
+  final String? _source;
+
+  /// Whether formatting is currently enabled.
+  ///
+  /// Set to `false` when encountering a `blade-formatter:off` comment,
+  /// and back to `true` when encountering `blade-formatter:on`.
+  bool _formattingEnabled = true;
+
   /// HTML void elements that should not have closing tags.
   static const Set<String> _voidElements = {
     'area',
@@ -167,14 +176,79 @@ class FormatterVisitor implements AstVisitor<String> {
     'aria-describedby',
   };
 
-  FormatterVisitor(this.config) : _indent = IndentTracker(config);
+  FormatterVisitor(this.config, {String? source})
+      : _source = source,
+        _indent = IndentTracker(config);
 
   /// Formats the AST and returns the formatted string.
   String format(AstNode node) {
     _output.clear();
     _indent.reset();
+    _formattingEnabled = true;
     node.accept(this);
     return _output.toString();
+  }
+
+  /// Checks if a comment is a formatter control comment.
+  ///
+  /// Returns 'off' if it disables formatting, 'on' if it enables formatting,
+  /// or null if it's not a control comment.
+  ///
+  /// Supports the following patterns (case-insensitive):
+  /// - `blade-formatter:off` / `blade-formatter:on`
+  /// - `blade-formatter-disable` / `blade-formatter-enable`
+  /// - `format:off` / `format:on`
+  String? _getFormatterControl(String content) {
+    // Normalize the content by stripping comment delimiters and trimming
+    var text = content;
+
+    // Strip Blade comment delimiters
+    if (text.startsWith('{{--')) {
+      text = text.substring(4);
+    }
+    if (text.endsWith('--}}')) {
+      text = text.substring(0, text.length - 4);
+    }
+
+    // Strip HTML comment delimiters
+    if (text.startsWith('<!--')) {
+      text = text.substring(4);
+    }
+    if (text.endsWith('-->')) {
+      text = text.substring(0, text.length - 3);
+    }
+
+    text = text.trim().toLowerCase();
+
+    // Check for off commands
+    if (text == 'blade-formatter:off' ||
+        text == 'blade-formatter-disable' ||
+        text == 'format:off') {
+      return 'off';
+    }
+
+    // Check for on commands
+    if (text == 'blade-formatter:on' ||
+        text == 'blade-formatter-enable' ||
+        text == 'format:on') {
+      return 'on';
+    }
+
+    return null;
+  }
+
+  /// Outputs the raw source text for a node.
+  ///
+  /// Used when formatting is disabled to preserve the original text.
+  void _outputRaw(AstNode node) {
+    if (_source == null) return;
+
+    final start = node.startPosition.offset;
+    final end = node.endPosition.offset;
+
+    if (start >= 0 && end <= _source!.length && start < end) {
+      _output.write(_source!.substring(start, end));
+    }
   }
 
   /// Returns the category priority for an attribute (for byType sorting).
@@ -287,14 +361,25 @@ class FormatterVisitor implements AstVisitor<String> {
         _output.write(_indent.current);
         _output.write(_formatAttribute(sortedAttrs[i]));
 
-        if (i < sortedAttrs.length - 1) {
+        final isLastAttr = i == sortedAttrs.length - 1;
+
+        if (isLastAttr) {
+          // Last attribute - closing bracket placement depends on style
+          if (config.closingBracketStyle == ClosingBracketStyle.newLine) {
+            // Bracket on its own line
+            _output.writeln();
+            _indent.decrease();
+            _output.write(_indent.current);
+            _output.write(closingBracket.trim());
+          } else {
+            // Bracket on same line as last attribute (default)
+            _output.write(closingBracket);
+            _indent.decrease();
+          }
+        } else {
           _output.writeln();
         }
       }
-
-      // Closing bracket on same line as last attribute or new line
-      _output.write(closingBracket);
-      _indent.decrease();
     } else {
       // Single-line formatting: all attributes on same line
       for (final attr in sortedAttrs) {
@@ -309,11 +394,7 @@ class FormatterVisitor implements AstVisitor<String> {
   ///
   /// Handles escaping and quote style conversion based on config.quoteStyle.
   String _formatAttributeValue(String value) {
-    final quote = switch (config.quoteStyle) {
-      QuoteStyle.single => "'",
-      QuoteStyle.double => '"',
-      QuoteStyle.preserve => '"', // Default to double quotes
-    };
+    final quote = config.quoteStyle.quoteChar;
 
     // Escape quotes in the value if needed
     String escaped = value;
@@ -334,7 +415,8 @@ class FormatterVisitor implements AstVisitor<String> {
       final child = node.children[i];
 
       // Handle whitespace-only text nodes that represent blank lines
-      if (child is TextNode && child.content.trim().isEmpty) {
+      // Only apply this logic when formatting is enabled
+      if (_formattingEnabled && child is TextNode && child.content.trim().isEmpty) {
         // Count the number of newlines in this text node
         final newlineCount = '\n'.allMatches(child.content).length;
 
@@ -348,8 +430,8 @@ class FormatterVisitor implements AstVisitor<String> {
 
       child.accept(this);
 
-      // Add spacing between top-level elements
-      if (i < node.children.length - 1) {
+      // Add spacing between top-level elements (only when formatting is enabled)
+      if (_formattingEnabled && i < node.children.length - 1) {
         // Find the next meaningful (non-whitespace) node
         AstNode? nextMeaningful;
         for (var j = i + 1; j < node.children.length; j++) {
@@ -383,6 +465,12 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitDirective(DirectiveNode node) {
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
     final isBlock = _blockDirectives.contains(node.name);
 
     // Write the directive opening
@@ -435,6 +523,12 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitEcho(EchoNode node) {
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
     _output.write(_indent.current);
 
     if (node.isRaw) {
@@ -449,6 +543,12 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitText(TextNode node) {
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
     // Handle text content carefully to preserve meaningful whitespace
     final content = node.content;
 
@@ -493,9 +593,23 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitHtmlElement(HtmlElementNode node) {
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
     final tagName = node.tagName.toLowerCase();
     final isVoid = _voidElements.contains(tagName);
     final attributes = node.attributes.values.toList();
+
+    // Check if element has meaningful content
+    final hasContent = node.children.any(
+      (child) => child is! TextNode || child.content.trim().isNotEmpty,
+    );
+
+    // Determine if we should format as self-closing
+    final shouldSelfClose = !isVoid && !hasContent && _shouldSelfClose(node.isSelfClosing);
 
     // Write opening tag
     _output.write(_indent.current);
@@ -506,11 +620,18 @@ class FormatterVisitor implements AstVisitor<String> {
       node.tagName,
       attributes,
       isComponent: false,
-      isSelfClosing: isVoid,
+      isSelfClosing: isVoid || shouldSelfClose,
     );
 
     if (isVoid) {
       _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
+      _output.writeln();
+      return '';
+    }
+
+    // Handle self-closing non-void elements
+    if (shouldSelfClose) {
+      _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
       _output.writeln();
       return '';
     }
@@ -630,6 +751,12 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitComponent(ComponentNode node) {
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
     final attributes = node.attributes.values.toList();
 
     // Check if component has content (slots or non-whitespace children)
@@ -637,6 +764,9 @@ class FormatterVisitor implements AstVisitor<String> {
         node.children.any(
           (child) => child is! TextNode || child.content.trim().isNotEmpty,
         );
+
+    // Determine if we should format as self-closing
+    final shouldSelfClose = !hasContent && _shouldSelfClose(node.isSelfClosing);
 
     // Write opening tag
     _output.write(_indent.current);
@@ -647,12 +777,20 @@ class FormatterVisitor implements AstVisitor<String> {
       node.name,
       attributes,
       isComponent: true,
-      isSelfClosing: !hasContent,
+      isSelfClosing: shouldSelfClose,
     );
 
-    // Self-closing if no content
-    if (!hasContent) {
+    // Handle self-closing components
+    if (shouldSelfClose) {
       _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
+      _output.writeln();
+      return '';
+    }
+
+    // For empty components with selfClosingStyle.never, output explicit close
+    if (!hasContent) {
+      _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
+      _output.write('</x-${node.name}>');
       _output.writeln();
       return '';
     }
@@ -731,8 +869,42 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitComment(CommentNode node) {
-    _output.write(_indent.current);
+    // Check if this is a formatter control comment
+    final control = _getFormatterControl(node.content);
 
+    if (control == 'off') {
+      // Disable formatting and output the comment
+      // Don't add trailing newline - the following raw text will preserve spacing
+      _formattingEnabled = false;
+      _output.write(_indent.current);
+      _formatComment(node);
+      return '';
+    }
+
+    if (control == 'on') {
+      // Re-enable formatting and output the comment
+      _formattingEnabled = true;
+      _output.write(_indent.current);
+      _formatComment(node);
+      _output.writeln();
+      return '';
+    }
+
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
+    // Normal comment formatting
+    _output.write(_indent.current);
+    _formatComment(node);
+    _output.writeln();
+    return '';
+  }
+
+  /// Formats a comment node with proper delimiters.
+  void _formatComment(CommentNode node) {
     var content = node.content;
 
     // Strip delimiters if they're already in the content (parser includes them)
@@ -749,13 +921,16 @@ class FormatterVisitor implements AstVisitor<String> {
       content = content.trim();
       _output.write('<!-- $content -->');
     }
-
-    _output.writeln();
-    return '';
   }
 
   @override
   String visitSlot(SlotNode node) {
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
     final attributes = node.attributes.values.toList();
 
     // Write opening slot tag
@@ -870,6 +1045,12 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitError(ErrorNode node) {
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
     // Preserve error nodes as-is (shouldn't happen in well-formed input)
     _output.write(_indent.current);
     _output.write('<!-- ERROR: ${node.error} -->');
@@ -929,6 +1110,21 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     return false;
+  }
+
+  /// Determines if an empty element should be formatted as self-closing.
+  ///
+  /// Takes the original `isSelfClosing` value from the AST and applies
+  /// the configured `selfClosingStyle` to decide the output format.
+  bool _shouldSelfClose(bool originalIsSelfClosing) {
+    switch (config.selfClosingStyle) {
+      case SelfClosingStyle.preserve:
+        return originalIsSelfClosing;
+      case SelfClosingStyle.always:
+        return true;
+      case SelfClosingStyle.never:
+        return false;
+    }
   }
 
   /// Checks if a directive has a closing tag.

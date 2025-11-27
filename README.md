@@ -2,7 +2,7 @@
 
 [![Playground](https://img.shields.io/badge/Try_Playground-Live-blue?style=for-the-badge)](http://dart-blade-parser-playground.vercel.app/)
 
-> **Note:** This project is stable and production-ready. The core parser and formatter are well-tested with 984 tests covering edge cases, performance, and real-world scenarios. API breaking changes will follow semantic versioning.
+> **Note:** This project is stable and production-ready. The core parser and formatter are well-tested with 1235 tests covering edge cases, performance, and real-world scenarios. API breaking changes will follow semantic versioning.
 
 A pure Dart parser for Laravel Blade templates. Produces a typed AST with full support for Blade directives, components, Alpine.js, and Livewire attributes. Includes robust error recovery, JSON serialization, and an idempotent formatter.
 
@@ -190,7 +190,7 @@ See [justfile](justfile) for complete command reference and additional options.
 - JSON serialization for interoperability
 - Zero external parsing dependencies
 - Idempotent formatter with configurable style
-- 112 test fixtures (17,500+ lines) with 984 tests covering real-world and synthetic cases
+- 112 test fixtures (17,500+ lines) with 1235 tests covering real-world and synthetic cases
 
 ## Use Cases
 
@@ -346,6 +346,8 @@ final config = FormatterConfig(
   maxLineLength: 120,                         // Default: 120
   wrapAttributes: WrapAttributes.auto,        // Default: auto
   attributeSort: AttributeSort.none,          // Default: none
+  closingBracketStyle: ClosingBracketStyle.sameLine,  // Default: sameLine
+  selfClosingStyle: SelfClosingStyle.preserve,        // Default: preserve
 );
 
 final formatter = BladeFormatter(config: config);
@@ -375,6 +377,13 @@ final formatter = BladeFormatter(config: config);
   - `AttributeSort.none`: Preserve original order (default)
   - `AttributeSort.alphabetical`: Sort attributes alphabetically
   - `AttributeSort.byType`: Sort by type (HTML → data-* → Alpine → Livewire → other)
+- `closingBracketStyle`: Control closing bracket placement when attributes wrap
+  - `ClosingBracketStyle.sameLine`: Keep `>` on same line as last attribute (default)
+  - `ClosingBracketStyle.newLine`: Put `>` on its own line
+- `selfClosingStyle`: Control empty element formatting
+  - `SelfClosingStyle.preserve`: Keep original style (default)
+  - `SelfClosingStyle.always`: Convert empty elements to self-closing (`<div />`)
+  - `SelfClosingStyle.never`: Convert self-closing to explicit close (`<div></div>`)
 
 ### API
 
@@ -410,6 +419,9 @@ if (formatter.needsFormatting(source)) {
 - **Line wrapping** - Wrap long attribute lists when exceeding maxLineLength
 - **Multi-line attributes** - Format attributes one per line when wrapping
 - **Attribute sorting** - Sort alphabetically or by type (HTML, data-*, Alpine, Livewire)
+- **Closing bracket style** - Control `>` placement when wrapping (same line or new line)
+- **Self-closing normalization** - Convert between `<div />` and `<div></div>` styles
+- **Ignore comments** - Disable formatting for sections with `{{-- blade-formatter:off --}}`
 - Preserves boolean attributes
 - Preserves line breaks between echo statements
 - Adds final newline
@@ -530,6 +542,29 @@ if (formatter.needsFormatting(source)) {
 ```blade
 <input class="form-input" id="email" type="email" data-testid="email" x-on:blur="validate" wire:model="email">
 ```
+
+#### Ignore Comments
+
+Use special comments to disable formatting for specific sections:
+
+```blade
+{{-- blade-formatter:off --}}
+<table>
+<tr><td>1</td><td>2</td><td>3</td></tr>
+<tr><td>4</td><td>5</td><td>6</td></tr>
+</table>
+{{-- blade-formatter:on --}}
+
+<!-- Also works with HTML comments -->
+<!-- blade-formatter:off -->
+<pre>   Preserved   whitespace   </pre>
+<!-- blade-formatter:on -->
+```
+
+**Supported patterns (case-insensitive):**
+- `blade-formatter:off` / `blade-formatter:on`
+- `blade-formatter-disable` / `blade-formatter-enable`
+- `format:off` / `format:on`
 
 ## Architecture
 
@@ -719,7 +754,6 @@ Located in [tool/format_file.dart](tool/format_file.dart).
 - Formatter does not reformat PHP expressions inside directives/echoes
 - True streaming/incremental parsing not implemented (stub exists)
 - Some component error positions are coarse but recoverable
-- Line wrapping not implemented (maxLineLength is a placeholder)
 - Not a PHP evaluator or security engine (parses syntax safely)
 
 ## API Documentation
