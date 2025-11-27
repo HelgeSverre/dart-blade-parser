@@ -18,7 +18,8 @@ class FormatterConfig {
 
   /// Maximum line length before considering wrapping.
   ///
-  /// Note: Line wrapping is not yet implemented in MVP.
+  /// When a line exceeds this length, the formatter will attempt to wrap
+  /// it by breaking attributes to multiple lines.
   final int maxLineLength;
 
   /// Preferred quote style for HTML attributes.
@@ -30,6 +31,12 @@ class FormatterConfig {
   /// Controls formatting style for component slots.
   final SlotFormatting slotFormatting;
 
+  /// Controls when to wrap attributes to multiple lines.
+  final WrapAttributes wrapAttributes;
+
+  /// Controls how to sort attributes on HTML elements and components.
+  final AttributeSort attributeSort;
+
   /// Creates a formatter configuration.
   const FormatterConfig({
     this.indentSize = 4,
@@ -39,6 +46,8 @@ class FormatterConfig {
     this.quoteStyle = QuoteStyle.preserve,
     this.directiveSpacing = DirectiveSpacing.betweenBlocks,
     this.slotFormatting = SlotFormatting.compact,
+    this.wrapAttributes = WrapAttributes.auto,
+    this.attributeSort = AttributeSort.none,
   });
 
   /// Creates a default formatter configuration.
@@ -71,6 +80,8 @@ class FormatterConfig {
       directiveSpacing:
           _parseDirectiveSpacing(map['directive_spacing'] as String?),
       slotFormatting: _parseSlotFormatting(map['slot_formatting'] as String?),
+      wrapAttributes: _parseWrapAttributes(map['wrap_attributes'] as String?),
+      attributeSort: _parseAttributeSort(map['attribute_sort'] as String?),
     );
   }
 
@@ -109,6 +120,32 @@ class FormatterConfig {
     }
   }
 
+  static WrapAttributes _parseWrapAttributes(String? wrap) {
+    switch (wrap) {
+      case 'always':
+        return WrapAttributes.always;
+      case 'never':
+        return WrapAttributes.never;
+      case 'auto':
+        return WrapAttributes.auto;
+      default:
+        return WrapAttributes.auto;
+    }
+  }
+
+  static AttributeSort _parseAttributeSort(String? sort) {
+    switch (sort) {
+      case 'alphabetical':
+        return AttributeSort.alphabetical;
+      case 'by_type':
+        return AttributeSort.byType;
+      case 'none':
+        return AttributeSort.none;
+      default:
+        return AttributeSort.none;
+    }
+  }
+
   /// Converts this configuration to a map.
   Map<String, dynamic> toMap() {
     return {
@@ -119,6 +156,8 @@ class FormatterConfig {
       'quote_style': _quoteStyleToString(quoteStyle),
       'directive_spacing': _directiveSpacingToString(directiveSpacing),
       'slot_formatting': _slotFormattingToString(slotFormatting),
+      'wrap_attributes': _wrapAttributesToString(wrapAttributes),
+      'attribute_sort': _attributeSortToString(attributeSort),
     };
   }
 
@@ -153,6 +192,28 @@ class FormatterConfig {
     }
   }
 
+  String _wrapAttributesToString(WrapAttributes wrap) {
+    switch (wrap) {
+      case WrapAttributes.always:
+        return 'always';
+      case WrapAttributes.never:
+        return 'never';
+      case WrapAttributes.auto:
+        return 'auto';
+    }
+  }
+
+  String _attributeSortToString(AttributeSort sort) {
+    switch (sort) {
+      case AttributeSort.alphabetical:
+        return 'alphabetical';
+      case AttributeSort.byType:
+        return 'by_type';
+      case AttributeSort.none:
+        return 'none';
+    }
+  }
+
   @override
   String toString() {
     return 'FormatterConfig('
@@ -162,7 +223,9 @@ class FormatterConfig {
         'maxLineLength: $maxLineLength, '
         'quoteStyle: $quoteStyle, '
         'directiveSpacing: $directiveSpacing, '
-        'slotFormatting: $slotFormatting'
+        'slotFormatting: $slotFormatting, '
+        'wrapAttributes: $wrapAttributes, '
+        'attributeSort: $attributeSort'
         ')';
   }
 }
@@ -253,4 +316,54 @@ enum SlotFormatting {
   /// </x-slot>
   /// ```
   compact,
+}
+
+/// Controls when to wrap attributes to multiple lines.
+enum WrapAttributes {
+  /// Always wrap attributes to multiple lines (one per line).
+  ///
+  /// Example:
+  /// ```blade
+  /// <div
+  ///     class="container"
+  ///     id="main"
+  ///     data-value="123">
+  /// ```
+  always,
+
+  /// Never wrap attributes - keep on single line regardless of length.
+  ///
+  /// Example:
+  /// ```blade
+  /// <div class="container" id="main" data-value="123">
+  /// ```
+  never,
+
+  /// Automatically wrap when line exceeds maxLineLength.
+  ///
+  /// This is the default behavior. When the opening tag (including all
+  /// attributes) would exceed maxLineLength, attributes are wrapped
+  /// to multiple lines.
+  auto,
+}
+
+/// Controls how to sort attributes on HTML elements and components.
+enum AttributeSort {
+  /// Do not sort attributes - preserve original order.
+  none,
+
+  /// Sort attributes alphabetically by name.
+  ///
+  /// Example: class, data-value, id, type
+  alphabetical,
+
+  /// Sort attributes by type/category:
+  /// 1. Standard HTML attributes (id, class, type, name, etc.)
+  /// 2. Data attributes (data-*)
+  /// 3. Alpine.js attributes (x-*, @*, :*)
+  /// 4. Livewire attributes (wire:*)
+  /// 5. Other attributes
+  ///
+  /// Within each category, attributes are sorted alphabetically.
+  byType,
 }

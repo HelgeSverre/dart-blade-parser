@@ -135,6 +135,38 @@ class FormatterVisitor implements AstVisitor<String> {
     'endverbatim',
   };
 
+  /// Standard HTML attributes that should appear first when sorting by type.
+  static const Set<String> _standardHtmlAttributes = {
+    'id',
+    'class',
+    'style',
+    'type',
+    'name',
+    'value',
+    'href',
+    'src',
+    'alt',
+    'title',
+    'width',
+    'height',
+    'disabled',
+    'readonly',
+    'required',
+    'checked',
+    'selected',
+    'placeholder',
+    'action',
+    'method',
+    'target',
+    'rel',
+    'for',
+    'role',
+    'tabindex',
+    'aria-label',
+    'aria-hidden',
+    'aria-describedby',
+  };
+
   FormatterVisitor(this.config) : _indent = IndentTracker(config);
 
   /// Formats the AST and returns the formatted string.
@@ -143,6 +175,134 @@ class FormatterVisitor implements AstVisitor<String> {
     _indent.reset();
     node.accept(this);
     return _output.toString();
+  }
+
+  /// Returns the category priority for an attribute (for byType sorting).
+  /// Lower numbers come first.
+  int _getAttributeCategory(String name) {
+    // 1. Standard HTML attributes
+    if (_standardHtmlAttributes.contains(name.toLowerCase())) {
+      return 1;
+    }
+    // 2. Data attributes
+    if (name.startsWith('data-')) {
+      return 2;
+    }
+    // 3. Alpine.js attributes (x-*, @*, :*)
+    if (name.startsWith('x-') || name.startsWith('@') || name.startsWith(':')) {
+      return 3;
+    }
+    // 4. Livewire attributes (wire:*)
+    if (name.startsWith('wire:')) {
+      return 4;
+    }
+    // 5. Other attributes
+    return 5;
+  }
+
+  /// Sorts attributes according to the configured sort order.
+  List<AttributeNode> _sortAttributes(Iterable<AttributeNode> attributes) {
+    final list = attributes.toList();
+
+    switch (config.attributeSort) {
+      case AttributeSort.none:
+        return list;
+
+      case AttributeSort.alphabetical:
+        list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        return list;
+
+      case AttributeSort.byType:
+        list.sort((a, b) {
+          final catA = _getAttributeCategory(a.name);
+          final catB = _getAttributeCategory(b.name);
+          if (catA != catB) {
+            return catA.compareTo(catB);
+          }
+          // Within same category, sort alphabetically
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        return list;
+    }
+  }
+
+  /// Formats a single attribute and returns its string representation.
+  String _formatAttribute(AttributeNode attr) {
+    if (attr.value == null) {
+      return attr.name;
+    }
+    return '${attr.name}=${_formatAttributeValue(attr.value!)}';
+  }
+
+  /// Calculates the length of the opening tag if all attributes were on one line.
+  int _calculateSingleLineTagLength(String tagName, List<AttributeNode> attributes, {bool isComponent = false, bool isSelfClosing = false}) {
+    final prefix = isComponent ? '<x-$tagName' : '<$tagName';
+    var length = _indent.current.length + prefix.length;
+
+    for (final attr in attributes) {
+      length += 1 + _formatAttribute(attr).length; // +1 for space
+    }
+
+    length += isSelfClosing ? 3 : 1; // ' />' or '>'
+    return length;
+  }
+
+  /// Determines if attributes should be wrapped to multiple lines.
+  bool _shouldWrapAttributes(String tagName, List<AttributeNode> attributes, {bool isComponent = false, bool isSelfClosing = false}) {
+    if (attributes.isEmpty) return false;
+
+    switch (config.wrapAttributes) {
+      case WrapAttributes.always:
+        return attributes.length > 1;
+
+      case WrapAttributes.never:
+        return false;
+
+      case WrapAttributes.auto:
+        final lineLength = _calculateSingleLineTagLength(
+          tagName,
+          attributes,
+          isComponent: isComponent,
+          isSelfClosing: isSelfClosing,
+        );
+        return lineLength > config.maxLineLength;
+    }
+  }
+
+  /// Writes attributes, either inline or wrapped to multiple lines.
+  void _writeAttributes(List<AttributeNode> attributes, {required bool wrap, required String closingBracket}) {
+    if (attributes.isEmpty) {
+      _output.write(closingBracket);
+      return;
+    }
+
+    final sortedAttrs = _sortAttributes(attributes);
+
+    if (wrap) {
+      // Multi-line formatting: one attribute per line
+      _output.writeln();
+      _indent.increase();
+
+      for (var i = 0; i < sortedAttrs.length; i++) {
+        _output.write(_indent.current);
+        _output.write(_formatAttribute(sortedAttrs[i]));
+
+        if (i < sortedAttrs.length - 1) {
+          _output.writeln();
+        }
+      }
+
+      // Closing bracket on same line as last attribute or new line
+      _output.write(closingBracket);
+      _indent.decrease();
+    } else {
+      // Single-line formatting: all attributes on same line
+      for (final attr in sortedAttrs) {
+        _output.write(' ');
+        _output.write(_formatAttribute(attr));
+      }
+      _output.write(closingBracket);
+    }
   }
 
   /// Formats an attribute value with the appropriate quote style.
@@ -335,31 +495,27 @@ class FormatterVisitor implements AstVisitor<String> {
   String visitHtmlElement(HtmlElementNode node) {
     final tagName = node.tagName.toLowerCase();
     final isVoid = _voidElements.contains(tagName);
+    final attributes = node.attributes.values.toList();
 
     // Write opening tag
     _output.write(_indent.current);
     _output.write('<${node.tagName}');
 
-    // Write attributes
-    if (node.attributes.isNotEmpty) {
-      for (final attr in node.attributes.values) {
-        _output.write(' ');
-        _output.write(attr.name);
-
-        if (attr.value != null) {
-          _output.write('=');
-          _output.write(_formatAttributeValue(attr.value!));
-        }
-      }
-    }
+    // Determine if we should wrap attributes
+    final shouldWrap = _shouldWrapAttributes(
+      node.tagName,
+      attributes,
+      isComponent: false,
+      isSelfClosing: isVoid,
+    );
 
     if (isVoid) {
-      _output.write('>');
+      _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
       _output.writeln();
       return '';
     }
 
-    _output.write('>');
+    _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
 
     // Format children
     if (node.children.isNotEmpty) {
@@ -474,22 +630,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitComponent(ComponentNode node) {
-    // Write opening tag
-    _output.write(_indent.current);
-    _output.write('<x-${node.name}');
-
-    // Write attributes
-    if (node.attributes.isNotEmpty) {
-      for (final attr in node.attributes.values) {
-        _output.write(' ');
-        _output.write(attr.name);
-
-        if (attr.value != null) {
-          _output.write('=');
-          _output.write(_formatAttributeValue(attr.value!));
-        }
-      }
-    }
+    final attributes = node.attributes.values.toList();
 
     // Check if component has content (slots or non-whitespace children)
     final hasContent = node.slots.isNotEmpty ||
@@ -497,14 +638,26 @@ class FormatterVisitor implements AstVisitor<String> {
           (child) => child is! TextNode || child.content.trim().isNotEmpty,
         );
 
+    // Write opening tag
+    _output.write(_indent.current);
+    _output.write('<x-${node.name}');
+
+    // Determine if we should wrap attributes
+    final shouldWrap = _shouldWrapAttributes(
+      node.name,
+      attributes,
+      isComponent: true,
+      isSelfClosing: !hasContent,
+    );
+
     // Self-closing if no content
     if (!hasContent) {
-      _output.write(' />');
+      _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
       _output.writeln();
       return '';
     }
 
-    _output.write('>');
+    _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
 
     // Format children
     // Check if we can keep content inline
@@ -603,26 +756,21 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitSlot(SlotNode node) {
+    final attributes = node.attributes.values.toList();
+
     // Write opening slot tag
     _output.write(_indent.current);
-
     _output.write('<x-slot:${node.name}');
 
-    // Write attributes if present
-    if (node.attributes.isNotEmpty) {
-      for (final attr in node.attributes.values) {
-        _output.write(' ');
-        _output.write(attr.name);
+    // Determine if we should wrap attributes
+    final shouldWrap = _shouldWrapAttributes(
+      'slot:${node.name}',
+      attributes,
+      isComponent: true,
+      isSelfClosing: false,
+    );
 
-        if (attr.value != null) {
-          _output.write('=');
-          // Always quote attribute values for consistency
-          _output.write('"${attr.value}"');
-        }
-      }
-    }
-
-    _output.write('>');
+    _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
 
     // Format children
     if (node.children.isEmpty) {
