@@ -1,6 +1,6 @@
 # Edge Cases and Known Limitations
 
-**Last Updated:** 2025-10-10
+**Last Updated:** 2025-11-27
 
 This document catalogs all edge cases, limitations, and known issues in the dart-blade-parser. Issues are prioritized by severity and implementation complexity.
 
@@ -135,55 +135,39 @@ _(No medium priority issues at this time)_
 
 **Completed:**
 
-- ✅ **Comprehensive Test Coverage** (COMPLETED 2025-10-26)
+- ✅ **Comprehensive Test Coverage** (COMPLETED 2025-11-27)
   - ✅ CLI Integration Tests (39 tests for bin/blade.dart)
-    - Format command modes (--write, --check, --stdin, stdout)
-    - Exit codes (0, 1, 2) for all scenarios
-    - File discovery (single files, directories, glob patterns, deduplication)
-    - JSON configuration loading and CLI overrides
-    - Verbose output and comprehensive error handling
   - ✅ Configuration Tests (52 tests for FormatterConfig)
-    - Constructor and factory methods
-    - fromMap() with valid, null, and edge case inputs
-    - toMap() serialization and roundtrip testing
-    - Real-world configuration scenarios
-  - ✅ Formatter Edge Case Tests (67 tests, 64 passing)
-    - Deep nesting (5-10 levels, mixed directive types)
-    - Raw text elements (<script>, <style>, <textarea>)
-    - Blade raw blocks (@verbatim, @php, @js)
-    - Alpine.js attributes (x-data, x-on, x-bind, x-show)
-    - Quote styles (double, single, mixed, escaped)
-    - Whitespace handling (inline elements, excessive space, tabs, line endings)
-    - Empty and minimal files
-    - Mixed line endings (CRLF/LF normalization)
-    - HTML entities preservation
-    - Complex real-world scenarios (auth, components with slots, Livewire+Alpine, forms with CSRF)
-  - ✅ **Test Suite Statistics:**
-    - Total tests: 769 (was 532, +237 new tests)
-    - Passing: 766 (99.6%)
-    - Failing: 3 (known edge cases - quote style preservation, whitespace-only input)
+  - ✅ Formatter Edge Case Tests (94 tests)
+  - ✅ Formatter Performance Tests (15 tests)
+  - ✅ Formatter Regression Tests (39 tests)
+  - ✅ Formatter Livewire Tests (39 tests)
+  - ✅ Formatter Wrapping Tests (33 tests)
+  - ✅ Formatter Sorting Tests (39 tests)
+  - ✅ Idempotency Tests (verified across all fixtures)
+  - ✅ **Test Suite: 984 tests, 100% passing**
 
-**Next Steps - Formatter Focus:**
+**Completed - Formatter Enhancements (2025-11-27):**
 
-1. **Code Cleanup** - High Priority (15-20 minutes)
-   - Remove unused variables and methods (see below)
-   - Delete old HTML report files
-   - Clean up technical debt
-   - Estimated effort: 15-20 minutes
+1. ✅ **Line Wrapping** - COMPLETED
+   - Implemented maxLineLength feature
+   - Wrap long attribute lists to multiple lines
+   - Configurable via `WrapAttributes` enum (auto, always, never)
 
-2. **Quote Style Preservation** - Medium Priority (2-3 hours)
-   - Implement QuoteStyle.single and QuoteStyle.double formatting
-   - Add quote style conversion logic to formatter_visitor.dart
-   - Currently only preserves existing quotes (normalizes to double)
-   - Fix 3 failing formatter tests
-   - Estimated effort: 2-3 hours
+2. ✅ **Multi-line Attribute Formatting** - COMPLETED
+   - Break attributes to separate lines when line exceeds maxLineLength
+   - Each attribute on its own line with proper indentation
+   - Works with HTML elements, components, and slots
 
-3. **Formatter Documentation** - Medium Priority (2-3 hours)
-   - Create `docs/FORMATTER.md` with all formatting rules
-   - Document configuration options (JSON only)
-   - Add before/after examples for each formatting rule
-   - Include CLI usage examples and integration guide
-   - Estimated effort: 2-3 hours
+3. ✅ **Attribute Sorting** - COMPLETED
+   - Sort attributes alphabetically or by category
+   - `AttributeSort.byType` sorts: HTML → data-* → Alpine → Livewire → other
+   - Within categories, sorts alphabetically
+
+4. **Formatter Documentation** - Low Priority
+   - README.md updated with new configuration options
+   - Add before/after examples for wrapping and sorting ✅
+   - Create `docs/FORMATTER.md` with all formatting rules (future)
 
 **Future Enhancements:**
 
@@ -197,6 +181,10 @@ _(No medium priority issues at this time)_
   - Configuration file support
   - Hover documentation for directives
   - Status bar integration
+
+- **EditorConfig Integration** (1 day)
+  - Read indent_size, indent_style from .editorconfig
+  - Fall back to .blade.json if present
 
 ### High Priority - Quick Wins (Code Cleanup)
 
@@ -257,30 +245,37 @@ _(No medium priority issues at this time)_
 
 **Test Suite Statistics:**
 
-- 📊 **Total tests:** 532
-- ✅ **Passing:** 530 (99.6%)
-- ⚠️ **Failing:** 2 (both marked "EXPECTED TO FAIL")
-  - Component error position (cosmetic - error still reported)
-  - Streaming incremental (feature not implemented)
+- 📊 **Total tests:** 984
+- ✅ **Passing:** 984 (100%)
+- Test breakdown:
+  - Parser/Lexer tests: ~600
+  - Formatter tests: ~250 (edge cases, regression, Livewire, performance, wrapping, sorting)
+  - Integration tests: ~100
+  - Performance benchmarks: ~40
 
 **Working Well:**
 
-- ✅ All 75+ Blade directives
+- ✅ All 108 Blade directives
 - ✅ Component parsing with slots (both syntaxes)
 - ✅ HTML elements (void elements, attributes, nesting)
-- ✅ Unquoted attributes (including URLs with colons) ✨ NEW
+- ✅ Unquoted attributes (including URLs with colons)
 - ✅ Alpine.js and Livewire attributes
 - ✅ Error recovery and multiple error reporting
 - ✅ Performance (50K-800K lines/sec - exceeds 1K target by 50-800x)
 - ✅ Raw text elements (`<script>`, `<style>`, `<textarea>`)
-- ✅ Empty tag validation ✨ NEW
-- ✅ `@@` escape handling (no token fragmentation) ✨ NEW
-- ✅ Unicode support (emoji, RTL, combining characters) ✨ NEW
-- ✅ Whitespace handling (tabs, NBSP, mixed line endings) ✨ NEW
+- ✅ Empty tag validation
+- ✅ `@@` escape handling (no token fragmentation)
+- ✅ Unicode support (emoji, RTL, combining characters)
+- ✅ Whitespace handling (tabs, NBSP, mixed line endings)
+- ✅ **Formatter with idempotent output**
+- ✅ **CLI tool (`blade parse`, `blade format`)**
+- ✅ **Line wrapping** (wrap attributes when line exceeds maxLineLength)
+- ✅ **Attribute sorting** (alphabetical or by type)
 
 **Known Limitations:**
 
-- ⚠️ True streaming (stub implementation only - planned for v2.0)
+- ⚠️ True streaming parser not implemented (placeholder only)
 - ⚠️ Component error positions could be more precise (cosmetic issue)
+- ⚠️ PHP expression formatting not implemented
 
-**Production Readiness:** ✅ **READY FOR v1.0.1 RELEASE**
+**Production Readiness:** ✅ **PRODUCTION READY**
