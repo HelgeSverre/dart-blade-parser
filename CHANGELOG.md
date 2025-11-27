@@ -14,6 +14,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `blade format [options] <files>` - Format Blade templates with consistent style
   - Improved ergonomics: shorter command name, clear subcommand structure
   - Comprehensive help system: `blade --help`, `blade parse --help`, `blade format --help`
+- **Line Wrapping:** Automatically wrap long attribute lists to multiple lines
+  - `maxLineLength`: Configure the threshold (default: 120)
+  - `wrapAttributes`: Control wrapping behavior
+    - `WrapAttributes.auto`: Wrap when line exceeds maxLineLength (default)
+    - `WrapAttributes.always`: Always wrap multiple attributes to separate lines
+    - `WrapAttributes.never`: Never wrap, keep all attributes on one line
+- **Attribute Sorting:** Sort attributes for consistent ordering
+  - `AttributeSort.none`: Preserve original order (default)
+  - `AttributeSort.alphabetical`: Sort attributes alphabetically
+  - `AttributeSort.byType`: Sort by category (HTML → data-* → Alpine → Livewire → other)
+- **Expanded Formatter Test Suite:** Added 192 new formatter tests (984 total tests, all passing)
+  - `formatter_edge_cases_test.dart` (94 tests): Directives, attributes, components, forms, tables
+  - `formatter_performance_test.dart` (15 tests): Large templates, stress testing, memory efficiency
+  - `formatter_regression_test.dart` (39 tests): Edge cases, whitespace, indentation, quotes
+  - `formatter_livewire_test.dart` (39 tests): wire:model, wire:click, wire:loading, Alpine.js integration
+  - `formatter_wrapping_test.dart` (33 tests): Line wrapping, multi-line attributes
+  - `formatter_sorting_test.dart` (39 tests): Attribute sorting by type and alphabetically
+- **Configurable Directive Spacing:** Control blank lines between directive blocks
+  - `DirectiveSpacing.betweenBlocks` (default): Add blank line between closing and opening directives
+  - `DirectiveSpacing.none`: Compact formatting with no blank lines
+- **Configurable Slot Formatting:** Control formatting style for component slots
+  - `SlotFormatting.compact` (default): Smart detection for simple vs complex slots
+  - `SlotFormatting.block`: Always use block formatting with extra newlines
 
 ### Changed
 
@@ -23,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration file renamed from `.blade-format.json` to `.blade.json` for consistency
 - All justfile commands updated to use new CLI structure
 - All documentation updated with new command examples
+- Test suite expanded from 792 to 984 tests (100% passing)
 
 ### Removed
 
@@ -200,18 +224,6 @@ None - initial release
 - Dart SDK: >=3.0.0 <4.0.0
 - test: ^1.24.0 (dev dependency)
 - lints: ^2.1.0 (dev dependency)
-
-## [Unreleased]
-
-### Planned
-
-- Full Pratt parser implementation for PHP expressions
-- Complete HTML element parsing with Alpine.js/Livewire attributes
-- Additional directive support (@can, @cannot, @php, @verbatim improvements)
-- Performance optimizations (T068-T070)
-- Additional unit tests (T071-T073)
-- API documentation generation (T077)
-- Memory usage benchmarks (T078)
 
 ---
 
