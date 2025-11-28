@@ -8,6 +8,8 @@ export 'src/ast/visitor.dart';
 export 'src/ast/json_serializer.dart';
 export 'src/error/parse_error.dart';
 export 'src/error/parse_result.dart';
+export 'src/docs/component_docs.dart';
+export 'src/formatter/editorconfig.dart';
 export 'src/formatter/formatter.dart';
 export 'src/formatter/formatter_config.dart';
 export 'src/lexer/lexer.dart';

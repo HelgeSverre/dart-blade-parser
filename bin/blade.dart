@@ -79,6 +79,31 @@ void main(List<String> arguments) async {
       negatable: false,
     );
 
+  // Add docs subcommand
+  argParser.addCommand('docs')
+    ..addOption(
+      'output',
+      abbr: 'o',
+      help: 'Output file path (default: stdout)',
+    )
+    ..addFlag(
+      'recursive',
+      abbr: 'r',
+      help: 'Recursively scan subdirectories',
+      defaultsTo: true,
+    )
+    ..addFlag(
+      'examples',
+      help: 'Include usage examples in documentation',
+      defaultsTo: true,
+    )
+    ..addFlag(
+      'help',
+      abbr: 'h',
+      help: 'Show help for docs command',
+      negatable: false,
+    );
+
   try {
     // Handle shell completion
     final argResults = completion.tryArgsCompletion(arguments, argParser);
@@ -110,6 +135,9 @@ void main(List<String> arguments) async {
       case 'format':
         await _handleFormatCommand(command);
         break;
+      case 'docs':
+        await _handleDocsCommand(command);
+        break;
       default:
         stderr.writeln('Unknown command: ${command.name}');
         _printMainUsage(argParser);
@@ -136,6 +164,7 @@ Usage:
 Commands:
   parse      Parse Blade templates to AST
   format     Format Blade templates with consistent style
+  docs       Generate documentation for Blade components
 
 Options:
 ${argParser.usage}
@@ -148,6 +177,7 @@ Examples:
   blade parse template.blade.php --json
   blade format templates/ --write --verbose
   blade format templates/ --check
+  blade docs resources/views/components/ -o COMPONENTS.md
 
 Run 'blade <command> --help' for more information on a specific command.
 ''');
@@ -273,7 +303,6 @@ Future<void> _handleFormatCommand(ArgResults command) async {
   }
 
   try {
-    final config = await _loadConfig(command);
     final verbose = command['verbose'] as bool;
     final checkMode = command['check'] as bool;
     final writeMode = command['write'] as bool;
@@ -292,10 +321,10 @@ Future<void> _handleFormatCommand(ArgResults command) async {
       exit(2);
     }
 
-    final formatter = BladeFormatter(config: config);
-
-    // Handle stdin mode
+    // Handle stdin mode (no EditorConfig support for stdin)
     if (useStdin) {
+      final config = await _loadConfig(command);
+      final formatter = BladeFormatter(config: config);
       await _formatStdin(formatter);
       return;
     }
@@ -310,6 +339,20 @@ Future<void> _handleFormatCommand(ArgResults command) async {
 
     // Find all matching files
     final files = await _findFiles(patterns, verbose);
+
+    // Load config with EditorConfig support using first file as reference
+    final sampleFile = files.isNotEmpty ? files.first : null;
+    final config = await _loadConfig(command, sampleFilePath: sampleFile?.path);
+    final formatter = BladeFormatter(config: config);
+
+    if (verbose && sampleFile != null) {
+      // Check if EditorConfig was found
+      final editorConfigProps =
+          await EditorConfig.getPropertiesForFile(sampleFile.path);
+      if (editorConfigProps.isNotEmpty) {
+        print('Using EditorConfig settings from .editorconfig');
+      }
+    }
 
     if (files.isEmpty) {
       stderr.writeln('Error: No .blade.php files found matching patterns');
@@ -625,13 +668,38 @@ bool _matchesGlobPattern(String filePath, String pattern) {
   return regex.hasMatch(testPath);
 }
 
-Future<FormatterConfig> _loadConfig(ArgResults argResults) async {
+Future<FormatterConfig> _loadConfig(
+  ArgResults argResults, {
+  String? sampleFilePath,
+}) async {
   final configPath = argResults['config'] as String?;
 
   // Start with defaults
   var configMap = <String, dynamic>{};
 
-  // Load from config file if specified
+  // 1. Try to load EditorConfig settings first (lowest priority)
+  if (sampleFilePath != null) {
+    final editorConfigProps =
+        await EditorConfig.getPropertiesForFile(sampleFilePath);
+    if (editorConfigProps.isNotEmpty) {
+      // Map EditorConfig properties to our config format
+      if (editorConfigProps.containsKey('indent_size')) {
+        final size = int.tryParse(editorConfigProps['indent_size']!);
+        if (size != null) configMap['indent_size'] = size;
+      }
+      if (editorConfigProps.containsKey('indent_style')) {
+        configMap['indent_style'] = editorConfigProps['indent_style'];
+      }
+      if (editorConfigProps.containsKey('tab_width')) {
+        final width = int.tryParse(editorConfigProps['tab_width']!);
+        if (width != null && !configMap.containsKey('indent_size')) {
+          configMap['indent_size'] = width;
+        }
+      }
+    }
+  }
+
+  // 2. Load from config file if specified (medium priority)
   if (configPath != null) {
     final configFile = File(configPath);
     if (!configFile.existsSync()) {
@@ -644,8 +712,9 @@ Future<FormatterConfig> _loadConfig(ArgResults argResults) async {
       // YAML support can be added with the yaml package
       final contents = await configFile.readAsString();
 
+      Map<String, dynamic> fileConfig;
       if (configPath.endsWith('.json')) {
-        configMap = jsonDecode(contents) as Map<String, dynamic>;
+        fileConfig = jsonDecode(contents) as Map<String, dynamic>;
       } else if (configPath.endsWith('.yaml') || configPath.endsWith('.yml')) {
         stderr.writeln(
           'Error: YAML configuration not yet supported. Use JSON or CLI flags.',
@@ -653,23 +722,116 @@ Future<FormatterConfig> _loadConfig(ArgResults argResults) async {
         exit(2);
       } else {
         // Try JSON by default
-        configMap = jsonDecode(contents) as Map<String, dynamic>;
+        fileConfig = jsonDecode(contents) as Map<String, dynamic>;
       }
+      // Merge file config over editorconfig
+      configMap.addAll(fileConfig);
     } catch (e) {
       stderr.writeln('Error: Failed to parse config file: $e');
       exit(2);
     }
   }
 
-  // Override with command-line arguments
-  final indentSize = argResults['indent-size'] as String;
-  configMap['indent_size'] = int.parse(indentSize);
+  // 3. Override with command-line arguments (highest priority)
+  // Only apply CLI args if they were explicitly provided (not defaults)
+  if (argResults.wasParsed('indent-size')) {
+    final indentSize = argResults['indent-size'] as String;
+    configMap['indent_size'] = int.parse(indentSize);
+  } else if (!configMap.containsKey('indent_size')) {
+    // Use default if not set by editorconfig or config file
+    configMap['indent_size'] = 4;
+  }
 
-  final indentStyle = argResults['indent-style'] as String;
-  configMap['indent_style'] = indentStyle;
+  if (argResults.wasParsed('indent-style')) {
+    final indentStyle = argResults['indent-style'] as String;
+    configMap['indent_style'] = indentStyle;
+  } else if (!configMap.containsKey('indent_style')) {
+    configMap['indent_style'] = 'spaces';
+  }
 
-  final quoteStyle = argResults['quote-style'] as String;
-  configMap['quote_style'] = quoteStyle;
+  if (argResults.wasParsed('quote-style')) {
+    final quoteStyle = argResults['quote-style'] as String;
+    configMap['quote_style'] = quoteStyle;
+  } else if (!configMap.containsKey('quote_style')) {
+    configMap['quote_style'] = 'preserve';
+  }
 
   return FormatterConfig.fromMap(configMap);
+}
+
+// ============================================================================
+// DOCS COMMAND
+// ============================================================================
+
+Future<void> _handleDocsCommand(ArgResults command) async {
+  // Show help if requested
+  if (command['help'] as bool) {
+    _printDocsUsage();
+    exit(0);
+  }
+
+  // Get component directory
+  if (command.rest.isEmpty) {
+    stderr.writeln('Error: No component directory specified');
+    _printDocsUsage();
+    exit(2);
+  }
+
+  final componentDir = command.rest.first;
+  final outputPath = command['output'] as String?;
+  final recursive = command['recursive'] as bool;
+  final includeExamples = command['examples'] as bool;
+
+  try {
+    final generator = ComponentDocGenerator();
+    final markdown = await generator.generateDocs(
+      componentDir,
+      recursive: recursive,
+      includeExamples: includeExamples,
+    );
+
+    if (outputPath != null) {
+      // Write to file
+      final outputFile = File(outputPath);
+      await outputFile.writeAsString(markdown);
+      print('Documentation written to: $outputPath');
+    } else {
+      // Write to stdout
+      print(markdown);
+    }
+
+    exit(0);
+  } catch (e) {
+    stderr.writeln('Error: $e');
+    exit(1);
+  }
+}
+
+void _printDocsUsage() {
+  print('''
+Generate documentation for Blade components
+
+Usage:
+  blade docs [options] <component-directory>
+
+Options:
+  -o, --output           Output file path (default: stdout)
+  -r, --[no-]recursive   Recursively scan subdirectories (default: true)
+      --[no-]examples    Include usage examples (default: true)
+  -h, --help             Show this help
+
+The command scans the specified directory for .blade.php files, extracts
+@props directives and slot usage, and generates markdown documentation.
+
+Output includes:
+  - Component name (derived from filename)
+  - Props table with names, types, and defaults
+  - Slots list
+  - Usage examples
+
+Examples:
+  blade docs resources/views/components/
+  blade docs components/ -o COMPONENTS.md
+  blade docs ui/ --no-recursive --no-examples
+''');
 }
