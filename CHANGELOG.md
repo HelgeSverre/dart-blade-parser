@@ -49,13 +49,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Use `<!-- blade-formatter:off -->` / `<!-- blade-formatter:on -->` (HTML comments)
   - Also supports `format:off` / `format:on` short syntax
   - Case-insensitive matching
-- **Additional Test Coverage:** Added 251 new formatter tests
+- **EditorConfig Integration:** Automatically read formatting settings from `.editorconfig` files
+  - Reads `indent_size`, `indent_style`, and `tab_width` properties
+  - Searches parent directories for `.editorconfig` files
+  - Respects `root = true` to stop searching
+  - Priority: EditorConfig < `.blade.json` < CLI arguments
+  - Supports glob patterns: `*`, `*.blade.php`, `{*.html,*.blade.php}`
+  - 18 new tests for EditorConfig parsing and pattern matching
+- **Component Documentation Generator:** Generate markdown documentation from Blade components
+  - `blade docs <directory>` - Scan components and generate docs
+  - Extracts `@props` directives with names, types, and default values
+  - Detects slot usage (`$slot`, `$header`, `$footer`, etc.)
+  - Extracts description from first Blade comment
+  - Generates table of contents, props tables, slots lists, usage examples
+  - Supports recursive scanning and output to file
+  - 14 new tests for component docs generation
+- **Additional Test Coverage:** Added 269 new formatter tests
   - `formatter_closing_style_test.dart` (16 tests): Closing bracket style
   - `formatter_self_closing_test.dart` (22 tests): Self-closing normalization
   - `formatter_ignore_comments_test.dart` (19 tests): Ignore comments feature
   - `formatter_stress_test.dart` (46 tests): Extreme whitespace, deep nesting, attribute soup, unicode
   - `formatter_chaos_test.dart` (37 tests): Copy-paste chaos, multi-developer styles, tool-generated code
   - `formatter_idempotency_stress_test.dart` (111 tests): Comprehensive idempotency verification across all formatter features
+  - `editorconfig_test.dart` (18 tests): EditorConfig parsing and section matching
 
 ### Changed
 

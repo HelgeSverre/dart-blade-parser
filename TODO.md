@@ -189,11 +189,17 @@ _(No medium priority issues at this time)_
    - `SelfClosingStyle.never`: Convert `<div />` to `<div></div>`
    - Apply to components and non-void HTML elements
 
-**Future Enhancements - Formatter:**
+**Completed - EditorConfig Integration (2025-11-27):**
 
-- **EditorConfig Integration** (2-3 hours)
-  - Read indent_size, indent_style from .editorconfig
-  - Fall back to .blade.json if present
+- ✅ **EditorConfig Integration** - COMPLETED
+  - Read indent_size, indent_style, tab_width from .editorconfig
+  - Search parent directories for .editorconfig files
+  - Respects root = true to stop searching
+  - Priority: EditorConfig < .blade.json < CLI arguments
+  - Created EditorConfig parser and section matcher
+  - Supports glob patterns: `*`, `*.blade.php`, `{*.html,*.blade.php}`
+
+**Future Enhancements - Formatter:**
 
 - **Format Range** (3-4 hours)
   - Format only a selection/range instead of whole file
@@ -237,9 +243,11 @@ _(No medium priority issues at this time)_
   - Build dependency tree of template relationships
   - Visualize @extends and @include chains
 
-- **Component Discovery** (1 day)
-  - Analyze project to catalog all components and their props
-  - Generate documentation from @props directives
+- ✅ **Component Discovery** - COMPLETED (2025-11-27)
+  - `blade docs <directory>` command to generate markdown docs
+  - Extracts @props with names, types, and defaults
+  - Detects slot usage and descriptions from comments
+  - Generates table of contents, props tables, usage examples
 
 ### High Priority - Quick Wins (Code Cleanup)
 
@@ -300,11 +308,12 @@ _(No medium priority issues at this time)_
 
 **Test Suite Statistics:**
 
-- 📊 **Total tests:** 1235
-- ✅ **Passing:** 1235 (100%)
+- 📊 **Total tests:** 1267
+- ✅ **Passing:** 1267 (100%)
 - Test breakdown:
   - Parser/Lexer tests: ~600
-  - Formatter tests: ~490 (edge cases, regression, Livewire, performance, wrapping, sorting, closing style, self-closing, ignore comments, stress, chaos, idempotency)
+  - Formatter tests: ~508 (edge cases, regression, Livewire, performance, wrapping, sorting, closing style, self-closing, ignore comments, stress, chaos, idempotency, EditorConfig)
+  - Docs tests: ~14 (component docs generation)
   - Integration tests: ~100
   - Performance benchmarks: ~40
 
@@ -329,11 +338,13 @@ _(No medium priority issues at this time)_
 - ✅ **Closing bracket style** (same line or new line)
 - ✅ **Self-closing normalization** (preserve, always, never)
 - ✅ **Ignore comments** (blade-formatter:off/on)
+- ✅ **EditorConfig integration** (reads settings from .editorconfig)
+- ✅ **Component docs generator** (`blade docs` command)
 
 **Known Limitations:**
 
 - ⚠️ True streaming parser not implemented (placeholder only)
-- ⚠️ Component error positions could be more precise (cosmetic issue)
 - ⚠️ PHP expression formatting not implemented
+- ⚠️ **Lexer bug with PHP string interpolation:** Echo statements containing `{$var}` inside double-quoted strings cause lexer errors (e.g., `{{ Arr::get($foo, "key.{$bar}") }}`). This can cause the parser to hang on files with this pattern.
 
 **Production Readiness:** ✅ **PRODUCTION READY**
