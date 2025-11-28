@@ -256,11 +256,11 @@ void main() {
 
       final error = result.errors.first;
 
-      // Error reports position of opening tag due to whitespace handling
+      // Error position now correctly points to the closing tag
       expect(
         error.position.line,
-        equals(1),
-        reason: 'Error position tracks opening tag (cosmetic limitation)',
+        equals(3),
+        reason: 'Error position should point to the mismatched closing tag',
       );
     });
 

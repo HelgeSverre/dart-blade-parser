@@ -214,6 +214,10 @@ class BladeLexer {
         if (buffer.isNotEmpty) {
           _emitToken(TokenType.text, buffer.toString());
         }
+        // Update start position for closing tag token
+        _start = _position;
+        _startLine = _line;
+        _startColumn = _column;
         // Scan closing tag
         _advance(); // <
         _advance(); // /
