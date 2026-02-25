@@ -1285,7 +1285,7 @@
             entries.forEach((e) => {
               if (e.isIntersecting) {
                 e.target.querySelectorAll(".bench-bar").forEach((b, i) => {
-                  setTimeout(() => b.classList.add("anim"), i * 40);
+                  setTimeout(() => b.classList.add("anim"), i * 25);
                 });
                 barObs.unobserve(e.target);
               }
