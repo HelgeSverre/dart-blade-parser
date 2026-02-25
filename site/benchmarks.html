@@ -799,8 +799,8 @@
           return;
         }
 
-        const perf = json.performance;
-        const idem = json.idempotency;
+        const perf = json.performance || { A: {}, B: {}, C: {} };
+        const idem = json.idempotency || { A: {}, B: {}, C: {} };
 
         // ── Generated at ──
         if (json.generatedAt) {

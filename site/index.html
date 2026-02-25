@@ -1,431 +1,1391 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>prettier-plugin-laravel-blade — Sub-millisecond Blade formatting</title>
-<meta name="description" content="The fastest Prettier plugin for Laravel Blade. 22–32× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser.">
-<meta name="keywords" content="prettier, blade, laravel, formatter, plugin, prettier-plugin, blade-formatter, code-formatter, php, template">
-<meta name="author" content="Helge Sverre">
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#050507">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      prettier-plugin-laravel-blade — Sub-millisecond Blade formatting
+    </title>
+    <meta
+      name="description"
+      content="The fastest Prettier plugin for Laravel Blade. 22–32× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser."
+    />
+    <meta
+      name="keywords"
+      content="prettier, blade, laravel, formatter, plugin, prettier-plugin, blade-formatter, code-formatter, php, template"
+    />
+    <meta name="author" content="Helge Sverre" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#050507" />
 
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="prettier-plugin-laravel-blade — Sub-millisecond Blade formatting">
-<meta property="og:description" content="The fastest Prettier plugin for Laravel Blade. 22–32× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser.">
-<meta property="og:image" content="og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="prettier-plugin-laravel-blade: Your Blade formatter is 22–32× too slow. Sub-millisecond formatting with a real recursive-descent parser.">
-<meta property="og:site_name" content="prettier-plugin-laravel-blade">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="prettier-plugin-laravel-blade — Sub-millisecond Blade formatting"
+    />
+    <meta
+      property="og:description"
+      content="The fastest Prettier plugin for Laravel Blade. 22–32× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser."
+    />
+    <meta property="og:image" content="og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="prettier-plugin-laravel-blade: Your Blade formatter is 22–32× too slow. Sub-millisecond formatting with a real recursive-descent parser."
+    />
+    <meta property="og:site_name" content="prettier-plugin-laravel-blade" />
 
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="prettier-plugin-laravel-blade — Sub-millisecond Blade formatting">
-<meta name="twitter:description" content="22–32× faster than alternatives. ~140 KB, 0 dependencies, 100% idempotent. A real recursive-descent Dart parser compiled to JS.">
-<meta name="twitter:image" content="og-image.png">
-<meta name="twitter:image:alt" content="prettier-plugin-laravel-blade: Your Blade formatter is 22–32× too slow.">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="prettier-plugin-laravel-blade — Sub-millisecond Blade formatting"
+    />
+    <meta
+      name="twitter:description"
+      content="22–32× faster than alternatives. ~140 KB, 0 dependencies, 100% idempotent. A real recursive-descent Dart parser compiled to JS."
+    />
+    <meta name="twitter:image" content="og-image.png" />
+    <meta
+      name="twitter:image:alt"
+      content="prettier-plugin-laravel-blade: Your Blade formatter is 22–32× too slow."
+    />
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="blade-syntax.css">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#050507;--surface:#0c0c10;--surface2:#111116;
-  --border:#1a1a22;--border-light:#252530;
-  --text:#e8e8ec;--text-dim:#8a8a96;--text-muted:#555560;
-  --accent:#b5f542;--accent-dim:rgba(181,245,66,.10);--accent-glow:rgba(181,245,66,.04);
-  --accent2:#8bf03c;
-  --red:#f87171;--blue:#60a5fa;--yellow:#fbbf24;
-  --serif:'Instrument Serif',Georgia,serif;
-  --sans:'Inter',system-ui,sans-serif;
-  --mono:'JetBrains Mono',monospace;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.02;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat:repeat;background-size:256px}
-a{color:var(--accent);text-decoration:none}
-::selection{background:var(--accent);color:var(--bg)}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="blade-syntax.css" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg: #050507;
+        --surface: #0c0c10;
+        --surface2: #111116;
+        --border: #1a1a22;
+        --border-light: #252530;
+        --text: #e8e8ec;
+        --text-dim: #8a8a96;
+        --text-muted: #555560;
+        --accent: #b5f542;
+        --accent-dim: rgba(181, 245, 66, 0.1);
+        --accent-glow: rgba(181, 245, 66, 0.04);
+        --accent2: #8bf03c;
+        --red: #f87171;
+        --blue: #60a5fa;
+        --yellow: #fbbf24;
+        --serif: "Instrument Serif", Georgia, serif;
+        --sans: "Inter", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.02;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 256px;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      ::selection {
+        background: var(--accent);
+        color: var(--bg);
+      }
 
-.w{max-width:1080px;margin:0 auto;padding:0 1.5rem}
+      .w {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
 
-/* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(14px);background:rgba(5,5,7,.82);border-bottom:1px solid var(--border)}
-nav .w{display:flex;align-items:center;height:48px;gap:2rem}
-.nav-brand{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--text);letter-spacing:-.01em}
-.nav-brand span{color:var(--accent)}
-.nav-links{display:flex;gap:1.5rem;list-style:none;margin-left:auto}
-.nav-links a{color:var(--text-muted);font-size:.8rem;font-weight:500;transition:color .12s}
-.nav-links a:hover{color:var(--text)}
-.nav-gh{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--border);padding:.3rem .7rem;border-radius:4px;color:var(--text-muted)!important;font-size:.78rem;transition:all .12s}
-.nav-gh:hover{border-color:var(--text-muted);color:var(--text)!important}
-.nav-live{color:var(--accent)!important;font-weight:600}
-.nav-live:hover{color:var(--accent)!important;opacity:.85}
+      /* ── NAV ── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        backdrop-filter: blur(14px);
+        background: rgba(5, 5, 7, 0.82);
+        border-bottom: 1px solid var(--border);
+      }
+      nav .w {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        gap: 2rem;
+      }
+      .nav-brand {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      .nav-brand span {
+        color: var(--accent);
+      }
+      .nav-links {
+        display: flex;
+        gap: 1.5rem;
+        list-style: none;
+        margin-left: auto;
+      }
+      .nav-links a {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: color 0.12s;
+      }
+      .nav-links a:hover {
+        color: var(--text);
+      }
+      .nav-gh {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border: 1px solid var(--border);
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+        color: var(--text-muted) !important;
+        font-size: 0.78rem;
+        transition: all 0.12s;
+      }
+      .nav-gh:hover {
+        border-color: var(--text-muted);
+        color: var(--text) !important;
+      }
+      .nav-live {
+        color: var(--accent) !important;
+        font-weight: 600;
+      }
+      .nav-live:hover {
+        color: var(--accent) !important;
+        opacity: 0.85;
+      }
 
-/* ── HERO ── */
-.hero{padding:10rem 0 5rem;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;
-  background:radial-gradient(ellipse,var(--accent-glow) 0%,transparent 60%);pointer-events:none}
-.hero::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;
-  background-image:radial-gradient(rgba(181,245,66,.04) 1px,transparent 1px);background-size:24px 24px}
-.hero-eyebrow{font-family:var(--mono);font-size:.7rem;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1.5rem;position:relative}
-.hero h1{font-family:var(--serif);font-size:clamp(3rem,7.5vw,5.5rem);font-weight:400;line-height:1;letter-spacing:-.03em;margin-bottom:1.5rem;max-width:800px;position:relative}
-.hero h1 em{font-style:italic;color:var(--accent)}
-.hero-sub{font-size:1.1rem;color:var(--text-dim);max-width:540px;line-height:1.55;margin-bottom:2.5rem;font-weight:300;position:relative}
-.hero-cmd{display:inline-flex;align-items:center;gap:.75rem;font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);padding:.6rem 1.2rem;border-radius:4px;cursor:pointer;transition:border-color .12s;position:relative}
-.hero-cmd:hover{border-color:var(--accent)}
-.hero-cmd .p{color:var(--text-muted)}
-.hero-cmd .cp{color:var(--text-muted);margin-left:.75rem;transition:color .12s}
-.hero-cmd:hover .cp{color:var(--text)}
-.hero-toast{position:absolute;top:-1.8rem;left:50%;transform:translateX(-50%);font-size:.68rem;color:var(--accent);opacity:0;transition:opacity .2s;font-family:var(--mono)}
-.hero-toast.show{opacity:1}
+      /* ── HERO ── */
+      .hero {
+        padding: 10rem 0 5rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -200px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 900px;
+        height: 900px;
+        background: radial-gradient(
+          ellipse,
+          var(--accent-glow) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        background-image: radial-gradient(
+          rgba(181, 245, 66, 0.04) 1px,
+          transparent 1px
+        );
+        background-size: 24px 24px;
+      }
+      .hero-eyebrow {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin-bottom: 1.5rem;
+        position: relative;
+      }
+      .hero h1 {
+        font-family: var(--serif);
+        font-size: clamp(3rem, 7.5vw, 5.5rem);
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        margin-bottom: 1.5rem;
+        max-width: 800px;
+        position: relative;
+      }
+      .hero h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+      .hero-sub {
+        font-size: 1.1rem;
+        color: var(--text-dim);
+        max-width: 540px;
+        line-height: 1.55;
+        margin-bottom: 2.5rem;
+        font-weight: 300;
+        position: relative;
+      }
+      .hero-cmd {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 0.6rem 1.2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: border-color 0.12s;
+        position: relative;
+      }
+      .hero-cmd:hover {
+        border-color: var(--accent);
+      }
+      .hero-cmd .p {
+        color: var(--text-muted);
+      }
+      .hero-cmd .cp {
+        color: var(--text-muted);
+        margin-left: 0.75rem;
+        transition: color 0.12s;
+      }
+      .hero-cmd:hover .cp {
+        color: var(--text);
+      }
+      .hero-toast {
+        position: absolute;
+        top: -1.8rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.68rem;
+        color: var(--accent);
+        opacity: 0;
+        transition: opacity 0.2s;
+        font-family: var(--mono);
+      }
+      .hero-toast.show {
+        opacity: 1;
+      }
 
-/* ── METRICS ── */
-.metrics{padding:2.5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.metrics .w{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
-.metric{text-align:center}
-.metric-val{font-family:var(--mono);font-size:1.8rem;font-weight:700;letter-spacing:-.03em}
-.metric-val.accent{color:var(--accent)}
-.metric-label{font-size:.75rem;color:var(--text-muted);margin-top:.2rem}
+      /* ── METRICS ── */
+      .metrics {
+        padding: 2.5rem 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .metrics .w {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+      }
+      .metric {
+        text-align: center;
+      }
+      .metric-val {
+        font-family: var(--mono);
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+      .metric-val.accent {
+        color: var(--accent);
+      }
+      .metric-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.2rem;
+      }
 
-/* ── SECTIONS ── */
-section{padding:5rem 0}
-.stag{font-family:var(--mono);font-size:.65rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.6rem}
-.sh{font-family:var(--serif);font-size:2.2rem;font-weight:400;letter-spacing:-.02em;margin-bottom:.4rem;line-height:1.15}
-.sd{color:var(--text-dim);font-weight:300;line-height:1.5;max-width:500px;margin-bottom:2.5rem;font-size:.95rem}
+      /* ── SECTIONS ── */
+      section {
+        padding: 5rem 0;
+      }
+      .stag {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        margin-bottom: 0.6rem;
+      }
+      .sh {
+        font-family: var(--serif);
+        font-size: 2.2rem;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.4rem;
+        line-height: 1.15;
+      }
+      .sd {
+        color: var(--text-dim);
+        font-weight: 300;
+        line-height: 1.5;
+        max-width: 500px;
+        margin-bottom: 2.5rem;
+        font-size: 0.95rem;
+      }
 
-/* ── SPEED ── */
-.speed-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.speed-grid{display:grid;grid-template-columns:1fr 340px;gap:3rem;align-items:start}
-.speed-rows{display:flex;flex-direction:column;gap:.75rem}
-.speed-row{display:grid;grid-template-columns:140px 1fr 52px;align-items:center;gap:.75rem}
-.speed-fixture{font-family:var(--mono);font-size:.72rem;color:var(--text-muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.speed-bars{display:flex;flex-direction:column;gap:3px}
-.speed-bar{height:7px;border-radius:1px;min-width:2px;transform-origin:left;transform:scaleX(0);transition:transform .7s cubic-bezier(.16,1,.3,1)}
-.speed-bar.anim{transform:scaleX(1)}
-.speed-bar.ours{background:var(--accent)}
-.speed-bar.b{background:var(--blue);opacity:.5}
-.speed-bar.c{background:var(--yellow);opacity:.4}
-.speed-ms{font-family:var(--mono);font-size:.68rem;color:var(--text-muted)}
-.speed-avg{border-top:1px solid var(--border);padding-top:.75rem;margin-top:.25rem}
-.speed-legend{display:flex;gap:1.2rem;margin-top:1rem;font-size:.7rem;color:var(--text-muted)}
-.speed-legend span{display:inline-flex;align-items:center;gap:.35rem}
-.speed-legend span::before{content:'';width:8px;height:8px;border-radius:1px}
-.speed-legend .l-a::before{background:var(--accent)}
-.speed-legend .l-b::before{background:var(--blue);opacity:.5}
-.speed-legend .l-c::before{background:var(--yellow);opacity:.4}
-.speed-callout{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.75rem}
-.speed-callout h3{font-family:var(--serif);font-size:1.3rem;margin-bottom:1.25rem}
-.speed-callout ul{list-style:none;display:flex;flex-direction:column;gap:0}
-.speed-callout li{font-size:.82rem;color:var(--text-dim);display:flex;align-items:center;gap:.75rem;padding:.55rem 0;border-bottom:1px solid var(--border);line-height:1.35}
-.speed-callout li:last-child{border-bottom:none}
-.speed-callout li strong{color:var(--accent);font-family:var(--mono);font-weight:600;font-size:.78rem;min-width:5.5rem;flex-shrink:0;letter-spacing:-.01em}
+      /* ── SPEED ── */
+      .speed-section {
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .speed-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 3rem;
+        align-items: start;
+      }
+      .speed-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .speed-row {
+        display: grid;
+        grid-template-columns: 140px 1fr 52px;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .speed-fixture {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-align: right;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .speed-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .speed-bar {
+        height: 7px;
+        border-radius: 1px;
+        min-width: 2px;
+        transform-origin: left;
+        transform: scaleX(0);
+        transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .speed-bar.anim {
+        transform: scaleX(1);
+      }
+      .speed-bar.ours {
+        background: var(--accent);
+      }
+      .speed-bar.b {
+        background: var(--blue);
+        opacity: 0.5;
+      }
+      .speed-bar.c {
+        background: var(--yellow);
+        opacity: 0.4;
+      }
+      .speed-ms {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+      }
+      .speed-avg {
+        border-top: 1px solid var(--border);
+        padding-top: 0.75rem;
+        margin-top: 0.25rem;
+      }
+      .speed-legend {
+        display: flex;
+        gap: 1.2rem;
+        margin-top: 1rem;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+      .speed-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .speed-legend span::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 1px;
+      }
+      .speed-legend .l-a::before {
+        background: var(--accent);
+      }
+      .speed-legend .l-b::before {
+        background: var(--blue);
+        opacity: 0.5;
+      }
+      .speed-legend .l-c::before {
+        background: var(--yellow);
+        opacity: 0.4;
+      }
+      .speed-callout {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1.75rem;
+      }
+      .speed-callout h3 {
+        font-family: var(--serif);
+        font-size: 1.3rem;
+        margin-bottom: 1.25rem;
+      }
+      .speed-callout ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .speed-callout li {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.55rem 0;
+        border-bottom: 1px solid var(--border);
+        line-height: 1.35;
+      }
+      .speed-callout li:last-child {
+        border-bottom: none;
+      }
+      .speed-callout li strong {
+        color: var(--accent);
+        font-family: var(--mono);
+        font-weight: 600;
+        font-size: 0.78rem;
+        min-width: 5.5rem;
+        flex-shrink: 0;
+        letter-spacing: -0.01em;
+      }
 
-/* ── CARDS ── */
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:4px;overflow:hidden}
-.card{background:var(--surface);padding:1.75rem}
-.card-icon{font-family:var(--mono);font-size:1.1rem;margin-bottom:.65rem;color:var(--accent)}
-.card h3{font-size:.95rem;font-weight:600;margin-bottom:.4rem;letter-spacing:-.01em}
-.card p{font-size:.82rem;color:var(--text-dim);line-height:1.5}
+      /* ── CARDS ── */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .card {
+        background: var(--surface);
+        padding: 1.75rem;
+      }
+      .card-icon {
+        font-family: var(--mono);
+        font-size: 1.1rem;
+        margin-bottom: 0.65rem;
+        color: var(--accent);
+      }
+      .card h3 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+        letter-spacing: -0.01em;
+      }
+      .card p {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        line-height: 1.5;
+      }
 
-/* ── CODE ── */
-.code-split{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:4px;overflow:hidden}
-.code-pane{background:var(--surface);padding:1.25rem;min-width:0;display:flex;flex-direction:column}
-.code-label{font-family:var(--mono);font-size:.65rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
-.code-label .cd{width:5px;height:5px;border-radius:50%;display:inline-block}
-.code-label .cd-r{background:var(--red)}
-.code-label .cd-g{background:var(--accent)}
-pre{font-family:var(--mono);font-size:.76rem;line-height:1.65;color:var(--text);overflow-x:auto;white-space:pre;margin:0;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-pre::-webkit-scrollbar{height:6px;width:6px}
-pre::-webkit-scrollbar-track{background:transparent}
-pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-pre::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
-/* ── DEMO EDITOR ── */
-.demo-editor{position:relative;min-height:60px;flex:1}
-.demo-editor textarea,
-.demo-editor pre{
-  font-family:var(--mono);font-size:.76rem;line-height:1.65;
-  margin:0;padding:0;border:none;width:100%;
-  white-space:pre-wrap;word-wrap:break-word;tab-size:4;-moz-tab-size:4;
-  resize:none;overflow:hidden;
-}
-.demo-editor pre{pointer-events:none;color:var(--text);min-height:100%}
-.demo-editor textarea{
-  position:absolute;top:0;left:0;height:100%;
-  color:transparent;caret-color:var(--accent);background:transparent;
-  outline:none;-webkit-text-fill-color:transparent;
-}
-.demo-editor textarea::selection{background:var(--accent);color:var(--bg);-webkit-text-fill-color:var(--bg)}
+      /* ── CODE ── */
+      .code-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .code-pane {
+        background: var(--surface);
+        padding: 1.25rem;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .code-label {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .code-label .cd {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .code-label .cd-r {
+        background: var(--red);
+      }
+      .code-label .cd-g {
+        background: var(--accent);
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        line-height: 1.65;
+        color: var(--text);
+        overflow-x: auto;
+        white-space: pre;
+        margin: 0;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      pre::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+      pre::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      pre::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      pre::-webkit-scrollbar-thumb:hover {
+        background: var(--border-light);
+      }
+      /* ── DEMO EDITOR ── */
+      .demo-editor {
+        position: relative;
+        min-height: 60px;
+        flex: 1;
+      }
+      .demo-editor textarea,
+      .demo-editor pre {
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        line-height: 1.65;
+        margin: 0;
+        padding: 0;
+        border: none;
+        width: 100%;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        tab-size: 4;
+        -moz-tab-size: 4;
+        resize: none;
+        overflow: hidden;
+      }
+      .demo-editor pre {
+        pointer-events: none;
+        color: var(--text);
+        min-height: 100%;
+      }
+      .demo-editor textarea {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        color: transparent;
+        caret-color: var(--accent);
+        background: transparent;
+        outline: none;
+        -webkit-text-fill-color: transparent;
+      }
+      .demo-editor textarea::selection {
+        background: var(--accent);
+        color: var(--bg);
+        -webkit-text-fill-color: var(--bg);
+      }
 
-/* ── TABLE ── */
-.tbl{width:100%;border-collapse:collapse;font-size:.82rem}
-.tbl th{text-align:left;padding:.6rem .8rem;border-bottom:2px solid var(--border);color:var(--text-muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em}
-.tbl td{padding:.55rem .8rem;border-bottom:1px solid var(--border)}
-.tbl tr:last-child td{border-bottom:none}
-.tbl .lbl{color:var(--text-dim);font-weight:500}
-.tbl .win{background:var(--accent-dim)}
-.tbl .ok{color:var(--accent)}
-.tbl .no{color:var(--red)}
-.tbl .m{font-family:var(--mono);font-size:.78rem}
-.tbl th:first-child{width:170px}
+      /* ── TABLE ── */
+      .tbl {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+      }
+      .tbl th {
+        text-align: left;
+        padding: 0.6rem 0.8rem;
+        border-bottom: 2px solid var(--border);
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .tbl td {
+        padding: 0.55rem 0.8rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .tbl tr:last-child td {
+        border-bottom: none;
+      }
+      .tbl .lbl {
+        color: var(--text-dim);
+        font-weight: 500;
+      }
+      .tbl .win {
+        background: var(--accent-dim);
+      }
+      .tbl .ok {
+        color: var(--accent);
+      }
+      .tbl .no {
+        color: var(--red);
+      }
+      .tbl .m {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+      }
+      .tbl th:first-child {
+        width: 170px;
+      }
 
-/* ── ARCH ── */
-.arch{display:flex;align-items:center;justify-content:center;gap:.35rem;flex-wrap:wrap;padding:1.5rem 0}
-.arch-step{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:.85rem 1.2rem;text-align:center;min-width:120px}
-.arch-step .as-label{font-family:var(--mono);font-size:.6rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.15rem}
-.arch-step .as-title{font-size:.85rem;font-weight:600}
-.arch-step .as-detail{font-size:.7rem;color:var(--text-dim);margin-top:.15rem}
-.arch-step.highlight{border-color:var(--accent)}
-.arch-step.highlight .as-title{color:var(--accent)}
-.arch-arrow{color:var(--text-muted);font-size:1rem;font-family:var(--mono)}
+      /* ── ARCH ── */
+      .arch {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+        padding: 1.5rem 0;
+      }
+      .arch-step {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 0.85rem 1.2rem;
+        text-align: center;
+        min-width: 120px;
+      }
+      .arch-step .as-label {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.15rem;
+      }
+      .arch-step .as-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .arch-step .as-detail {
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        margin-top: 0.15rem;
+      }
+      .arch-step.highlight {
+        border-color: var(--accent);
+      }
+      .arch-step.highlight .as-title {
+        color: var(--accent);
+      }
+      .arch-arrow {
+        color: var(--text-muted);
+        font-size: 1rem;
+        font-family: var(--mono);
+      }
 
-/* ── OPTIONS TABLE ── */
-.opts{width:100%;border-collapse:collapse;font-size:.82rem}
-.opts th{text-align:left;padding:.55rem .75rem;border-bottom:2px solid var(--border);color:var(--text-muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em}
-.opts td{padding:.5rem .75rem;border-bottom:1px solid var(--border)}
-.opts tr:last-child td{border-bottom:none}
-.opts .m{font-family:var(--mono);font-size:.78rem}
+      /* ── OPTIONS TABLE ── */
+      .opts {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+      }
+      .opts th {
+        text-align: left;
+        padding: 0.55rem 0.75rem;
+        border-bottom: 2px solid var(--border);
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .opts td {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .opts tr:last-child td {
+        border-bottom: none;
+      }
+      .opts .m {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+      }
 
-/* ── CTA ── */
-.cta{text-align:center;padding:5rem 0;border-top:1px solid var(--border)}
-.cta h2{font-family:var(--serif);font-size:2.8rem;letter-spacing:-.03em;margin-bottom:.6rem}
-.cta p{color:var(--text-dim);font-size:1rem;font-weight:300;margin-bottom:2rem}
-.cta-btn{display:inline-flex;align-items:center;gap:.5rem;background:var(--accent);color:var(--bg);font-family:var(--sans);font-size:.9rem;font-weight:600;padding:.7rem 1.6rem;border-radius:4px;transition:opacity .12s;margin:0 .5rem .75rem}
-.cta-btn:hover{opacity:.85;color:var(--bg)}
-.cta-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--text-dim)}
-.cta-btn.secondary:hover{border-color:var(--text-muted);color:var(--text)}
-.install-block{background:var(--surface);border:1px solid var(--border);border-radius:4px;max-width:560px;margin:2rem auto 0;padding:1.25rem 1.5rem;text-align:left}
+      /* ── CTA ── */
+      .cta {
+        text-align: center;
+        padding: 5rem 0;
+        border-top: 1px solid var(--border);
+      }
+      .cta h2 {
+        font-family: var(--serif);
+        font-size: 2.8rem;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.6rem;
+      }
+      .cta p {
+        color: var(--text-dim);
+        font-size: 1rem;
+        font-weight: 300;
+        margin-bottom: 2rem;
+      }
+      .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--accent);
+        color: var(--bg);
+        font-family: var(--sans);
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.7rem 1.6rem;
+        border-radius: 4px;
+        transition: opacity 0.12s;
+        margin: 0 0.5rem 0.75rem;
+      }
+      .cta-btn:hover {
+        opacity: 0.85;
+        color: var(--bg);
+      }
+      .cta-btn.secondary {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+      }
+      .cta-btn.secondary:hover {
+        border-color: var(--text-muted);
+        color: var(--text);
+      }
+      .install-block {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        max-width: 560px;
+        margin: 2rem auto 0;
+        padding: 1.25rem 1.5rem;
+        text-align: left;
+      }
 
-/* ── FOOTER ── */
-footer{border-top:1px solid var(--border);padding:2rem 0;text-align:center}
-footer p{font-size:.78rem;color:var(--text-muted)}
-footer a{color:var(--text-dim)}
+      /* ── FOOTER ── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 2rem 0;
+        text-align: center;
+      }
+      footer p {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+      footer a {
+        color: var(--text-dim);
+      }
 
-/* ── RESPONSIVE ── */
-@media(max-width:768px){
-  .metrics .w{grid-template-columns:repeat(2,1fr)}
-  .speed-grid{grid-template-columns:1fr}
-  .cards{grid-template-columns:1fr}
-  .code-split{grid-template-columns:1fr}
-  .speed-row{grid-template-columns:100px 1fr 44px}
-  .nav-links{display:none}
-}
+      /* ── RESPONSIVE ── */
+      @media (max-width: 768px) {
+        .metrics .w {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .speed-grid {
+          grid-template-columns: 1fr;
+        }
+        .cards {
+          grid-template-columns: 1fr;
+        }
+        .code-split {
+          grid-template-columns: 1fr;
+        }
+        .speed-row {
+          grid-template-columns: 100px 1fr 44px;
+        }
+        .nav-links {
+          display: none;
+        }
+      }
 
-/* ── ANIM ── */
-.reveal{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
-.reveal.vis{opacity:1;transform:translateY(0)}
-*{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-::-webkit-scrollbar{height:6px;width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
-</style>
-</head>
-<body>
-
-<nav>
-  <div class="w">
-    <a href="index.html" class="nav-brand"><span>prettier</span>-plugin-laravel-blade</a>
-    <ul class="nav-links">
-      <li><a href="#speed">Speed</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#comparison">Comparison</a></li>
-      <li><a href="benchmarks.html">Benchmarks</a></li>
-      <li><a href="formatter.html" class="nav-live">Try Live</a></li>
-    </ul>
-    <a href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/prettier-plugin-laravel-blade" class="nav-gh" target="_blank">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-      GitHub
-    </a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="w">
-    <div class="hero-eyebrow">Prettier Plugin for Blade</div>
-    <h1>Your Blade formatter is <em>22–32× too slow.</em></h1>
-    <p class="hero-sub">A real recursive-descent parser — compiled from Dart to JavaScript — formats your templates in under a millisecond. No regex. No child processes. No compromises.</p>
-    <div class="hero-cmd" onclick="copyCmd(this)">
-      <span class="p">$</span> npm i -D prettier-plugin-laravel-blade prettier
-      <span class="cp"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></span>
-      <span class="hero-toast">Copied</span>
-    </div>
-  </div>
-</section>
-
-<!-- METRICS -->
-<div class="metrics">
-  <div class="w">
-    <div class="metric"><div class="metric-val accent" id="metric-avg-time" data-count="0.33" data-suffix="ms">0.33ms</div><div class="metric-label">Avg format time</div></div>
-    <div class="metric"><div class="metric-val" data-count="140" data-suffix="KB">~140 KB</div><div class="metric-label">Package size</div></div>
-    <div class="metric"><div class="metric-val" id="metric-fixture-count" data-count="109">109</div><div class="metric-label">Fixtures tested</div></div>
-    <div class="metric"><div class="metric-val accent" id="metric-idempotent" data-count="100" data-suffix="%">100%</div><div class="metric-label">Idempotent</div></div>
-  </div>
-</div>
-
-<!-- SPEED -->
-<section id="speed" class="speed-section">
-  <div class="w">
-    <div class="stag">Performance</div>
-    <div class="sh">Measured, not claimed</div>
-    <div class="sd">Average format time across 109 fixtures. 20 timed runs after warmup. <a href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/benchmark">Run it yourself →</a></div>
-    <div class="speed-grid">
-      <div>
-        <div class="speed-rows" id="speedChart"></div>
-        <div class="speed-legend">
-          <span class="l-a">This plugin</span>
-          <span class="l-b">stillat</span>
-          <span class="l-c">shufo</span>
-        </div>
-      </div>
-      <div class="speed-callout">
-        <h3>Why sub-millisecond?</h3>
-        <ul>
-          <li><strong>0 IPC</strong> Runs in-process, no child processes</li>
-          <li><strong>dart2js</strong> Dart parser compiled to optimized JS</li>
-          <li><strong>In-process</strong> Lexer → Parser → Formatter, all in-memory</li>
-          <li><strong>No regex</strong> Real recursive-descent, no backtracking</li>
-          <li><strong>~140 KB</strong> vs 777 KB vs 12+ MB</li>
-          <li><strong>0 deps</strong> No blade-formatter or php-parser</li>
+      /* ── ANIM ── */
+      .reveal {
+        opacity: 0;
+        transform: translateY(12px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+      .reveal.vis {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      ::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--border-light);
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="w">
+        <a href="index.html" class="nav-brand"
+          ><span>prettier</span>-plugin-laravel-blade</a
+        >
+        <ul class="nav-links">
+          <li><a href="#speed">Speed</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#comparison">Comparison</a></li>
+          <li><a href="benchmarks.html">Benchmarks</a></li>
+          <li>
+            <a href="formatter.html" class="nav-live">Try Live</a>
+          </li>
         </ul>
+        <a
+          href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/prettier-plugin-laravel-blade"
+          class="nav-gh"
+          target="_blank"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"
+            />
+          </svg>
+          GitHub
+        </a>
       </div>
-    </div>
-  </div>
-</section>
+    </nav>
 
-<!-- FEATURES -->
-<section id="features">
-  <div class="w">
-    <div class="stag">Capabilities</div>
-    <div class="sh">Everything Blade throws at you</div>
-    <div class="sd">First-class support for the full Laravel ecosystem — directives, components, and frontend frameworks.</div>
-    <div class="cards">
-      <div class="card reveal"><div class="card-icon">@</div><h3>108 Directives</h3><p>Every built-in: @if, @foreach, @forelse, @auth, @guest, @switch, @push, @section, @extends, @yield, @component, and more.</p></div>
-      <div class="card reveal"><div class="card-icon">&lt;x&gt;</div><h3>Blade Components</h3><p>Full &lt;x-component&gt; support with named slots, attributes, and deeply nested content. Properly indents &lt;x-slot:name&gt; blocks.</p></div>
-      <div class="card reveal"><div class="card-icon">::</div><h3>Alpine.js &amp; Livewire</h3><p>x-data, @click, :bind, x-show, x-transition, wire:model, wire:click, wire:poll — all modifiers handled correctly.</p></div>
-      <div class="card reveal"><div class="card-icon">f(f(x))</div><h3>Always Idempotent</h3><p>Format once or a hundred times — identical output. No trailing spaces, no oscillating blank lines, no second-save diffs.</p></div>
-      <div class="card reveal"><div class="card-icon">//</div><h3>Smart Attribute Wrapping</h3><p>Respects printWidth. Choose auto, always, or never. Configurable closing bracket position and self-closing style.</p></div>
-      <div class="card reveal"><div class="card-icon">*</div><h3>9 Custom Options</h3><p>Quote style, directive spacing, slot formatting, slot name style, slot spacing, wrap attributes, attribute sorting, closing bracket, self-closing control.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- CODE EXAMPLE -->
-<section>
-  <div class="w">
-    <div class="stag">Output</div>
-    <div class="sh">Correct nesting, every time</div>
-    <div class="sd">Deeply interleaved Blade and HTML get proper hierarchical indentation — not collapsed onto one line.</div>
-    <div class="code-split code-demo">
-      <div class="code-pane">
-        <div class="code-label"><span class="cd cd-r"></span>Input — <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">editable, try it</span></div>
-        <div class="demo-editor">
-          <pre class="demo-hl" aria-hidden="true"></pre>
-          <textarea class="demo-input" spellcheck="false"></textarea>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="w">
+        <div class="hero-eyebrow">Prettier Plugin for Blade</div>
+        <h1>
+          Your Blade formatter is <br />
+          <em>22–32× too slow.</em>
+        </h1>
+        <p class="hero-sub">
+          A real recursive-descent parser — compiled from Dart to JavaScript —
+          formats your templates in under a millisecond. No regex. No child
+          processes. No compromises.
+        </p>
+        <div class="hero-cmd" onclick="copyCmd(this)">
+          <span class="p">$</span> npm i -D prettier-plugin-laravel-blade
+          prettier
+          <span class="cp"
+            ><svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path
+                d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+              /></svg
+          ></span>
+          <span class="hero-toast">Copied</span>
         </div>
       </div>
-      <div class="code-pane">
-        <div class="code-label"><span class="cd cd-g"></span>Formatted</div>
-        <pre class="demo-output"></pre>
-      </div>
-      <script type="text/plain" class="demo-source"><div>@auth @foreach($items as $item) @if($item->active) <p>{{ $item->name }}</p> @endif @endforeach @endauth</div></script>
-    </div>
-    <div style="height:1rem"></div>
-    <div class="code-split code-demo">
-      <div class="code-pane">
-        <div class="code-label"><span class="cd cd-r"></span>Input — <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">editable, try it</span></div>
-        <div class="demo-editor">
-          <pre class="demo-hl" aria-hidden="true"></pre>
-          <textarea class="demo-input" spellcheck="false"></textarea>
+    </section>
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="w">
+        <div class="metric">
+          <div
+            class="metric-val accent"
+            id="metric-avg-time"
+            data-count="0.33"
+            data-suffix="ms"
+          >
+            0.33ms
+          </div>
+          <div class="metric-label">Avg format time</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" data-count="140" data-suffix="KB">
+            ~140 KB
+          </div>
+          <div class="metric-label">Package size</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" id="metric-fixture-count" data-count="109">
+            109
+          </div>
+          <div class="metric-label">Fixtures tested</div>
+        </div>
+        <div class="metric">
+          <div
+            class="metric-val accent"
+            id="metric-idempotent"
+            data-count="100"
+            data-suffix="%"
+          >
+            100%
+          </div>
+          <div class="metric-label">Idempotent</div>
         </div>
       </div>
-      <div class="code-pane">
-        <div class="code-label"><span class="cd cd-g"></span>Formatted</div>
-        <pre class="demo-output"></pre>
+    </div>
+
+    <!-- SPEED -->
+    <section id="speed" class="speed-section">
+      <div class="w">
+        <div class="stag">Performance</div>
+        <div class="sh">Measured, not claimed</div>
+        <div class="sd">
+          Average format time across 109 fixtures. 20 timed runs after warmup.
+          <a
+            href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/benchmark"
+            >Run it yourself →</a
+          >
+        </div>
+        <div class="speed-grid">
+          <div>
+            <div class="speed-rows" id="speedChart"></div>
+            <div class="speed-legend">
+              <span class="l-a">This plugin</span>
+              <span class="l-b">stillat</span>
+              <span class="l-c">shufo</span>
+            </div>
+          </div>
+          <div class="speed-callout">
+            <h3>Why sub-millisecond?</h3>
+            <ul>
+              <li>
+                <strong>0 IPC</strong> Runs in-process, no child processes
+              </li>
+              <li>
+                <strong>dart2js</strong> Dart parser compiled to optimized JS
+              </li>
+              <li>
+                <strong>In-process</strong> Lexer → Parser → Formatter, all
+                in-memory
+              </li>
+              <li>
+                <strong>No regex</strong> Real recursive-descent, no
+                backtracking
+              </li>
+              <li><strong>~140 KB</strong> vs 777 KB vs 12+ MB</li>
+              <li><strong>0 deps</strong> No blade-formatter or php-parser</li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <script type="text/plain" class="demo-source"><x-card title="{{ $title }}"><x-slot:header><h2>{{ $heading }}</h2></x-slot><p>{{ $body }}</p></x-card></script>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- COMPARISON -->
-<section id="comparison">
-  <div class="w">
-    <div class="stag">Comparison</div>
-    <div class="sh">Side by side with every alternative</div>
-    <div class="sd">Tested against stillat's prettier-plugin-blade (v2.1.21) and shufo's @shufo/prettier-plugin-blade (v1.16.1).</div>
-    <div style="overflow-x:auto">
-      <table class="tbl">
-        <thead><tr><th></th><th>This plugin</th><th>stillat</th><th>shufo</th></tr></thead>
-        <tbody>
-          <tr><td class="lbl">Package size</td><td class="win m">~140 KB</td><td class="m">777 KB</td><td class="m">12+ MB</td></tr>
-          <tr><td class="lbl">Avg format time</td><td class="win m" id="cmp-avg-a">0.33 ms</td><td class="m" id="cmp-avg-b">7.31 ms</td><td class="m" id="cmp-avg-c">10.45 ms</td></tr>
-          <tr><td class="lbl">Parser</td><td class="win">Real recursive-descent AST</td><td>TypeScript AST (Prettier IR)</td><td>Heuristic-based (no AST)</td></tr>
-          <tr><td class="lbl">Idempotent</td><td class="ok" id="cmp-idem-a">✓ 104/104</td><td class="no" id="cmp-idem-b">✗ 4 failures</td><td class="no" id="cmp-idem-c">✗ 1 failure</td></tr>
-          <tr><td class="lbl">Dependencies</td><td class="win">None</td><td>None</td><td>blade-formatter, php-parser</td></tr>
-          <tr><td class="lbl">Trailing whitespace</td><td class="ok">✓ None</td><td class="no">✗ Present</td><td class="ok">✓ None</td></tr>
-          <tr><td class="lbl">Quote preservation</td><td class="ok">✓ Preserves</td><td class="no">✗ Converts ' → "</td><td class="ok">✓ Preserves</td></tr>
-          <tr><td class="lbl">Nested directives</td><td class="ok">✓ Correct hierarchy</td><td class="ok">✓ Correct</td><td class="no">✗ Collapses levels</td></tr>
-          <tr><td class="lbl">&lt;x-slot&gt; formatting</td><td class="ok">✓ Fully expanded</td><td>Keeps inline</td><td class="no">✗ Misaligned</td></tr>
-          <tr><td class="lbl">Architecture</td><td>Compiled Dart (dart2js)</td><td>TypeScript → Prettier IR</td><td>blade-formatter wrapper</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
+    <!-- FEATURES -->
+    <section id="features">
+      <div class="w">
+        <div class="stag">Capabilities</div>
+        <div class="sh">Everything Blade throws at you</div>
+        <div class="sd">
+          First-class support for the full Laravel ecosystem — directives,
+          components, and frontend frameworks.
+        </div>
+        <div class="cards">
+          <div class="card reveal">
+            <div class="card-icon">@</div>
+            <h3>108 Directives</h3>
+            <p>
+              Every built-in: @if, @foreach, @forelse, @auth, @guest, @switch,
+              @push, @section, @extends, @yield, @component, and more.
+            </p>
+          </div>
+          <div class="card reveal">
+            <div class="card-icon">&lt;x&gt;</div>
+            <h3>Blade Components</h3>
+            <p>
+              Full &lt;x-component&gt; support with named slots, attributes, and
+              deeply nested content. Properly indents &lt;x-slot:name&gt;
+              blocks.
+            </p>
+          </div>
+          <div class="card reveal">
+            <div class="card-icon">::</div>
+            <h3>Alpine.js &amp; Livewire</h3>
+            <p>
+              x-data, @click, :bind, x-show, x-transition, wire:model,
+              wire:click, wire:poll — all modifiers handled correctly.
+            </p>
+          </div>
+          <div class="card reveal">
+            <div class="card-icon">f(f(x))</div>
+            <h3>Always Idempotent</h3>
+            <p>
+              Format once or a hundred times — identical output. No trailing
+              spaces, no oscillating blank lines, no second-save diffs.
+            </p>
+          </div>
+          <div class="card reveal">
+            <div class="card-icon">//</div>
+            <h3>Smart Attribute Wrapping</h3>
+            <p>
+              Respects printWidth. Choose auto, always, or never. Configurable
+              closing bracket position and self-closing style.
+            </p>
+          </div>
+          <div class="card reveal">
+            <div class="card-icon">*</div>
+            <h3>9 Custom Options</h3>
+            <p>
+              Quote style, directive spacing, slot formatting, slot name style,
+              slot spacing, wrap attributes, attribute sorting, closing bracket,
+              self-closing control.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<!-- ARCHITECTURE -->
-<section>
-  <div class="w">
-    <div class="stag">Architecture</div>
-    <div class="sh">How it works</div>
-    <div class="sd">A full Dart parser compiled to optimized JavaScript runs inside Node.js — zero IPC, zero filesystem overhead.</div>
-    <div class="arch">
-      <div class="arch-step"><div class="as-label">Input</div><div class="as-title">.blade.php</div><div class="as-detail">Source template</div></div>
-      <div class="arch-arrow">→</div>
-      <div class="arch-step"><div class="as-label">Step 1</div><div class="as-title">Prettier</div><div class="as-detail">Calls preprocess</div></div>
-      <div class="arch-arrow">→</div>
-      <div class="arch-step highlight"><div class="as-label">Step 2</div><div class="as-title">Dart AST</div><div class="as-detail">Recursive-descent parser</div></div>
-      <div class="arch-arrow">→</div>
-      <div class="arch-step"><div class="as-label">Step 3</div><div class="as-title">Format</div><div class="as-detail">Visitor traversal</div></div>
-      <div class="arch-arrow">→</div>
-      <div class="arch-step"><div class="as-label">Output</div><div class="as-title">Done</div><div class="as-detail">&lt; 1ms</div></div>
-    </div>
-  </div>
-</section>
+    <!-- CODE EXAMPLE -->
+    <section>
+      <div class="w">
+        <div class="stag">Output</div>
+        <div class="sh">Correct nesting, every time</div>
+        <div class="sd">
+          Deeply interleaved Blade and HTML get proper hierarchical indentation
+          — not collapsed onto one line.
+        </div>
+        <div class="code-split code-demo">
+          <div class="code-pane">
+            <div class="code-label">
+              <span class="cd cd-r"></span>Input —
+              <span
+                style="
+                  color: var(--text-muted);
+                  font-weight: 400;
+                  text-transform: none;
+                  letter-spacing: 0;
+                "
+                >editable, try it</span
+              >
+            </div>
+            <div class="demo-editor">
+              <pre class="demo-hl" aria-hidden="true"></pre>
+              <textarea class="demo-input" spellcheck="false"></textarea>
+            </div>
+          </div>
+          <div class="code-pane">
+            <div class="code-label"><span class="cd cd-g"></span>Formatted</div>
+            <pre class="demo-output"></pre>
+          </div>
+          <script type="text/plain" class="demo-source">
+            <div>@auth @foreach($items as $item) @if($item->active) <p>{{ $item->name }}</p> @endif @endforeach @endauth</div>
+          </script>
+        </div>
+        <div style="height: 1rem"></div>
+        <div class="code-split code-demo">
+          <div class="code-pane">
+            <div class="code-label">
+              <span class="cd cd-r"></span>Input —
+              <span
+                style="
+                  color: var(--text-muted);
+                  font-weight: 400;
+                  text-transform: none;
+                  letter-spacing: 0;
+                "
+                >editable, try it</span
+              >
+            </div>
+            <div class="demo-editor">
+              <pre class="demo-hl" aria-hidden="true"></pre>
+              <textarea class="demo-input" spellcheck="false"></textarea>
+            </div>
+          </div>
+          <div class="code-pane">
+            <div class="code-label"><span class="cd cd-g"></span>Formatted</div>
+            <pre class="demo-output"></pre>
+          </div>
+          <script type="text/plain" class="demo-source">
+            <x-card title="{{ $title }}"><x-slot:header><h2>{{ $heading }}</h2></x-slot><p>{{ $body }}</p></x-card>
+          </script>
+        </div>
+      </div>
+    </section>
 
-<!-- OPTIONS -->
-<section>
-  <div class="w">
-    <div class="stag">Configuration</div>
-    <div class="sh">Fine-grained control</div>
-    <div class="sd">9 Blade-specific options alongside Prettier's standard tabWidth, useTabs, and printWidth.</div>
-    <div style="overflow-x:auto">
-      <table class="opts">
-        <thead><tr><th>Option</th><th>Default</th><th>Choices</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="m">bladeQuoteStyle</td><td class="m">"preserve"</td><td class="m">single, double, preserve</td><td>' vs " in attribute values</td></tr>
-          <tr><td class="m">bladeDirectiveSpacing</td><td class="m">"between_blocks"</td><td class="m">between_blocks, none, preserve</td><td>Blank lines between @if, @foreach, etc.</td></tr>
-          <tr><td class="m">bladeSlotFormatting</td><td class="m">"compact"</td><td class="m">compact, block</td><td>Extra newlines inside &lt;x-slot&gt; blocks</td></tr>
-          <tr><td class="m">bladeSlotNameStyle</td><td class="m">"colon"</td><td class="m">colon, attribute, preserve</td><td>&lt;x-slot:name&gt; vs &lt;x-slot name="..."&gt;</td></tr>
-          <tr><td class="m">bladeSlotSpacing</td><td class="m">"after"</td><td class="m">none, after, before, around</td><td>Blank lines before/after &lt;x-slot&gt; tags</td></tr>
-          <tr><td class="m">bladeWrapAttributes</td><td class="m">"auto"</td><td class="m">auto, always, never</td><td>Multi-line attributes when line is too long</td></tr>
-          <tr><td class="m">bladeAttributeSort</td><td class="m">"none"</td><td class="m">none, alphabetical, by_type</td><td>Reorder attributes (HTML → Alpine → Livewire)</td></tr>
-          <tr><td class="m">bladeClosingBracketStyle</td><td class="m">"same_line"</td><td class="m">same_line, new_line</td><td>Where &gt; sits when attributes wrap</td></tr>
-          <tr><td class="m">bladeSelfClosingStyle</td><td class="m">"preserve"</td><td class="m">preserve, always, never</td><td>&lt;x-icon /&gt; vs &lt;x-icon&gt;&lt;/x-icon&gt; for empty tags</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:2rem">
-      <div style="background:var(--surface);padding:1.25rem">
-        <div class="code-label">.prettierrc</div>
-<pre>{
+    <!-- COMPARISON -->
+    <section id="comparison">
+      <div class="w">
+        <div class="stag">Comparison</div>
+        <div class="sh">Side by side with every alternative</div>
+        <div class="sd">
+          Tested against stillat's prettier-plugin-blade (v2.1.21) and shufo's
+          @shufo/prettier-plugin-blade (v1.16.1).
+        </div>
+        <div style="overflow-x: auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>This plugin</th>
+                <th>stillat</th>
+                <th>shufo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="lbl">Package size</td>
+                <td class="win m">~140 KB</td>
+                <td class="m">777 KB</td>
+                <td class="m">12+ MB</td>
+              </tr>
+              <tr>
+                <td class="lbl">Avg format time</td>
+                <td class="win m" id="cmp-avg-a">0.33 ms</td>
+                <td class="m" id="cmp-avg-b">7.31 ms</td>
+                <td class="m" id="cmp-avg-c">10.45 ms</td>
+              </tr>
+              <tr>
+                <td class="lbl">Parser</td>
+                <td class="win">Real recursive-descent AST</td>
+                <td>TypeScript AST (Prettier IR)</td>
+                <td>Heuristic-based (no AST)</td>
+              </tr>
+              <tr>
+                <td class="lbl">Idempotent</td>
+                <td class="ok" id="cmp-idem-a">✓ 104/104</td>
+                <td class="no" id="cmp-idem-b">✗ 4 failures</td>
+                <td class="no" id="cmp-idem-c">✗ 1 failure</td>
+              </tr>
+              <tr>
+                <td class="lbl">Dependencies</td>
+                <td class="win">None</td>
+                <td>None</td>
+                <td>blade-formatter, php-parser</td>
+              </tr>
+              <tr>
+                <td class="lbl">Trailing whitespace</td>
+                <td class="ok">✓ None</td>
+                <td class="no">✗ Present</td>
+                <td class="ok">✓ None</td>
+              </tr>
+              <tr>
+                <td class="lbl">Quote preservation</td>
+                <td class="ok">✓ Preserves</td>
+                <td class="no">✗ Converts ' → "</td>
+                <td class="ok">✓ Preserves</td>
+              </tr>
+              <tr>
+                <td class="lbl">Nested directives</td>
+                <td class="ok">✓ Correct hierarchy</td>
+                <td class="ok">✓ Correct</td>
+                <td class="no">✗ Collapses levels</td>
+              </tr>
+              <tr>
+                <td class="lbl">&lt;x-slot&gt; formatting</td>
+                <td class="ok">✓ Fully expanded</td>
+                <td>Keeps inline</td>
+                <td class="no">✗ Misaligned</td>
+              </tr>
+              <tr>
+                <td class="lbl">Architecture</td>
+                <td>Compiled Dart (dart2js)</td>
+                <td>TypeScript → Prettier IR</td>
+                <td>blade-formatter wrapper</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section>
+      <div class="w">
+        <div class="stag">Architecture</div>
+        <div class="sh">How it works</div>
+        <div class="sd">
+          A full Dart parser compiled to optimized JavaScript runs inside
+          Node.js — zero IPC, zero filesystem overhead.
+        </div>
+        <div class="arch">
+          <div class="arch-step">
+            <div class="as-label">Input</div>
+            <div class="as-title">.blade.php</div>
+            <div class="as-detail">Source template</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-step">
+            <div class="as-label">Step 1</div>
+            <div class="as-title">Prettier</div>
+            <div class="as-detail">Calls preprocess</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-step highlight">
+            <div class="as-label">Step 2</div>
+            <div class="as-title">Dart AST</div>
+            <div class="as-detail">Recursive-descent parser</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-step">
+            <div class="as-label">Step 3</div>
+            <div class="as-title">Format</div>
+            <div class="as-detail">Visitor traversal</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-step">
+            <div class="as-label">Output</div>
+            <div class="as-title">Done</div>
+            <div class="as-detail">&lt; 1ms</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPTIONS -->
+    <section>
+      <div class="w">
+        <div class="stag">Configuration</div>
+        <div class="sh">Fine-grained control</div>
+        <div class="sd">
+          9 Blade-specific options alongside Prettier's standard tabWidth,
+          useTabs, and printWidth.
+        </div>
+        <div style="overflow-x: auto">
+          <table class="opts">
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>Default</th>
+                <th>Choices</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="m">bladeQuoteStyle</td>
+                <td class="m">"preserve"</td>
+                <td class="m">single, double, preserve</td>
+                <td>' vs " in attribute values</td>
+              </tr>
+              <tr>
+                <td class="m">bladeDirectiveSpacing</td>
+                <td class="m">"between_blocks"</td>
+                <td class="m">between_blocks, none, preserve</td>
+                <td>Blank lines between @if, @foreach, etc.</td>
+              </tr>
+              <tr>
+                <td class="m">bladeSlotFormatting</td>
+                <td class="m">"compact"</td>
+                <td class="m">compact, block</td>
+                <td>Extra newlines inside &lt;x-slot&gt; blocks</td>
+              </tr>
+              <tr>
+                <td class="m">bladeSlotNameStyle</td>
+                <td class="m">"colon"</td>
+                <td class="m">colon, attribute, preserve</td>
+                <td>&lt;x-slot:name&gt; vs &lt;x-slot name="..."&gt;</td>
+              </tr>
+              <tr>
+                <td class="m">bladeSlotSpacing</td>
+                <td class="m">"after"</td>
+                <td class="m">none, after, before, around</td>
+                <td>Blank lines before/after &lt;x-slot&gt; tags</td>
+              </tr>
+              <tr>
+                <td class="m">bladeWrapAttributes</td>
+                <td class="m">"auto"</td>
+                <td class="m">auto, always, never</td>
+                <td>Multi-line attributes when line is too long</td>
+              </tr>
+              <tr>
+                <td class="m">bladeAttributeSort</td>
+                <td class="m">"none"</td>
+                <td class="m">none, alphabetical, by_type</td>
+                <td>Reorder attributes (HTML → Alpine → Livewire)</td>
+              </tr>
+              <tr>
+                <td class="m">bladeClosingBracketStyle</td>
+                <td class="m">"same_line"</td>
+                <td class="m">same_line, new_line</td>
+                <td>Where &gt; sits when attributes wrap</td>
+              </tr>
+              <tr>
+                <td class="m">bladeSelfClosingStyle</td>
+                <td class="m">"preserve"</td>
+                <td class="m">preserve, always, never</td>
+                <td>
+                  &lt;x-icon /&gt; vs &lt;x-icon&gt;&lt;/x-icon&gt; for empty
+                  tags
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 2rem;
+          "
+        >
+          <div style="background: var(--surface); padding: 1.25rem">
+            <div class="code-label">.prettierrc</div>
+            <pre>
+{
   "plugins": ["prettier-plugin-laravel-blade"],
   "overrides": [{
     "files": "*.blade.php",
@@ -440,11 +1400,13 @@ footer a{color:var(--text-dim)}
       "bladeSelfClosingStyle": "preserve"
     }
   }]
-}</pre>
-      </div>
-      <div style="background:var(--surface);padding:1.25rem">
-        <div class="code-label">.blade.json</div>
-<pre>{
+}</pre
+            >
+          </div>
+          <div style="background: var(--surface); padding: 1.25rem">
+            <div class="code-label">.blade.json</div>
+            <pre>
+{
   "indent_size": 4,
   "indent_style": "spaces",
   "max_line_length": 120,
@@ -454,22 +1416,28 @@ footer a{color:var(--text-dim)}
   "wrap_attributes": "auto",
   "attribute_sort": "by_type",
   "self_closing_style": "preserve"
-}</pre>
+}</pre
+            >
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- CTA -->
-<section class="cta">
-  <h2>Try it now</h2>
-  <p>Works with Prettier 3.x. Just add the plugin to your .prettierrc.</p>
-  <div>
-    <a href="formatter.html" class="cta-btn">Open Live Formatter</a>
-    <a href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/prettier-plugin-laravel-blade" class="cta-btn secondary" target="_blank">View Source</a>
-  </div>
-  <div class="install-block">
-<pre><span style="color:var(--text-muted)"># Install</span>
+    <!-- CTA -->
+    <section class="cta">
+      <h2>Try it now</h2>
+      <p>Works with Prettier 3.x. Just add the plugin to your .prettierrc.</p>
+      <div>
+        <a href="formatter.html" class="cta-btn">Open Live Formatter</a>
+        <a
+          href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/prettier-plugin-laravel-blade"
+          class="cta-btn secondary"
+          target="_blank"
+          >View Source</a
+        >
+      </div>
+      <div class="install-block">
+        <pre><span style="color:var(--text-muted)"># Install</span>
 npm install --save-dev prettier-plugin-laravel-blade prettier
 
 <span style="color:var(--text-muted)"># Add to .prettierrc</span>
@@ -480,218 +1448,319 @@ npx prettier --write "**/*.blade.php"
 
 <span style="color:var(--text-muted)"># Check (CI)</span>
 npx prettier --check "**/*.blade.php"</pre>
-  </div>
-</section>
+      </div>
+    </section>
 
-<footer>
-  <div class="w">
-    <p>Built by <a href="https://github.com/HelgeSverre">Helge Sverre</a> · <a href="https://github.com/HelgeSverre/dart-blade-parser">Source</a> · MIT</p>
-  </div>
-</footer>
+    <footer>
+      <div class="w">
+        <p>
+          Built by
+          <a href="https://github.com/HelgeSverre">Helge Sverre</a> ·
+          <a href="https://github.com/HelgeSverre/dart-blade-parser">Source</a>
+          · MIT
+        </p>
+      </div>
+    </footer>
 
-<script src="blade-highlight.js"></script>
-<script src="dist/blade-formatter.js"></script>
-<script>
-// ── Live code demos ──
-(function() {
-  const { highlightBlade } = BladeHighlight;
-  const fmtOpts = JSON.stringify({ tabWidth: 4, useTabs: false, printWidth: 120,
-    quoteStyle: 'preserve', directiveSpacing: 'between_blocks',
-    slotFormatting: 'compact', slotNameStyle: 'colon', slotSpacing: 'after',
-    wrapAttributes: 'auto', attributeSort: 'none',
-    closingBracketStyle: 'same_line', selfClosingStyle: 'preserve' });
+    <script src="blade-highlight.js"></script>
+    <script src="dist/blade-formatter.js"></script>
+    <script>
+      // ── Live code demos ──
+      (function () {
+        const { highlightBlade } = BladeHighlight;
+        const fmtOpts = JSON.stringify({
+          tabWidth: 4,
+          useTabs: false,
+          printWidth: 120,
+          quoteStyle: "preserve",
+          directiveSpacing: "between_blocks",
+          slotFormatting: "compact",
+          slotNameStyle: "colon",
+          slotSpacing: "after",
+          wrapAttributes: "auto",
+          attributeSort: "none",
+          closingBracketStyle: "same_line",
+          selfClosingStyle: "preserve",
+        });
 
-  // Apply saved theme
-  document.documentElement.dataset.theme = localStorage.getItem('blade-formatter-theme') || 'muted-steel';
+        // Apply saved theme
+        document.documentElement.dataset.theme =
+          localStorage.getItem("blade-formatter-theme") || "muted-steel";
 
-  function formatAndHighlight(el) {
-    const textarea = el.querySelector('.demo-input');
-    const hlPre = el.querySelector('.demo-hl');
-    const outputPre = el.querySelector('.demo-output');
-    const source = textarea.value;
+        function formatAndHighlight(el) {
+          const textarea = el.querySelector(".demo-input");
+          const hlPre = el.querySelector(".demo-hl");
+          const outputPre = el.querySelector(".demo-output");
+          const source = textarea.value;
 
-    hlPre.innerHTML = highlightBlade(source);
+          hlPre.innerHTML = highlightBlade(source);
 
-    if (!source.trim()) {
-      outputPre.innerHTML = '';
-      return;
-    }
+          if (!source.trim()) {
+            outputPre.innerHTML = "";
+            return;
+          }
 
-    try {
-      const raw = globalThis.__dartBladeFormatter(source, fmtOpts);
-      const result = JSON.parse(raw);
-      if (result.error) {
-        outputPre.textContent = 'Error: ' + result.error;
-        outputPre.className = 'demo-output';
-        outputPre.style.color = 'var(--red)';
-      } else {
-        outputPre.innerHTML = highlightBlade(result.formatted);
-        outputPre.style.color = '';
+          try {
+            const raw = globalThis.__dartBladeFormatter(source, fmtOpts);
+            const result = JSON.parse(raw);
+            if (result.error) {
+              outputPre.textContent = "Error: " + result.error;
+              outputPre.className = "demo-output";
+              outputPre.style.color = "var(--red)";
+            } else {
+              outputPre.innerHTML = highlightBlade(result.formatted);
+              outputPre.style.color = "";
+            }
+          } catch (e) {
+            outputPre.textContent = "Error: " + e.message;
+            outputPre.style.color = "var(--red)";
+          }
+        }
+
+        function autoSize(textarea) {
+          const pre = textarea.previousElementSibling;
+          pre.style.minHeight = "0";
+          pre.style.minHeight = textarea.scrollHeight + "px";
+        }
+
+        function hydrateDemo(el) {
+          const source = el.querySelector(".demo-source").textContent.trim();
+          const textarea = el.querySelector(".demo-input");
+          textarea.value = source;
+          autoSize(textarea);
+          formatAndHighlight(el);
+
+          let timer = null;
+          textarea.addEventListener("input", () => {
+            autoSize(textarea);
+            clearTimeout(timer);
+            timer = setTimeout(() => formatAndHighlight(el), 150);
+          });
+        }
+
+        function waitForFormatter() {
+          if (typeof globalThis.__dartBladeFormatter === "function") {
+            document.querySelectorAll(".code-demo").forEach(hydrateDemo);
+          } else {
+            setTimeout(waitForFormatter, 50);
+          }
+        }
+        waitForFormatter();
+      })();
+
+      // Speed chart — loads benchmark data dynamically, falls back to hardcoded defaults
+      const ch = document.getElementById("speedChart");
+
+      const heroFixtures = [
+        "large/01-pagination",
+        "alpine/01-billing",
+        "components/02-billing",
+        "legacy/laravel5-auth-login",
+        "livewire/01-layout",
+        "error/malformed-dashboard",
+        "format/07-real-world-mess",
+        "format/06-mixed-content",
+      ];
+
+      function displayName(key) {
+        return key.split("/").pop().replace(/^\d+-/, "").replace(/[-_]/g, " ");
       }
-    } catch (e) {
-      outputPre.textContent = 'Error: ' + e.message;
-      outputPre.style.color = 'var(--red)';
-    }
-  }
 
-  function autoSize(textarea) {
-    const pre = textarea.previousElementSibling;
-    pre.style.minHeight = '0';
-    pre.style.minHeight = textarea.scrollHeight + 'px';
-  }
+      function renderChart(data, avgA, avgB, avgC) {
+        ch.innerHTML = "";
+        const mx = Math.max(...data.map((d) => Math.max(d.a, d.b, d.c)));
+        data.forEach((d) => {
+          const r = document.createElement("div");
+          r.className = "speed-row";
+          r.innerHTML = `<span class="speed-fixture">${d.f}</span><div class="speed-bars"><div class="speed-bar ours" style="width:${((d.a / mx) * 100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${((d.b / mx) * 100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${((d.c / mx) * 100).toFixed(1)}%"></div></div><span class="speed-ms">${d.a}ms</span>`;
+          ch.appendChild(r);
+        });
+        const avg = document.createElement("div");
+        avg.className = "speed-row speed-avg";
+        avg.innerHTML = `<span class="speed-fixture" style="font-weight:600;color:var(--text)">Average</span><div class="speed-bars"><div class="speed-bar ours" style="width:${((avgA / mx) * 100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${((avgB / mx) * 100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${((avgC / mx) * 100).toFixed(1)}%"></div></div><span class="speed-ms" style="font-weight:600;color:var(--accent)">${avgA.toFixed(2)}ms</span>`;
+        ch.appendChild(avg);
+        // Observe after bars exist so the IntersectionObserver can animate them
+        speedObs.observe(ch);
+      }
 
-  function hydrateDemo(el) {
-    const source = el.querySelector('.demo-source').textContent.trim();
-    const textarea = el.querySelector('.demo-input');
-    textarea.value = source;
-    autoSize(textarea);
-    formatAndHighlight(el);
+      function updateMetrics(avgA, fixtureCount, idemPct) {
+        const mAvg = document.getElementById("metric-avg-time");
+        if (mAvg) {
+          mAvg.textContent = avgA.toFixed(2) + "ms";
+          mAvg.setAttribute("data-count", avgA.toFixed(2));
+        }
+        const mFix = document.getElementById("metric-fixture-count");
+        if (mFix) {
+          mFix.textContent = String(fixtureCount);
+          mFix.setAttribute("data-count", String(fixtureCount));
+        }
+        const mIdem = document.getElementById("metric-idempotent");
+        if (mIdem) {
+          mIdem.textContent = idemPct + "%";
+          mIdem.setAttribute("data-count", String(idemPct));
+        }
+      }
 
-    let timer = null;
-    textarea.addEventListener('input', () => {
-      autoSize(textarea);
-      clearTimeout(timer);
-      timer = setTimeout(() => formatAndHighlight(el), 150);
-    });
-  }
+      function updateComparison(avgA, avgB, avgC, idemA, idemB, idemC) {
+        const ca = document.getElementById("cmp-avg-a");
+        if (ca) ca.textContent = avgA.toFixed(2) + " ms";
+        const cb = document.getElementById("cmp-avg-b");
+        if (cb) cb.textContent = avgB.toFixed(2) + " ms";
+        const cc = document.getElementById("cmp-avg-c");
+        if (cc) cc.textContent = avgC.toFixed(2) + " ms";
+        const ia = document.getElementById("cmp-idem-a");
+        const ib = document.getElementById("cmp-idem-b");
+        const ic = document.getElementById("cmp-idem-c");
+        if (ia) {
+          ia.className = "ok";
+          ia.textContent = "\u2713 " + idemA.pass + "/" + idemA.total;
+        }
+        if (ib) {
+          const f = idemB.fail + idemB.error;
+          ib.className = f ? "no" : "ok";
+          ib.textContent = f
+            ? "\u2717 " + f + " failure" + (f > 1 ? "s" : "")
+            : "\u2713 " + idemB.pass + "/" + idemB.total;
+        }
+        if (ic) {
+          const f = idemC.fail + idemC.error;
+          ic.className = f ? "no" : "ok";
+          ic.textContent = f
+            ? "\u2717 " + f + " failure" + (f > 1 ? "s" : "")
+            : "\u2713 " + idemC.pass + "/" + idemC.total;
+        }
+      }
 
-  function waitForFormatter() {
-    if (typeof globalThis.__dartBladeFormatter === 'function') {
-      document.querySelectorAll('.code-demo').forEach(hydrateDemo);
-    } else {
-      setTimeout(waitForFormatter, 50);
-    }
-  }
-  waitForFormatter();
-})();
+      function updateHeroSubtitle(ratioB, ratioC) {
+        const h1 = document.querySelector(".hero h1 em");
+        if (h1) {
+          const lo = Math.floor(Math.min(ratioB, ratioC));
+          const hi = Math.floor(Math.max(ratioB, ratioC));
+          h1.textContent = lo + "\u2013" + hi + "× too slow.";
+        }
+      }
 
-// Speed chart — loads benchmark data dynamically, falls back to hardcoded defaults
-const ch=document.getElementById('speedChart');
+      function countIdem(entries) {
+        let pass = 0,
+          fail = 0,
+          error = 0;
+        for (const v of Object.values(entries)) {
+          if (v.error) {
+            error++;
+          } else if (v.idempotent === true) {
+            pass++;
+          } else {
+            fail++;
+          }
+        }
+        return { pass, fail, error, total: pass + fail + error };
+      }
 
-const heroFixtures=[
-  'large/01-pagination','alpine/01-billing','components/02-billing',
-  'legacy/laravel5-auth-login','livewire/01-layout','error/malformed-dashboard',
-  'format/07-real-world-mess','format/06-mixed-content'
-];
+      function computeAvg(perfEntries) {
+        const vals = Object.values(perfEntries)
+          .filter((e) => e.avg != null && !e.error)
+          .map((e) => e.avg);
+        return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+      }
 
-function displayName(key){return key.split('/').pop().replace(/^\d+-/,'').replace(/[-_]/g,' ')}
+      async function loadBenchmarkData() {
+        try {
+          const res = await fetch("data/benchmark.json");
+          const json = await res.json();
+          const perf = json.performance || { A: {}, B: {}, C: {} };
+          const perfA = perf.A || {},
+            perfB = perf.B || {},
+            perfC = perf.C || {};
+          const avgA = computeAvg(perfA),
+            avgB = computeAvg(perfB),
+            avgC = computeAvg(perfC);
+          const fixtureCount = Object.keys(perfA).length;
 
-function renderChart(data,avgA,avgB,avgC){
-  ch.innerHTML='';
-  const mx=Math.max(...data.map(d=>Math.max(d.a,d.b,d.c)));
-  data.forEach(d=>{
-    const r=document.createElement('div');r.className='speed-row';
-    r.innerHTML=`<span class="speed-fixture">${d.f}</span><div class="speed-bars"><div class="speed-bar ours" style="width:${(d.a/mx*100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${(d.b/mx*100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${(d.c/mx*100).toFixed(1)}%"></div></div><span class="speed-ms">${d.a}ms</span>`;
-    ch.appendChild(r);
-  });
-  const avg=document.createElement('div');avg.className='speed-row speed-avg';
-  avg.innerHTML=`<span class="speed-fixture" style="font-weight:600;color:var(--text)">Average</span><div class="speed-bars"><div class="speed-bar ours" style="width:${(avgA/mx*100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${(avgB/mx*100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${(avgC/mx*100).toFixed(1)}%"></div></div><span class="speed-ms" style="font-weight:600;color:var(--accent)">${avgA.toFixed(2)}ms</span>`;
-  ch.appendChild(avg);
-  // Observe after bars exist so the IntersectionObserver can animate them
-  speedObs.observe(ch);
-}
+          // Build selected fixtures, sorted by A time descending
+          const selected = heroFixtures
+            .filter((k) => perfA[k] && perfA[k].avg != null)
+            .map((k) => ({
+              f: displayName(k),
+              a: perfA[k].avg,
+              b: (perfB[k] && perfB[k].avg) || 0,
+              c: (perfC[k] && perfC[k].avg) || 0,
+            }))
+            .sort((a, b) => b.a - a.a);
 
-function updateMetrics(avgA,fixtureCount,idemPct){
-  const mAvg=document.getElementById('metric-avg-time');
-  if(mAvg){mAvg.textContent=avgA.toFixed(2)+'ms';mAvg.setAttribute('data-count',avgA.toFixed(2))}
-  const mFix=document.getElementById('metric-fixture-count');
-  if(mFix){mFix.textContent=String(fixtureCount);mFix.setAttribute('data-count',String(fixtureCount))}
-  const mIdem=document.getElementById('metric-idempotent');
-  if(mIdem){mIdem.textContent=idemPct+'%';mIdem.setAttribute('data-count',String(idemPct))}
-}
+          renderChart(selected, avgA, avgB, avgC);
 
-function updateComparison(avgA,avgB,avgC,idemA,idemB,idemC){
-  const ca=document.getElementById('cmp-avg-a');if(ca)ca.textContent=avgA.toFixed(2)+' ms';
-  const cb=document.getElementById('cmp-avg-b');if(cb)cb.textContent=avgB.toFixed(2)+' ms';
-  const cc=document.getElementById('cmp-avg-c');if(cc)cc.textContent=avgC.toFixed(2)+' ms';
-  const ia=document.getElementById('cmp-idem-a');
-  const ib=document.getElementById('cmp-idem-b');
-  const ic=document.getElementById('cmp-idem-c');
-  if(ia){ia.className='ok';ia.textContent='\u2713 '+idemA.pass+'/'+idemA.total}
-  if(ib){const f=idemB.fail+idemB.error;ib.className=f?'no':'ok';ib.textContent=f?'\u2717 '+f+' failure'+(f>1?'s':''):'\u2713 '+idemB.pass+'/'+idemB.total}
-  if(ic){const f=idemC.fail+idemC.error;ic.className=f?'no':'ok';ic.textContent=f?'\u2717 '+f+' failure'+(f>1?'s':''):'\u2713 '+idemC.pass+'/'+idemC.total}
-}
+          // Idempotency
+          const idm = json.idempotency || { A: {}, B: {}, C: {} };
+          const idemA = countIdem(idm.A || {});
+          const idemB = countIdem(idm.B || {});
+          const idemC = countIdem(idm.C || {});
+          const idemPct = idemA.total
+            ? Math.round((idemA.pass / idemA.total) * 100)
+            : 100;
 
-function updateHeroSubtitle(ratioB,ratioC){
-  const h1=document.querySelector('.hero h1 em');
-  if(h1){const lo=Math.floor(Math.min(ratioB,ratioC));const hi=Math.floor(Math.max(ratioB,ratioC));h1.textContent=lo+'\u2013'+hi+'× too slow.'}
-}
+          updateMetrics(avgA, fixtureCount, idemPct);
+          updateComparison(avgA, avgB, avgC, idemA, idemB, idemC);
+          updateHeroSubtitle(avgB / avgA, avgC / avgA);
+        } catch (e) {
+          // Fallback to hardcoded defaults
+          const data = [
+            { f: "pagination", a: 0.83, b: 84.44, c: 47.1 },
+            { f: "billing", a: 1.15, b: 29.5, c: 40.93 },
+            { f: "billing", a: 0.87, b: 15.18, c: 19.25 },
+            { f: "auth login", a: 0.42, b: 9.93, c: 14.21 },
+            { f: "layout", a: 0.36, b: 8.03, c: 10.02 },
+            {
+              f: "malformed dashboard",
+              a: 0.26,
+              b: 3.79,
+              c: 15.65,
+            },
+            { f: "real world mess", a: 0.23, b: 2.91, c: 8.33 },
+            { f: "mixed content", a: 0.18, b: 2.95, c: 7.9 },
+          ];
+          renderChart(data, 0.33, 7.31, 10.45);
+        }
+      }
+      loadBenchmarkData();
 
-function countIdem(entries){
-  let pass=0,fail=0,error=0;
-  for(const v of Object.values(entries)){
-    if(v.error){error++}else if(v.idempotent===true){pass++}else{fail++}
-  }
-  return {pass,fail,error,total:pass+fail+error};
-}
+      // Animate bars on scroll
+      const speedObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.querySelectorAll(".speed-bar").forEach((b, i) => {
+                setTimeout(() => b.classList.add("anim"), i * 60);
+              });
+              speedObs.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.2 },
+      );
 
-function computeAvg(perfEntries){
-  const vals=Object.values(perfEntries).filter(e=>e.avg!=null&&!e.error).map(e=>e.avg);
-  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
-}
+      // Reveal on scroll
+      const revObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("vis");
+              revObs.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+      document.querySelectorAll(".reveal").forEach((el) => revObs.observe(el));
 
-async function loadBenchmarkData(){
-  try{
-    const res=await fetch('data/benchmark.json');
-    const json=await res.json();
-    const perfA=json.performance.A,perfB=json.performance.B,perfC=json.performance.C;
-    const avgA=computeAvg(perfA),avgB=computeAvg(perfB),avgC=computeAvg(perfC);
-    const fixtureCount=Object.keys(perfA).length;
-
-    // Build selected fixtures, sorted by A time descending
-    const selected=heroFixtures
-      .filter(k=>perfA[k]&&perfA[k].avg!=null)
-      .map(k=>({f:displayName(k),a:perfA[k].avg,b:(perfB[k]&&perfB[k].avg)||0,c:(perfC[k]&&perfC[k].avg)||0}))
-      .sort((a,b)=>b.a-a.a);
-
-    renderChart(selected,avgA,avgB,avgC);
-
-    // Idempotency
-    const idemA=countIdem(json.idempotency.A);
-    const idemB=countIdem(json.idempotency.B);
-    const idemC=countIdem(json.idempotency.C);
-    const idemPct=idemA.total?Math.round(idemA.pass/idemA.total*100):100;
-
-    updateMetrics(avgA,fixtureCount,idemPct);
-    updateComparison(avgA,avgB,avgC,idemA,idemB,idemC);
-    updateHeroSubtitle(avgB/avgA,avgC/avgA);
-  }catch(e){
-    // Fallback to hardcoded defaults
-    const data=[
-      {f:'pagination',a:.83,b:84.44,c:47.10},
-      {f:'billing',a:1.15,b:29.50,c:40.93},
-      {f:'billing',a:.87,b:15.18,c:19.25},
-      {f:'auth login',a:.42,b:9.93,c:14.21},
-      {f:'layout',a:.36,b:8.03,c:10.02},
-      {f:'malformed dashboard',a:.26,b:3.79,c:15.65},
-      {f:'real world mess',a:.23,b:2.91,c:8.33},
-      {f:'mixed content',a:.18,b:2.95,c:7.90},
-    ];
-    renderChart(data,0.33,7.31,10.45);
-  }
-}
-loadBenchmarkData();
-
-// Animate bars on scroll
-const speedObs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){
-    e.target.querySelectorAll('.speed-bar').forEach((b,i)=>{setTimeout(()=>b.classList.add('anim'),i*60)});
-    speedObs.unobserve(e.target);
-  }});
-},{threshold:.2});
-
-// Reveal on scroll
-const revObs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');revObs.unobserve(e.target)}});
-},{threshold:.12});
-document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
-
-// Copy install command
-function copyCmd(el){
-  navigator.clipboard.writeText('npm i -D prettier-plugin-laravel-blade prettier');
-  const t=el.querySelector('.hero-toast');t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),1200);
-}
-</script>
-</body>
+      // Copy install command
+      function copyCmd(el) {
+        navigator.clipboard.writeText(
+          "npm i -D prettier-plugin-laravel-blade prettier",
+        );
+        const t = el.querySelector(".hero-toast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 1200);
+      }
+    </script>
+  </body>
 </html>
