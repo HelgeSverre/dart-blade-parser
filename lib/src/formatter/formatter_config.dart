@@ -126,7 +126,9 @@ class FormatterConfig {
         'directiveSpacing: $directiveSpacing, '
         'slotFormatting: $slotFormatting, '
         'wrapAttributes: $wrapAttributes, '
-        'attributeSort: $attributeSort'
+        'attributeSort: $attributeSort, '
+        'closingBracketStyle: $closingBracketStyle, '
+        'selfClosingStyle: $selfClosingStyle'
         ')';
   }
 }

@@ -598,6 +598,69 @@ void main() {
     });
   });
 
+  group('CLI - Parse Command - Multi-line stdin', () {
+    test('parse --stdin handles multi-line input', () async {
+      final process = await Process.start(
+        'dart',
+        [bladePath, 'parse', '--stdin'],
+      );
+
+      process.stdin.writeln('@if(\$show)');
+      process.stdin.writeln('  <p>Hello</p>');
+      process.stdin.writeln('@endif');
+      await process.stdin.close();
+
+      final stdout = await process.stdout.transform(utf8.decoder).join();
+      final exitCode = await process.exitCode;
+
+      expect(exitCode, 0);
+      expect(stdout, contains('Hello'));
+      expect(stdout, contains('@if'));
+    });
+  });
+
+  group('CLI - Parse Command - Tree output for all node types', () {
+    test('parse shows HTML elements in tree output', () async {
+      final file = File(path.join(tempDir.path, 'tree.blade.php'));
+      file.writeAsStringSync('<div class="test"><p>Hello</p></div>');
+
+      final result = await Process.run(
+        'dart',
+        [bladePath, 'parse', file.path],
+      );
+
+      expect(result.exitCode, 0);
+      expect(result.stdout.toString(), contains('div'));
+      expect(result.stdout.toString(), contains('p'));
+    });
+
+    test('parse shows comments in tree output', () async {
+      final file = File(path.join(tempDir.path, 'comment.blade.php'));
+      file.writeAsStringSync('{{-- A comment --}}');
+
+      final result = await Process.run(
+        'dart',
+        [bladePath, 'parse', file.path],
+      );
+
+      expect(result.exitCode, 0);
+      expect(result.stdout.toString(), contains('Comment'));
+    });
+
+    test('parse shows components in tree output', () async {
+      final file = File(path.join(tempDir.path, 'component.blade.php'));
+      file.writeAsStringSync('<x-alert type="error">Warning!</x-alert>');
+
+      final result = await Process.run(
+        'dart',
+        [bladePath, 'parse', file.path],
+      );
+
+      expect(result.exitCode, 0);
+      expect(result.stdout.toString(), contains('alert'));
+    });
+  });
+
   group('CLI - Parse Command', () {
     test('parses file and shows tree output by default', () async {
       final testFile = File(path.join(tempDir.path, 'test.blade.php'));

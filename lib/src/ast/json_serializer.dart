@@ -25,6 +25,7 @@ class JsonSerializerVisitor extends RecursiveAstVisitor<Map<String, dynamic>> {
       'type': 'directive',
       'name': node.name,
       if (node.expression != null) 'expression': node.expression,
+      if (node.closedBy != null) 'closedBy': node.closedBy,
       'position': {
         'start': node.startPosition.toJson(),
         'end': node.endPosition.toJson(),

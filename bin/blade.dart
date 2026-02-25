@@ -202,7 +202,12 @@ Future<void> _handleParseCommand(ArgResults command) async {
     String source;
 
     if (useStdin) {
-      source = stdin.readLineSync() ?? '';
+      final buffer = StringBuffer();
+      String? line;
+      while ((line = stdin.readLineSync()) != null) {
+        buffer.writeln(line);
+      }
+      source = buffer.toString();
     } else if (filePath != null) {
       source = File(filePath).readAsStringSync();
     } else {
@@ -260,24 +265,47 @@ Examples:
 void _printTree(AstNode node, int indent) {
   final prefix = '  ' * indent;
 
-  if (node is DocumentNode) {
-    print('${prefix}Document');
-    for (final child in node.children) {
-      _printTree(child, indent + 1);
-    }
-  } else if (node is DirectiveNode) {
-    print('$prefix@${node.name}');
-    for (final child in node.children) {
-      _printTree(child, indent + 1);
-    }
-  } else if (node is EchoNode) {
-    final type = node.isRaw ? 'RawEcho' : 'Echo';
-    print('$prefix$type: ${node.expression}');
-  } else if (node is TextNode) {
-    final preview = node.content.length > 30
-        ? '${node.content.substring(0, 30)}...'
-        : node.content;
-    print('${prefix}Text: "$preview"');
+  switch (node) {
+    case DocumentNode():
+      print('${prefix}Document');
+      for (final child in node.children) {
+        _printTree(child, indent + 1);
+      }
+    case DirectiveNode():
+      print('$prefix@${node.name}');
+      for (final child in node.children) {
+        _printTree(child, indent + 1);
+      }
+    case EchoNode():
+      final type = node.isRaw ? 'RawEcho' : 'Echo';
+      print('$prefix$type: ${node.expression}');
+    case TextNode():
+      final preview = node.content.length > 30
+          ? '${node.content.substring(0, 30)}...'
+          : node.content;
+      print('${prefix}Text: "$preview"');
+    case HtmlElementNode():
+      print('$prefix<${node.tagName}>');
+      for (final child in node.children) {
+        _printTree(child, indent + 1);
+      }
+    case ComponentNode():
+      print('${prefix}Component: x-${node.name}');
+      for (final child in node.children) {
+        _printTree(child, indent + 1);
+      }
+    case CommentNode():
+      final preview = node.content.length > 30
+          ? '${node.content.substring(0, 30)}...'
+          : node.content;
+      print('${prefix}Comment: "$preview"');
+    case ErrorNode():
+      print('${prefix}Error: ${node.error}');
+    case SlotNode():
+      print('${prefix}Slot: ${node.name}');
+      for (final child in node.children) {
+        _printTree(child, indent + 1);
+      }
   }
 }
 

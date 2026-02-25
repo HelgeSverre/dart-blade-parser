@@ -2,6 +2,47 @@ import 'package:blade_parser/src/ast/node.dart';
 import 'package:blade_parser/src/formatter/formatter_config.dart';
 import 'package:blade_parser/src/formatter/indent_tracker.dart';
 
+/// A StringBuffer wrapper that tracks the last two characters written,
+/// avoiding O(n) toString() calls for endsWith checks.
+class _TrackedBuffer {
+  final StringBuffer _buffer = StringBuffer();
+  String _lastTwo = '';
+
+  void write(Object? obj) {
+    final s = obj.toString();
+    _buffer.write(s);
+    _updateTrailing(s);
+  }
+
+  void writeln([Object? obj = '']) {
+    final s = obj.toString();
+    _buffer.write(s);
+    _buffer.write('\n');
+    _updateTrailing('$s\n');
+  }
+
+  void _updateTrailing(String s) {
+    if (s.isEmpty) return;
+    if (s.length >= 2) {
+      _lastTwo = s.substring(s.length - 2);
+    } else {
+      _lastTwo =
+          (_lastTwo.isNotEmpty ? _lastTwo[_lastTwo.length - 1] : '') + s;
+    }
+  }
+
+  bool endsWithNewline() => _lastTwo.endsWith('\n');
+  bool endsWithDoubleNewline() => _lastTwo == '\n\n';
+
+  void clear() {
+    _buffer.clear();
+    _lastTwo = '';
+  }
+
+  @override
+  String toString() => _buffer.toString();
+}
+
 /// Visitor that traverses an AST and generates formatted Blade template output.
 ///
 /// This visitor implements the formatting logic for all AST node types,
@@ -10,7 +51,7 @@ import 'package:blade_parser/src/formatter/indent_tracker.dart';
 class FormatterVisitor implements AstVisitor<String> {
   final FormatterConfig config;
   final IndentTracker _indent;
-  final StringBuffer _output = StringBuffer();
+  final _TrackedBuffer _output = _TrackedBuffer();
 
   /// Original source for raw output in ignored sections.
   final String? _source;
@@ -20,6 +61,15 @@ class FormatterVisitor implements AstVisitor<String> {
   /// Set to `false` when encountering a `blade-formatter:off` comment,
   /// and back to `true` when encountering `blade-formatter:on`.
   bool _formattingEnabled = true;
+
+  /// Block-level HTML elements that should get blank line spacing between siblings.
+  static const Set<String> _blockElements = {
+    'div', 'p', 'section', 'article', 'aside', 'header', 'footer',
+    'nav', 'main', 'figure', 'figcaption', 'details', 'summary',
+    'form', 'fieldset', 'table', 'blockquote', 'pre', 'address',
+    'dl', 'ol', 'ul', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'hgroup', 'dialog', 'search',
+  };
 
   /// HTML void elements that should not have closing tags.
   static const Set<String> _voidElements = {
@@ -368,7 +418,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
         // If there are 2+ newlines, it represents intentional blank line(s)
         // Preserve one blank line (we already have one from previous element's writeln)
-        if (newlineCount >= 2 && !_output.toString().endsWith('\n\n')) {
+        if (newlineCount >= 2 && !_output.endsWithDoubleNewline()) {
           _output.writeln();
         }
         continue;
@@ -395,14 +445,14 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     // Ensure file ends with newline
-    final outputStr = _output.toString();
-    if (outputStr.isEmpty) {
+    final isEmpty = _output.toString().isEmpty;
+    if (isEmpty) {
       // If document had children (even if just whitespace), add newline
       // If document was truly empty, keep output empty
       if (node.children.isNotEmpty) {
         _output.writeln();
       }
-    } else if (!outputStr.endsWith('\n')) {
+    } else if (!_output.endsWithNewline()) {
       _output.writeln();
     }
 
@@ -460,7 +510,11 @@ class FormatterVisitor implements AstVisitor<String> {
     // Inline directives (like @section('title', 'value')) don't get closing tags
     if (isBlock && node.children.isNotEmpty && _hasClosingDirective(node.name)) {
       _output.write(_indent.current);
-      _output.write('@end${node.name}');
+      if (node.closedBy != null) {
+        _output.write('@${node.closedBy}');
+      } else {
+        _output.write('@end${node.name}');
+      }
       _output.writeln();
     }
 
@@ -505,7 +559,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // If text contains only whitespace and newlines, preserve one newline
     if (content.trim().isEmpty) {
-      if (!_output.toString().endsWith('\n\n')) {
+      if (!_output.endsWithDoubleNewline()) {
         _output.writeln();
       }
       return '';
@@ -521,7 +575,7 @@ class FormatterVisitor implements AstVisitor<String> {
       if (trimmedLine.isNotEmpty) {
         // Check if this line should be indented
         // Don't indent if it's in the middle of inline content
-        if (i == 0 && !_output.toString().endsWith('\n')) {
+        if (i == 0 && !_output.endsWithNewline()) {
           _output.write(line);
         } else {
           _output.write(_indent.current);
@@ -1021,7 +1075,8 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Add spacing between block-level HTML elements
     if (current is HtmlElementNode && next is HtmlElementNode) {
-      return true;
+      return _blockElements.contains(current.tagName.toLowerCase()) &&
+          _blockElements.contains(next.tagName.toLowerCase());
     }
 
     // Add spacing between components

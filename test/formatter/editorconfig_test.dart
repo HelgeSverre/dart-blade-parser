@@ -1,4 +1,6 @@
-import 'package:blade_parser/blade_parser.dart';
+import 'dart:io';
+
+import 'package:blade_parser/src/formatter/editorconfig.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -170,6 +172,66 @@ indent_size = 2
 ''');
         final props = config.getProperties('layout.blade.php');
         expect(props['indent_size'], equals('2'));
+      });
+    });
+
+    group('Path-based pattern matching', () {
+      test('section matches path-based pattern with directory', () {
+        final section = EditorConfigSection(
+          pattern: 'views/*.blade.php',
+          properties: {'indent_size': '2'},
+        );
+
+        expect(section.matches('views/home.blade.php'), isTrue);
+        expect(section.matches('home.blade.php'), isFalse);
+        expect(section.matches('other/home.blade.php'), isFalse);
+      });
+
+      test('section matches ** pattern with full relative path', () {
+        final section = EditorConfigSection(
+          pattern: 'resources/views/**/*.blade.php',
+          properties: {'indent_size': '2'},
+        );
+
+        expect(section.matches('resources/views/home.blade.php'), isTrue);
+        expect(
+          section.matches('resources/views/partials/nav.blade.php'),
+          isTrue,
+        );
+        expect(section.matches('home.blade.php'), isFalse);
+      });
+
+      test('getPropertiesForFile uses relative path for matching', () async {
+        final tempDir = await Directory.systemTemp.createTemp(
+          'editorconfig_test_',
+        );
+        try {
+          final viewsDir = Directory('${tempDir.path}/resources/views');
+          await viewsDir.create(recursive: true);
+
+          final editorConfigFile = File('${tempDir.path}/.editorconfig');
+          await editorConfigFile.writeAsString('''
+root = true
+
+[*.blade.php]
+indent_size = 4
+
+[resources/views/*.blade.php]
+indent_size = 2
+''');
+
+          final bladeFile = File('${viewsDir.path}/home.blade.php');
+          await bladeFile.writeAsString('test');
+
+          final props = await EditorConfig.getPropertiesForFile(bladeFile.path);
+          expect(
+            props['indent_size'],
+            equals('2'),
+            reason: 'Path-based pattern should match with relative path',
+          );
+        } finally {
+          await tempDir.delete(recursive: true);
+        }
       });
     });
 

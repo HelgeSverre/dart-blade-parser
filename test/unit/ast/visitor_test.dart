@@ -152,6 +152,18 @@ void main() {
       expect(collector.errors, isA<List<ErrorNode>>());
     });
 
+    test('node.dart does not have circular imports through barrel', () {
+      // Verify that node types work correctly when imported directly
+      final parser = BladeParser();
+      final result = parser.parse('@if(\$x) hello @endif');
+      expect(result.ast, isNotNull);
+
+      // Verify RecursiveAstVisitor works (it's what node.dart imports)
+      final visitor = _CountingVisitor();
+      result.ast!.accept(visitor);
+      expect(visitor.count, greaterThan(0));
+    });
+
     test('defaultVisit is called for unknown node types', () {
       final visitor = CustomVisitor();
       final parser = BladeParser();
@@ -316,6 +328,20 @@ class ErrorCollector extends RecursiveAstVisitor<void> {
   void visitError(ErrorNode node) {
     errors.add(node);
     super.visitError(node);
+  }
+}
+
+/// Counts directive nodes.
+class _CountingVisitor extends RecursiveAstVisitor<void> {
+  @override
+  void get defaultValue => null;
+
+  int count = 0;
+
+  @override
+  void visitDirective(DirectiveNode node) {
+    count++;
+    super.visitDirective(node);
   }
 }
 

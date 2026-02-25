@@ -98,7 +98,7 @@ class EditorConfig {
     final fileName = file.uri.pathSegments.last;
     var directory = file.parent;
     final allProperties = <String, String>{};
-    final configStack = <EditorConfig>[];
+    final configStack = <(EditorConfig, String)>[];
 
     // Walk up directories looking for .editorconfig files
     while (directory.path != directory.parent.path) {
@@ -106,7 +106,7 @@ class EditorConfig {
       final config = await loadFromFile(editorConfigPath);
 
       if (config != null) {
-        configStack.add(config);
+        configStack.add((config, directory.path));
         if (config.isRoot) break;
       }
 
@@ -114,15 +114,26 @@ class EditorConfig {
     }
 
     // Process configs from root to leaf (most specific wins)
-    for (final config in configStack.reversed) {
+    for (final (config, configDir) in configStack.reversed) {
+      final relativePath = _relativePath(configDir, filePath);
+
       for (final section in config.sections) {
-        if (section.matches(fileName)) {
+        if (section.matches(fileName) ||
+            (relativePath != null && section.matches(relativePath))) {
           allProperties.addAll(section.properties);
         }
       }
     }
 
     return allProperties;
+  }
+
+  static String? _relativePath(String fromDir, String toFile) {
+    final from = fromDir.endsWith('/') ? fromDir : '$fromDir/';
+    if (toFile.startsWith(from)) {
+      return toFile.substring(from.length);
+    }
+    return null;
   }
 
   /// Get properties for a file pattern from this EditorConfig.
@@ -175,18 +186,40 @@ class EditorConfigSection {
       return false;
     }
 
-    // Handle ** patterns (match any path)
-    if (pattern.contains('**')) {
-      final regexPattern = pattern
-          .replaceAll('.', r'\.')
-          .replaceAll('**/', '.*')
-          .replaceAll('**', '.*')
-          .replaceAll('*', '[^/]*');
+    // Handle patterns with path components or **
+    if (pattern.contains('/') || pattern.contains('**')) {
+      final regexPattern = _globToRegex(pattern);
       return RegExp('^$regexPattern\$').hasMatch(fileName);
     }
 
     // Simple glob with *
     return _matchSimpleGlob(pattern, fileName);
+  }
+
+  static String _globToRegex(String pattern) {
+    final buffer = StringBuffer();
+    final chars = pattern.split('');
+    for (var i = 0; i < chars.length; i++) {
+      if (chars[i] == '*' && i + 1 < chars.length && chars[i + 1] == '*') {
+        // ** matches any number of path segments
+        if (i + 2 < chars.length && chars[i + 2] == '/') {
+          buffer.write('(.*/)?');
+          i += 2; // skip **/
+        } else {
+          buffer.write('.*');
+          i += 1; // skip **
+        }
+      } else if (chars[i] == '*') {
+        buffer.write('[^/]*');
+      } else if (chars[i] == '?') {
+        buffer.write('[^/]');
+      } else if (RegExp(r'[.+^${}()|\\]').hasMatch(chars[i])) {
+        buffer.write('\\${chars[i]}');
+      } else {
+        buffer.write(chars[i]);
+      }
+    }
+    return buffer.toString();
   }
 
   bool _matchSimpleGlob(String pattern, String fileName) {

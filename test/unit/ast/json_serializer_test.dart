@@ -240,6 +240,35 @@ void main() {
       expect(jsonEncode(visitorJson), jsonEncode(nodeJson));
     });
 
+    test('JsonSerializerVisitor includes closedBy for @section/@show', () {
+      final parser = BladeParser();
+      final result = parser.parse('@section("sidebar")\n  content\n@show');
+
+      final visitor = JsonSerializerVisitor();
+      final visitorJson = result.ast!.accept(visitor);
+
+      // Find the section directive
+      final directive = (visitorJson['children'] as List).firstWhere(
+        (child) => child['type'] == 'directive' && child['name'] == 'section',
+      );
+
+      expect(directive.containsKey('closedBy'), isTrue,
+          reason: 'Visitor should include closedBy field');
+      expect(directive['closedBy'], equals('show'));
+    });
+
+    test('JsonSerializerVisitor matches node.toJson() for section with closedBy',
+        () {
+      final parser = BladeParser();
+      final result = parser.parse('@section("sidebar")\n  content\n@show');
+
+      final visitor = JsonSerializerVisitor();
+      final visitorJson = result.ast!.accept(visitor);
+      final nodeJson = result.ast!.toJson();
+
+      expect(jsonEncode(visitorJson), equals(jsonEncode(nodeJson)));
+    });
+
     test('Handles empty children lists', () {
       final parser = BladeParser();
       final result = parser.parse('{{ \$var }}');

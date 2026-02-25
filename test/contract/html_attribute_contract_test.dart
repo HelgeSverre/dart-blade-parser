@@ -1,29 +1,31 @@
 import 'package:blade_parser/blade_parser.dart';
 import 'package:test/test.dart';
 
+final _p = Position(line: 1, column: 1, offset: 0);
+
 void main() {
   group('Attribute Categorization Contract Tests', () {
     test('StandardAttribute for standard HTML attributes', () {
-      final classAttr = StandardAttribute(name: 'class', value: 'container');
+      final classAttr = StandardAttribute(name: 'class', value: 'container', startPosition: _p, endPosition: _p);
       expect(classAttr.name, 'class');
       expect(classAttr.value, 'container');
       expect(classAttr.toJson()['type'], 'standard');
 
-      final idAttr = StandardAttribute(name: 'id', value: 'app');
+      final idAttr = StandardAttribute(name: 'id', value: 'app', startPosition: _p, endPosition: _p);
       expect(idAttr.name, 'id');
       expect(idAttr.value, 'app');
       expect(idAttr.toJson()['type'], 'standard');
     });
 
     test('StandardAttribute for data-* attributes', () {
-      final dataAttr = StandardAttribute(name: 'data-user-id', value: '123');
+      final dataAttr = StandardAttribute(name: 'data-user-id', value: '123', startPosition: _p, endPosition: _p);
       expect(dataAttr.name, 'data-user-id');
       expect(dataAttr.value, '123');
       expect(dataAttr.toJson()['type'], 'standard');
     });
 
     test('StandardAttribute for aria-* attributes', () {
-      final ariaAttr = StandardAttribute(name: 'aria-label', value: 'Close');
+      final ariaAttr = StandardAttribute(name: 'aria-label', value: 'Close', startPosition: _p, endPosition: _p);
       expect(ariaAttr.name, 'aria-label');
       expect(ariaAttr.value, 'Close');
       expect(ariaAttr.toJson()['type'], 'standard');
@@ -34,6 +36,8 @@ void main() {
         name: 'x-data',
         directive: 'data',
         value: '{count: 0}',
+        startPosition: _p,
+        endPosition: _p,
       );
       expect(xData.name, 'x-data');
       expect(xData.directive, 'data');
@@ -46,6 +50,8 @@ void main() {
         name: '@click',
         directive: 'on:click',
         value: 'handle',
+        startPosition: _p,
+        endPosition: _p,
       );
       expect(onClick.name, '@click');
       expect(onClick.directive, 'on:click');
@@ -58,6 +64,8 @@ void main() {
         name: ':class',
         directive: 'bind:class',
         value: "{'active': isActive}",
+        startPosition: _p,
+        endPosition: _p,
       );
       expect(bindClass.name, ':class');
       expect(bindClass.directive, 'bind:class');
@@ -69,6 +77,8 @@ void main() {
         name: 'x-show',
         directive: 'show',
         value: 'open',
+        startPosition: _p,
+        endPosition: _p,
       );
       expect(xShow.name, 'x-show');
       expect(xShow.directive, 'show');
@@ -81,6 +91,8 @@ void main() {
         name: 'wire:click',
         action: 'click',
         value: 'save',
+        startPosition: _p,
+        endPosition: _p,
       );
       expect(wireClick.name, 'wire:click');
       expect(wireClick.action, 'click');
@@ -93,6 +105,8 @@ void main() {
         name: 'wire:model',
         action: 'model',
         value: 'name',
+        startPosition: _p,
+        endPosition: _p,
       );
       expect(wireModel.name, 'wire:model');
       expect(wireModel.action, 'model');
@@ -106,6 +120,8 @@ void main() {
         action: 'model',
         modifiers: ['defer'],
         value: 'email',
+        startPosition: _p,
+        endPosition: _p,
       );
       expect(wireModelDefer.name, 'wire:model.defer');
       expect(wireModelDefer.action, 'model');
@@ -120,6 +136,8 @@ void main() {
         action: 'loading',
         modifiers: ['class'],
         value: 'opacity-50',
+        startPosition: _p,
+        endPosition: _p,
       );
       expect(wireLoading.name, 'wire:loading.class');
       expect(wireLoading.action, 'loading');
@@ -129,30 +147,34 @@ void main() {
     });
 
     test('StandardAttribute boolean attributes have null value', () {
-      final disabled = StandardAttribute(name: 'disabled');
+      final disabled = StandardAttribute(name: 'disabled', startPosition: _p, endPosition: _p);
       expect(disabled.name, 'disabled');
       expect(disabled.value, isNull);
 
-      final required = StandardAttribute(name: 'required');
+      final required = StandardAttribute(name: 'required', startPosition: _p, endPosition: _p);
       expect(required.name, 'required');
       expect(required.value, isNull);
 
-      final readonly = StandardAttribute(name: 'readonly');
+      final readonly = StandardAttribute(name: 'readonly', startPosition: _p, endPosition: _p);
       expect(readonly.name, 'readonly');
       expect(readonly.value, isNull);
     });
 
     test('Attributes serialize to JSON with correct type field', () {
-      final standard = StandardAttribute(name: 'class', value: 'foo');
+      final standard = StandardAttribute(name: 'class', value: 'foo', startPosition: _p, endPosition: _p);
       final alpine = AlpineAttribute(
         name: 'x-data',
         directive: 'data',
         value: '{}',
+        startPosition: _p,
+        endPosition: _p,
       );
       final livewire = LivewireAttribute(
         name: 'wire:click',
         action: 'click',
         value: 'save',
+        startPosition: _p,
+        endPosition: _p,
       );
 
       final standardJson = standard.toJson();
@@ -175,7 +197,7 @@ void main() {
     });
 
     test('Boolean attributes omit value in JSON when null', () {
-      final disabled = StandardAttribute(name: 'disabled');
+      final disabled = StandardAttribute(name: 'disabled', startPosition: _p, endPosition: _p);
       final json = disabled.toJson();
 
       expect(json['type'], 'standard');
@@ -189,6 +211,8 @@ void main() {
         action: 'poll',
         modifiers: ['5s', 'visible'],
         value: 'refresh',
+        startPosition: _p,
+        endPosition: _p,
       );
 
       final json = wireAttr.toJson();

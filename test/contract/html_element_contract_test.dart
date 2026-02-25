@@ -98,8 +98,8 @@ void main() {
       final node = HtmlElementNode(
         tagName: 'div',
         attributes: {
-          'class': StandardAttribute(name: 'class', value: 'container'),
-          'id': StandardAttribute(name: 'id', value: 'app'),
+          'class': StandardAttribute(name: 'class', value: 'container', startPosition: Position(line: 1, column: 1, offset: 0), endPosition: Position(line: 1, column: 1, offset: 0)),
+          'id': StandardAttribute(name: 'id', value: 'app', startPosition: Position(line: 1, column: 1, offset: 0), endPosition: Position(line: 1, column: 1, offset: 0)),
         },
         startPosition: Position(line: 1, column: 1, offset: 0),
         endPosition: Position(line: 1, column: 20, offset: 19),
@@ -169,7 +169,7 @@ void main() {
       final node = HtmlElementNode(
         tagName: 'div',
         attributes: {
-          'class': StandardAttribute(name: 'class', value: 'container'),
+          'class': StandardAttribute(name: 'class', value: 'container', startPosition: Position(line: 1, column: 1, offset: 0), endPosition: Position(line: 1, column: 1, offset: 0)),
         },
         startPosition: Position(line: 1, column: 1, offset: 0),
         endPosition: Position(line: 1, column: 20, offset: 19),
@@ -212,16 +212,20 @@ void main() {
       final node = HtmlElementNode(
         tagName: 'button',
         attributes: {
-          'class': StandardAttribute(name: 'class', value: 'btn'),
+          'class': StandardAttribute(name: 'class', value: 'btn', startPosition: Position(line: 1, column: 1, offset: 0), endPosition: Position(line: 1, column: 1, offset: 0)),
           'x-data': AlpineAttribute(
             name: 'x-data',
             directive: 'data',
             value: '{}',
+            startPosition: Position(line: 1, column: 1, offset: 0),
+            endPosition: Position(line: 1, column: 1, offset: 0),
           ),
           'wire:click': LivewireAttribute(
             name: 'wire:click',
             action: 'click',
             value: 'save',
+            startPosition: Position(line: 1, column: 1, offset: 0),
+            endPosition: Position(line: 1, column: 1, offset: 0),
           ),
         },
         startPosition: Position(line: 1, column: 1, offset: 0),
@@ -245,7 +249,7 @@ void main() {
 
       final node = HtmlElementNode(
         tagName: 'div',
-        attributes: {'id': StandardAttribute(name: 'id', value: 'test')},
+        attributes: {'id': StandardAttribute(name: 'id', value: 'test', startPosition: Position(line: 1, column: 1, offset: 0), endPosition: Position(line: 1, column: 1, offset: 0))},
         startPosition: Position(line: 1, column: 1, offset: 0),
         endPosition: Position(line: 1, column: 17, offset: 16),
         children: [child],

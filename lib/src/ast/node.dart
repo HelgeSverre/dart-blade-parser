@@ -1,4 +1,3 @@
-import 'package:blade_parser/blade_parser.dart' show RecursiveAstVisitor;
 import 'package:blade_parser/src/ast/visitor.dart' show RecursiveAstVisitor;
 import 'package:blade_parser/src/lexer/position.dart';
 
@@ -296,8 +295,19 @@ sealed class AttributeNode {
   /// The attribute value, if any.
   final String? value;
 
+  /// The source position where this attribute starts.
+  final Position startPosition;
+
+  /// The source position where this attribute ends.
+  final Position endPosition;
+
   /// Creates a new attribute node.
-  AttributeNode({required this.name, this.value});
+  AttributeNode({
+    required this.name,
+    this.value,
+    required this.startPosition,
+    required this.endPosition,
+  });
 
   /// Convert this attribute to JSON representation.
   Map<String, dynamic> toJson();
@@ -312,13 +322,22 @@ final class StandardAttribute extends AttributeNode {
   ///
   /// [name] is the attribute name (e.g., "class", "id").
   /// [value] is the optional attribute value.
-  StandardAttribute({required super.name, super.value});
+  StandardAttribute({
+    required super.name,
+    super.value,
+    required super.startPosition,
+    required super.endPosition,
+  });
 
   @override
   Map<String, dynamic> toJson() => {
         'type': 'standard',
         'name': name,
         if (value != null) 'value': value,
+        'position': {
+          'start': startPosition.toJson(),
+          'end': endPosition.toJson(),
+        },
       };
 }
 
@@ -335,7 +354,13 @@ final class AlpineAttribute extends AttributeNode {
   /// [name] is the full attribute name (e.g., "x-data", "@click").
   /// [directive] is the Alpine directive type (e.g., "data", "click").
   /// [value] is the optional Alpine expression.
-  AlpineAttribute({required super.name, required this.directive, super.value});
+  AlpineAttribute({
+    required super.name,
+    required this.directive,
+    super.value,
+    required super.startPosition,
+    required super.endPosition,
+  });
 
   @override
   Map<String, dynamic> toJson() => {
@@ -343,6 +368,10 @@ final class AlpineAttribute extends AttributeNode {
         'name': name,
         'directive': directive,
         if (value != null) 'value': value,
+        'position': {
+          'start': startPosition.toJson(),
+          'end': endPosition.toJson(),
+        },
       };
 }
 
@@ -368,6 +397,8 @@ final class LivewireAttribute extends AttributeNode {
     required this.action,
     this.modifiers = const [],
     super.value,
+    required super.startPosition,
+    required super.endPosition,
   });
 
   @override
@@ -377,6 +408,10 @@ final class LivewireAttribute extends AttributeNode {
         'action': action,
         'modifiers': modifiers,
         if (value != null) 'value': value,
+        'position': {
+          'start': startPosition.toJson(),
+          'end': endPosition.toJson(),
+        },
       };
 }
 

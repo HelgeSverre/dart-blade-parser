@@ -43,6 +43,7 @@ class BladeParser {
     _tokens = lexer.tokenize();
     _current = 0;
     _errors.clear();
+    _tagStack.clear();
 
     final children = <AstNode>[];
 
@@ -149,6 +150,15 @@ class BladeParser {
         return _parseGenericDirective('push', TokenType.directiveEndpush);
       case TokenType.directivePrepend:
         return _parseGenericDirective('prepend', TokenType.directiveEndprepend);
+      case TokenType.directivePushOnce:
+        return _parseGenericDirective(
+            'pushOnce', TokenType.directiveEndPushOnce);
+      case TokenType.directivePrependOnce:
+        return _parseGenericDirective(
+            'prependOnce', TokenType.directiveEndPrependOnce);
+      case TokenType.directivePushIf:
+        return _parseGenericDirective(
+            'pushIf', TokenType.directiveEndPushOnce);
       case TokenType.directiveFragment:
         return _parseGenericDirective(
           'fragment',
@@ -536,7 +546,9 @@ class BladeParser {
     }
 
     // Parse @empty clause if present
+    Position? emptyTokenPosition;
     if (_check(TokenType.directiveEmpty)) {
+      emptyTokenPosition = _peek().startPosition;
       _advance(); // consume @empty
       while (!_check(TokenType.directiveEndforelse) && !_isAtEnd()) {
         final node = _parseNode();
@@ -559,7 +571,7 @@ class BladeParser {
     if (emptyChildren.isNotEmpty) {
       loopChildren.add(
         DirectiveNode(
-          startPosition: startToken.startPosition,
+          startPosition: emptyTokenPosition!,
           endPosition: _previous().endPosition,
           name: 'empty',
           children: emptyChildren,
@@ -687,15 +699,21 @@ class BladeParser {
       while (_isAttributeToken(_peek().type)) {
         final attrToken = _advance();
         final attrName = attrToken.value;
+        final attrStartPos = attrToken.startPosition;
+        Position attrEndPos = attrToken.endPosition;
 
         String? attrValue;
         if (_check(TokenType.attributeValue)) {
-          attrValue = _advance().value;
+          final valueToken = _advance();
+          attrValue = valueToken.value;
+          attrEndPos = valueToken.endPosition;
         }
 
         attributes[attrName] = StandardAttribute(
           name: attrName,
           value: attrValue,
+          startPosition: attrStartPos,
+          endPosition: attrEndPos,
         );
       }
     } else {
@@ -704,10 +722,14 @@ class BladeParser {
       while (_isAttributeToken(_peek().type)) {
         final attrToken = _advance();
         final attrName = attrToken.value;
+        final attrStartPos = attrToken.startPosition;
+        Position attrEndPos = attrToken.endPosition;
 
         String? attrValue;
         if (_check(TokenType.attributeValue)) {
-          attrValue = _advance().value;
+          final valueToken = _advance();
+          attrValue = valueToken.value;
+          attrEndPos = valueToken.endPosition;
         }
 
         if (attrName == 'name' && attrValue != null) {
@@ -717,6 +739,8 @@ class BladeParser {
         attributes[attrName] = StandardAttribute(
           name: attrName,
           value: attrValue,
+          startPosition: attrStartPos,
+          endPosition: attrEndPos,
         );
       }
     }
@@ -798,11 +822,15 @@ class BladeParser {
     while (_isAttributeToken(_peek().type)) {
       final attrToken = _advance();
       final attrName = attrToken.value;
+      final attrStartPos = attrToken.startPosition;
+      Position attrEndPos = attrToken.endPosition;
 
       // Check for attribute value in next token
       String? attrValue;
       if (_check(TokenType.attributeValue)) {
-        attrValue = _advance().value;
+        final valueToken = _advance();
+        attrValue = valueToken.value;
+        attrEndPos = valueToken.endPosition;
       }
 
       // Create appropriate attribute node based on token type
@@ -827,7 +855,7 @@ class BladeParser {
           attrToken.type == TokenType.alpineRef ||
           attrToken.type == TokenType.alpineTeleport;
 
-      final isLivewireToken = attrToken.type.toString().contains('livewire');
+      final isLivewireToken = _isLivewireAttributeToken(attrToken.type);
 
       if (isAlpineToken ||
           attrName.startsWith('x-') ||
@@ -846,6 +874,8 @@ class BladeParser {
           name: attrName,
           directive: directive,
           value: attrValue,
+          startPosition: attrStartPos,
+          endPosition: attrEndPos,
         );
       } else if (isLivewireToken || attrName.startsWith('wire:')) {
         // Extract action and modifiers from wire:action.modifier1.modifier2
@@ -858,9 +888,16 @@ class BladeParser {
           action: action,
           modifiers: modifiers,
           value: attrValue,
+          startPosition: attrStartPos,
+          endPosition: attrEndPos,
         );
       } else {
-        attrNode = StandardAttribute(name: attrName, value: attrValue);
+        attrNode = StandardAttribute(
+          name: attrName,
+          value: attrValue,
+          startPosition: attrStartPos,
+          endPosition: attrEndPos,
+        );
       }
 
       attributes[attrName] = attrNode;
@@ -1113,6 +1150,24 @@ class BladeParser {
     while (!_isAtEnd()) {
       if (_check(TokenType.directiveIf) ||
           _check(TokenType.directiveForeach) ||
+          _check(TokenType.directiveFor) ||
+          _check(TokenType.directiveWhile) ||
+          _check(TokenType.directiveSection) ||
+          _check(TokenType.directiveSwitch) ||
+          _check(TokenType.directiveComponent) ||
+          _check(TokenType.directiveAuth) ||
+          _check(TokenType.directiveGuest) ||
+          _check(TokenType.directiveEnv) ||
+          _check(TokenType.directiveUnless) ||
+          _check(TokenType.directiveCan) ||
+          _check(TokenType.directiveCannot) ||
+          _check(TokenType.directiveCanany) ||
+          _check(TokenType.directiveOnce) ||
+          _check(TokenType.directivePhp) ||
+          _check(TokenType.directivePush) ||
+          _check(TokenType.directivePrepend) ||
+          _check(TokenType.htmlTagOpen) ||
+          _check(TokenType.componentTagOpen) ||
           _check(TokenType.eof)) {
         return;
       }
@@ -1153,6 +1208,39 @@ class BladeParser {
 
   bool _checkAny(List<TokenType> types) => types.any(_check);
 
+  /// Check if token type is a Livewire attribute token.
+  bool _isLivewireAttributeToken(TokenType type) {
+    return type == TokenType.livewireClick ||
+        type == TokenType.livewireSubmit ||
+        type == TokenType.livewireKeydown ||
+        type == TokenType.livewireKeyup ||
+        type == TokenType.livewireMouseenter ||
+        type == TokenType.livewireMouseleave ||
+        type == TokenType.livewireModel ||
+        type == TokenType.livewireModelLive ||
+        type == TokenType.livewireModelBlur ||
+        type == TokenType.livewireModelDebounce ||
+        type == TokenType.livewireModelLazy ||
+        type == TokenType.livewireModelDefer ||
+        type == TokenType.livewireLoading ||
+        type == TokenType.livewireTarget ||
+        type == TokenType.livewireLoadingClass ||
+        type == TokenType.livewireLoadingRemove ||
+        type == TokenType.livewireLoadingAttr ||
+        type == TokenType.livewirePoll ||
+        type == TokenType.livewirePollKeepAlive ||
+        type == TokenType.livewirePollVisible ||
+        type == TokenType.livewireIgnore ||
+        type == TokenType.livewireKey ||
+        type == TokenType.livewireId ||
+        type == TokenType.livewireInit ||
+        type == TokenType.livewireDirty ||
+        type == TokenType.livewireOffline ||
+        type == TokenType.livewireNavigate ||
+        type == TokenType.livewireTransition ||
+        type == TokenType.livewireStream;
+  }
+
   /// Check if token type represents an attribute (standard, Alpine, or Livewire)
   bool _isAttributeToken(TokenType type) {
     // Standard attributes
@@ -1184,37 +1272,7 @@ class BladeParser {
     }
 
     // Livewire attributes
-    if (type == TokenType.livewireClick ||
-        type == TokenType.livewireSubmit ||
-        type == TokenType.livewireKeydown ||
-        type == TokenType.livewireKeyup ||
-        type == TokenType.livewireMouseenter ||
-        type == TokenType.livewireMouseleave ||
-        type == TokenType.livewireModel ||
-        type == TokenType.livewireModelLive ||
-        type == TokenType.livewireModelBlur ||
-        type == TokenType.livewireModelDebounce ||
-        type == TokenType.livewireModelLazy ||
-        type == TokenType.livewireModelDefer ||
-        type == TokenType.livewireLoading ||
-        type == TokenType.livewireTarget ||
-        type == TokenType.livewireLoadingClass ||
-        type == TokenType.livewireLoadingRemove ||
-        type == TokenType.livewireLoadingAttr ||
-        type == TokenType.livewirePoll ||
-        type == TokenType.livewirePollKeepAlive ||
-        type == TokenType.livewirePollVisible ||
-        type == TokenType.livewireIgnore ||
-        type == TokenType.livewireKey ||
-        type == TokenType.livewireId ||
-        type == TokenType.livewireInit ||
-        type == TokenType.livewireDirty ||
-        type == TokenType.livewireOffline ||
-        type == TokenType.livewireNavigate ||
-        type == TokenType.livewireTransition ||
-        type == TokenType.livewireStream) {
-      return true;
-    }
+    if (_isLivewireAttributeToken(type)) return true;
 
     return false;
   }
@@ -1283,11 +1341,15 @@ class BladeParser {
     while (_isAttributeToken(_peek().type)) {
       final attrToken = _advance();
       final attrName = attrToken.value;
+      final attrStartPos = attrToken.startPosition;
+      Position attrEndPos = attrToken.endPosition;
 
       // Check for attribute value in next token
       String? attrValue;
       if (_check(TokenType.attributeValue)) {
-        attrValue = _advance().value;
+        final valueToken = _advance();
+        attrValue = valueToken.value;
+        attrEndPos = valueToken.endPosition;
       }
 
       // Create appropriate attribute node based on token type
@@ -1312,9 +1374,7 @@ class BladeParser {
           attrToken.type == TokenType.alpineRef ||
           attrToken.type == TokenType.alpineTeleport;
 
-      final isLivewireToken = attrToken.type.toString().startsWith(
-            'TokenType.livewire',
-          );
+      final isLivewireToken = _isLivewireAttributeToken(attrToken.type);
 
       if (isAlpineToken) {
         // Alpine.js attribute
@@ -1330,6 +1390,8 @@ class BladeParser {
           name: attrName,
           directive: directive,
           value: attrValue,
+          startPosition: attrStartPos,
+          endPosition: attrEndPos,
         );
       } else if (isLivewireToken) {
         // Livewire attribute - parse action and modifiers
@@ -1343,10 +1405,17 @@ class BladeParser {
           action: action,
           modifiers: modifiers,
           value: attrValue,
+          startPosition: attrStartPos,
+          endPosition: attrEndPos,
         );
       } else {
         // Standard attribute
-        attrNode = StandardAttribute(name: attrName, value: attrValue);
+        attrNode = StandardAttribute(
+          name: attrName,
+          value: attrValue,
+          startPosition: attrStartPos,
+          endPosition: attrEndPos,
+        );
       }
 
       attributes[attrName] = attrNode;

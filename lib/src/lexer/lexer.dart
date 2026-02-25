@@ -399,11 +399,35 @@ class BladeLexer {
       final ch = _peek();
 
       if (inSingleQuote) {
-        if (ch == "'" && _previousChar() != '\\') inSingleQuote = false;
+        if (ch == "'") {
+          int backslashCount = 0;
+          int checkPos = _position - 1;
+          while (checkPos >= 0 && input[checkPos] == '\\') {
+            backslashCount++;
+            checkPos--;
+          }
+          if (backslashCount % 2 == 0) inSingleQuote = false;
+        }
       } else if (inDoubleQuote) {
-        if (ch == '"' && _previousChar() != '\\') inDoubleQuote = false;
+        if (ch == '"') {
+          int backslashCount = 0;
+          int checkPos = _position - 1;
+          while (checkPos >= 0 && input[checkPos] == '\\') {
+            backslashCount++;
+            checkPos--;
+          }
+          if (backslashCount % 2 == 0) inDoubleQuote = false;
+        }
       } else if (inTemplateLiteral) {
-        if (ch == '`' && _previousChar() != '\\') inTemplateLiteral = false;
+        if (ch == '`') {
+          int backslashCount = 0;
+          int checkPos = _position - 1;
+          while (checkPos >= 0 && input[checkPos] == '\\') {
+            backslashCount++;
+            checkPos--;
+          }
+          if (backslashCount % 2 == 0) inTemplateLiteral = false;
+        }
       } else {
         if (ch == "'") inSingleQuote = true;
         if (ch == '"') inDoubleQuote = true;
@@ -655,13 +679,52 @@ class BladeLexer {
 
     // Check for expression after directive and emit as separate token
     if (_peek() == '(') {
+      // Reset position tracking for expression token
+      _start = _position;
+      _startLine = _line;
+      _startColumn = _column;
+
       final exprStart = _position;
       _advance(); // (
       int parenCount = 1;
+      bool inSingleQuote = false;
+      bool inDoubleQuote = false;
 
       while (!_isAtEnd() && parenCount > 0) {
-        if (_peek() == '(') parenCount++;
-        if (_peek() == ')') parenCount--;
+        final ch = _peek();
+
+        if (inSingleQuote) {
+          if (ch == "'") {
+            int backslashCount = 0;
+            int checkPos = _position - 1;
+            while (checkPos >= 0 && input[checkPos] == '\\') {
+              backslashCount++;
+              checkPos--;
+            }
+            if (backslashCount % 2 == 0) inSingleQuote = false;
+          }
+        } else if (inDoubleQuote) {
+          if (ch == '"') {
+            int backslashCount = 0;
+            int checkPos = _position - 1;
+            while (checkPos >= 0 && input[checkPos] == '\\') {
+              backslashCount++;
+              checkPos--;
+            }
+            if (backslashCount % 2 == 0) inDoubleQuote = false;
+          }
+        } else {
+          if (ch == "'") {
+            inSingleQuote = true;
+          } else if (ch == '"') {
+            inDoubleQuote = true;
+          } else if (ch == '(') {
+            parenCount++;
+          } else if (ch == ')') {
+            parenCount--;
+          }
+        }
+
         _advance();
       }
 
@@ -718,30 +781,63 @@ class BladeLexer {
 
     _emitToken(TokenType.echoOpen, '{{');
 
+    // Reset position tracking for expression token
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
     // Scan expression
     final exprStart = _position;
     int braceCount = 0;
+    bool inSingleQuote = false;
+    bool inDoubleQuote = false;
 
     while (!_isAtEnd()) {
       final ch = _peek();
 
-      if (ch == '{') {
-        braceCount++;
-      } else if (ch == '}') {
-        if (braceCount > 0) {
-          braceCount--;
-        } else if (_peekNext() == '}') {
-          // End of echo
-          if (_position > exprStart) {
-            _emitToken(
-              TokenType.expression,
-              input.substring(exprStart, _position),
-            );
+      if (inSingleQuote) {
+        if (ch == "'") {
+          int backslashCount = 0;
+          int checkPos = _position - 1;
+          while (checkPos >= 0 && input[checkPos] == '\\') {
+            backslashCount++;
+            checkPos--;
           }
-          _advance(); // }
-          _advance(); // }
-          _emitToken(TokenType.echoClose, '}}');
-          return _LexerState.text;
+          if (backslashCount % 2 == 0) inSingleQuote = false;
+        }
+      } else if (inDoubleQuote) {
+        if (ch == '"') {
+          int backslashCount = 0;
+          int checkPos = _position - 1;
+          while (checkPos >= 0 && input[checkPos] == '\\') {
+            backslashCount++;
+            checkPos--;
+          }
+          if (backslashCount % 2 == 0) inDoubleQuote = false;
+        }
+      } else {
+        if (ch == "'") {
+          inSingleQuote = true;
+        } else if (ch == '"') {
+          inDoubleQuote = true;
+        } else if (ch == '{') {
+          braceCount++;
+        } else if (ch == '}') {
+          if (braceCount > 0) {
+            braceCount--;
+          } else if (_peekNext() == '}') {
+            // End of echo
+            if (_position > exprStart) {
+              _emitToken(
+                TokenType.expression,
+                input.substring(exprStart, _position),
+              );
+            }
+            _advance(); // }
+            _advance(); // }
+            _emitToken(TokenType.echoClose, '}}');
+            return _LexerState.text;
+          }
         }
       }
 
