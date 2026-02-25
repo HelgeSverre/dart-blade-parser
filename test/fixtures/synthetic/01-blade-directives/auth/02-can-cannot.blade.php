@@ -1,4 +1,4 @@
----
+{{--
 description: "Authorization directives: @can and @cannot for permission-based rendering"
 features:
   - "@can directive"
@@ -8,7 +8,7 @@ features:
   - "Policy-based authorization"
   - "Model-based permissions"
 complexity: medium
----
+--}}
 <div class="post-container">
     <article class="post">
         <h1>{{ $post->title }}</h1>

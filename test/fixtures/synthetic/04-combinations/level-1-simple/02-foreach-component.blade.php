@@ -1,10 +1,10 @@
----
+{{--
 description: Product grid using foreach loop with component rendering
 features:
   - foreach-directive
   - component-tag
 difficulty: level-1-simple
----
+--}}
 <div class="product-catalog">
     <h1>Featured Products</h1>
 

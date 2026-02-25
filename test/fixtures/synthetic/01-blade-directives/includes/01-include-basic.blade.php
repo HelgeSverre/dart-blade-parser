@@ -1,4 +1,4 @@
----
+{{--
 description: "Basic @include directive with data passing and scoped variables"
 features:
   - "@include directive"
@@ -6,7 +6,7 @@ features:
   - "Variable scoping"
   - "Partial templates"
 complexity: low
----
+--}}
 <!DOCTYPE html>
 <html lang="en">
 <head>

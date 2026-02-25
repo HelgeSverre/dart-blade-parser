@@ -1,7 +1,7 @@
----
+{{--
 description: "@for loop for pagination and numbered list generation"
 tags: ["for", "pagination", "numbered-lists"]
----
+--}}
 <div class="pagination-container">
     <nav aria-label="Page navigation">
         <ul class="pagination">

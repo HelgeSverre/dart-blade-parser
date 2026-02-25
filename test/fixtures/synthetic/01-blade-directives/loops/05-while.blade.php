@@ -1,7 +1,7 @@
----
+{{--
 description: "@while loop for iterative tree/hierarchy rendering"
 tags: ["while", "hierarchy", "tree-structure"]
----
+--}}
 <div class="notification-feed">
     <h2>Recent Notifications</h2>
 

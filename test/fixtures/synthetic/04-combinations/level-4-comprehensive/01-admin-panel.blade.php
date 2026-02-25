@@ -1,4 +1,4 @@
----
+{{--
 description: "Full admin dashboard with authentication, authorization, and real-time features"
 features:
   - "@extends layout inheritance"
@@ -16,7 +16,7 @@ features:
 level: 4
 complexity: comprehensive
 line_count: ~190
----
+--}}
 @extends('layouts.admin')
 
 @section('title', 'Admin Dashboard')

@@ -1,10 +1,10 @@
----
+{{--
 description: Conditional button visibility with Livewire click handlers
 features:
   - if-directive
   - livewire-click
 difficulty: level-1-simple
----
+--}}
 <div class="task-manager">
     <h2>Task Management</h2>
 

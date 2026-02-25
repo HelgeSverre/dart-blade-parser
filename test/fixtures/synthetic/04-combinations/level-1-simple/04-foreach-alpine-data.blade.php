@@ -1,10 +1,10 @@
----
+{{--
 description: Interactive todo list with Alpine.js data and foreach loop
 features:
   - foreach-directive
   - alpine-data
 difficulty: level-1-simple
----
+--}}
 <div x-data="{
     filter: 'all',
     completedCount: {{ $todos->where('completed', true)->count() }}

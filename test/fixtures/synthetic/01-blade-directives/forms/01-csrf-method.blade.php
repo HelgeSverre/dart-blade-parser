@@ -1,4 +1,4 @@
----
+{{--
 description: "Form security directives: @csrf and @method for CSRF protection and method spoofing"
 features:
   - "@csrf directive"
@@ -7,7 +7,7 @@ features:
   - "HTTP method spoofing"
   - "Form security"
 complexity: low
----
+--}}
 <div class="forms-container">
     {{-- Create form with CSRF protection --}}
     <form method="POST" action="/posts" class="create-form">

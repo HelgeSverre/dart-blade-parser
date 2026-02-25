@@ -1,10 +1,10 @@
----
+{{--
 description: Notification list with Alpine.js toggle and forelse for empty state
 features:
   - forelse-directive
   - alpine-show
 difficulty: level-1-simple
----
+--}}
 <div x-data="{
     showRead: false,
     showUnread: true,

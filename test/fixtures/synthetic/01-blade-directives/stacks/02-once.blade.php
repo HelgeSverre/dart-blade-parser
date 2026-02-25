@@ -1,4 +1,4 @@
----
+{{--
 description: "The @once directive for preventing duplicate asset inclusion in components"
 features:
   - "@once directive"
@@ -6,7 +6,7 @@ features:
   - "Component-level assets"
   - "Conditional asset loading"
 complexity: low
----
+--}}
 <div class="alert alert-{{ $type ?? 'info' }}">
     <div class="alert-icon">
         @if($type === 'success')

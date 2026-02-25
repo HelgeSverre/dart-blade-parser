@@ -1,4 +1,4 @@
----
+{{--
 description: "Complex modal form with validation, file uploads, and transitions"
 features:
   - "Custom component <x-modal> with slots"
@@ -12,7 +12,7 @@ features:
 level: 3
 complexity: complex
 line_count: ~135
----
+--}}
 <div x-data="{ open: @entangle('showModal'), imagePreview: null }">
     {{-- Trigger Button --}}
     <button @click="open = true" class="btn-primary">

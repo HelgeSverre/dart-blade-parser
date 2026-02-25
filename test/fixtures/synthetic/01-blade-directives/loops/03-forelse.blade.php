@@ -1,7 +1,7 @@
----
+{{--
 description: "@forelse loop with empty state handling for blog posts"
 tags: ["forelse", "empty-state", "posts", "blog"]
----
+--}}
 <div class="blog-container">
     <header class="blog-header">
         <h1>Latest Blog Posts</h1>

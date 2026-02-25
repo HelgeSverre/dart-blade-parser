@@ -1,4 +1,4 @@
----
+{{--
 description: "The @includeFirst directive for fallback template selection"
 features:
   - "@includeFirst directive"
@@ -6,7 +6,7 @@ features:
   - "View existence checking"
   - "Multiple template options"
 complexity: medium
----
+--}}
 <div class="notification-center">
     <h2>Notifications</h2>
 

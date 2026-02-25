@@ -1,10 +1,10 @@
----
+{{--
 description: Optional data display with Alpine.js conditional rendering
 features:
   - isset-directive
   - alpine-if
 difficulty: level-1-simple
----
+--}}
 <div x-data="{
     showDetails: false,
     showContact: false,

@@ -1,4 +1,4 @@
----
+{{--
 description: "The @each directive for rendering collections with optional empty state"
 features:
   - "@each directive"
@@ -6,7 +6,7 @@ features:
   - "Empty state handling"
   - "Iterator variables"
 complexity: medium
----
+--}}
 <div class="products-grid">
     <h2>Featured Products</h2>
 

@@ -1,7 +1,7 @@
----
+{{--
 description: "Basic @foreach loop rendering product cards with realistic data"
 tags: ["foreach", "loops", "products", "html-structure"]
----
+--}}
 <div class="product-grid">
     @foreach($products as $product)
     <article class="product-card">

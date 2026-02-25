@@ -1,10 +1,10 @@
----
+{{--
 description: Included partials with Livewire polling for real-time updates
 features:
   - include-directive
   - livewire-poll
 difficulty: level-1-simple
----
+--}}
 <div class="dashboard-container">
     <header>
         @include('partials.nav', ['user' => $user])

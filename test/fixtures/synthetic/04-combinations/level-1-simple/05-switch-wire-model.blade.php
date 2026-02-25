@@ -1,10 +1,10 @@
----
+{{--
 description: Dynamic form fields based on selection with Livewire model binding
 features:
   - switch-directive
   - livewire-model
 difficulty: level-1-simple
----
+--}}
 <div class="contact-form">
     <h2>Contact Us</h2>
 

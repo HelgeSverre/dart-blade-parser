@@ -1,4 +1,4 @@
----
+{{--
 description: "Stack directives for managing asset injection with @push, @prepend, and @stack"
 features:
   - "@push directive"
@@ -7,7 +7,7 @@ features:
   - "Multiple stack targets"
   - "Scripts and styles management"
 complexity: medium
----
+--}}
 <!DOCTYPE html>
 <html lang="en">
 <head>

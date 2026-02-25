@@ -1,10 +1,10 @@
----
+{{--
 description: Component usage with Livewire loading states
 features:
   - component-tag
   - livewire-loading
 difficulty: level-1-simple
----
+--}}
 <div class="user-profile-page">
     <x-page-header
         :title="$user->name"

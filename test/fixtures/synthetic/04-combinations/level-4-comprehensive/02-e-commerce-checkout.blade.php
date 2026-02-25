@@ -1,4 +1,4 @@
----
+{{--
 description: "Complete e-commerce checkout flow with multi-step forms, payment methods, and order summary"
 features:
   - "@extends layout with sections"
@@ -17,7 +17,7 @@ features:
 level: 4
 complexity: comprehensive
 line_count: ~210
----
+--}}
 @extends('layouts.shop')
 
 @section('title', 'Checkout')

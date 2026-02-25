@@ -1,7 +1,7 @@
----
+{{--
 description: "@continue and @break directives for conditional loop control"
 tags: ["continue", "break", "loop-control", "filtering"]
----
+--}}
 <div class="order-management">
     <h2>Active Orders Dashboard</h2>
 

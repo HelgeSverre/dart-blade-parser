@@ -1,4 +1,4 @@
----
+{{--
 description: "Dashboard page with real-time stats, charts, and activity feed"
 features:
   - "@extends and @section inheritance"
@@ -11,7 +11,7 @@ features:
 level: 3
 complexity: complex
 line_count: ~110
----
+--}}
 @extends('layouts.app')
 
 @section('title', 'Dashboard')

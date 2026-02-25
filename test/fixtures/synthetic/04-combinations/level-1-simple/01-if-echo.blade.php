@@ -1,10 +1,10 @@
----
+{{--
 description: Conditional user greeting with echo statements
 features:
   - if-directive
   - echo-statement
 difficulty: level-1-simple
----
+--}}
 <!DOCTYPE html>
 <html lang="en">
 <head>

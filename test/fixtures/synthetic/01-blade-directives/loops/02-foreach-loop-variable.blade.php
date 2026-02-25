@@ -1,7 +1,7 @@
----
+{{--
 description: "@foreach with $loop variable properties for enhanced user list rendering"
 tags: ["foreach", "loop-variable", "users", "conditional-styling"]
----
+--}}
 <div class="team-directory">
     <h2>Team Members ({{ count($users) }})</h2>
 

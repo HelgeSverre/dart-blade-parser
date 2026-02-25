@@ -1,4 +1,4 @@
----
+{{--
 description: "Sortable and filterable data table with pagination and bulk actions"
 features:
   - "@forelse for list rendering with empty state"
@@ -11,7 +11,7 @@ features:
 level: 3
 complexity: complex
 line_count: ~125
----
+--}}
 <div class="bg-white rounded-lg shadow-md" x-data="tableData()">
     {{-- Table Header --}}
     <div class="p-6 border-b border-gray-200">

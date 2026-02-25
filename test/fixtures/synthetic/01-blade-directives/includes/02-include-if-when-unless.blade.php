@@ -1,4 +1,4 @@
----
+{{--
 description: "Conditional include directives: @includeIf, @includeWhen, and @includeUnless"
 features:
   - "@includeIf directive"
@@ -7,7 +7,7 @@ features:
   - "Conditional rendering"
   - "Optional partials"
 complexity: medium
----
+--}}
 <div class="user-profile">
     <div class="profile-header">
         <h1>{{ $user->name }}</h1>

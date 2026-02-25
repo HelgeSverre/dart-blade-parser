@@ -1,4 +1,4 @@
----
+{{--
 description: "Authentication state directives: @auth and @guest for conditional rendering"
 features:
   - "@auth directive"
@@ -7,7 +7,7 @@ features:
   - "Guard specification"
   - "Authentication checks"
 complexity: low
----
+--}}
 <!DOCTYPE html>
 <html lang="en">
 <head>

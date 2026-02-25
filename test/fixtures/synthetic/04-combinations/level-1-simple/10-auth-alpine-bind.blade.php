@@ -1,10 +1,10 @@
----
+{{--
 description: Authenticated user interface with Alpine.js attribute binding
 features:
   - auth-directive
   - alpine-bind
 difficulty: level-1-simple
----
+--}}
 <div x-data="{
     theme: 'light',
     sidebarOpen: true,
