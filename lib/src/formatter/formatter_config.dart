@@ -31,6 +31,9 @@ class FormatterConfig {
   /// Controls formatting style for component slots.
   final SlotFormatting slotFormatting;
 
+  /// Controls how slot names are rendered (colon vs attribute syntax).
+  final SlotNameStyle slotNameStyle;
+
   /// Controls when to wrap attributes to multiple lines.
   final WrapAttributes wrapAttributes;
 
@@ -52,6 +55,7 @@ class FormatterConfig {
     this.quoteStyle = QuoteStyle.preserve,
     this.directiveSpacing = DirectiveSpacing.betweenBlocks,
     this.slotFormatting = SlotFormatting.compact,
+    this.slotNameStyle = SlotNameStyle.colon,
     this.wrapAttributes = WrapAttributes.auto,
     this.attributeSort = AttributeSort.none,
     this.closingBracketStyle = ClosingBracketStyle.sameLine,
@@ -88,6 +92,8 @@ class FormatterConfig {
           DirectiveSpacing.fromString(map['directive_spacing'] as String?),
       slotFormatting:
           SlotFormatting.fromString(map['slot_formatting'] as String?),
+      slotNameStyle:
+          SlotNameStyle.fromString(map['slot_name_style'] as String?),
       wrapAttributes:
           WrapAttributes.fromString(map['wrap_attributes'] as String?),
       attributeSort: AttributeSort.fromString(map['attribute_sort'] as String?),
@@ -108,6 +114,7 @@ class FormatterConfig {
       'quote_style': quoteStyle.value,
       'directive_spacing': directiveSpacing.value,
       'slot_formatting': slotFormatting.value,
+      'slot_name_style': slotNameStyle.value,
       'wrap_attributes': wrapAttributes.value,
       'attribute_sort': attributeSort.value,
       'closing_bracket_style': closingBracketStyle.value,
@@ -125,6 +132,7 @@ class FormatterConfig {
         'quoteStyle: $quoteStyle, '
         'directiveSpacing: $directiveSpacing, '
         'slotFormatting: $slotFormatting, '
+        'slotNameStyle: $slotNameStyle, '
         'wrapAttributes: $wrapAttributes, '
         'attributeSort: $attributeSort, '
         'closingBracketStyle: $closingBracketStyle, '
@@ -254,6 +262,35 @@ enum SlotFormatting {
   static SlotFormatting fromString(String? s) => switch (s) {
         'block' => block,
         _ => compact,
+      };
+}
+
+/// Controls how slot names are rendered in the output.
+enum SlotNameStyle {
+  /// Always use colon syntax: `<x-slot:header>`
+  ///
+  /// This is the most concise syntax and is the Laravel convention.
+  colon('colon'),
+
+  /// Always use attribute syntax: `<x-slot name="header">`
+  ///
+  /// Some teams prefer this for explicitness.
+  attribute('attribute'),
+
+  /// Preserve the original syntax from the source.
+  ///
+  /// If the source used `<x-slot:header>`, output colon syntax.
+  /// If the source used `<x-slot name="header">`, output attribute syntax.
+  preserve('preserve');
+
+  final String value;
+  const SlotNameStyle(this.value);
+
+  static SlotNameStyle fromString(String? s) => switch (s) {
+        'colon' => colon,
+        'attribute' => attribute,
+        'preserve' => preserve,
+        _ => colon,
       };
 }
 

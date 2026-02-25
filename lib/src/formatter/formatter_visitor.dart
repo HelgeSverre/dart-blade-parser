@@ -959,18 +959,50 @@ class FormatterVisitor implements AstVisitor<String> {
       return '';
     }
 
-    final attributes = node.attributes.entries
-        .where((e) => e.key != 'name')
-        .map((e) => e.value)
-        .toList();
+    final useColon = switch (config.slotNameStyle) {
+      SlotNameStyle.colon => true,
+      SlotNameStyle.attribute => false,
+      SlotNameStyle.preserve => node.useColonSyntax,
+    };
+
+    // Build attribute list, handling name attribute based on syntax choice
+    final List<AttributeNode> attributes;
+    if (useColon) {
+      // Colon syntax: filter out 'name' attribute to avoid duplication
+      attributes = node.attributes.entries
+          .where((e) => e.key != 'name')
+          .map((e) => e.value)
+          .toList();
+    } else {
+      // Attribute syntax: ensure name attribute is present
+      final hasNameAttr = node.attributes.containsKey('name');
+      if (hasNameAttr) {
+        attributes = node.attributes.values.toList();
+      } else {
+        // Source was colon syntax but we're converting to attribute syntax
+        attributes = [
+          StandardAttribute(
+            name: 'name',
+            value: node.name,
+            startPosition: node.startPosition,
+            endPosition: node.startPosition,
+          ),
+          ...node.attributes.values,
+        ];
+      }
+    }
 
     // Write opening slot tag
     _output.write(_indent.current);
-    _output.write('<x-slot:${node.name}');
+    if (useColon) {
+      _output.write('<x-slot:${node.name}');
+    } else {
+      _output.write('<x-slot');
+    }
 
     // Determine if we should wrap attributes
     final shouldWrap = _shouldWrapAttributes(
-      'slot:${node.name}',
+      useColon ? 'slot:${node.name}' : 'slot',
       attributes,
       isComponent: true,
     );

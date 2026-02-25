@@ -492,6 +492,10 @@ final class SlotNode extends AstNode {
   /// The slot name (e.g., "header", "footer", or "default").
   final String name;
 
+  /// Whether the original source used colon syntax (`<x-slot:name>`)
+  /// vs attribute syntax (`<x-slot name="...">`).
+  final bool useColonSyntax;
+
   /// Attributes passed to the slot.
   final Map<String, AttributeNode> attributes;
 
@@ -504,6 +508,7 @@ final class SlotNode extends AstNode {
     required this.startPosition,
     required this.endPosition,
     required this.name,
+    this.useColonSyntax = true,
     this.attributes = const {},
     required this.children,
   });
@@ -515,6 +520,7 @@ final class SlotNode extends AstNode {
   Map<String, dynamic> toJson() => {
         'type': 'slot',
         'name': name,
+        'useColonSyntax': useColonSyntax,
         'attributes': attributes.map((k, v) => MapEntry(k, v.toJson())),
         'position': {
           'start': startPosition.toJson(),

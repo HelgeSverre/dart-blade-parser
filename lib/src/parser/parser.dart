@@ -658,7 +658,8 @@ class BladeParser {
     String slotName = 'default';
 
     // Check if name is in colon syntax: "slot:header"
-    if (componentName.startsWith('slot:')) {
+    final isColonSyntax = componentName.startsWith('slot:');
+    if (isColonSyntax) {
       slotName = componentName.substring(5); // Remove "slot:"
     }
 
@@ -666,7 +667,7 @@ class BladeParser {
     final attributes = _parseAttributeMap();
 
     // For attribute syntax: extract name from attributes
-    if (!componentName.startsWith('slot:')) {
+    if (!isColonSyntax) {
       final nameAttr = attributes['name'];
       if (nameAttr != null && nameAttr.value != null) {
         slotName = nameAttr.value!;
@@ -697,7 +698,7 @@ class BladeParser {
         _errors.add(
           ParseError(
             message:
-                'Unclosed slot <x-slot${componentName.startsWith('slot:') ? ':$slotName' : ''}>',
+                'Unclosed slot <x-slot${isColonSyntax ? ':$slotName' : ''}>',
             position: startToken.startPosition,
           ),
         );
@@ -705,7 +706,7 @@ class BladeParser {
         final closingToken = _advance();
         // Closing token is like "</x-slot:header" or "</x-slot"
         // For named slots (e.g., <x-slot:title>), both </x-slot:title> and </x-slot> are valid
-        final expectedClosing = componentName.startsWith('slot:')
+        final expectedClosing = isColonSyntax
             ? '</x-slot:$slotName'
             : '</x-slot';
         const genericClosing = '</x-slot'; // Generic closing is always valid
@@ -728,6 +729,7 @@ class BladeParser {
       startPosition: startToken.startPosition,
       endPosition: _previous().endPosition,
       name: slotName,
+      useColonSyntax: isColonSyntax,
       attributes: attributes,
       children: children,
     );
