@@ -1,0 +1,3623 @@
+{
+  "performance": {
+    "A": {
+      "alpine/01-billing": {
+        "avg": 1.82,
+        "min": 1.32,
+        "max": 2.13,
+        "runs": 5
+      },
+      "alpine/02-faq": {
+        "avg": 0.9,
+        "min": 0.65,
+        "max": 1.24,
+        "runs": 5
+      },
+      "components/01-form": {
+        "avg": 0.48,
+        "min": 0.44,
+        "max": 0.53,
+        "runs": 5
+      },
+      "components/02-billing": {
+        "avg": 1.79,
+        "min": 1.56,
+        "max": 2.22,
+        "runs": 5
+      },
+      "edge_cases/alpine_shorthand": {
+        "avg": 0.33,
+        "min": 0.3,
+        "max": 0.38,
+        "runs": 5
+      },
+      "edge_cases/blade_comments": {
+        "avg": 0.26,
+        "min": 0.25,
+        "max": 0.29,
+        "runs": 5
+      },
+      "edge_cases/crlf_line_endings": {
+        "avg": 0.34,
+        "min": 0.27,
+        "max": 0.52,
+        "runs": 5
+      },
+      "edge_cases/email_addresses": {
+        "avg": 0.27,
+        "min": 0.25,
+        "max": 0.27,
+        "runs": 5
+      },
+      "edge_cases/ternary_or": {
+        "avg": 0.26,
+        "min": 0.23,
+        "max": 0.3,
+        "runs": 5
+      },
+      "edge_cases/utf8_content": {
+        "avg": 0.33,
+        "min": 0.25,
+        "max": 0.59,
+        "runs": 5
+      },
+      "edge_cases/verbatim_blocks": {
+        "avg": 0.23,
+        "min": 0.21,
+        "max": 0.27,
+        "runs": 5
+      },
+      "error/malformed-dashboard": {
+        "avg": 0.37,
+        "min": 0.35,
+        "max": 0.41,
+        "runs": 5
+      },
+      "format/01-basic-messy": {
+        "avg": 0.29,
+        "min": 0.27,
+        "max": 0.32,
+        "runs": 5
+      },
+      "format/02-indentation-chaos": {
+        "avg": 0.28,
+        "min": 0.27,
+        "max": 0.3,
+        "runs": 5
+      },
+      "format/03-whitespace-hell": {
+        "avg": 0.32,
+        "min": 0.24,
+        "max": 0.56,
+        "runs": 5
+      },
+      "format/04-nested-directives-ugly": {
+        "avg": 0.26,
+        "min": 0.24,
+        "max": 0.29,
+        "runs": 5
+      },
+      "format/05-components-messy": {
+        "avg": 0.27,
+        "min": 0.25,
+        "max": 0.29,
+        "runs": 5
+      },
+      "format/06-mixed-content": {
+        "avg": 0.37,
+        "min": 0.25,
+        "max": 0.78,
+        "runs": 5
+      },
+      "format/07-real-world-mess": {
+        "avg": 0.37,
+        "min": 0.29,
+        "max": 0.49,
+        "runs": 5
+      },
+      "format/08-edge-cases": {
+        "avg": 0.26,
+        "min": 0.24,
+        "max": 0.28,
+        "runs": 5
+      },
+      "large/01-pagination": {
+        "avg": 0.98,
+        "min": 0.89,
+        "max": 1.12,
+        "runs": 5
+      },
+      "legacy/laravel4-master-layout": {
+        "avg": 0.54,
+        "min": 0.45,
+        "max": 0.66,
+        "runs": 5
+      },
+      "legacy/laravel5-auth-login": {
+        "avg": 0.74,
+        "min": 0.61,
+        "max": 1.12,
+        "runs": 5
+      },
+      "legacy/laravel5-auth-register": {
+        "avg": 0.59,
+        "min": 0.56,
+        "max": 0.61,
+        "runs": 5
+      },
+      "legacy/section-with-overwrite": {
+        "avg": 0.5,
+        "min": 0.39,
+        "max": 0.88,
+        "runs": 5
+      },
+      "livewire/01-layout": {
+        "avg": 0.47,
+        "min": 0.44,
+        "max": 0.56,
+        "runs": 5
+      },
+      "livewire/02-examples": {
+        "avg": 0.37,
+        "min": 0.35,
+        "max": 0.39,
+        "runs": 5
+      },
+      "livewire/03-dashboard-page": {
+        "avg": 0.78,
+        "min": 0.72,
+        "max": 0.85,
+        "runs": 5
+      },
+      "medium/01-tooltip": {
+        "avg": 0.26,
+        "min": 0.23,
+        "max": 0.29,
+        "runs": 5
+      },
+      "medium/02-select-button": {
+        "avg": 0.3,
+        "min": 0.28,
+        "max": 0.34,
+        "runs": 5
+      },
+      "small/01-checkbox": {
+        "avg": 0.21,
+        "min": 0.19,
+        "max": 0.25,
+        "runs": 5
+      },
+      "small/02-footer": {
+        "avg": 0.26,
+        "min": 0.23,
+        "max": 0.29,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/auth/01-auth-guest": {
+        "avg": 0.48,
+        "min": 0.45,
+        "max": 0.51,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/auth/02-can-cannot": {
+        "avg": 0.42,
+        "min": 0.4,
+        "max": 0.43,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/01-component-basic": {
+        "avg": 0.45,
+        "min": 0.42,
+        "max": 0.48,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/02-component-props": {
+        "avg": 0.4,
+        "min": 0.39,
+        "max": 0.44,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/03-component-slots": {
+        "avg": 0.66,
+        "min": 0.59,
+        "max": 0.93,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/04-component-attributes": {
+        "avg": 0.47,
+        "min": 0.44,
+        "max": 0.5,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/05-dynamic-component": {
+        "avg": 0.47,
+        "min": 0.45,
+        "max": 0.49,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/01-if-basic": {
+        "avg": 0.33,
+        "min": 0.3,
+        "max": 0.36,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/02-unless": {
+        "avg": 0.43,
+        "min": 0.35,
+        "max": 0.68,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/03-switch-case": {
+        "avg": 0.41,
+        "min": 0.35,
+        "max": 0.59,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/04-isset-empty": {
+        "avg": 0.33,
+        "min": 0.32,
+        "max": 0.35,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/05-if-nested": {
+        "avg": 0.38,
+        "min": 0.35,
+        "max": 0.4,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/forms/01-csrf-method": {
+        "avg": 0.4,
+        "min": 0.3,
+        "max": 0.62,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/01-include-basic": {
+        "avg": 0.27,
+        "min": 0.24,
+        "max": 0.29,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
+        "avg": 0.25,
+        "min": 0.23,
+        "max": 0.28,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/03-include-first": {
+        "avg": 0.26,
+        "min": 0.24,
+        "max": 0.29,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/04-each": {
+        "avg": 0.32,
+        "min": 0.29,
+        "max": 0.34,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/01-foreach-basic": {
+        "avg": 0.32,
+        "min": 0.31,
+        "max": 0.33,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
+        "avg": 0.36,
+        "min": 0.33,
+        "max": 0.4,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/03-forelse": {
+        "avg": 0.43,
+        "min": 0.4,
+        "max": 0.48,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/04-for": {
+        "avg": 0.42,
+        "min": 0.39,
+        "max": 0.47,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/05-while": {
+        "avg": 0.37,
+        "min": 0.34,
+        "max": 0.41,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/06-loop-control": {
+        "avg": 0.47,
+        "min": 0.44,
+        "max": 0.53,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
+        "avg": 0.29,
+        "min": 0.27,
+        "max": 0.33,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/stacks/02-once": {
+        "avg": 0.31,
+        "min": 0.29,
+        "max": 0.36,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
+        "avg": 0.59,
+        "min": 0.58,
+        "max": 0.61,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
+        "avg": 0.6,
+        "min": 0.57,
+        "max": 0.64,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/03-section-show": {
+        "avg": 0.9,
+        "min": 0.78,
+        "max": 1.19,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/01-wire-click": {
+        "avg": 0.3,
+        "min": 0.28,
+        "max": 0.34,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/02-wire-submit": {
+        "avg": 0.43,
+        "min": 0.4,
+        "max": 0.47,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/03-wire-keydown": {
+        "avg": 0.38,
+        "min": 0.36,
+        "max": 0.42,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/04-event-modifiers": {
+        "avg": 0.41,
+        "min": 0.39,
+        "max": 0.43,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/01-wire-model-basic": {
+        "avg": 0.38,
+        "min": 0.35,
+        "max": 0.42,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/02-wire-model-live": {
+        "avg": 0.34,
+        "min": 0.32,
+        "max": 0.36,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
+        "avg": 0.29,
+        "min": 0.27,
+        "max": 0.33,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
+        "avg": 0.36,
+        "min": 0.34,
+        "max": 0.4,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
+        "avg": 0.28,
+        "min": 0.25,
+        "max": 0.32,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/02-x-init": {
+        "avg": 0.38,
+        "min": 0.3,
+        "max": 0.62,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/03-x-effect": {
+        "avg": 0.45,
+        "min": 0.43,
+        "max": 0.49,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
+        "avg": 0.63,
+        "min": 0.59,
+        "max": 0.67,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/05-alpine-store": {
+        "avg": 0.67,
+        "min": 0.56,
+        "max": 0.91,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/01-x-on-basic": {
+        "avg": 0.28,
+        "min": 0.25,
+        "max": 0.31,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/02-x-on-modifiers": {
+        "avg": 0.28,
+        "min": 0.26,
+        "max": 0.3,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/03-x-on-keyboard": {
+        "avg": 0.25,
+        "min": 0.23,
+        "max": 0.27,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/01-if-echo": {
+        "avg": 0.31,
+        "min": 0.29,
+        "max": 0.34,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/02-foreach-component": {
+        "avg": 0.27,
+        "min": 0.25,
+        "max": 0.3,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
+        "avg": 0.29,
+        "min": 0.26,
+        "max": 0.33,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
+        "avg": 0.3,
+        "min": 0.27,
+        "max": 0.34,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
+        "avg": 0.45,
+        "min": 0.44,
+        "max": 0.48,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
+        "avg": 0.36,
+        "min": 0.33,
+        "max": 0.38,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
+        "avg": 0.39,
+        "min": 0.37,
+        "max": 0.41,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
+        "avg": 0.41,
+        "min": 0.38,
+        "max": 0.43,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
+        "avg": 0.33,
+        "min": 0.3,
+        "max": 0.36,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
+        "avg": 0.39,
+        "min": 0.37,
+        "max": 0.44,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
+        "avg": 0.32,
+        "min": 0.3,
+        "max": 0.34,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
+        "avg": 0.36,
+        "min": 0.34,
+        "max": 0.4,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
+        "avg": 0.36,
+        "min": 0.34,
+        "max": 0.4,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
+        "avg": 0.45,
+        "min": 0.41,
+        "max": 0.49,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
+        "avg": 0.5,
+        "min": 0.47,
+        "max": 0.53,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
+        "avg": 0.4,
+        "min": 0.39,
+        "max": 0.42,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
+        "avg": 0.43,
+        "min": 0.42,
+        "max": 0.46,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
+        "avg": 0.55,
+        "min": 0.53,
+        "max": 0.59,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
+        "avg": 0.54,
+        "min": 0.5,
+        "max": 0.58,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-3-complex/02-data-table": {
+        "avg": 0.73,
+        "min": 0.69,
+        "max": 0.78,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-3-complex/03-modal-form": {
+        "avg": 0.85,
+        "min": 0.81,
+        "max": 0.91,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
+        "avg": 1.17,
+        "min": 1.14,
+        "max": 1.2,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
+        "avg": 1.63,
+        "min": 1.58,
+        "max": 1.67,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
+        "avg": 1.28,
+        "min": 1.03,
+        "max": 1.88,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
+        "avg": 0.93,
+        "min": 0.67,
+        "max": 1.29,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
+        "avg": 0.78,
+        "min": 0.7,
+        "max": 0.87,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
+        "avg": 0.67,
+        "min": 0.64,
+        "max": 0.7,
+        "runs": 5
+      },
+      "valid/alpine_js": {
+        "avg": 0.42,
+        "min": 0.33,
+        "max": 0.55,
+        "runs": 5
+      },
+      "valid/components": {
+        "avg": 0.49,
+        "min": 0.36,
+        "max": 0.59,
+        "runs": 5
+      },
+      "valid/control_structures": {
+        "avg": 0.47,
+        "min": 0.39,
+        "max": 0.64,
+        "runs": 5
+      },
+      "valid/livewire": {
+        "avg": 0.42,
+        "min": 0.29,
+        "max": 0.64,
+        "runs": 5
+      },
+      "valid/nested_directives": {
+        "avg": 0.69,
+        "min": 0.62,
+        "max": 0.79,
+        "runs": 5
+      },
+      "valid/simple_echo": {
+        "avg": 0.71,
+        "min": 0.36,
+        "max": 1.14,
+        "runs": 5
+      },
+      "valid/template_inheritance": {
+        "avg": 0.7,
+        "min": 0.54,
+        "max": 1.03,
+        "runs": 5
+      }
+    },
+    "B": {
+      "alpine/01-billing": {
+        "avg": 34.16,
+        "min": 28.91,
+        "max": 43.08,
+        "runs": 5
+      },
+      "alpine/02-faq": {
+        "avg": 10.51,
+        "min": 9.41,
+        "max": 11.74,
+        "runs": 5
+      },
+      "components/01-form": {
+        "avg": 3.72,
+        "min": 3.28,
+        "max": 4.31,
+        "runs": 5
+      },
+      "components/02-billing": {
+        "avg": 15.41,
+        "min": 14.24,
+        "max": 16.98,
+        "runs": 5
+      },
+      "edge_cases/alpine_shorthand": {
+        "avg": 2.32,
+        "min": 2.09,
+        "max": 2.92,
+        "runs": 5
+      },
+      "edge_cases/blade_comments": {
+        "avg": 0.63,
+        "min": 0.6,
+        "max": 0.64,
+        "runs": 5
+      },
+      "edge_cases/crlf_line_endings": {
+        "avg": 0.96,
+        "min": 0.88,
+        "max": 1.11,
+        "runs": 5
+      },
+      "edge_cases/email_addresses": {
+        "avg": 0.53,
+        "min": 0.49,
+        "max": 0.57,
+        "runs": 5
+      },
+      "edge_cases/ternary_or": {
+        "avg": 2.25,
+        "min": 2.06,
+        "max": 2.74,
+        "runs": 5
+      },
+      "edge_cases/utf8_content": {
+        "avg": 2.01,
+        "min": 1.92,
+        "max": 2.18,
+        "runs": 5
+      },
+      "edge_cases/verbatim_blocks": {
+        "avg": 1.93,
+        "min": 1.68,
+        "max": 2.48,
+        "runs": 5
+      },
+      "error/malformed-dashboard": {
+        "avg": 5.68,
+        "min": 4.73,
+        "max": 6.96,
+        "runs": 5
+      },
+      "format/01-basic-messy": {
+        "avg": 1.57,
+        "min": 1.49,
+        "max": 1.71,
+        "runs": 5
+      },
+      "format/02-indentation-chaos": {
+        "avg": 3.12,
+        "min": 2.68,
+        "max": 4.17,
+        "runs": 5
+      },
+      "format/03-whitespace-hell": {
+        "avg": 0.9,
+        "min": 0.85,
+        "max": 0.96,
+        "runs": 5
+      },
+      "format/04-nested-directives-ugly": {
+        "avg": 3.31,
+        "min": 2.75,
+        "max": 4.22,
+        "runs": 5
+      },
+      "format/05-components-messy": {
+        "avg": 0.9,
+        "min": 0.81,
+        "max": 0.97,
+        "runs": 5
+      },
+      "format/06-mixed-content": {
+        "avg": 3.34,
+        "min": 3.05,
+        "max": 3.75,
+        "runs": 5
+      },
+      "format/07-real-world-mess": {
+        "avg": 3.77,
+        "min": 3.16,
+        "max": 4.68,
+        "runs": 5
+      },
+      "format/08-edge-cases": {
+        "avg": 1.17,
+        "min": 1.07,
+        "max": 1.26,
+        "runs": 5
+      },
+      "large/01-pagination": {
+        "avg": 82.81,
+        "min": 77.82,
+        "max": 87.89,
+        "runs": 5
+      },
+      "legacy/laravel4-master-layout": {
+        "avg": 7.06,
+        "min": 6.38,
+        "max": 7.54,
+        "runs": 5
+      },
+      "legacy/laravel5-auth-login": {
+        "avg": 9.96,
+        "min": 9.74,
+        "max": 10.46,
+        "runs": 5
+      },
+      "legacy/laravel5-auth-register": {
+        "avg": 9.72,
+        "min": 9.4,
+        "max": 10.08,
+        "runs": 5
+      },
+      "legacy/section-with-overwrite": {
+        "avg": 8.71,
+        "min": 7.83,
+        "max": 9.09,
+        "runs": 5
+      },
+      "livewire/01-layout": {
+        "avg": 8.26,
+        "min": 7.22,
+        "max": 8.94,
+        "runs": 5
+      },
+      "livewire/02-examples": {
+        "avg": 5.91,
+        "min": 5.51,
+        "max": 6.39,
+        "runs": 5
+      },
+      "livewire/03-dashboard-page": {
+        "avg": 12.91,
+        "min": 12.35,
+        "max": 13.42,
+        "runs": 5
+      },
+      "medium/01-tooltip": {
+        "avg": 4.73,
+        "min": 4.2,
+        "max": 5.21,
+        "runs": 5
+      },
+      "medium/02-select-button": {
+        "avg": 6.39,
+        "min": 5.45,
+        "max": 7.8,
+        "runs": 5
+      },
+      "small/01-checkbox": {
+        "avg": 0.39,
+        "min": 0.37,
+        "max": 0.43,
+        "runs": 5
+      },
+      "small/02-footer": {
+        "avg": 2.8,
+        "min": 2.23,
+        "max": 4.09,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/auth/01-auth-guest": {
+        "avg": 5.08,
+        "min": 4.51,
+        "max": 5.8,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/auth/02-can-cannot": {
+        "avg": 10.85,
+        "min": 10.12,
+        "max": 11.91,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/01-component-basic": {
+        "avg": 4.72,
+        "min": 4.27,
+        "max": 5.18,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/02-component-props": {
+        "avg": 8.87,
+        "min": 8.63,
+        "max": 9.29,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/03-component-slots": {
+        "avg": 7.76,
+        "min": 7.33,
+        "max": 8.25,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/04-component-attributes": {
+        "avg": 19.05,
+        "min": 17.66,
+        "max": 20.94,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/05-dynamic-component": {
+        "avg": 11.76,
+        "min": 11.05,
+        "max": 12.3,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/01-if-basic": {
+        "avg": 6.34,
+        "min": 5.46,
+        "max": 7.45,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/02-unless": {
+        "avg": 5.87,
+        "min": 5.39,
+        "max": 6.41,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/03-switch-case": {
+        "avg": 8.25,
+        "min": 7.44,
+        "max": 9.18,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/04-isset-empty": {
+        "avg": 8.11,
+        "min": 7.52,
+        "max": 8.38,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/05-if-nested": {
+        "avg": 19.25,
+        "min": 18.18,
+        "max": 20.15,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/forms/01-csrf-method": {
+        "avg": 5.71,
+        "min": 5.23,
+        "max": 6.26,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/01-include-basic": {
+        "avg": 5.59,
+        "min": 5.23,
+        "max": 6.07,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
+        "avg": 6.72,
+        "min": 6.39,
+        "max": 7.2,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/03-include-first": {
+        "avg": 4.83,
+        "min": 4.45,
+        "max": 5.23,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/04-each": {
+        "avg": 6.04,
+        "min": 5.68,
+        "max": 6.74,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/01-foreach-basic": {
+        "avg": 13.13,
+        "min": 12.72,
+        "max": 13.49,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
+        "avg": 14.02,
+        "min": 13.57,
+        "max": 14.65,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/03-forelse": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/01-blade-directives/loops/04-for": {
+        "avg": 15.88,
+        "min": 15.23,
+        "max": 16.81,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/05-while": {
+        "avg": 11,
+        "min": 10.31,
+        "max": 11.9,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/06-loop-control": {
+        "avg": 19.99,
+        "min": 18.74,
+        "max": 23.51,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
+        "avg": 5.57,
+        "min": 5.02,
+        "max": 5.92,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/stacks/02-once": {
+        "avg": 5.83,
+        "min": 5.3,
+        "max": 7.04,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
+        "avg": 22.16,
+        "min": 21.24,
+        "max": 24.03,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
+        "avg": 20.86,
+        "min": 20.34,
+        "max": 21.29,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/03-section-show": {
+        "avg": 39.17,
+        "min": 37.15,
+        "max": 43.21,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/01-wire-click": {
+        "avg": 5.22,
+        "min": 4.91,
+        "max": 5.6,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/02-wire-submit": {
+        "avg": 7.83,
+        "min": 7.26,
+        "max": 8.25,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/03-wire-keydown": {
+        "avg": 5.44,
+        "min": 4.82,
+        "max": 6.12,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/04-event-modifiers": {
+        "avg": 4.31,
+        "min": 4.01,
+        "max": 4.63,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/01-wire-model-basic": {
+        "avg": 4.76,
+        "min": 4.2,
+        "max": 5.13,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/02-wire-model-live": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
+        "avg": 2.42,
+        "min": 2.2,
+        "max": 2.99,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
+        "avg": 4,
+        "min": 3.64,
+        "max": 4.76,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
+        "avg": 6.4,
+        "min": 5.54,
+        "max": 7.28,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/02-x-init": {
+        "avg": 8.23,
+        "min": 7.61,
+        "max": 8.66,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/03-x-effect": {
+        "avg": 8.33,
+        "min": 7.8,
+        "max": 8.77,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
+        "avg": 13.02,
+        "min": 12.14,
+        "max": 13.76,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/05-alpine-store": {
+        "avg": 14.48,
+        "min": 13.71,
+        "max": 15.87,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/01-x-on-basic": {
+        "avg": 3.28,
+        "min": 2.93,
+        "max": 3.74,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/02-x-on-modifiers": {
+        "avg": 3.41,
+        "min": 3.12,
+        "max": 3.91,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/03-x-on-keyboard": {
+        "avg": 3.6,
+        "min": 3.26,
+        "max": 4.06,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/01-if-echo": {
+        "avg": 7.47,
+        "min": 6.81,
+        "max": 8.14,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/02-foreach-component": {
+        "avg": 3.87,
+        "min": 3.56,
+        "max": 4.21,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
+        "avg": 3.95,
+        "min": 3.65,
+        "max": 4.3,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
+        "avg": 12.36,
+        "min": 11.87,
+        "max": 12.89,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
+        "avg": 8.74,
+        "min": 8.61,
+        "max": 8.98,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
+        "avg": 3.16,
+        "min": 2.91,
+        "max": 3.56,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
+        "avg": 24.74,
+        "min": 24.01,
+        "max": 25.86,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
+        "avg": 7.48,
+        "min": 7.33,
+        "max": 7.64,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
+        "avg": 26.88,
+        "min": 25.52,
+        "max": 28.16,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
+        "avg": 12.33,
+        "min": 11.73,
+        "max": 13.25,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
+        "avg": 13.2,
+        "min": 12.4,
+        "max": 14.17,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
+        "avg": 17.66,
+        "min": 16.02,
+        "max": 22.27,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
+        "avg": 18.25,
+        "min": 17.66,
+        "max": 18.78,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
+        "avg": 27.83,
+        "min": 27.42,
+        "max": 28.72,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
+        "avg": 22.01,
+        "min": 21.64,
+        "max": 22.73,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
+        "avg": 25.94,
+        "min": 23.84,
+        "max": 30.74,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
+        "avg": 22.51,
+        "min": 22.33,
+        "max": 22.92,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-3-complex/02-data-table": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/04-combinations/level-3-complex/03-modal-form": {
+        "avg": 40.95,
+        "min": 40.6,
+        "max": 41.28,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
+        "avg": 21.09,
+        "min": 17.04,
+        "max": 27.48,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
+        "avg": 11.41,
+        "min": 10.07,
+        "max": 14.04,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
+        "avg": 423.02,
+        "min": 409.5,
+        "max": 433.67,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
+        "avg": 45.19,
+        "min": 41.7,
+        "max": 50.46,
+        "runs": 5
+      },
+      "valid/alpine_js": {
+        "avg": 1.74,
+        "min": 1.39,
+        "max": 2.59,
+        "runs": 5
+      },
+      "valid/components": {
+        "avg": 1.13,
+        "min": 1.05,
+        "max": 1.22,
+        "runs": 5
+      },
+      "valid/control_structures": {
+        "avg": 4.65,
+        "min": 4.07,
+        "max": 5.44,
+        "runs": 5
+      },
+      "valid/livewire": {
+        "avg": 0.66,
+        "min": 0.62,
+        "max": 0.72,
+        "runs": 5
+      },
+      "valid/nested_directives": {
+        "avg": null,
+        "error": true
+      },
+      "valid/simple_echo": {
+        "avg": 3.58,
+        "min": 2.2,
+        "max": 4.73,
+        "runs": 5
+      },
+      "valid/template_inheritance": {
+        "avg": 9.51,
+        "min": 8.55,
+        "max": 10.98,
+        "runs": 5
+      }
+    },
+    "C": {
+      "alpine/01-billing": {
+        "avg": 41.31,
+        "min": 39.69,
+        "max": 44.99,
+        "runs": 5
+      },
+      "alpine/02-faq": {
+        "avg": 14.01,
+        "min": 13.22,
+        "max": 15.46,
+        "runs": 5
+      },
+      "components/01-form": {
+        "avg": 10.33,
+        "min": 8.93,
+        "max": 12.95,
+        "runs": 5
+      },
+      "components/02-billing": {
+        "avg": 20.12,
+        "min": 19.31,
+        "max": 21.35,
+        "runs": 5
+      },
+      "edge_cases/alpine_shorthand": {
+        "avg": 7.73,
+        "min": 7.39,
+        "max": 8.2,
+        "runs": 5
+      },
+      "edge_cases/blade_comments": {
+        "avg": 3.39,
+        "min": 3.04,
+        "max": 4.61,
+        "runs": 5
+      },
+      "edge_cases/crlf_line_endings": {
+        "avg": 6.91,
+        "min": 6.76,
+        "max": 7.12,
+        "runs": 5
+      },
+      "edge_cases/email_addresses": {
+        "avg": 3.25,
+        "min": 3.06,
+        "max": 3.82,
+        "runs": 5
+      },
+      "edge_cases/ternary_or": {
+        "avg": 3.7,
+        "min": 3.42,
+        "max": 4.56,
+        "runs": 5
+      },
+      "edge_cases/utf8_content": {
+        "avg": 3.57,
+        "min": 3.17,
+        "max": 4.9,
+        "runs": 5
+      },
+      "edge_cases/verbatim_blocks": {
+        "avg": null,
+        "error": true
+      },
+      "error/malformed-dashboard": {
+        "avg": 15.05,
+        "min": 14.71,
+        "max": 15.8,
+        "runs": 5
+      },
+      "format/01-basic-messy": {
+        "avg": 7.55,
+        "min": 7.05,
+        "max": 8.19,
+        "runs": 5
+      },
+      "format/02-indentation-chaos": {
+        "avg": 7.82,
+        "min": 7.41,
+        "max": 8.44,
+        "runs": 5
+      },
+      "format/03-whitespace-hell": {
+        "avg": 3.47,
+        "min": 3.08,
+        "max": 4.17,
+        "runs": 5
+      },
+      "format/04-nested-directives-ugly": {
+        "avg": 8.07,
+        "min": 7.43,
+        "max": 9.01,
+        "runs": 5
+      },
+      "format/05-components-messy": {
+        "avg": 3.01,
+        "min": 2.96,
+        "max": 3.04,
+        "runs": 5
+      },
+      "format/06-mixed-content": {
+        "avg": 8.71,
+        "min": 7.02,
+        "max": 11.74,
+        "runs": 5
+      },
+      "format/07-real-world-mess": {
+        "avg": 8.19,
+        "min": 7.81,
+        "max": 8.66,
+        "runs": 5
+      },
+      "format/08-edge-cases": {
+        "avg": 3.5,
+        "min": 3.14,
+        "max": 4.65,
+        "runs": 5
+      },
+      "large/01-pagination": {
+        "avg": 46.91,
+        "min": 46.24,
+        "max": 49.12,
+        "runs": 5
+      },
+      "legacy/laravel4-master-layout": {
+        "avg": 10.73,
+        "min": 9.28,
+        "max": 13.37,
+        "runs": 5
+      },
+      "legacy/laravel5-auth-login": {
+        "avg": 13.88,
+        "min": 13.12,
+        "max": 14.84,
+        "runs": 5
+      },
+      "legacy/laravel5-auth-register": {
+        "avg": 13.96,
+        "min": 13.24,
+        "max": 15.22,
+        "runs": 5
+      },
+      "legacy/section-with-overwrite": {
+        "avg": 9.47,
+        "min": 8.9,
+        "max": 10.35,
+        "runs": 5
+      },
+      "livewire/01-layout": {
+        "avg": 11,
+        "min": 9.52,
+        "max": 12.56,
+        "runs": 5
+      },
+      "livewire/02-examples": {
+        "avg": 9.82,
+        "min": 9.15,
+        "max": 10.64,
+        "runs": 5
+      },
+      "livewire/03-dashboard-page": {
+        "avg": 15.43,
+        "min": 14.81,
+        "max": 16.55,
+        "runs": 5
+      },
+      "medium/01-tooltip": {
+        "avg": 4.89,
+        "min": 4.57,
+        "max": 5.62,
+        "runs": 5
+      },
+      "medium/02-select-button": {
+        "avg": 5.86,
+        "min": 5.39,
+        "max": 6.52,
+        "runs": 5
+      },
+      "small/01-checkbox": {
+        "avg": 2.89,
+        "min": 2.79,
+        "max": 2.94,
+        "runs": 5
+      },
+      "small/02-footer": {
+        "avg": 4.55,
+        "min": 3.9,
+        "max": 5.51,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/auth/01-auth-guest": {
+        "avg": 8.45,
+        "min": 8,
+        "max": 9.04,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/auth/02-can-cannot": {
+        "avg": 13.6,
+        "min": 13.04,
+        "max": 14.3,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/01-component-basic": {
+        "avg": 9.55,
+        "min": 8.33,
+        "max": 10.78,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/02-component-props": {
+        "avg": 10.44,
+        "min": 9.66,
+        "max": 11.23,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/03-component-slots": {
+        "avg": 10.43,
+        "min": 9.7,
+        "max": 11.15,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/04-component-attributes": {
+        "avg": 13.06,
+        "min": 12.32,
+        "max": 13.94,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/components/05-dynamic-component": {
+        "avg": 12.7,
+        "min": 12.29,
+        "max": 13.35,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/01-if-basic": {
+        "avg": 8.69,
+        "min": 8.25,
+        "max": 9.07,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/02-unless": {
+        "avg": 9.05,
+        "min": 8.29,
+        "max": 9.89,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/03-switch-case": {
+        "avg": 8.39,
+        "min": 7.95,
+        "max": 9.02,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/04-isset-empty": {
+        "avg": 11.24,
+        "min": 9.97,
+        "max": 13.05,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/control-structures/05-if-nested": {
+        "avg": 11.05,
+        "min": 10.45,
+        "max": 11.85,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/forms/01-csrf-method": {
+        "avg": 5.32,
+        "min": 4.84,
+        "max": 6.02,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/01-include-basic": {
+        "avg": 4.98,
+        "min": 4.63,
+        "max": 5.58,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
+        "avg": 5.23,
+        "min": 4.62,
+        "max": 6.04,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/03-include-first": {
+        "avg": 8.18,
+        "min": 7.69,
+        "max": 9.12,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/includes/04-each": {
+        "avg": 4.7,
+        "min": 4.22,
+        "max": 5.61,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/01-foreach-basic": {
+        "avg": 11.29,
+        "min": 10.45,
+        "max": 12.99,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
+        "avg": 11.75,
+        "min": 11.09,
+        "max": 12.28,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/03-forelse": {
+        "avg": 10.98,
+        "min": 10.51,
+        "max": 11.64,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/04-for": {
+        "avg": 12.05,
+        "min": 11.58,
+        "max": 12.67,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/05-while": {
+        "avg": 10.62,
+        "min": 10.19,
+        "max": 11.45,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/loops/06-loop-control": {
+        "avg": 16.74,
+        "min": 14.52,
+        "max": 19.31,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
+        "avg": 8.93,
+        "min": 8.48,
+        "max": 9.49,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/stacks/02-once": {
+        "avg": 9.05,
+        "min": 8.33,
+        "max": 10.04,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
+        "avg": 13.73,
+        "min": 13.1,
+        "max": 14.21,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
+        "avg": 14.26,
+        "min": 13.69,
+        "max": 14.9,
+        "runs": 5
+      },
+      "synthetic/01-blade-directives/template-inheritance/03-section-show": {
+        "avg": 20.86,
+        "min": 20.48,
+        "max": 21.07,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/01-wire-click": {
+        "avg": 4.89,
+        "min": 4.5,
+        "max": 5.56,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/02-wire-submit": {
+        "avg": 9.28,
+        "min": 8.82,
+        "max": 9.88,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/03-wire-keydown": {
+        "avg": 8.91,
+        "min": 8.38,
+        "max": 9.78,
+        "runs": 5
+      },
+      "synthetic/02-livewire/actions/04-event-modifiers": {
+        "avg": 9.03,
+        "min": 8.48,
+        "max": 9.82,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/01-wire-model-basic": {
+        "avg": 7.74,
+        "min": 7.47,
+        "max": 8.3,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/02-wire-model-live": {
+        "avg": 7.79,
+        "min": 7.45,
+        "max": 8.3,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
+        "avg": 4.13,
+        "min": 3.76,
+        "max": 4.85,
+        "runs": 5
+      },
+      "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
+        "avg": 9.36,
+        "min": 7.72,
+        "max": 10.75,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
+        "avg": 4.65,
+        "min": 4.22,
+        "max": 5.32,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/02-x-init": {
+        "avg": 5.17,
+        "min": 4.71,
+        "max": 6.52,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/03-x-effect": {
+        "avg": 6.49,
+        "min": 5.9,
+        "max": 7.75,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
+        "avg": 9.24,
+        "min": 8.92,
+        "max": 9.64,
+        "runs": 5
+      },
+      "synthetic/03-alpine/data-reactivity/05-alpine-store": {
+        "avg": 14.76,
+        "min": 14.11,
+        "max": 15.53,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/01-x-on-basic": {
+        "avg": 4.1,
+        "min": 3.89,
+        "max": 4.73,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/02-x-on-modifiers": {
+        "avg": 4.02,
+        "min": 3.79,
+        "max": 4.79,
+        "runs": 5
+      },
+      "synthetic/03-alpine/events/03-x-on-keyboard": {
+        "avg": 4.4,
+        "min": 4.02,
+        "max": 5.5,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/01-if-echo": {
+        "avg": 9.94,
+        "min": 8.94,
+        "max": 10.89,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/02-foreach-component": {
+        "avg": 9.12,
+        "min": 8.69,
+        "max": 9.66,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
+        "avg": 9.18,
+        "min": 8.71,
+        "max": 9.79,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
+        "avg": 9.4,
+        "min": 8.95,
+        "max": 10.16,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
+        "avg": 9.92,
+        "min": 9.63,
+        "max": 10.6,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
+        "avg": 10.65,
+        "min": 10.2,
+        "max": 11.72,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
+        "avg": 6,
+        "min": 5.74,
+        "max": 6.69,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
+        "avg": 11.44,
+        "min": 10.65,
+        "max": 12,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
+        "avg": 5.48,
+        "min": 5.06,
+        "max": 6.34,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
+        "avg": 11.84,
+        "min": 11.26,
+        "max": 12.56,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
+        "avg": 11.53,
+        "min": 10.93,
+        "max": 12.1,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
+        "avg": 12.29,
+        "min": 10.71,
+        "max": 14.46,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
+        "avg": 13.56,
+        "min": 11.85,
+        "max": 16.05,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
+        "avg": 14.97,
+        "min": 14.53,
+        "max": 15.6,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
+        "avg": 14.28,
+        "min": 13.78,
+        "max": 14.69,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
+        "avg": 17.71,
+        "min": 17.16,
+        "max": 18.22,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
+        "avg": 16.37,
+        "min": 15.72,
+        "max": 17.47,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
+        "avg": 16.57,
+        "min": 16.01,
+        "max": 17,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
+        "avg": 17.58,
+        "min": 16.91,
+        "max": 18.22,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-3-complex/02-data-table": {
+        "avg": 23.77,
+        "min": 23.04,
+        "max": 24.5,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-3-complex/03-modal-form": {
+        "avg": 34.61,
+        "min": 33.74,
+        "max": 35.64,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
+        "avg": 51.34,
+        "min": 50.82,
+        "max": 52.16,
+        "runs": 5
+      },
+      "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
+        "avg": 14.5,
+        "min": 13.12,
+        "max": 17.12,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
+        "avg": 12.91,
+        "min": 12.2,
+        "max": 13.57,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
+        "avg": 18.23,
+        "min": 16.87,
+        "max": 19.57,
+        "runs": 5
+      },
+      "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
+        "avg": 84.32,
+        "min": 82.64,
+        "max": 86.2,
+        "runs": 5
+      },
+      "valid/alpine_js": {
+        "avg": 3.84,
+        "min": 3.56,
+        "max": 4.41,
+        "runs": 5
+      },
+      "valid/components": {
+        "avg": 3.8,
+        "min": 3.42,
+        "max": 4.96,
+        "runs": 5
+      },
+      "valid/control_structures": {
+        "avg": 8.8,
+        "min": 8.27,
+        "max": 9.4,
+        "runs": 5
+      },
+      "valid/livewire": {
+        "avg": 3.46,
+        "min": 3.07,
+        "max": 4.42,
+        "runs": 5
+      },
+      "valid/nested_directives": {
+        "avg": null,
+        "error": true
+      },
+      "valid/simple_echo": {
+        "avg": 6.71,
+        "min": 5.13,
+        "max": 9.91,
+        "runs": 5
+      },
+      "valid/template_inheritance": {
+        "avg": 11.75,
+        "min": 10.61,
+        "max": 13.33,
+        "runs": 5
+      }
+    }
+  },
+  "idempotency": {
+    "A": {
+      "alpine/01-billing": {
+        "idempotent": true,
+        "pass1Length": 5232,
+        "pass2Length": 5232
+      },
+      "alpine/02-faq": {
+        "idempotent": true,
+        "pass1Length": 1946,
+        "pass2Length": 1946
+      },
+      "components/01-form": {
+        "idempotent": true,
+        "pass1Length": 1038,
+        "pass2Length": 1038
+      },
+      "components/02-billing": {
+        "idempotent": true,
+        "pass1Length": 7078,
+        "pass2Length": 7078
+      },
+      "edge_cases/alpine_shorthand": {
+        "idempotent": true,
+        "pass1Length": 216,
+        "pass2Length": 216
+      },
+      "edge_cases/blade_comments": {
+        "idempotent": true,
+        "pass1Length": 95,
+        "pass2Length": 95
+      },
+      "edge_cases/crlf_line_endings": {
+        "idempotent": true,
+        "pass1Length": 47,
+        "pass2Length": 47
+      },
+      "edge_cases/email_addresses": {
+        "idempotent": true,
+        "pass1Length": 72,
+        "pass2Length": 72
+      },
+      "edge_cases/ternary_or": {
+        "idempotent": true,
+        "pass1Length": 97,
+        "pass2Length": 97
+      },
+      "edge_cases/utf8_content": {
+        "idempotent": true,
+        "pass1Length": 54,
+        "pass2Length": 54
+      },
+      "edge_cases/verbatim_blocks": {
+        "idempotent": true,
+        "pass1Length": 144,
+        "pass2Length": 144
+      },
+      "error/malformed-dashboard": {
+        "idempotent": true,
+        "pass1Length": 323,
+        "pass2Length": 323
+      },
+      "format/01-basic-messy": {
+        "idempotent": true,
+        "pass1Length": 109,
+        "pass2Length": 109
+      },
+      "format/02-indentation-chaos": {
+        "idempotent": true,
+        "pass1Length": 163,
+        "pass2Length": 163
+      },
+      "format/03-whitespace-hell": {
+        "idempotent": true,
+        "pass1Length": 23,
+        "pass2Length": 23
+      },
+      "format/04-nested-directives-ugly": {
+        "idempotent": true,
+        "pass1Length": 134,
+        "pass2Length": 134
+      },
+      "format/05-components-messy": {
+        "idempotent": true,
+        "pass1Length": 109,
+        "pass2Length": 109
+      },
+      "format/06-mixed-content": {
+        "idempotent": true,
+        "pass1Length": 187,
+        "pass2Length": 187
+      },
+      "format/07-real-world-mess": {
+        "idempotent": true,
+        "pass1Length": 297,
+        "pass2Length": 297
+      },
+      "format/08-edge-cases": {
+        "idempotent": true,
+        "pass1Length": 103,
+        "pass2Length": 103
+      },
+      "large/01-pagination": {
+        "idempotent": true,
+        "pass1Length": 8647,
+        "pass2Length": 8647
+      },
+      "legacy/laravel4-master-layout": {
+        "idempotent": true,
+        "pass1Length": 1255,
+        "pass2Length": 1255
+      },
+      "legacy/laravel5-auth-login": {
+        "idempotent": true,
+        "pass1Length": 3070,
+        "pass2Length": 3070
+      },
+      "legacy/laravel5-auth-register": {
+        "idempotent": true,
+        "pass1Length": 3266,
+        "pass2Length": 3266
+      },
+      "legacy/section-with-overwrite": {
+        "idempotent": true,
+        "pass1Length": 1181,
+        "pass2Length": 1181
+      },
+      "livewire/01-layout": {
+        "idempotent": true,
+        "pass1Length": 1711,
+        "pass2Length": 1711
+      },
+      "livewire/02-examples": {
+        "idempotent": true,
+        "pass1Length": 1561,
+        "pass2Length": 1561
+      },
+      "livewire/03-dashboard-page": {
+        "idempotent": true,
+        "pass1Length": 5399,
+        "pass2Length": 5399
+      },
+      "medium/01-tooltip": {
+        "idempotent": true,
+        "pass1Length": 473,
+        "pass2Length": 473
+      },
+      "medium/02-select-button": {
+        "idempotent": true,
+        "pass1Length": 1619,
+        "pass2Length": 1619
+      },
+      "small/01-checkbox": {
+        "idempotent": true,
+        "pass1Length": 36,
+        "pass2Length": 36
+      },
+      "small/02-footer": {
+        "idempotent": true,
+        "pass1Length": 317,
+        "pass2Length": 317
+      },
+      "synthetic/01-blade-directives/auth/01-auth-guest": {
+        "idempotent": true,
+        "pass1Length": 1687,
+        "pass2Length": 1687
+      },
+      "synthetic/01-blade-directives/auth/02-can-cannot": {
+        "idempotent": true,
+        "pass1Length": 1880,
+        "pass2Length": 1880
+      },
+      "synthetic/01-blade-directives/components/01-component-basic": {
+        "idempotent": true,
+        "pass1Length": 1462,
+        "pass2Length": 1462
+      },
+      "synthetic/01-blade-directives/components/02-component-props": {
+        "idempotent": true,
+        "pass1Length": 1907,
+        "pass2Length": 1907
+      },
+      "synthetic/01-blade-directives/components/03-component-slots": {
+        "idempotent": true,
+        "pass1Length": 2013,
+        "pass2Length": 2013
+      },
+      "synthetic/01-blade-directives/components/04-component-attributes": {
+        "idempotent": true,
+        "pass1Length": 2822,
+        "pass2Length": 2822
+      },
+      "synthetic/01-blade-directives/components/05-dynamic-component": {
+        "idempotent": true,
+        "pass1Length": 2593,
+        "pass2Length": 2593
+      },
+      "synthetic/01-blade-directives/control-structures/01-if-basic": {
+        "idempotent": true,
+        "pass1Length": 1424,
+        "pass2Length": 1424
+      },
+      "synthetic/01-blade-directives/control-structures/02-unless": {
+        "idempotent": true,
+        "pass1Length": 1676,
+        "pass2Length": 1676
+      },
+      "synthetic/01-blade-directives/control-structures/03-switch-case": {
+        "idempotent": true,
+        "pass1Length": 1498,
+        "pass2Length": 1498
+      },
+      "synthetic/01-blade-directives/control-structures/04-isset-empty": {
+        "idempotent": true,
+        "pass1Length": 1698,
+        "pass2Length": 1698
+      },
+      "synthetic/01-blade-directives/control-structures/05-if-nested": {
+        "idempotent": true,
+        "pass1Length": 2580,
+        "pass2Length": 2580
+      },
+      "synthetic/01-blade-directives/forms/01-csrf-method": {
+        "idempotent": true,
+        "pass1Length": 1743,
+        "pass2Length": 1743
+      },
+      "synthetic/01-blade-directives/includes/01-include-basic": {
+        "idempotent": true,
+        "pass1Length": 1275,
+        "pass2Length": 1275
+      },
+      "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
+        "idempotent": true,
+        "pass1Length": 1556,
+        "pass2Length": 1556
+      },
+      "synthetic/01-blade-directives/includes/03-include-first": {
+        "idempotent": true,
+        "pass1Length": 1556,
+        "pass2Length": 1556
+      },
+      "synthetic/01-blade-directives/includes/04-each": {
+        "idempotent": true,
+        "pass1Length": 1374,
+        "pass2Length": 1374
+      },
+      "synthetic/01-blade-directives/loops/01-foreach-basic": {
+        "idempotent": true,
+        "pass1Length": 1925,
+        "pass2Length": 1925
+      },
+      "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
+        "idempotent": true,
+        "pass1Length": 2422,
+        "pass2Length": 2422
+      },
+      "synthetic/01-blade-directives/loops/03-forelse": {
+        "idempotent": true,
+        "pass1Length": 2972,
+        "pass2Length": 2972
+      },
+      "synthetic/01-blade-directives/loops/04-for": {
+        "idempotent": true,
+        "pass1Length": 2664,
+        "pass2Length": 2664
+      },
+      "synthetic/01-blade-directives/loops/05-while": {
+        "idempotent": true,
+        "pass1Length": 2232,
+        "pass2Length": 2232
+      },
+      "synthetic/01-blade-directives/loops/06-loop-control": {
+        "idempotent": true,
+        "pass1Length": 3433,
+        "pass2Length": 3433
+      },
+      "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
+        "idempotent": true,
+        "pass1Length": 1136,
+        "pass2Length": 1136
+      },
+      "synthetic/01-blade-directives/stacks/02-once": {
+        "idempotent": true,
+        "pass1Length": 1152,
+        "pass2Length": 1152
+      },
+      "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
+        "idempotent": true,
+        "pass1Length": 3594,
+        "pass2Length": 3594
+      },
+      "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
+        "idempotent": true,
+        "pass1Length": 4699,
+        "pass2Length": 4699
+      },
+      "synthetic/01-blade-directives/template-inheritance/03-section-show": {
+        "idempotent": true,
+        "pass1Length": 7824,
+        "pass2Length": 7824
+      },
+      "synthetic/02-livewire/actions/01-wire-click": {
+        "idempotent": true,
+        "pass1Length": 1752,
+        "pass2Length": 1752
+      },
+      "synthetic/02-livewire/actions/02-wire-submit": {
+        "idempotent": true,
+        "pass1Length": 2265,
+        "pass2Length": 2265
+      },
+      "synthetic/02-livewire/actions/03-wire-keydown": {
+        "idempotent": true,
+        "pass1Length": 2358,
+        "pass2Length": 2358
+      },
+      "synthetic/02-livewire/actions/04-event-modifiers": {
+        "idempotent": true,
+        "pass1Length": 2687,
+        "pass2Length": 2687
+      },
+      "synthetic/02-livewire/data-binding/01-wire-model-basic": {
+        "idempotent": true,
+        "pass1Length": 1871,
+        "pass2Length": 1871
+      },
+      "synthetic/02-livewire/data-binding/02-wire-model-live": {
+        "idempotent": true,
+        "pass1Length": 1394,
+        "pass2Length": 1394
+      },
+      "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
+        "idempotent": true,
+        "pass1Length": 1449,
+        "pass2Length": 1449
+      },
+      "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
+        "idempotent": true,
+        "pass1Length": 1987,
+        "pass2Length": 1987
+      },
+      "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
+        "idempotent": true,
+        "pass1Length": 2056,
+        "pass2Length": 2056
+      },
+      "synthetic/03-alpine/data-reactivity/02-x-init": {
+        "idempotent": true,
+        "pass1Length": 3150,
+        "pass2Length": 3150
+      },
+      "synthetic/03-alpine/data-reactivity/03-x-effect": {
+        "idempotent": true,
+        "pass1Length": 3670,
+        "pass2Length": 3670
+      },
+      "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
+        "idempotent": true,
+        "pass1Length": 6386,
+        "pass2Length": 6386
+      },
+      "synthetic/03-alpine/data-reactivity/05-alpine-store": {
+        "idempotent": true,
+        "pass1Length": 8266,
+        "pass2Length": 8266
+      },
+      "synthetic/03-alpine/events/01-x-on-basic": {
+        "idempotent": true,
+        "pass1Length": 1093,
+        "pass2Length": 1093
+      },
+      "synthetic/03-alpine/events/02-x-on-modifiers": {
+        "idempotent": true,
+        "pass1Length": 1502,
+        "pass2Length": 1502
+      },
+      "synthetic/03-alpine/events/03-x-on-keyboard": {
+        "idempotent": true,
+        "pass1Length": 1597,
+        "pass2Length": 1597
+      },
+      "synthetic/04-combinations/level-1-simple/01-if-echo": {
+        "idempotent": true,
+        "pass1Length": 1900,
+        "pass2Length": 1900
+      },
+      "synthetic/04-combinations/level-1-simple/02-foreach-component": {
+        "idempotent": true,
+        "pass1Length": 1288,
+        "pass2Length": 1288
+      },
+      "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
+        "idempotent": true,
+        "pass1Length": 1579,
+        "pass2Length": 1579
+      },
+      "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
+        "idempotent": true,
+        "pass1Length": 1827,
+        "pass2Length": 1827
+      },
+      "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
+        "idempotent": true,
+        "pass1Length": 3546,
+        "pass2Length": 3546
+      },
+      "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
+        "idempotent": true,
+        "pass1Length": 2721,
+        "pass2Length": 2721
+      },
+      "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
+        "idempotent": true,
+        "pass1Length": 2756,
+        "pass2Length": 2756
+      },
+      "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
+        "idempotent": true,
+        "pass1Length": 3247,
+        "pass2Length": 3247
+      },
+      "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
+        "idempotent": true,
+        "pass1Length": 2212,
+        "pass2Length": 2212
+      },
+      "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
+        "idempotent": true,
+        "pass1Length": 3168,
+        "pass2Length": 3168
+      },
+      "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
+        "idempotent": true,
+        "pass1Length": 2688,
+        "pass2Length": 2688
+      },
+      "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
+        "idempotent": true,
+        "pass1Length": 2789,
+        "pass2Length": 2789
+      },
+      "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
+        "idempotent": true,
+        "pass1Length": 3698,
+        "pass2Length": 3698
+      },
+      "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
+        "idempotent": true,
+        "pass1Length": 3791,
+        "pass2Length": 3791
+      },
+      "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
+        "idempotent": true,
+        "pass1Length": 4356,
+        "pass2Length": 4356
+      },
+      "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
+        "idempotent": true,
+        "pass1Length": 4370,
+        "pass2Length": 4370
+      },
+      "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
+        "idempotent": true,
+        "pass1Length": 5263,
+        "pass2Length": 5263
+      },
+      "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
+        "idempotent": true,
+        "pass1Length": 5806,
+        "pass2Length": 5806
+      },
+      "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
+        "idempotent": true,
+        "pass1Length": 7037,
+        "pass2Length": 7037
+      },
+      "synthetic/04-combinations/level-3-complex/02-data-table": {
+        "idempotent": true,
+        "pass1Length": 13054,
+        "pass2Length": 13054
+      },
+      "synthetic/04-combinations/level-3-complex/03-modal-form": {
+        "idempotent": true,
+        "pass1Length": 14539,
+        "pass2Length": 14539
+      },
+      "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
+        "idempotent": true,
+        "pass1Length": 21235,
+        "pass2Length": 21235
+      },
+      "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
+        "idempotent": true,
+        "pass1Length": 32621,
+        "pass2Length": 32621
+      },
+      "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
+        "idempotent": true,
+        "pass1Length": 2040,
+        "pass2Length": 2040
+      },
+      "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
+        "idempotent": true,
+        "pass1Length": 1780,
+        "pass2Length": 1780
+      },
+      "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
+        "idempotent": true,
+        "pass1Length": 4590,
+        "pass2Length": 4590
+      },
+      "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
+        "idempotent": true,
+        "pass1Length": 3856,
+        "pass2Length": 3856
+      },
+      "valid/alpine_js": {
+        "idempotent": true,
+        "pass1Length": 214,
+        "pass2Length": 214
+      },
+      "valid/components": {
+        "idempotent": true,
+        "pass1Length": 201,
+        "pass2Length": 201
+      },
+      "valid/control_structures": {
+        "idempotent": true,
+        "pass1Length": 348,
+        "pass2Length": 348
+      },
+      "valid/livewire": {
+        "idempotent": true,
+        "pass1Length": 230,
+        "pass2Length": 230
+      },
+      "valid/nested_directives": {
+        "idempotent": true,
+        "pass1Length": 2034,
+        "pass2Length": 2034
+      },
+      "valid/simple_echo": {
+        "idempotent": true,
+        "pass1Length": 53,
+        "pass2Length": 53
+      },
+      "valid/template_inheritance": {
+        "idempotent": true,
+        "pass1Length": 312,
+        "pass2Length": 312
+      }
+    },
+    "B": {
+      "alpine/01-billing": {
+        "idempotent": true,
+        "pass1Length": 4899,
+        "pass2Length": 4899
+      },
+      "alpine/02-faq": {
+        "idempotent": true,
+        "pass1Length": 2065,
+        "pass2Length": 2065
+      },
+      "components/01-form": {
+        "idempotent": true,
+        "pass1Length": 1026,
+        "pass2Length": 1026
+      },
+      "components/02-billing": {
+        "idempotent": true,
+        "pass1Length": 6905,
+        "pass2Length": 6905
+      },
+      "edge_cases/alpine_shorthand": {
+        "idempotent": true,
+        "pass1Length": 217,
+        "pass2Length": 217
+      },
+      "edge_cases/blade_comments": {
+        "idempotent": true,
+        "pass1Length": 97,
+        "pass2Length": 97
+      },
+      "edge_cases/crlf_line_endings": {
+        "idempotent": true,
+        "pass1Length": 48,
+        "pass2Length": 48
+      },
+      "edge_cases/email_addresses": {
+        "idempotent": true,
+        "pass1Length": 71,
+        "pass2Length": 71
+      },
+      "edge_cases/ternary_or": {
+        "idempotent": true,
+        "pass1Length": 94,
+        "pass2Length": 94
+      },
+      "edge_cases/utf8_content": {
+        "idempotent": true,
+        "pass1Length": 53,
+        "pass2Length": 53
+      },
+      "edge_cases/verbatim_blocks": {
+        "idempotent": false,
+        "pass1Length": 168,
+        "pass2Length": 188,
+        "diffAt": 18,
+        "pass1Snippet": "@verbatim\n        {{ This should not b",
+        "pass2Snippet": "@verbatim\n            {{ This should n"
+      },
+      "error/malformed-dashboard": {
+        "idempotent": false,
+        "pass1Length": 367,
+        "pass2Length": 339,
+        "diffAt": 145,
+        "pass1Snippet": ">\n            <h3>{{\n                $wi",
+        "pass2Snippet": ">\n            <h3>{{ $widget->title }}</"
+      },
+      "format/01-basic-messy": {
+        "idempotent": true,
+        "pass1Length": 106,
+        "pass2Length": 106
+      },
+      "format/02-indentation-chaos": {
+        "idempotent": true,
+        "pass1Length": 165,
+        "pass2Length": 165
+      },
+      "format/03-whitespace-hell": {
+        "idempotent": true,
+        "pass1Length": 29,
+        "pass2Length": 29
+      },
+      "format/04-nested-directives-ugly": {
+        "idempotent": true,
+        "pass1Length": 107,
+        "pass2Length": 107
+      },
+      "format/05-components-messy": {
+        "idempotent": true,
+        "pass1Length": 94,
+        "pass2Length": 94
+      },
+      "format/06-mixed-content": {
+        "idempotent": true,
+        "pass1Length": 210,
+        "pass2Length": 210
+      },
+      "format/07-real-world-mess": {
+        "idempotent": true,
+        "pass1Length": 280,
+        "pass2Length": 280
+      },
+      "format/08-edge-cases": {
+        "idempotent": true,
+        "pass1Length": 107,
+        "pass2Length": 107
+      },
+      "large/01-pagination": {
+        "idempotent": true,
+        "pass1Length": 8764,
+        "pass2Length": 8764
+      },
+      "legacy/laravel4-master-layout": {
+        "idempotent": true,
+        "pass1Length": 1247,
+        "pass2Length": 1247
+      },
+      "legacy/laravel5-auth-login": {
+        "idempotent": true,
+        "pass1Length": 3094,
+        "pass2Length": 3094
+      },
+      "legacy/laravel5-auth-register": {
+        "idempotent": true,
+        "pass1Length": 3135,
+        "pass2Length": 3135
+      },
+      "legacy/section-with-overwrite": {
+        "idempotent": true,
+        "pass1Length": 1155,
+        "pass2Length": 1155
+      },
+      "livewire/01-layout": {
+        "idempotent": true,
+        "pass1Length": 1777,
+        "pass2Length": 1777
+      },
+      "livewire/02-examples": {
+        "idempotent": true,
+        "pass1Length": 1760,
+        "pass2Length": 1760
+      },
+      "livewire/03-dashboard-page": {
+        "idempotent": true,
+        "pass1Length": 4657,
+        "pass2Length": 4657
+      },
+      "medium/01-tooltip": {
+        "idempotent": true,
+        "pass1Length": 486,
+        "pass2Length": 486
+      },
+      "medium/02-select-button": {
+        "idempotent": true,
+        "pass1Length": 1721,
+        "pass2Length": 1721
+      },
+      "small/01-checkbox": {
+        "idempotent": true,
+        "pass1Length": 35,
+        "pass2Length": 35
+      },
+      "small/02-footer": {
+        "idempotent": true,
+        "pass1Length": 339,
+        "pass2Length": 339
+      },
+      "synthetic/01-blade-directives/auth/01-auth-guest": {
+        "idempotent": true,
+        "pass1Length": 1711,
+        "pass2Length": 1711
+      },
+      "synthetic/01-blade-directives/auth/02-can-cannot": {
+        "idempotent": true,
+        "pass1Length": 1888,
+        "pass2Length": 1888
+      },
+      "synthetic/01-blade-directives/components/01-component-basic": {
+        "idempotent": true,
+        "pass1Length": 1255,
+        "pass2Length": 1255
+      },
+      "synthetic/01-blade-directives/components/02-component-props": {
+        "idempotent": true,
+        "pass1Length": 1724,
+        "pass2Length": 1724
+      },
+      "synthetic/01-blade-directives/components/03-component-slots": {
+        "idempotent": true,
+        "pass1Length": 2084,
+        "pass2Length": 2084
+      },
+      "synthetic/01-blade-directives/components/04-component-attributes": {
+        "idempotent": true,
+        "pass1Length": 2829,
+        "pass2Length": 2829
+      },
+      "synthetic/01-blade-directives/components/05-dynamic-component": {
+        "idempotent": true,
+        "pass1Length": 2546,
+        "pass2Length": 2546
+      },
+      "synthetic/01-blade-directives/control-structures/01-if-basic": {
+        "idempotent": true,
+        "pass1Length": 1408,
+        "pass2Length": 1408
+      },
+      "synthetic/01-blade-directives/control-structures/02-unless": {
+        "idempotent": true,
+        "pass1Length": 1639,
+        "pass2Length": 1639
+      },
+      "synthetic/01-blade-directives/control-structures/03-switch-case": {
+        "idempotent": true,
+        "pass1Length": 1642,
+        "pass2Length": 1642
+      },
+      "synthetic/01-blade-directives/control-structures/04-isset-empty": {
+        "idempotent": true,
+        "pass1Length": 1675,
+        "pass2Length": 1675
+      },
+      "synthetic/01-blade-directives/control-structures/05-if-nested": {
+        "idempotent": true,
+        "pass1Length": 2375,
+        "pass2Length": 2375
+      },
+      "synthetic/01-blade-directives/forms/01-csrf-method": {
+        "idempotent": true,
+        "pass1Length": 1776,
+        "pass2Length": 1776
+      },
+      "synthetic/01-blade-directives/includes/01-include-basic": {
+        "idempotent": true,
+        "pass1Length": 1580,
+        "pass2Length": 1580
+      },
+      "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
+        "idempotent": true,
+        "pass1Length": 1760,
+        "pass2Length": 1760
+      },
+      "synthetic/01-blade-directives/includes/03-include-first": {
+        "idempotent": true,
+        "pass1Length": 1605,
+        "pass2Length": 1605
+      },
+      "synthetic/01-blade-directives/includes/04-each": {
+        "idempotent": true,
+        "pass1Length": 1396,
+        "pass2Length": 1396
+      },
+      "synthetic/01-blade-directives/loops/01-foreach-basic": {
+        "idempotent": true,
+        "pass1Length": 1947,
+        "pass2Length": 1947
+      },
+      "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
+        "idempotent": true,
+        "pass1Length": 2514,
+        "pass2Length": 2514
+      },
+      "synthetic/01-blade-directives/loops/03-forelse": {
+        "error": "Unpaired condition control structure\n\n  50|                 </div>\n  51|             </div>\n  52|         </article>\n >53|         @empty\n  54|         <div class=\"empty-state\">\n  55|             <div class=\"empty-icon\">\n  56|                 <svg width=\"120\" height=\"120\" viewBox=\"0 0 120 120\">\n"
+      },
+      "synthetic/01-blade-directives/loops/04-for": {
+        "idempotent": true,
+        "pass1Length": 2612,
+        "pass2Length": 2612
+      },
+      "synthetic/01-blade-directives/loops/05-while": {
+        "idempotent": true,
+        "pass1Length": 2129,
+        "pass2Length": 2129
+      },
+      "synthetic/01-blade-directives/loops/06-loop-control": {
+        "idempotent": true,
+        "pass1Length": 3268,
+        "pass2Length": 3268
+      },
+      "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
+        "idempotent": true,
+        "pass1Length": 1168,
+        "pass2Length": 1168
+      },
+      "synthetic/01-blade-directives/stacks/02-once": {
+        "idempotent": true,
+        "pass1Length": 1103,
+        "pass2Length": 1103
+      },
+      "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
+        "idempotent": true,
+        "pass1Length": 3481,
+        "pass2Length": 3481
+      },
+      "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
+        "idempotent": true,
+        "pass1Length": 4545,
+        "pass2Length": 4545
+      },
+      "synthetic/01-blade-directives/template-inheritance/03-section-show": {
+        "idempotent": true,
+        "pass1Length": 7195,
+        "pass2Length": 7195
+      },
+      "synthetic/02-livewire/actions/01-wire-click": {
+        "idempotent": true,
+        "pass1Length": 1688,
+        "pass2Length": 1688
+      },
+      "synthetic/02-livewire/actions/02-wire-submit": {
+        "idempotent": true,
+        "pass1Length": 2252,
+        "pass2Length": 2252
+      },
+      "synthetic/02-livewire/actions/03-wire-keydown": {
+        "idempotent": true,
+        "pass1Length": 2431,
+        "pass2Length": 2431
+      },
+      "synthetic/02-livewire/actions/04-event-modifiers": {
+        "idempotent": true,
+        "pass1Length": 2626,
+        "pass2Length": 2626
+      },
+      "synthetic/02-livewire/data-binding/01-wire-model-basic": {
+        "idempotent": true,
+        "pass1Length": 1892,
+        "pass2Length": 1892
+      },
+      "synthetic/02-livewire/data-binding/02-wire-model-live": {
+        "error": "Unpaired condition control structure\n\n  38|                 <h3>{{ $product->name }}</h3>\n  39|                 <p>${{ $product->price }}</p>\n  40|             </div>\n >41|         @empty\n  42|             <p class=\"no-results\">No products found</p>\n  43|         @endforelse\n  44|     </div>\n"
+      },
+      "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
+        "idempotent": true,
+        "pass1Length": 1531,
+        "pass2Length": 1531
+      },
+      "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
+        "idempotent": true,
+        "pass1Length": 2002,
+        "pass2Length": 2002
+      },
+      "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
+        "idempotent": true,
+        "pass1Length": 2250,
+        "pass2Length": 2250
+      },
+      "synthetic/03-alpine/data-reactivity/02-x-init": {
+        "idempotent": true,
+        "pass1Length": 3650,
+        "pass2Length": 3650
+      },
+      "synthetic/03-alpine/data-reactivity/03-x-effect": {
+        "idempotent": true,
+        "pass1Length": 4318,
+        "pass2Length": 4318
+      },
+      "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
+        "idempotent": true,
+        "pass1Length": 6979,
+        "pass2Length": 6979
+      },
+      "synthetic/03-alpine/data-reactivity/05-alpine-store": {
+        "idempotent": true,
+        "pass1Length": 8661,
+        "pass2Length": 8661
+      },
+      "synthetic/03-alpine/events/01-x-on-basic": {
+        "idempotent": true,
+        "pass1Length": 1061,
+        "pass2Length": 1061
+      },
+      "synthetic/03-alpine/events/02-x-on-modifiers": {
+        "idempotent": true,
+        "pass1Length": 1494,
+        "pass2Length": 1494
+      },
+      "synthetic/03-alpine/events/03-x-on-keyboard": {
+        "idempotent": true,
+        "pass1Length": 1642,
+        "pass2Length": 1642
+      },
+      "synthetic/04-combinations/level-1-simple/01-if-echo": {
+        "idempotent": true,
+        "pass1Length": 1920,
+        "pass2Length": 1920
+      },
+      "synthetic/04-combinations/level-1-simple/02-foreach-component": {
+        "idempotent": true,
+        "pass1Length": 1317,
+        "pass2Length": 1317
+      },
+      "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
+        "idempotent": true,
+        "pass1Length": 1389,
+        "pass2Length": 1389
+      },
+      "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
+        "idempotent": true,
+        "pass1Length": 1895,
+        "pass2Length": 1895
+      },
+      "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
+        "idempotent": true,
+        "pass1Length": 3827,
+        "pass2Length": 3827
+      },
+      "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
+        "error": "Unpaired condition control structure\n\n  63|                         <p>{{ $notification->message }}</p>\n  64|                     </div>\n  65|                 </div>\n >66|             @empty\n  67|                 <div class=\"empty-state\" x-show=\"BwYPbIl6MUB\">\n  68|                     <p>No read notifications.</p>\n  69|                 </div>\n"
+      },
+      "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
+        "idempotent": true,
+        "pass1Length": 2408,
+        "pass2Length": 2408
+      },
+      "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
+        "idempotent": true,
+        "pass1Length": 3169,
+        "pass2Length": 3169
+      },
+      "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
+        "idempotent": true,
+        "pass1Length": 2474,
+        "pass2Length": 2474
+      },
+      "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
+        "idempotent": true,
+        "pass1Length": 3536,
+        "pass2Length": 3536
+      },
+      "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
+        "idempotent": true,
+        "pass1Length": 2600,
+        "pass2Length": 2600
+      },
+      "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
+        "idempotent": true,
+        "pass1Length": 2826,
+        "pass2Length": 2826
+      },
+      "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
+        "error": "Unpaired condition control structure\n\n  83|                     </div>\n  84|                 </div>\n  85|             </div>\n >86|         @empty\n  87|             <div class=\"empty-state text-center py-12\">\n  88|                 <p class=\"text-gray-500\">No notifications</p>\n  89|                 <p class=\"text-sm text-gray-400 mt-2\">You're all caught up!</p>\n"
+      },
+      "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
+        "idempotent": true,
+        "pass1Length": 3850,
+        "pass2Length": 3850
+      },
+      "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
+        "idempotent": true,
+        "pass1Length": 3931,
+        "pass2Length": 3931
+      },
+      "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
+        "idempotent": true,
+        "pass1Length": 4184,
+        "pass2Length": 4184
+      },
+      "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
+        "idempotent": true,
+        "pass1Length": 5303,
+        "pass2Length": 5303
+      },
+      "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
+        "idempotent": true,
+        "pass1Length": 5973,
+        "pass2Length": 5973
+      },
+      "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
+        "idempotent": true,
+        "pass1Length": 7841,
+        "pass2Length": 7841
+      },
+      "synthetic/04-combinations/level-3-complex/02-data-table": {
+        "error": "Unpaired condition control structure\n\n  151|                             <button wire:click=\"deleteUser({{ $user->id }})\" class=\"text-red-600 hover:text-red-900\">Delete</button>\n  152|                         </td>\n  153|                     </tr>\n >154|                 @empty\n  155|                     <tr>\n  156|                         <td colspan=\"7\" class=\"px-6 py-12 text-center\">\n  157|                             <svg class=\"mx-auto h-12 w-12 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">\n"
+      },
+      "synthetic/04-combinations/level-3-complex/03-modal-form": {
+        "idempotent": true,
+        "pass1Length": 15111,
+        "pass2Length": 15111
+      },
+      "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
+        "error": "Unpaired condition control structure\n\n  194| \n  195|                 <div class=\"grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6\">\n  196|                     {{-- Recent Orders --}}\n >197|                     @can('view-orders')\n  198|                         <div class=\"lg:col-span-2 bg-white rounded-lg shadow-md\">\n  199|                             <div class=\"px-6 py-4 border-b border-gray-200 flex items-center justify-between\">\n  200|                                 <h2 class=\"text-lg font-semibold\">Recent Orders</h2>\n"
+      },
+      "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
+        "idempotent": true,
+        "pass1Length": 35032,
+        "pass2Length": 35032
+      },
+      "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
+        "idempotent": true,
+        "pass1Length": 2079,
+        "pass2Length": 2079
+      },
+      "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
+        "idempotent": false,
+        "pass1Length": 1769,
+        "pass2Length": 1857,
+        "diffAt": 479,
+        "pass1Snippet": "@verbatim\n          <div class=\"code-exa",
+        "pass2Snippet": "@verbatim\n              <div class=\"code"
+      },
+      "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
+        "idempotent": true,
+        "pass1Length": 4348,
+        "pass2Length": 4348
+      },
+      "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
+        "idempotent": true,
+        "pass1Length": 3632,
+        "pass2Length": 3632
+      },
+      "valid/alpine_js": {
+        "idempotent": true,
+        "pass1Length": 214,
+        "pass2Length": 214
+      },
+      "valid/components": {
+        "idempotent": true,
+        "pass1Length": 201,
+        "pass2Length": 201
+      },
+      "valid/control_structures": {
+        "idempotent": true,
+        "pass1Length": 350,
+        "pass2Length": 350
+      },
+      "valid/livewire": {
+        "idempotent": true,
+        "pass1Length": 210,
+        "pass2Length": 210
+      },
+      "valid/nested_directives": {
+        "error": "worker crashed"
+      },
+      "valid/simple_echo": {
+        "idempotent": true,
+        "pass1Length": 53,
+        "pass2Length": 53
+      },
+      "valid/template_inheritance": {
+        "idempotent": true,
+        "pass1Length": 314,
+        "pass2Length": 314
+      }
+    },
+    "C": {
+      "alpine/01-billing": {
+        "idempotent": true,
+        "pass1Length": 4882,
+        "pass2Length": 4882
+      },
+      "alpine/02-faq": {
+        "idempotent": true,
+        "pass1Length": 1851,
+        "pass2Length": 1851
+      },
+      "components/01-form": {
+        "idempotent": true,
+        "pass1Length": 968,
+        "pass2Length": 968
+      },
+      "components/02-billing": {
+        "idempotent": true,
+        "pass1Length": 7123,
+        "pass2Length": 7123
+      },
+      "edge_cases/alpine_shorthand": {
+        "idempotent": true,
+        "pass1Length": 217,
+        "pass2Length": 217
+      },
+      "edge_cases/blade_comments": {
+        "idempotent": true,
+        "pass1Length": 95,
+        "pass2Length": 95
+      },
+      "edge_cases/crlf_line_endings": {
+        "idempotent": true,
+        "pass1Length": 48,
+        "pass2Length": 48
+      },
+      "edge_cases/email_addresses": {
+        "idempotent": true,
+        "pass1Length": 71,
+        "pass2Length": 71
+      },
+      "edge_cases/ternary_or": {
+        "idempotent": true,
+        "pass1Length": 94,
+        "pass2Length": 94
+      },
+      "edge_cases/utf8_content": {
+        "idempotent": true,
+        "pass1Length": 53,
+        "pass2Length": 53
+      },
+      "edge_cases/verbatim_blocks": {
+        "error": "Parse Error : syntax error, unexpected 'literal' (T_STRING), expecting ';' on line 1\n> 1 | <?php echo Also literal ?>\n    |                ^\n> 1 | @verbatim\n    |          ^\n  2 |     {{ This should not be parsed }}\n  3 |     {!! Also literal !!}\n  4 |     @if($test)"
+      },
+      "error/malformed-dashboard": {
+        "idempotent": true,
+        "pass1Length": 335,
+        "pass2Length": 335
+      },
+      "format/01-basic-messy": {
+        "idempotent": true,
+        "pass1Length": 108,
+        "pass2Length": 108
+      },
+      "format/02-indentation-chaos": {
+        "idempotent": true,
+        "pass1Length": 165,
+        "pass2Length": 165
+      },
+      "format/03-whitespace-hell": {
+        "idempotent": true,
+        "pass1Length": 31,
+        "pass2Length": 31
+      },
+      "format/04-nested-directives-ugly": {
+        "idempotent": true,
+        "pass1Length": 137,
+        "pass2Length": 137
+      },
+      "format/05-components-messy": {
+        "idempotent": true,
+        "pass1Length": 108,
+        "pass2Length": 108
+      },
+      "format/06-mixed-content": {
+        "idempotent": true,
+        "pass1Length": 210,
+        "pass2Length": 210
+      },
+      "format/07-real-world-mess": {
+        "idempotent": true,
+        "pass1Length": 280,
+        "pass2Length": 280
+      },
+      "format/08-edge-cases": {
+        "idempotent": true,
+        "pass1Length": 103,
+        "pass2Length": 103
+      },
+      "large/01-pagination": {
+        "idempotent": true,
+        "pass1Length": 8000,
+        "pass2Length": 8000
+      },
+      "legacy/laravel4-master-layout": {
+        "idempotent": true,
+        "pass1Length": 1128,
+        "pass2Length": 1128
+      },
+      "legacy/laravel5-auth-login": {
+        "idempotent": true,
+        "pass1Length": 2862,
+        "pass2Length": 2862
+      },
+      "legacy/laravel5-auth-register": {
+        "idempotent": true,
+        "pass1Length": 3101,
+        "pass2Length": 3101
+      },
+      "legacy/section-with-overwrite": {
+        "idempotent": true,
+        "pass1Length": 1183,
+        "pass2Length": 1183
+      },
+      "livewire/01-layout": {
+        "idempotent": true,
+        "pass1Length": 1564,
+        "pass2Length": 1564
+      },
+      "livewire/02-examples": {
+        "idempotent": true,
+        "pass1Length": 1486,
+        "pass2Length": 1486
+      },
+      "livewire/03-dashboard-page": {
+        "idempotent": true,
+        "pass1Length": 4303,
+        "pass2Length": 4303
+      },
+      "medium/01-tooltip": {
+        "idempotent": true,
+        "pass1Length": 486,
+        "pass2Length": 486
+      },
+      "medium/02-select-button": {
+        "idempotent": true,
+        "pass1Length": 1675,
+        "pass2Length": 1675
+      },
+      "small/01-checkbox": {
+        "idempotent": true,
+        "pass1Length": 35,
+        "pass2Length": 35
+      },
+      "small/02-footer": {
+        "idempotent": true,
+        "pass1Length": 324,
+        "pass2Length": 324
+      },
+      "synthetic/01-blade-directives/auth/01-auth-guest": {
+        "idempotent": true,
+        "pass1Length": 1526,
+        "pass2Length": 1526
+      },
+      "synthetic/01-blade-directives/auth/02-can-cannot": {
+        "idempotent": true,
+        "pass1Length": 1902,
+        "pass2Length": 1902
+      },
+      "synthetic/01-blade-directives/components/01-component-basic": {
+        "idempotent": true,
+        "pass1Length": 1282,
+        "pass2Length": 1282
+      },
+      "synthetic/01-blade-directives/components/02-component-props": {
+        "idempotent": true,
+        "pass1Length": 1755,
+        "pass2Length": 1755
+      },
+      "synthetic/01-blade-directives/components/03-component-slots": {
+        "idempotent": true,
+        "pass1Length": 2028,
+        "pass2Length": 2028
+      },
+      "synthetic/01-blade-directives/components/04-component-attributes": {
+        "idempotent": true,
+        "pass1Length": 2520,
+        "pass2Length": 2520
+      },
+      "synthetic/01-blade-directives/components/05-dynamic-component": {
+        "idempotent": true,
+        "pass1Length": 2434,
+        "pass2Length": 2434
+      },
+      "synthetic/01-blade-directives/control-structures/01-if-basic": {
+        "idempotent": true,
+        "pass1Length": 1388,
+        "pass2Length": 1388
+      },
+      "synthetic/01-blade-directives/control-structures/02-unless": {
+        "idempotent": true,
+        "pass1Length": 1632,
+        "pass2Length": 1632
+      },
+      "synthetic/01-blade-directives/control-structures/03-switch-case": {
+        "idempotent": true,
+        "pass1Length": 1503,
+        "pass2Length": 1503
+      },
+      "synthetic/01-blade-directives/control-structures/04-isset-empty": {
+        "idempotent": true,
+        "pass1Length": 1655,
+        "pass2Length": 1655
+      },
+      "synthetic/01-blade-directives/control-structures/05-if-nested": {
+        "idempotent": true,
+        "pass1Length": 2310,
+        "pass2Length": 2310
+      },
+      "synthetic/01-blade-directives/forms/01-csrf-method": {
+        "idempotent": true,
+        "pass1Length": 1750,
+        "pass2Length": 1750
+      },
+      "synthetic/01-blade-directives/includes/01-include-basic": {
+        "idempotent": true,
+        "pass1Length": 1239,
+        "pass2Length": 1239
+      },
+      "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
+        "idempotent": true,
+        "pass1Length": 1566,
+        "pass2Length": 1566
+      },
+      "synthetic/01-blade-directives/includes/03-include-first": {
+        "idempotent": true,
+        "pass1Length": 1597,
+        "pass2Length": 1597
+      },
+      "synthetic/01-blade-directives/includes/04-each": {
+        "idempotent": true,
+        "pass1Length": 1376,
+        "pass2Length": 1376
+      },
+      "synthetic/01-blade-directives/loops/01-foreach-basic": {
+        "idempotent": true,
+        "pass1Length": 1952,
+        "pass2Length": 1952
+      },
+      "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
+        "idempotent": true,
+        "pass1Length": 2484,
+        "pass2Length": 2484
+      },
+      "synthetic/01-blade-directives/loops/03-forelse": {
+        "idempotent": true,
+        "pass1Length": 2896,
+        "pass2Length": 2896
+      },
+      "synthetic/01-blade-directives/loops/04-for": {
+        "idempotent": true,
+        "pass1Length": 2647,
+        "pass2Length": 2647
+      },
+      "synthetic/01-blade-directives/loops/05-while": {
+        "idempotent": true,
+        "pass1Length": 2224,
+        "pass2Length": 2224
+      },
+      "synthetic/01-blade-directives/loops/06-loop-control": {
+        "idempotent": true,
+        "pass1Length": 3306,
+        "pass2Length": 3306
+      },
+      "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
+        "idempotent": true,
+        "pass1Length": 1080,
+        "pass2Length": 1080
+      },
+      "synthetic/01-blade-directives/stacks/02-once": {
+        "idempotent": true,
+        "pass1Length": 1078,
+        "pass2Length": 1078
+      },
+      "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
+        "idempotent": true,
+        "pass1Length": 3349,
+        "pass2Length": 3349
+      },
+      "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
+        "idempotent": true,
+        "pass1Length": 4372,
+        "pass2Length": 4372
+      },
+      "synthetic/01-blade-directives/template-inheritance/03-section-show": {
+        "idempotent": true,
+        "pass1Length": 6888,
+        "pass2Length": 6888
+      },
+      "synthetic/02-livewire/actions/01-wire-click": {
+        "idempotent": true,
+        "pass1Length": 1758,
+        "pass2Length": 1758
+      },
+      "synthetic/02-livewire/actions/02-wire-submit": {
+        "idempotent": true,
+        "pass1Length": 2268,
+        "pass2Length": 2268
+      },
+      "synthetic/02-livewire/actions/03-wire-keydown": {
+        "idempotent": true,
+        "pass1Length": 2188,
+        "pass2Length": 2188
+      },
+      "synthetic/02-livewire/actions/04-event-modifiers": {
+        "idempotent": true,
+        "pass1Length": 2660,
+        "pass2Length": 2660
+      },
+      "synthetic/02-livewire/data-binding/01-wire-model-basic": {
+        "idempotent": true,
+        "pass1Length": 1778,
+        "pass2Length": 1778
+      },
+      "synthetic/02-livewire/data-binding/02-wire-model-live": {
+        "idempotent": true,
+        "pass1Length": 1397,
+        "pass2Length": 1397
+      },
+      "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
+        "idempotent": true,
+        "pass1Length": 1350,
+        "pass2Length": 1350
+      },
+      "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
+        "idempotent": true,
+        "pass1Length": 1994,
+        "pass2Length": 1994
+      },
+      "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
+        "idempotent": true,
+        "pass1Length": 1969,
+        "pass2Length": 1969
+      },
+      "synthetic/03-alpine/data-reactivity/02-x-init": {
+        "idempotent": true,
+        "pass1Length": 3095,
+        "pass2Length": 3095
+      },
+      "synthetic/03-alpine/data-reactivity/03-x-effect": {
+        "idempotent": true,
+        "pass1Length": 3878,
+        "pass2Length": 3878
+      },
+      "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
+        "idempotent": true,
+        "pass1Length": 6252,
+        "pass2Length": 6252
+      },
+      "synthetic/03-alpine/data-reactivity/05-alpine-store": {
+        "idempotent": true,
+        "pass1Length": 8117,
+        "pass2Length": 8117
+      },
+      "synthetic/03-alpine/events/01-x-on-basic": {
+        "idempotent": true,
+        "pass1Length": 1065,
+        "pass2Length": 1065
+      },
+      "synthetic/03-alpine/events/02-x-on-modifiers": {
+        "idempotent": true,
+        "pass1Length": 1462,
+        "pass2Length": 1462
+      },
+      "synthetic/03-alpine/events/03-x-on-keyboard": {
+        "idempotent": true,
+        "pass1Length": 1524,
+        "pass2Length": 1524
+      },
+      "synthetic/04-combinations/level-1-simple/01-if-echo": {
+        "idempotent": true,
+        "pass1Length": 1741,
+        "pass2Length": 1741
+      },
+      "synthetic/04-combinations/level-1-simple/02-foreach-component": {
+        "idempotent": true,
+        "pass1Length": 1225,
+        "pass2Length": 1225
+      },
+      "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
+        "idempotent": true,
+        "pass1Length": 1585,
+        "pass2Length": 1585
+      },
+      "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
+        "idempotent": true,
+        "pass1Length": 1748,
+        "pass2Length": 1748
+      },
+      "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
+        "idempotent": true,
+        "pass1Length": 3786,
+        "pass2Length": 3786
+      },
+      "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
+        "idempotent": true,
+        "pass1Length": 2719,
+        "pass2Length": 2719
+      },
+      "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
+        "idempotent": true,
+        "pass1Length": 2369,
+        "pass2Length": 2369
+      },
+      "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
+        "idempotent": true,
+        "pass1Length": 2956,
+        "pass2Length": 2956
+      },
+      "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
+        "idempotent": true,
+        "pass1Length": 2218,
+        "pass2Length": 2218
+      },
+      "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
+        "idempotent": true,
+        "pass1Length": 2976,
+        "pass2Length": 2976
+      },
+      "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
+        "idempotent": true,
+        "pass1Length": 2527,
+        "pass2Length": 2527
+      },
+      "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
+        "idempotent": true,
+        "pass1Length": 2704,
+        "pass2Length": 2704
+      },
+      "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
+        "idempotent": true,
+        "pass1Length": 3675,
+        "pass2Length": 3675
+      },
+      "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
+        "idempotent": true,
+        "pass1Length": 3659,
+        "pass2Length": 3659
+      },
+      "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
+        "idempotent": true,
+        "pass1Length": 4227,
+        "pass2Length": 4227
+      },
+      "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
+        "idempotent": true,
+        "pass1Length": 4065,
+        "pass2Length": 4065
+      },
+      "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
+        "idempotent": true,
+        "pass1Length": 5091,
+        "pass2Length": 5091
+      },
+      "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
+        "idempotent": true,
+        "pass1Length": 5857,
+        "pass2Length": 5857
+      },
+      "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
+        "idempotent": true,
+        "pass1Length": 6834,
+        "pass2Length": 6834
+      },
+      "synthetic/04-combinations/level-3-complex/02-data-table": {
+        "idempotent": true,
+        "pass1Length": 12153,
+        "pass2Length": 12153
+      },
+      "synthetic/04-combinations/level-3-complex/03-modal-form": {
+        "idempotent": true,
+        "pass1Length": 13037,
+        "pass2Length": 13037
+      },
+      "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
+        "idempotent": true,
+        "pass1Length": 18849,
+        "pass2Length": 18849
+      },
+      "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
+        "idempotent": false,
+        "pass1Length": 29071,
+        "pass2Length": 29291,
+        "diffAt": 3518,
+        "pass1Snippet": "           :class=\"{ 'text-blue-600': cu",
+        "pass2Snippet": "           :class=\"{\n                   "
+      },
+      "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
+        "idempotent": true,
+        "pass1Length": 1863,
+        "pass2Length": 1863
+      },
+      "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
+        "idempotent": true,
+        "pass1Length": 1835,
+        "pass2Length": 1835
+      },
+      "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
+        "idempotent": true,
+        "pass1Length": 4146,
+        "pass2Length": 4146
+      },
+      "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
+        "idempotent": true,
+        "pass1Length": 3612,
+        "pass2Length": 3612
+      },
+      "valid/alpine_js": {
+        "idempotent": true,
+        "pass1Length": 214,
+        "pass2Length": 214
+      },
+      "valid/components": {
+        "idempotent": true,
+        "pass1Length": 201,
+        "pass2Length": 201
+      },
+      "valid/control_structures": {
+        "idempotent": true,
+        "pass1Length": 350,
+        "pass2Length": 350
+      },
+      "valid/livewire": {
+        "idempotent": true,
+        "pass1Length": 230,
+        "pass2Length": 230
+      },
+      "valid/nested_directives": {
+        "idempotent": true,
+        "pass1Length": 2054,
+        "pass2Length": 2054
+      },
+      "valid/simple_echo": {
+        "idempotent": true,
+        "pass1Length": 53,
+        "pass2Length": 53
+      },
+      "valid/template_inheritance": {
+        "idempotent": true,
+        "pass1Length": 314,
+        "pass2Length": 314
+      }
+    }
+  },
+  "generatedAt": "2026-02-25T21:38:26.056Z"
+}

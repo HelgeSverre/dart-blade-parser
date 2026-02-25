@@ -263,6 +263,16 @@ function killWorker(workers, key) {
   }
 }
 
+// Ensure a worker is alive, respawning if it crashed.
+async function ensureWorker(workers, plugin) {
+  const child = workers.get(plugin.short);
+  if (child && !child.killed && child.connected) return child;
+  // Worker is dead — respawn it
+  const newChild = await spawnWorker(plugin);
+  workers.set(plugin.short, newChild);
+  return newChild;
+}
+
 // ── Performance benchmark (streaming) ──
 async function benchPerformance(workers) {
   console.log(bold('PERFORMANCE') + dim(` (avg ms over ${TIMED_RUNS} runs, ${WARMUP_RUNS} warmup)`));
@@ -296,8 +306,8 @@ async function benchPerformance(workers) {
     const avgs = {};
 
     for (const plugin of activePlugins) {
-      const child = workers.get(plugin.short);
-      if (!child || child.killed || !child.connected) {
+      const child = await ensureWorker(workers, plugin);
+      if (!child) {
         avgs[plugin.short] = null;
         continue;
       }
@@ -408,8 +418,8 @@ async function benchIdempotency(workers) {
     const row = [fixture.name];
 
     for (const plugin of activePlugins) {
-      const child = workers.get(plugin.short);
-      if (!child || child.killed || !child.connected) {
+      const child = await ensureWorker(workers, plugin);
+      if (!child) {
         row.push(dim('--'));
         continue;
       }
