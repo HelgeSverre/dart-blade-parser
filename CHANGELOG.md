@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **PHP string interpolation in echo statements:** Fixed brace counting in lexer so `{$var}` inside double-quoted strings no longer breaks echo parsing (e.g., `{{ Arr::get($foo, "key.{$bar}") }}`)
+- **@props comment handling:** Replaced regex-based `@props` parsing with `PhpArrayParser`, a recursive descent parser that correctly handles PHP comments, string escapes, nested arrays, and all literal value types. Commented-out props no longer produce false positives
+- **Required prop detection:** Standalone entries in `@props` (e.g., `'message'` without `=>`) are now correctly identified as required props
+
 ### Added
 
 - **Unified `blade` CLI:** Consolidated `blade_parser` and `blade_formatter` into a single ergonomic `blade` CLI with subcommands
@@ -81,7 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration file renamed from `.blade-format.json` to `.blade.json` for consistency
 - All justfile commands updated to use new CLI structure
 - All documentation updated with new command examples
-- Test suite expanded from 792 to 1235 tests (all passing)
+- Test suite expanded from 792 to 1343 tests (all passing)
 
 ### Removed
 

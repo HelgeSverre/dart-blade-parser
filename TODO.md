@@ -48,6 +48,20 @@ This document catalogs all edge cases, limitations, and known issues in the dart
 **Files:** `lib/src/lexer/lexer.dart` (lines 313-333)
 **Fixed:** 2025-10-10
 
+### 8. PHP String Interpolation in Echo Statements (FIXED)
+
+**Issue:** Echo statements containing `{$var}` inside double-quoted strings caused lexer errors (e.g., `{{ Arr::get($foo, "key.{$bar}") }}`). The brace counting only decremented on `}}`, so single `}` from PHP interpolation was never matched.
+**Status:** **FIXED**. Single `}` now decrements braceCount when > 0; `}}` only closes echo at braceCount == 0.
+**Files:** `lib/src/lexer/lexer.dart`
+**Fixed:** 2025-02-25
+
+### 9. Regex @props Parsing False Positives (FIXED)
+
+**Issue:** Regex-based `@props` parsing extracted commented-out props as real props and missed required props (standalone entries without `=>`).
+**Status:** **FIXED**. Replaced with `PhpArrayParser`, a recursive descent parser that handles comments, string escapes, nested arrays, and all PHP literal value types.
+**Files:** `lib/src/docs/php_array_parser.dart`, `lib/src/docs/component_docs.dart`
+**Fixed:** 2025-02-25
+
 ---
 
 ## 🟠 HIGH - Important for Correctness
@@ -308,12 +322,12 @@ _(No medium priority issues at this time)_
 
 **Test Suite Statistics:**
 
-- 📊 **Total tests:** 1267
-- ✅ **Passing:** 1267 (100%)
+- 📊 **Total tests:** 1343
+- ✅ **Passing:** 1343 (100%)
 - Test breakdown:
-  - Parser/Lexer tests: ~600
+  - Parser/Lexer tests: ~608 (includes echo interpolation tests)
   - Formatter tests: ~508 (edge cases, regression, Livewire, performance, wrapping, sorting, closing style, self-closing, ignore comments, stress, chaos, idempotency, EditorConfig)
-  - Docs tests: ~14 (component docs generation)
+  - Docs tests: ~82 (component docs generation + PHP array parser)
   - Integration tests: ~100
   - Performance benchmarks: ~40
 
@@ -345,6 +359,5 @@ _(No medium priority issues at this time)_
 
 - ⚠️ True streaming parser not implemented (placeholder only)
 - ⚠️ PHP expression formatting not implemented
-- ⚠️ **Lexer bug with PHP string interpolation:** Echo statements containing `{$var}` inside double-quoted strings cause lexer errors (e.g., `{{ Arr::get($foo, "key.{$bar}") }}`). This can cause the parser to hang on files with this pattern.
 
 **Production Readiness:** ✅ **PRODUCTION READY**
