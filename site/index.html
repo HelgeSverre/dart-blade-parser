@@ -1562,8 +1562,19 @@ npx prettier --check "**/*.blade.php"</pre>
         "format/06-mixed-content",
       ];
 
+      const fixtureNames = {
+        "large/01-pagination": "Pagination (large)",
+        "alpine/01-billing": "Alpine Billing",
+        "components/02-billing": "Component Billing",
+        "legacy/laravel5-auth-login": "Laravel 5 Auth Login",
+        "livewire/01-layout": "Livewire Layout",
+        "error/malformed-dashboard": "Malformed Dashboard",
+        "format/07-real-world-mess": "Real-World Mess",
+        "format/06-mixed-content": "Mixed Content",
+      };
+
       function displayName(key) {
-        return key.split("/").pop().replace(/^\d+-/, "").replace(/[-_]/g, " ");
+        return fixtureNames[key] || key.split("/").pop().replace(/^\d+-/, "").replace(/[-_]/g, " ");
       }
 
       function renderChart(data, avgA, avgB, avgC) {
