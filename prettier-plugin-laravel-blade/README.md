@@ -19,7 +19,15 @@ npm install --save-dev prettier-plugin-laravel-blade prettier
 
 ## Usage
 
-The plugin automatically formats `.blade.php` files:
+Add the plugin to your `.prettierrc`:
+
+```json
+{
+  "plugins": ["prettier-plugin-laravel-blade"]
+}
+```
+
+Then format your Blade templates:
 
 ```bash
 # Format all Blade files
@@ -29,7 +37,7 @@ prettier --write "**/*.blade.php"
 prettier --check "**/*.blade.php"
 ```
 
-Or configure in `.prettierrc`:
+### Full configuration example
 
 ```json
 {

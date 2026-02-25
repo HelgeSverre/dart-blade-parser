@@ -14,10 +14,11 @@ Unlike simple regex-based approaches, this parser uses an iterative state machin
 
 ## Prettier Plugin
 
-This parser powers a Prettier plugin for Blade templates. Install it directly from npm:
+This parser powers a Prettier plugin for Blade templates:
 
 ```bash
 npm install --save-dev prettier-plugin-laravel-blade prettier
+echo '{ "plugins": ["prettier-plugin-laravel-blade"] }' > .prettierrc
 npx prettier --write "**/*.blade.php"
 ```
 

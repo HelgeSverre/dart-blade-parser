@@ -463,7 +463,7 @@ footer a{color:var(--text-dim)}
 <!-- CTA -->
 <section class="cta">
   <h2>Try it now</h2>
-  <p>Works with Prettier 3.x. Zero configuration needed.</p>
+  <p>Works with Prettier 3.x. Just add the plugin to your .prettierrc.</p>
   <div>
     <a href="formatter.html" class="cta-btn">Open Live Formatter</a>
     <a href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/prettier-plugin-laravel-blade" class="cta-btn secondary" target="_blank">View Source</a>
@@ -471,6 +471,9 @@ footer a{color:var(--text-dim)}
   <div class="install-block">
 <pre><span style="color:var(--text-muted)"># Install</span>
 npm install --save-dev prettier-plugin-laravel-blade prettier
+
+<span style="color:var(--text-muted)"># Add to .prettierrc</span>
+echo '{ "plugins": ["prettier-plugin-laravel-blade"] }' > .prettierrc
 
 <span style="color:var(--text-muted)"># Format</span>
 npx prettier --write "**/*.blade.php"
