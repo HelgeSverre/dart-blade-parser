@@ -7,13 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-02-25
+
 ### Added
 - **Slot name style** (`slotNameStyle`): Control how slot names are rendered — `colon` (`<x-slot:header>`), `attribute` (`<x-slot name="header">`), or `preserve` original syntax
 - **Slot spacing** (`slotSpacing`): Control blank lines around slot elements — `after` (default), `before`, `around`, or `none`
+- `@else` branch support inside `@empty` and `@isset` directives
 - Livewire dashboard page fixture and playground example
 
 ### Fixed
 - `<x-slot name="header">` no longer produces `<x-slot:header name="header">` (duplicate name attribute)
+- `@empty` inside `@forelse` is now correctly treated as an intermediate directive (no `@endempty` emitted)
+- Standalone `@empty($var)` blocks correctly emit `@endempty` closing tag
+- Unknown/custom directives are now preserved as text instead of being dropped
+
+### Prettier Plugin (v0.3.0)
+- Rebuilt with latest parser fixes — directives like `@inertia()` are no longer dropped
+- Fixed site deployment to always use fresh `blade-formatter.js` build
 
 ## [1.0.0] - 2025-02-25
 
