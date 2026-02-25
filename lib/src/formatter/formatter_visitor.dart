@@ -565,7 +565,6 @@ class FormatterVisitor implements AstVisitor<String> {
     final shouldWrap = _shouldWrapAttributes(
       node.tagName,
       attributes,
-      isComponent: false,
       isSelfClosing: isVoid || shouldSelfClose,
     );
 
@@ -596,7 +595,7 @@ class FormatterVisitor implements AstVisitor<String> {
       // BUT: if there are newlines in whitespace between meaningful children, don't inline
       var canKeepInline = meaningfulChildren.isNotEmpty &&
           meaningfulChildren.every((child) =>
-              _isSimpleTextNode(child) || _isSimpleEchoNode(child));
+              _isSimpleTextNode(child) || _isSimpleEchoNode(child),);
 
       // Check for newlines between meaningful children
       if (canKeepInline && meaningfulChildren.length > 1) {
@@ -888,7 +887,6 @@ class FormatterVisitor implements AstVisitor<String> {
       'slot:${node.name}',
       attributes,
       isComponent: true,
-      isSelfClosing: false,
     );
 
     _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');

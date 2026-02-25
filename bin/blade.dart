@@ -675,7 +675,7 @@ Future<FormatterConfig> _loadConfig(
   final configPath = argResults['config'] as String?;
 
   // Start with defaults
-  var configMap = <String, dynamic>{};
+  final configMap = <String, dynamic>{};
 
   // 1. Try to load EditorConfig settings first (lowest priority)
   if (sampleFilePath != null) {

@@ -50,7 +50,7 @@ class EditorConfig {
           sections.add(EditorConfigSection(
             pattern: currentPattern,
             properties: Map.from(currentProperties),
-          ));
+          ),);
         }
         currentPattern = line.substring(1, line.length - 1);
         currentProperties = {};
@@ -71,7 +71,7 @@ class EditorConfig {
       sections.add(EditorConfigSection(
         pattern: currentPattern,
         properties: Map.from(currentProperties),
-      ));
+      ),);
     }
 
     return EditorConfig(sections: sections, isRoot: isRoot);
