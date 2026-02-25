@@ -192,6 +192,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     value: '15-messy-components-slots',
                     child: Text('Messy Components & Slots'),
                   ),
+                  const PopupMenuItem(
+                    value: '16-livewire-dashboard-page',
+                    child: Text('Livewire Dashboard Page'),
+                  ),
                 ],
               ),
               IconButton(
