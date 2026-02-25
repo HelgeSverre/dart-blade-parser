@@ -1,240 +1,681 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>prettier-plugin-laravel-blade — Live Formatter</title>
-<meta name="description" content="Try the fastest Blade formatter live in your browser. Paste your .blade.php code and see instant formatting with 9 configurable options.">
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#050507">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>prettier-plugin-laravel-blade — Live Formatter</title>
+    <meta
+      name="description"
+      content="Try the fastest Blade formatter live in your browser. Paste your .blade.php code and see instant formatting with 9 configurable options."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#050507" />
 
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="Live Blade Formatter — prettier-plugin-laravel-blade">
-<meta property="og:description" content="Try the fastest Blade formatter live in your browser. Paste your .blade.php code and see instant formatting.">
-<meta property="og:image" content="og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:site_name" content="prettier-plugin-laravel-blade">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Live Blade Formatter — prettier-plugin-laravel-blade"
+    />
+    <meta
+      property="og:description"
+      content="Try the fastest Blade formatter live in your browser. Paste your .blade.php code and see instant formatting."
+    />
+    <meta property="og:image" content="og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="prettier-plugin-laravel-blade" />
 
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Live Blade Formatter — prettier-plugin-laravel-blade">
-<meta name="twitter:description" content="Try the fastest Blade formatter live in your browser. Sub-millisecond formatting powered by a real recursive-descent parser.">
-<meta name="twitter:image" content="og-image.png">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Live Blade Formatter — prettier-plugin-laravel-blade"
+    />
+    <meta
+      name="twitter:description"
+      content="Try the fastest Blade formatter live in your browser. Sub-millisecond formatting powered by a real recursive-descent parser."
+    />
+    <meta name="twitter:image" content="og-image.png" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="blade-syntax.css">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#050507;--surface:#0c0c10;--surface2:#111116;
-  --border:#1a1a22;--border-light:#252530;
-  --text:#d4d4dc;--text-dim:#6e6e7a;--text-muted:#44444e;
-  --accent:#b5f542;--accent-dim:rgba(181,245,66,.10);--accent-glow:rgba(181,245,66,.06);
-  --red:#f87171;
-  --font-ui:'Inter',system-ui,sans-serif;
-  --font-mono:'JetBrains Mono',monospace;
-  --radius:3px;
-}
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);font-family:var(--font-ui);-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.02;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat:repeat;background-size:256px}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="blade-syntax.css" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg: #050507;
+        --surface: #0c0c10;
+        --surface2: #111116;
+        --border: #1a1a22;
+        --border-light: #252530;
+        --text: #d4d4dc;
+        --text-dim: #6e6e7a;
+        --text-muted: #44444e;
+        --accent: #b5f542;
+        --accent-dim: rgba(181, 245, 66, 0.1);
+        --accent-glow: rgba(181, 245, 66, 0.06);
+        --red: #f87171;
+        --font-ui: "Inter", system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", monospace;
+        --radius: 3px;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-ui);
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.02;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 256px;
+      }
 
-/* Scrollbars */
-*{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-::-webkit-scrollbar{height:6px;width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
+      /* Scrollbars */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      ::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--border-light);
+      }
 
-/* LAYOUT */
-.app{display:grid;grid-template-rows:40px 1fr 28px;height:100vh}
+      /* LAYOUT */
+      .app {
+        display: grid;
+        grid-template-rows: 40px 1fr 28px;
+        height: 100vh;
+      }
 
-/* TOPBAR */
-.topbar{display:flex;align-items:center;gap:1rem;padding:0 12px;background:var(--surface);border-bottom:1px solid var(--border);font-size:.75rem;z-index:10}
-.topbar-brand{font-family:var(--font-mono);font-weight:700;font-size:.8rem;color:var(--text);letter-spacing:-.02em;white-space:nowrap}
-.topbar-brand span{color:var(--accent)}
-.topbar-sep{width:1px;height:16px;background:var(--border)}
-.topbar-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
-.topbar select{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:var(--radius);font-family:var(--font-ui);font-size:.72rem;cursor:pointer;outline:none}
-.topbar select:focus{border-color:var(--accent)}
-.topbar select option{background:var(--surface)}
-.btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text-dim);font-family:var(--font-ui);font-size:.72rem;cursor:pointer;transition:all .12s;white-space:nowrap}
-.btn:hover{border-color:var(--accent);color:var(--text)}
-.btn-accent{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
-.btn-accent:hover{background:rgba(181,245,66,.18)}
-.btn svg{width:12px;height:12px}
-.back-link{color:var(--text-muted);text-decoration:none;font-size:.72rem;transition:color .12s}
-.back-link:hover{color:var(--text)}
+      /* TOPBAR */
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0 12px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        font-size: 0.75rem;
+        z-index: 10;
+      }
+      .topbar-brand {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--text);
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+      }
+      .topbar-brand span {
+        color: var(--accent);
+      }
+      .topbar-sep {
+        width: 1px;
+        height: 16px;
+        background: var(--border);
+      }
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+      }
+      .topbar select {
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 4px 8px;
+        border-radius: var(--radius);
+        font-family: var(--font-ui);
+        font-size: 0.72rem;
+        cursor: pointer;
+        outline: none;
+      }
+      .topbar select:focus {
+        border-color: var(--accent);
+      }
+      .topbar select option {
+        background: var(--surface);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface2);
+        color: var(--text-dim);
+        font-family: var(--font-ui);
+        font-size: 0.72rem;
+        cursor: pointer;
+        transition: all 0.12s;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        border-color: var(--accent);
+        color: var(--text);
+      }
+      .btn-accent {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-dim);
+      }
+      .btn-accent:hover {
+        background: rgba(181, 245, 66, 0.18);
+      }
+      .btn svg {
+        width: 12px;
+        height: 12px;
+      }
+      .back-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.72rem;
+        transition: color 0.12s;
+      }
+      .back-link:hover {
+        color: var(--text);
+      }
 
-/* MAIN PANES */
-.panes{display:grid;grid-template-columns:1fr 1px 1fr;overflow:hidden;position:relative}
-.panes.settings-open{grid-template-columns:1fr 1px 1fr 260px}
-.divider{background:var(--border);cursor:col-resize;position:relative;z-index:2}
-.divider:hover{background:var(--accent)}
+      /* MAIN PANES */
+      .panes {
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr;
+        overflow: hidden;
+        position: relative;
+      }
+      .panes.settings-open {
+        grid-template-columns: 1fr 1px 1fr 260px;
+      }
+      .divider {
+        background: var(--border);
+        cursor: col-resize;
+        position: relative;
+        z-index: 2;
+      }
+      .divider:hover {
+        background: var(--accent);
+      }
 
-.pane{display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.pane-header{display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:28px;background:var(--surface);border-bottom:1px solid var(--border);font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);flex-shrink:0}
-.pane-header .dot{width:5px;height:5px;border-radius:50%;margin-right:6px;display:inline-block}
-.pane-header .dot-red{background:var(--red)}
-.pane-header .dot-green{background:var(--accent)}
+      .pane {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 0;
+      }
+      .pane-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 12px;
+        height: 28px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+      .pane-header .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        margin-right: 6px;
+        display: inline-block;
+      }
+      .pane-header .dot-red {
+        background: var(--red);
+      }
+      .pane-header .dot-green {
+        background: var(--accent);
+      }
 
-/* EDITOR with highlight overlay */
-.editor-wrap{flex:1;position:relative;overflow:hidden;min-height:0;background:var(--bg)}
-.editor-highlight,
-.editor-wrap textarea{
-  position:absolute;top:0;left:0;width:100%;height:100%;
-  padding:14px;font-family:var(--font-mono);font-size:13px;line-height:1.65;
-  tab-size:4;-moz-tab-size:4;white-space:pre-wrap;word-wrap:break-word;
-  border:none;margin:0;overflow:auto;
-}
-.editor-highlight{
-  pointer-events:none;color:var(--text);background:var(--bg);z-index:0;
-}
-.editor-wrap textarea{
-  color:transparent;caret-color:var(--accent);background:transparent;
-  outline:none;resize:none;z-index:1;
-  -webkit-text-fill-color:transparent;
-}
-.editor-wrap textarea::placeholder{color:var(--text-muted);-webkit-text-fill-color:var(--text-muted)}
-.editor-wrap textarea::selection{background:var(--accent);color:var(--bg);-webkit-text-fill-color:var(--bg)}
+      /* EDITOR with highlight overlay */
+      .editor-wrap {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        min-height: 0;
+        background: var(--bg);
+      }
+      .editor-highlight,
+      .editor-wrap textarea {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding: 14px;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        line-height: 1.65;
+        tab-size: 4;
+        -moz-tab-size: 4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        border: none;
+        margin: 0;
+        overflow: auto;
+      }
+      .editor-highlight {
+        pointer-events: none;
+        color: var(--text);
+        background: var(--bg);
+        z-index: 0;
+      }
+      .editor-wrap textarea {
+        color: transparent;
+        caret-color: var(--accent);
+        background: transparent;
+        outline: none;
+        resize: none;
+        z-index: 1;
+        -webkit-text-fill-color: transparent;
+      }
+      .editor-wrap textarea::placeholder {
+        color: var(--text-muted);
+        -webkit-text-fill-color: var(--text-muted);
+      }
+      .editor-wrap textarea::selection {
+        background: var(--accent);
+        color: var(--bg);
+        -webkit-text-fill-color: var(--bg);
+      }
 
-/* Output pane (read-only, just highlighted pre) */
-.output-wrap{flex:1;overflow:auto;background:var(--bg)}
-.output-wrap pre{padding:14px;font-family:var(--font-mono);font-size:13px;line-height:1.65;color:var(--text);white-space:pre;margin:0;min-height:100%}
-.output-wrap pre.error{color:var(--red);white-space:pre-wrap}
+      /* Output pane (read-only, just highlighted pre) */
+      .output-wrap {
+        flex: 1;
+        overflow: auto;
+        background: var(--bg);
+      }
+      .output-wrap pre {
+        padding: 14px;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        line-height: 1.65;
+        color: var(--text);
+        white-space: pre;
+        margin: 0;
+        min-height: 100%;
+      }
+      .output-wrap pre.error {
+        color: var(--red);
+        white-space: pre-wrap;
+      }
 
-/* SETTINGS PANEL */
-.settings{background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;display:none;flex-direction:column}
-.settings-open .settings{display:flex}
-.settings-section{padding:10px 12px;border-bottom:1px solid var(--border)}
-.settings-section h4{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px}
-.settings-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.settings-row label{font-size:.72rem;color:var(--text-dim)}
-.settings-row select,.settings-row input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px 6px;border-radius:var(--radius);font-family:var(--font-mono);font-size:.7rem;width:110px;outline:none}
-.settings-row select:focus,.settings-row input:focus{border-color:var(--accent)}
-.settings-row input[type=checkbox]{accent-color:var(--accent)}
+      /* SETTINGS PANEL */
+      .settings {
+        background: var(--surface);
+        border-left: 1px solid var(--border);
+        overflow-y: auto;
+        display: none;
+        flex-direction: column;
+      }
+      .settings-open .settings {
+        display: flex;
+      }
+      .settings-section {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .settings-section h4 {
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+      .settings-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      .settings-row label {
+        font-size: 0.72rem;
+        color: var(--text-dim);
+      }
+      .settings-row select,
+      .settings-row input[type="number"] {
+        background: var(--bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 3px 6px;
+        border-radius: var(--radius);
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        width: 110px;
+        outline: none;
+      }
+      .settings-row select:focus,
+      .settings-row input:focus {
+        border-color: var(--accent);
+      }
+      .settings-row input[type="checkbox"] {
+        accent-color: var(--accent);
+      }
 
-/* STATUS BAR */
-.statusbar{display:flex;align-items:center;gap:12px;padding:0 12px;background:var(--surface);border-top:1px solid var(--border);font-size:.65rem;color:var(--text-muted);font-family:var(--font-mono)}
-.statusbar .timing{color:var(--accent)}
-.statusbar .spacer{flex:1}
-.statusbar a{color:var(--text-muted);text-decoration:none}
-.statusbar a:hover{color:var(--text)}
+      /* STATUS BAR */
+      .statusbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+      .statusbar .timing {
+        color: var(--accent);
+      }
+      .statusbar .spacer {
+        flex: 1;
+      }
+      .statusbar a {
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+      .statusbar a:hover {
+        color: var(--text);
+      }
 
-/* LOADING */
-.loading-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:100;font-family:var(--font-mono);font-size:.85rem;color:var(--text-dim)}
-.loading-overlay.hidden{display:none}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.loading-overlay span{animation:blink 1.2s ease-in-out infinite}
-</style>
-</head>
-<body>
-<div class="app">
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <a href="index.html" class="back-link">← Site</a>
-    <div class="topbar-sep"></div>
-    <div class="topbar-brand"><span>blade</span>-formatter</div>
-    <div class="topbar-sep"></div>
-    <select id="examples" aria-label="Load example">
-      <option value="">Load example...</option>
-      <option value="basic">Basic @if/@else</option>
-      <option value="nested">Nested Directives</option>
-      <option value="components">Components &amp; Slots</option>
-      <option value="alpine">Alpine + Livewire</option>
-      <option value="form">Login Form</option>
-      <option value="kitchen">Kitchen Sink</option>
-      <option value="table">Table with @foreach</option>
-      <option value="dashboard">Dashboard Layout</option>
-    </select>
-    <div class="topbar-actions">
-      <select id="themeSelect" aria-label="Syntax theme">
-        <option value="muted-steel">Muted Steel</option>
-        <option value="classic">Classic</option>
-        <option value="ghost">Ghost Markup</option>
-        <option value="warm-fade">Warm Fade</option>
-        <option value="mono">Mono + Blade Pop</option>
-        <option value="dim-spectrum">Dim Spectrum</option>
-      </select>
-      <button class="btn btn-accent" id="formatBtn" title="Format (Ctrl+S)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V4M5 11l7-7 7 7"/></svg>
-        Format
-      </button>
-      <button class="btn" id="copyBtn" title="Copy output">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-        Copy
-      </button>
-      <button class="btn" id="settingsBtn" title="Toggle settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4m-9.2-5.8l2.8-2.8m12.8-4.8l2.8-2.8M1 12h4m14 0h4M4.2 4.2l2.8 2.8m9.2 9.2l2.8 2.8"/></svg>
-        Settings
-      </button>
-    </div>
-  </div>
+      /* LOADING */
+      .loading-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        z-index: 100;
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--text-dim);
+      }
+      .loading-overlay.hidden {
+        display: none;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .loading-overlay span {
+        animation: blink 1.2s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <a href="index.html" class="back-link">← Site</a>
+        <div class="topbar-sep"></div>
+        <div class="topbar-brand"><span>blade</span>-formatter</div>
+        <div class="topbar-sep"></div>
+        <select id="examples" aria-label="Load example">
+          <option value="">Load example...</option>
+          <option value="basic">Basic @if/@else</option>
+          <option value="nested">Nested Directives</option>
+          <option value="components">Components &amp; Slots</option>
+          <option value="alpine">Alpine + Livewire</option>
+          <option value="form">Login Form</option>
+          <option value="kitchen">Kitchen Sink</option>
+          <option value="table">Table with @foreach</option>
+          <option value="dashboard">Dashboard Layout</option>
+        </select>
+        <div class="topbar-actions">
+          <select id="themeSelect" aria-label="Syntax theme">
+            <option value="muted-steel">Muted Steel</option>
+            <option value="classic">Classic</option>
+            <option value="ghost">Ghost Markup</option>
+            <option value="warm-fade">Warm Fade</option>
+            <option value="mono">Mono + Blade Pop</option>
+            <option value="dim-spectrum">Dim Spectrum</option>
+          </select>
+          <button class="btn btn-accent" id="formatBtn" title="Format (Ctrl+S)">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 20V4M5 11l7-7 7 7" />
+            </svg>
+            Format
+          </button>
+          <button class="btn" id="copyBtn" title="Copy output">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+            </svg>
+            Copy
+          </button>
+          <button class="btn" id="settingsBtn" title="Toggle settings">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M12 1v4m0 14v4m-9.2-5.8l2.8-2.8m12.8-4.8l2.8-2.8M1 12h4m14 0h4M4.2 4.2l2.8 2.8m9.2 9.2l2.8 2.8"
+              />
+            </svg>
+            Settings
+          </button>
+        </div>
+      </div>
 
-  <!-- PANES -->
-  <div class="panes" id="panes">
-    <div class="loading-overlay" id="loadingOverlay"><span>Loading formatter...</span></div>
-    <!-- INPUT -->
-    <div class="pane">
-      <div class="pane-header"><span><span class="dot dot-red"></span>Input</span><span id="inputChars">0 chars</span></div>
-      <div class="editor-wrap">
-        <textarea id="input" placeholder="Paste your Blade template here..." spellcheck="false"></textarea>
-        <pre class="editor-highlight" id="inputHighlight" aria-hidden="true"></pre>
+      <!-- PANES -->
+      <div class="panes" id="panes">
+        <div class="loading-overlay" id="loadingOverlay">
+          <span>Loading formatter...</span>
+        </div>
+        <!-- INPUT -->
+        <div class="pane">
+          <div class="pane-header">
+            <span><span class="dot dot-red"></span>Input</span
+            ><span id="inputChars">0 chars</span>
+          </div>
+          <div class="editor-wrap">
+            <textarea
+              id="input"
+              placeholder="Paste your Blade template here..."
+              spellcheck="false"
+            ></textarea>
+            <pre
+              class="editor-highlight"
+              id="inputHighlight"
+              aria-hidden="true"
+            ></pre>
+          </div>
+        </div>
+        <div class="divider" id="divider"></div>
+        <!-- OUTPUT -->
+        <div class="pane">
+          <div class="pane-header">
+            <span><span class="dot dot-green"></span>Formatted</span
+            ><span id="outputChars">0 chars</span>
+          </div>
+          <div class="output-wrap"><pre id="output"></pre></div>
+        </div>
+        <!-- SETTINGS -->
+        <div class="settings" id="settingsPanel">
+          <div class="settings-section">
+            <h4>Standard</h4>
+            <div class="settings-row">
+              <label>Tab width</label
+              ><input
+                type="number"
+                id="opt-tabWidth"
+                value="4"
+                min="1"
+                max="12"
+              />
+            </div>
+            <div class="settings-row">
+              <label>Print width</label
+              ><input
+                type="number"
+                id="opt-printWidth"
+                value="120"
+                min="40"
+                max="300"
+              />
+            </div>
+            <div class="settings-row">
+              <label>Use tabs</label><input type="checkbox" id="opt-useTabs" />
+            </div>
+          </div>
+          <div class="settings-section">
+            <h4>Blade</h4>
+            <div class="settings-row">
+              <label>Quote style</label
+              ><select id="opt-quoteStyle">
+                <option value="preserve">preserve</option>
+                <option value="single">single</option>
+                <option value="double">double</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Directive spacing</label
+              ><select id="opt-directiveSpacing">
+                <option value="between_blocks">between_blocks</option>
+                <option value="none">none</option>
+                <option value="preserve">preserve</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Slot formatting</label
+              ><select id="opt-slotFormatting">
+                <option value="compact">compact</option>
+                <option value="block">block</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Slot name style</label
+              ><select id="opt-slotNameStyle">
+                <option value="colon">colon</option>
+                <option value="attribute">attribute</option>
+                <option value="preserve">preserve</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Slot spacing</label
+              ><select id="opt-slotSpacing">
+                <option value="after">after</option>
+                <option value="none">none</option>
+                <option value="before">before</option>
+                <option value="around">around</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Wrap attributes</label
+              ><select id="opt-wrapAttributes">
+                <option value="auto">auto</option>
+                <option value="always">always</option>
+                <option value="never">never</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Attribute sort</label
+              ><select id="opt-attributeSort">
+                <option value="none">none</option>
+                <option value="alphabetical">alphabetical</option>
+                <option value="by_type">by_type</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Closing bracket</label
+              ><select id="opt-closingBracketStyle">
+                <option value="same_line">same_line</option>
+                <option value="new_line">new_line</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Self-closing</label
+              ><select id="opt-selfClosingStyle">
+                <option value="preserve">preserve</option>
+                <option value="always">always</option>
+                <option value="never">never</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="statusbar">
+        <span id="status">Ready</span>
+        <span class="timing" id="timing"></span>
+        <span class="spacer"></span>
+        <a
+          href="https://github.com/HelgeSverre/dart-blade-parser"
+          target="_blank"
+          >Powered by dart-blade-parser</a
+        >
       </div>
     </div>
-    <div class="divider" id="divider"></div>
-    <!-- OUTPUT -->
-    <div class="pane">
-      <div class="pane-header"><span><span class="dot dot-green"></span>Formatted</span><span id="outputChars">0 chars</span></div>
-      <div class="output-wrap"><pre id="output"></pre></div>
-    </div>
-    <!-- SETTINGS -->
-    <div class="settings" id="settingsPanel">
-      <div class="settings-section">
-        <h4>Standard</h4>
-        <div class="settings-row"><label>Tab width</label><input type="number" id="opt-tabWidth" value="4" min="1" max="12"></div>
-        <div class="settings-row"><label>Print width</label><input type="number" id="opt-printWidth" value="120" min="40" max="300"></div>
-        <div class="settings-row"><label>Use tabs</label><input type="checkbox" id="opt-useTabs"></div>
-      </div>
-      <div class="settings-section">
-        <h4>Blade</h4>
-        <div class="settings-row"><label>Quote style</label><select id="opt-quoteStyle"><option value="preserve">preserve</option><option value="single">single</option><option value="double">double</option></select></div>
-        <div class="settings-row"><label>Directive spacing</label><select id="opt-directiveSpacing"><option value="between_blocks">between_blocks</option><option value="none">none</option><option value="preserve">preserve</option></select></div>
-        <div class="settings-row"><label>Slot formatting</label><select id="opt-slotFormatting"><option value="compact">compact</option><option value="block">block</option></select></div>
-        <div class="settings-row"><label>Slot name style</label><select id="opt-slotNameStyle"><option value="colon">colon</option><option value="attribute">attribute</option><option value="preserve">preserve</option></select></div>
-        <div class="settings-row"><label>Slot spacing</label><select id="opt-slotSpacing"><option value="after">after</option><option value="none">none</option><option value="before">before</option><option value="around">around</option></select></div>
-        <div class="settings-row"><label>Wrap attributes</label><select id="opt-wrapAttributes"><option value="auto">auto</option><option value="always">always</option><option value="never">never</option></select></div>
-        <div class="settings-row"><label>Attribute sort</label><select id="opt-attributeSort"><option value="none">none</option><option value="alphabetical">alphabetical</option><option value="by_type">by_type</option></select></div>
-        <div class="settings-row"><label>Closing bracket</label><select id="opt-closingBracketStyle"><option value="same_line">same_line</option><option value="new_line">new_line</option></select></div>
-        <div class="settings-row"><label>Self-closing</label><select id="opt-selfClosingStyle"><option value="preserve">preserve</option><option value="always">always</option><option value="never">never</option></select></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- STATUS BAR -->
-  <div class="statusbar">
-    <span id="status">Ready</span>
-    <span class="timing" id="timing"></span>
-    <span class="spacer"></span>
-    <a href="https://github.com/HelgeSverre/dart-blade-parser" target="_blank">Powered by dart-blade-parser</a>
-  </div>
-</div>
+    <script src="blade-highlight.js"></script>
+    <script src="dist/blade-formatter.js"></script>
+    <script>
+      const { highlightBlade } = BladeHighlight;
 
-<script src="blade-highlight.js"></script>
-<script src="dist/blade-formatter.js"></script>
-<script>
-const { highlightBlade } = BladeHighlight;
-
-// ── Examples (longer, more realistic) ──
-const examples = {
-  basic: `<div>@if($user)   <p>Hello,  {{$user->name}}</p>   @else   <p>Guest</p>   @endif</div>`,
-  nested: `<div class="content">
+      // ── Examples (longer, more realistic) ──
+      const examples = {
+        basic: `<div>@if($user)   <p>Hello,  {{$user->name}}</p>   @else   <p>Guest</p>   @endif</div>`,
+        nested: `<div class="content">
 @auth
 @foreach($sections as $section)
 <section id="section-{{ $section->slug }}">
@@ -258,7 +699,7 @@ const examples = {
 <div class="text-center"><h2>Please Sign In</h2><a href="{{ route('login') }}" class="btn">Sign In</a></div>
 @endguest
 </div>`,
-  components: `<x-app-layout>
+        components: `<x-app-layout>
 <x-slot:header><h2 class="font-semibold text-xl">{{ __('Dashboard') }}</h2></x-slot>
 <div class="py-12"><div class="max-w-7xl mx-auto">
 <x-card title="{{ $pageTitle }}" class="mb-6"><x-slot:header><div class="flex items-center justify-between"><h3>{{ $heading }}</h3><x-badge color="green">{{ $status }}</x-badge></div></x-slot><x-slot:actions><x-button wire:click="refresh">Refresh</x-button><x-button variant="danger" wire:click="delete">Delete</x-button></x-slot:actions><p>{{ $body }}</p><x-slot:footer><div class="flex justify-end gap-2"><x-button variant="secondary">Cancel</x-button><x-button type="submit">Save</x-button></div></x-slot:footer></x-card>
@@ -267,7 +708,7 @@ const examples = {
 @endforeach
 </div></div>
 </x-app-layout>`,
-  alpine: `<div x-data="{ open: false, count: 0, search: '' }" class="relative">
+        alpine: `<div x-data="{ open: false, count: 0, search: '' }" class="relative">
 <div class="flex items-center gap-4">
 <button @click="open = !open" wire:click="toggle" class="btn" :class="{ 'active': open }">Toggle</button>
 <span x-text="count" class="badge"></span>
@@ -284,14 +725,15 @@ const examples = {
 <div wire:loading class="text-gray-500">Loading...</div>
 </div>
 </div>`,
-  form: `<form method="POST" action="{{ route('login') }}" class="space-y-4">
+        form: `<form method="POST" action="{{ route('login') }}" class="space-y-4">
 @csrf
 <div><label for="email" class="block text-sm font-medium mb-1">Email</label><input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus class="form-input w-full rounded-lg" placeholder="you@example.com">@error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror</div>
 <div><label for="password" class="block text-sm font-medium mb-1">Password</label><input type="password" id="password" name="password" required class="form-input w-full rounded-lg">@error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror</div>
 <div class="flex items-center justify-between"><label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remember" class="rounded"> Remember me</label><a href="{{ route('password.request') }}" class="text-sm text-indigo-600">Forgot password?</a></div>
 <button type="submit" class="w-full btn btn-primary py-2.5">Log In</button>
 </form>`,
-  kitchen: `@extends('layouts.app')
+        kitchen:
+          `@extends('layouts.app')
 @section('title', $pageTitle ?? 'Dashboard')
 @push('styles')<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">@endpush
 @section('content')
@@ -305,8 +747,10 @@ const examples = {
 @endguest
 </div>
 @endsection
-@push('scripts')<scr` + `ipt src="{{ asset('js/dashboard.js') }}" defer></scr` + `ipt>@endpush`,
-  table: `<div class="overflow-x-auto">
+@push('scripts')<scr` +
+          `ipt src="{{ asset('js/dashboard.js') }}" defer></scr` +
+          `ipt>@endpush`,
+        table: `<div class="overflow-x-auto">
 <table class="min-w-full divide-y divide-gray-200">
 <thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-6 py-3"></th></tr></thead>
 <tbody class="bg-white divide-y divide-gray-200">
@@ -325,7 +769,7 @@ const examples = {
 </table>
 @if($users->hasPages())<div class="mt-4">{{ $users->links() }}</div>@endif
 </div>`,
-  dashboard: `@extends('layouts.app')
+        dashboard: `@extends('layouts.app')
 @section('content')
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 <div class="md:flex md:items-center md:justify-between mb-8">
@@ -359,161 +803,178 @@ const examples = {
 </div>
 </div>
 @endsection`,
-};
+      };
 
-// ── DOM refs ──
-const inputEl = document.getElementById('input');
-const inputHlEl = document.getElementById('inputHighlight');
-const outputEl = document.getElementById('output');
-const timingEl = document.getElementById('timing');
-const statusEl = document.getElementById('status');
-const inputCharsEl = document.getElementById('inputChars');
-const outputCharsEl = document.getElementById('outputChars');
-const loadingOverlay = document.getElementById('loadingOverlay');
+      // ── DOM refs ──
+      const inputEl = document.getElementById("input");
+      const inputHlEl = document.getElementById("inputHighlight");
+      const outputEl = document.getElementById("output");
+      const timingEl = document.getElementById("timing");
+      const statusEl = document.getElementById("status");
+      const inputCharsEl = document.getElementById("inputChars");
+      const outputCharsEl = document.getElementById("outputChars");
+      const loadingOverlay = document.getElementById("loadingOverlay");
 
-let debounceTimer = null;
-let hlRaf = 0;
-let formatterReady = false;
+      let debounceTimer = null;
+      let hlRaf = 0;
+      let formatterReady = false;
 
-// ── Highlight sync ──
-function scheduleInputHighlight() {
-  cancelAnimationFrame(hlRaf);
-  hlRaf = requestAnimationFrame(() => {
-    inputHlEl.innerHTML = highlightBlade(inputEl.value);
-  });
-}
+      // ── Highlight sync ──
+      function scheduleInputHighlight() {
+        cancelAnimationFrame(hlRaf);
+        hlRaf = requestAnimationFrame(() => {
+          inputHlEl.innerHTML = highlightBlade(inputEl.value);
+        });
+      }
 
-function syncScroll() {
-  inputHlEl.scrollTop = inputEl.scrollTop;
-  inputHlEl.scrollLeft = inputEl.scrollLeft;
-}
+      function syncScroll() {
+        inputHlEl.scrollTop = inputEl.scrollTop;
+        inputHlEl.scrollLeft = inputEl.scrollLeft;
+      }
 
-inputEl.addEventListener('scroll', syncScroll);
-inputEl.addEventListener('input', () => {
-  scheduleInputHighlight();
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(doFormat, 150);
-});
+      inputEl.addEventListener("scroll", syncScroll);
+      inputEl.addEventListener("input", () => {
+        scheduleInputHighlight();
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(doFormat, 150);
+      });
 
-// ── Formatter ──
-function checkFormatter() {
-  if (typeof globalThis.__dartBladeFormatter === 'function') {
-    formatterReady = true;
-    loadingOverlay.classList.add('hidden');
-    statusEl.textContent = 'Ready';
-    inputEl.value = examples.kitchen;
-    document.getElementById('examples').value = 'kitchen';
-    scheduleInputHighlight();
-    doFormat();
-  } else {
-    setTimeout(checkFormatter, 50);
-  }
-}
-checkFormatter();
+      // ── Formatter ──
+      function checkFormatter() {
+        if (typeof globalThis.__dartBladeFormatter === "function") {
+          formatterReady = true;
+          loadingOverlay.classList.add("hidden");
+          statusEl.textContent = "Ready";
+          inputEl.value = examples.kitchen;
+          document.getElementById("examples").value = "kitchen";
+          scheduleInputHighlight();
+          doFormat();
+        } else {
+          setTimeout(checkFormatter, 50);
+        }
+      }
+      checkFormatter();
 
-function getOptions() {
-  return {
-    tabWidth: parseInt(document.getElementById('opt-tabWidth').value) || 4,
-    useTabs: document.getElementById('opt-useTabs').checked,
-    printWidth: parseInt(document.getElementById('opt-printWidth').value) || 120,
-    quoteStyle: document.getElementById('opt-quoteStyle').value,
-    directiveSpacing: document.getElementById('opt-directiveSpacing').value,
-    slotFormatting: document.getElementById('opt-slotFormatting').value,
-    slotNameStyle: document.getElementById('opt-slotNameStyle').value,
-    slotSpacing: document.getElementById('opt-slotSpacing').value,
-    wrapAttributes: document.getElementById('opt-wrapAttributes').value,
-    attributeSort: document.getElementById('opt-attributeSort').value,
-    closingBracketStyle: document.getElementById('opt-closingBracketStyle').value,
-    selfClosingStyle: document.getElementById('opt-selfClosingStyle').value,
-  };
-}
+      function getOptions() {
+        return {
+          tabWidth:
+            parseInt(document.getElementById("opt-tabWidth").value) || 4,
+          useTabs: document.getElementById("opt-useTabs").checked,
+          printWidth:
+            parseInt(document.getElementById("opt-printWidth").value) || 120,
+          quoteStyle: document.getElementById("opt-quoteStyle").value,
+          directiveSpacing: document.getElementById("opt-directiveSpacing")
+            .value,
+          slotFormatting: document.getElementById("opt-slotFormatting").value,
+          slotNameStyle: document.getElementById("opt-slotNameStyle").value,
+          slotSpacing: document.getElementById("opt-slotSpacing").value,
+          wrapAttributes: document.getElementById("opt-wrapAttributes").value,
+          attributeSort: document.getElementById("opt-attributeSort").value,
+          closingBracketStyle: document.getElementById(
+            "opt-closingBracketStyle",
+          ).value,
+          selfClosingStyle: document.getElementById("opt-selfClosingStyle")
+            .value,
+        };
+      }
 
-function doFormat() {
-  if (!formatterReady) return;
-  const source = inputEl.value;
-  inputCharsEl.textContent = source.length + ' chars';
-  if (!source.trim()) {
-    outputEl.innerHTML = '';
-    outputEl.className = '';
-    outputCharsEl.textContent = '0 chars';
-    timingEl.textContent = '';
-    return;
-  }
-  try {
-    const opts = getOptions();
-    const t0 = performance.now();
-    const raw = globalThis.__dartBladeFormatter(source, JSON.stringify(opts));
-    const elapsed = performance.now() - t0;
-    const result = JSON.parse(raw);
-    if (result.error) {
-      outputEl.textContent = 'Error: ' + result.error;
-      outputEl.className = 'error';
-      statusEl.textContent = 'Error';
-      timingEl.textContent = '';
-    } else {
-      outputEl.innerHTML = highlightBlade(result.formatted);
-      outputEl.className = '';
-      outputCharsEl.textContent = result.formatted.length + ' chars';
-      statusEl.textContent = 'Formatted';
-      timingEl.textContent = elapsed < 1 ? (elapsed * 1000).toFixed(0) + ' us' : elapsed.toFixed(2) + ' ms';
-    }
-  } catch (e) {
-    outputEl.textContent = 'Error: ' + e.message;
-    outputEl.className = 'error';
-    statusEl.textContent = 'Error';
-    timingEl.textContent = '';
-  }
-}
+      function doFormat() {
+        if (!formatterReady) return;
+        const source = inputEl.value;
+        inputCharsEl.textContent = source.length + " chars";
+        if (!source.trim()) {
+          outputEl.innerHTML = "";
+          outputEl.className = "";
+          outputCharsEl.textContent = "0 chars";
+          timingEl.textContent = "";
+          return;
+        }
+        try {
+          const opts = getOptions();
+          const t0 = performance.now();
+          const raw = globalThis.__dartBladeFormatter(
+            source,
+            JSON.stringify(opts),
+          );
+          const elapsed = performance.now() - t0;
+          const result = JSON.parse(raw);
+          if (result.error) {
+            outputEl.textContent = "Error: " + result.error;
+            outputEl.className = "error";
+            statusEl.textContent = "Error";
+            timingEl.textContent = "";
+          } else {
+            outputEl.innerHTML = highlightBlade(result.formatted);
+            outputEl.className = "";
+            outputCharsEl.textContent = result.formatted.length + " chars";
+            statusEl.textContent = "Formatted";
+            timingEl.textContent =
+              elapsed < 1
+                ? (elapsed * 1000).toFixed(0) + " us"
+                : elapsed.toFixed(2) + " ms";
+          }
+        } catch (e) {
+          outputEl.textContent = "Error: " + e.message;
+          outputEl.className = "error";
+          statusEl.textContent = "Error";
+          timingEl.textContent = "";
+        }
+      }
 
-// ── Events ──
-document.getElementById('formatBtn').addEventListener('click', doFormat);
+      // ── Events ──
+      document.getElementById("formatBtn").addEventListener("click", doFormat);
 
-document.getElementById('copyBtn').addEventListener('click', () => {
-  const text = outputEl.textContent;
-  if (text) {
-    navigator.clipboard.writeText(text);
-    statusEl.textContent = 'Copied!';
-    setTimeout(() => { statusEl.textContent = 'Ready'; }, 1200);
-  }
-});
+      document.getElementById("copyBtn").addEventListener("click", () => {
+        const text = outputEl.textContent;
+        if (text) {
+          navigator.clipboard.writeText(text);
+          statusEl.textContent = "Copied!";
+          setTimeout(() => {
+            statusEl.textContent = "Ready";
+          }, 1200);
+        }
+      });
 
-document.getElementById('settingsBtn').addEventListener('click', () => {
-  document.getElementById('panes').classList.toggle('settings-open');
-});
+      document.getElementById("settingsBtn").addEventListener("click", () => {
+        document.getElementById("panes").classList.toggle("settings-open");
+      });
 
-document.getElementById('examples').addEventListener('change', (e) => {
-  if (examples[e.target.value]) {
-    inputEl.value = examples[e.target.value];
-    scheduleInputHighlight();
-    doFormat();
-  }
-});
+      document.getElementById("examples").addEventListener("change", (e) => {
+        if (examples[e.target.value]) {
+          inputEl.value = examples[e.target.value];
+          scheduleInputHighlight();
+          doFormat();
+        }
+      });
 
-document.getElementById('settingsPanel').addEventListener('change', doFormat);
-document.getElementById('settingsPanel').addEventListener('input', () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(doFormat, 200);
-});
+      document
+        .getElementById("settingsPanel")
+        .addEventListener("change", doFormat);
+      document.getElementById("settingsPanel").addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(doFormat, 200);
+      });
 
-document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    doFormat();
-  }
-});
+      document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+          e.preventDefault();
+          doFormat();
+        }
+      });
 
-// ── Theme switcher ──
-const themeSelect = document.getElementById('themeSelect');
-const savedTheme = localStorage.getItem('blade-formatter-theme') || 'muted-steel';
-document.documentElement.setAttribute('data-theme', savedTheme);
-themeSelect.value = savedTheme;
+      // ── Theme switcher ──
+      const themeSelect = document.getElementById("themeSelect");
+      const savedTheme =
+        localStorage.getItem("blade-formatter-theme") || "muted-steel";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      themeSelect.value = savedTheme;
 
-themeSelect.addEventListener('change', () => {
-  document.documentElement.setAttribute('data-theme', themeSelect.value);
-  localStorage.setItem('blade-formatter-theme', themeSelect.value);
-  scheduleInputHighlight();
-  doFormat();
-});
-</script>
-</body>
+      themeSelect.addEventListener("change", () => {
+        document.documentElement.setAttribute("data-theme", themeSelect.value);
+        localStorage.setItem("blade-formatter-theme", themeSelect.value);
+        scheduleInputHighlight();
+        doFormat();
+      });
+    </script>
+  </body>
 </html>
