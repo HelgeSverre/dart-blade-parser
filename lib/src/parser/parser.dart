@@ -69,6 +69,7 @@ class BladeParser {
       children: children,
     );
 
+    _linkParents(doc);
     return ParseResult(ast: doc, errors: List.unmodifiable(_errors));
   }
 
@@ -157,8 +158,7 @@ class BladeParser {
         return _parseGenericDirective(
             'prependOnce', TokenType.directiveEndPrependOnce);
       case TokenType.directivePushIf:
-        return _parseGenericDirective(
-            'pushIf', TokenType.directiveEndPushOnce);
+        return _parseGenericDirective('pushIf', TokenType.directiveEndPushOnce);
       case TokenType.directiveFragment:
         return _parseGenericDirective(
           'fragment',
@@ -595,84 +595,52 @@ class BladeParser {
     return null;
   }
 
-  EchoNode _parseEcho() {
-    final openToken = _advance(); // {{
+  EchoNode _parseEcho() => _parseEchoVariant(
+        closeType: TokenType.echoClose,
+        label: 'echo statement',
+        isRaw: false,
+      );
+
+  EchoNode _parseRawEcho() => _parseEchoVariant(
+        closeType: TokenType.rawEchoClose,
+        label: 'raw echo statement',
+        isRaw: true,
+      );
+
+  EchoNode _parseLegacyEcho() => _parseEchoVariant(
+        closeType: TokenType.legacyEchoClose,
+        label: 'legacy echo statement',
+        isRaw: true,
+      );
+
+  EchoNode _parseEchoVariant({
+    required TokenType closeType,
+    required String label,
+    required bool isRaw,
+  }) {
+    final openToken = _advance();
 
     String expression = '';
     if (_check(TokenType.expression)) {
       expression = _advance().value;
     }
 
-    if (!_check(TokenType.echoClose)) {
+    if (!_check(closeType)) {
       _errors.add(
         ParseError(
-          message: 'Unclosed echo statement',
+          message: 'Unclosed $label',
           position: openToken.startPosition,
         ),
       );
     } else {
-      _advance(); // }}
+      _advance();
     }
 
     return EchoNode(
       startPosition: openToken.startPosition,
       endPosition: _previous().endPosition,
       expression: expression.trim(),
-      isRaw: false,
-    );
-  }
-
-  EchoNode _parseRawEcho() {
-    final openToken = _advance(); // {!!
-
-    String expression = '';
-    if (_check(TokenType.expression)) {
-      expression = _advance().value;
-    }
-
-    if (!_check(TokenType.rawEchoClose)) {
-      _errors.add(
-        ParseError(
-          message: 'Unclosed raw echo statement',
-          position: openToken.startPosition,
-        ),
-      );
-    } else {
-      _advance(); // !!}
-    }
-
-    return EchoNode(
-      startPosition: openToken.startPosition,
-      endPosition: _previous().endPosition,
-      expression: expression.trim(),
-      isRaw: true,
-    );
-  }
-
-  EchoNode _parseLegacyEcho() {
-    final openToken = _advance(); // {{{
-
-    String expression = '';
-    if (_check(TokenType.expression)) {
-      expression = _advance().value;
-    }
-
-    if (!_check(TokenType.legacyEchoClose)) {
-      _errors.add(
-        ParseError(
-          message: 'Unclosed legacy echo statement',
-          position: openToken.startPosition,
-        ),
-      );
-    } else {
-      _advance(); // }}}
-    }
-
-    return EchoNode(
-      startPosition: openToken.startPosition,
-      endPosition: _previous().endPosition,
-      expression: expression.trim(),
-      isRaw: true, // Legacy echo is raw (not escaped)
+      isRaw: isRaw,
     );
   }
 
@@ -688,60 +656,20 @@ class BladeParser {
   /// Parse slot tag: <x-slot:name> or <x-slot name="...">
   SlotNode _parseSlot(Token startToken, String componentName) {
     String slotName = 'default';
-    final attributes = <String, AttributeNode>{};
 
     // Check if name is in colon syntax: "slot:header"
     if (componentName.startsWith('slot:')) {
       slotName = componentName.substring(5); // Remove "slot:"
+    }
 
-      // Still need to parse any additional attributes after the colon
-      // e.g., <x-slot:header class="bold" id="title">
-      while (_isAttributeToken(_peek().type)) {
-        final attrToken = _advance();
-        final attrName = attrToken.value;
-        final attrStartPos = attrToken.startPosition;
-        Position attrEndPos = attrToken.endPosition;
+    // Parse attributes (handles both colon and attribute syntax)
+    final attributes = _parseAttributeMap();
 
-        String? attrValue;
-        if (_check(TokenType.attributeValue)) {
-          final valueToken = _advance();
-          attrValue = valueToken.value;
-          attrEndPos = valueToken.endPosition;
-        }
-
-        attributes[attrName] = StandardAttribute(
-          name: attrName,
-          value: attrValue,
-          startPosition: attrStartPos,
-          endPosition: attrEndPos,
-        );
-      }
-    } else {
-      // componentName is just "slot", need to parse name attribute
-      // Parse attributes to find name
-      while (_isAttributeToken(_peek().type)) {
-        final attrToken = _advance();
-        final attrName = attrToken.value;
-        final attrStartPos = attrToken.startPosition;
-        Position attrEndPos = attrToken.endPosition;
-
-        String? attrValue;
-        if (_check(TokenType.attributeValue)) {
-          final valueToken = _advance();
-          attrValue = valueToken.value;
-          attrEndPos = valueToken.endPosition;
-        }
-
-        if (attrName == 'name' && attrValue != null) {
-          slotName = attrValue;
-        }
-
-        attributes[attrName] = StandardAttribute(
-          name: attrName,
-          value: attrValue,
-          startPosition: attrStartPos,
-          endPosition: attrEndPos,
-        );
+    // For attribute syntax: extract name from attributes
+    if (!componentName.startsWith('slot:')) {
+      final nameAttr = attributes['name'];
+      if (nameAttr != null && nameAttr.value != null) {
+        slotName = nameAttr.value!;
       }
     }
 
@@ -818,90 +746,7 @@ class BladeParser {
     }
 
     // Parse attributes - collect tokens until we hit > or />
-    final attributes = <String, AttributeNode>{};
-    while (_isAttributeToken(_peek().type)) {
-      final attrToken = _advance();
-      final attrName = attrToken.value;
-      final attrStartPos = attrToken.startPosition;
-      Position attrEndPos = attrToken.endPosition;
-
-      // Check for attribute value in next token
-      String? attrValue;
-      if (_check(TokenType.attributeValue)) {
-        final valueToken = _advance();
-        attrValue = valueToken.value;
-        attrEndPos = valueToken.endPosition;
-      }
-
-      // Create appropriate attribute node based on token type
-      AttributeNode attrNode;
-
-      // Check token type first for proper classification
-      final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
-          attrToken.type == TokenType.alpineShorthandBind ||
-          attrToken.type == TokenType.alpineData ||
-          attrToken.type == TokenType.alpineInit ||
-          attrToken.type == TokenType.alpineShow ||
-          attrToken.type == TokenType.alpineIf ||
-          attrToken.type == TokenType.alpineFor ||
-          attrToken.type == TokenType.alpineModel ||
-          attrToken.type == TokenType.alpineText ||
-          attrToken.type == TokenType.alpineHtml ||
-          attrToken.type == TokenType.alpineBind ||
-          attrToken.type == TokenType.alpineOn ||
-          attrToken.type == TokenType.alpineTransition ||
-          attrToken.type == TokenType.alpineCloak ||
-          attrToken.type == TokenType.alpineIgnore ||
-          attrToken.type == TokenType.alpineRef ||
-          attrToken.type == TokenType.alpineTeleport;
-
-      final isLivewireToken = _isLivewireAttributeToken(attrToken.type);
-
-      if (isAlpineToken ||
-          attrName.startsWith('x-') ||
-          attrName.startsWith('@') ||
-          attrName.startsWith(':')) {
-        // Extract directive from attribute name
-        final directive = attrName.startsWith('x-')
-            ? attrName.substring(2)
-            : attrName.startsWith('@')
-                ? attrName.substring(1)
-                : attrName.startsWith(':')
-                    ? attrName.substring(1)
-                    : attrName;
-
-        attrNode = AlpineAttribute(
-          name: attrName,
-          directive: directive,
-          value: attrValue,
-          startPosition: attrStartPos,
-          endPosition: attrEndPos,
-        );
-      } else if (isLivewireToken || attrName.startsWith('wire:')) {
-        // Extract action and modifiers from wire:action.modifier1.modifier2
-        final parts = attrName.substring(5).split('.');
-        final action = parts.first;
-        final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
-
-        attrNode = LivewireAttribute(
-          name: attrName,
-          action: action,
-          modifiers: modifiers,
-          value: attrValue,
-          startPosition: attrStartPos,
-          endPosition: attrEndPos,
-        );
-      } else {
-        attrNode = StandardAttribute(
-          name: attrName,
-          value: attrValue,
-          startPosition: attrStartPos,
-          endPosition: attrEndPos,
-        );
-      }
-
-      attributes[attrName] = attrNode;
-    }
+    final attributes = _parseAttributeMap();
 
     // Check for self-closing
     bool isSelfClosing = false;
@@ -963,8 +808,9 @@ class BladeParser {
         startPosition: children.first.startPosition,
         endPosition: children.last.endPosition,
         name: 'default',
-        children: children,
+        children: List.of(children),
       );
+      children.clear();
     }
 
     return ComponentNode(
@@ -1277,6 +1123,105 @@ class BladeParser {
     return false;
   }
 
+  /// Parse attributes from current token position into a map.
+  /// Handles Alpine.js, Livewire, and standard HTML attributes.
+  Map<String, AttributeNode> _parseAttributeMap() {
+    final attributes = <String, AttributeNode>{};
+    while (_isAttributeToken(_peek().type)) {
+      final attrToken = _advance();
+      final attrName = attrToken.value;
+      final attrStartPos = attrToken.startPosition;
+      Position attrEndPos = attrToken.endPosition;
+
+      String? attrValue;
+      if (_check(TokenType.attributeValue)) {
+        final valueToken = _advance();
+        attrValue = valueToken.value;
+        attrEndPos = valueToken.endPosition;
+      }
+
+      attributes[attrName] = _classifyAttribute(
+        attrToken,
+        attrName,
+        attrValue,
+        attrStartPos,
+        attrEndPos,
+      );
+    }
+    return attributes;
+  }
+
+  /// Classify an attribute token into the appropriate AttributeNode subclass.
+  AttributeNode _classifyAttribute(
+    Token attrToken,
+    String attrName,
+    String? attrValue,
+    Position startPos,
+    Position endPos,
+  ) {
+    final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
+        attrToken.type == TokenType.alpineShorthandBind ||
+        attrToken.type == TokenType.alpineData ||
+        attrToken.type == TokenType.alpineInit ||
+        attrToken.type == TokenType.alpineShow ||
+        attrToken.type == TokenType.alpineIf ||
+        attrToken.type == TokenType.alpineFor ||
+        attrToken.type == TokenType.alpineModel ||
+        attrToken.type == TokenType.alpineText ||
+        attrToken.type == TokenType.alpineHtml ||
+        attrToken.type == TokenType.alpineBind ||
+        attrToken.type == TokenType.alpineOn ||
+        attrToken.type == TokenType.alpineTransition ||
+        attrToken.type == TokenType.alpineCloak ||
+        attrToken.type == TokenType.alpineIgnore ||
+        attrToken.type == TokenType.alpineRef ||
+        attrToken.type == TokenType.alpineTeleport;
+
+    final isLivewireToken = _isLivewireAttributeToken(attrToken.type);
+
+    if (isAlpineToken ||
+        attrName.startsWith('x-') ||
+        attrName.startsWith('@') ||
+        attrName.startsWith(':')) {
+      final directive = attrName.startsWith('@')
+          ? 'on:${attrName.substring(1)}'
+          : attrName.startsWith(':')
+              ? 'bind:${attrName.substring(1)}'
+              : attrName.startsWith('x-')
+                  ? attrName.substring(2)
+                  : attrName;
+
+      return AlpineAttribute(
+        name: attrName,
+        directive: directive,
+        value: attrValue,
+        startPosition: startPos,
+        endPosition: endPos,
+      );
+    } else if (isLivewireToken || attrName.startsWith('wire:')) {
+      final parts = attrName.split('.');
+      final action =
+          parts[0].startsWith('wire:') ? parts[0].substring(5) : parts[0];
+      final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
+
+      return LivewireAttribute(
+        name: attrName,
+        action: action,
+        modifiers: modifiers,
+        value: attrValue,
+        startPosition: startPos,
+        endPosition: endPos,
+      );
+    } else {
+      return StandardAttribute(
+        name: attrName,
+        value: attrValue,
+        startPosition: startPos,
+        endPosition: endPos,
+      );
+    }
+  }
+
   /// Parse HTML element into HtmlElementNode (T031-T037)
   ///
   /// Handles:
@@ -1337,89 +1282,7 @@ class BladeParser {
     final isVoid = _isVoidElement(tagName);
 
     // Parse attributes (T034)
-    final attributes = <String, AttributeNode>{};
-    while (_isAttributeToken(_peek().type)) {
-      final attrToken = _advance();
-      final attrName = attrToken.value;
-      final attrStartPos = attrToken.startPosition;
-      Position attrEndPos = attrToken.endPosition;
-
-      // Check for attribute value in next token
-      String? attrValue;
-      if (_check(TokenType.attributeValue)) {
-        final valueToken = _advance();
-        attrValue = valueToken.value;
-        attrEndPos = valueToken.endPosition;
-      }
-
-      // Create appropriate attribute node based on token type
-      AttributeNode attrNode;
-
-      // Check token type first for proper classification
-      final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
-          attrToken.type == TokenType.alpineShorthandBind ||
-          attrToken.type == TokenType.alpineData ||
-          attrToken.type == TokenType.alpineInit ||
-          attrToken.type == TokenType.alpineShow ||
-          attrToken.type == TokenType.alpineIf ||
-          attrToken.type == TokenType.alpineFor ||
-          attrToken.type == TokenType.alpineModel ||
-          attrToken.type == TokenType.alpineText ||
-          attrToken.type == TokenType.alpineHtml ||
-          attrToken.type == TokenType.alpineBind ||
-          attrToken.type == TokenType.alpineOn ||
-          attrToken.type == TokenType.alpineTransition ||
-          attrToken.type == TokenType.alpineCloak ||
-          attrToken.type == TokenType.alpineIgnore ||
-          attrToken.type == TokenType.alpineRef ||
-          attrToken.type == TokenType.alpineTeleport;
-
-      final isLivewireToken = _isLivewireAttributeToken(attrToken.type);
-
-      if (isAlpineToken) {
-        // Alpine.js attribute
-        final directive = attrName.startsWith('@')
-            ? 'on:${attrName.substring(1)}'
-            : attrName.startsWith(':')
-                ? 'bind:${attrName.substring(1)}'
-                : attrName.startsWith('x-')
-                    ? attrName.substring(2)
-                    : attrName;
-
-        attrNode = AlpineAttribute(
-          name: attrName,
-          directive: directive,
-          value: attrValue,
-          startPosition: attrStartPos,
-          endPosition: attrEndPos,
-        );
-      } else if (isLivewireToken) {
-        // Livewire attribute - parse action and modifiers
-        final parts = attrName.split('.');
-        final action =
-            parts[0].startsWith('wire:') ? parts[0].substring(5) : parts[0];
-        final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
-
-        attrNode = LivewireAttribute(
-          name: attrName,
-          action: action,
-          modifiers: modifiers,
-          value: attrValue,
-          startPosition: attrStartPos,
-          endPosition: attrEndPos,
-        );
-      } else {
-        // Standard attribute
-        attrNode = StandardAttribute(
-          name: attrName,
-          value: attrValue,
-          startPosition: attrStartPos,
-          endPosition: attrEndPos,
-        );
-      }
-
-      attributes[attrName] = attrNode;
-    }
+    final attributes = _parseAttributeMap();
 
     // Check for self-closing or regular close
     bool isSelfClosing = false;
@@ -1528,6 +1391,20 @@ class BladeParser {
       endPosition: endPosition,
       children: children,
     );
+  }
+
+  /// Recursively set parent references on all nodes.
+  void _linkParents(AstNode node) {
+    for (final child in node.children) {
+      child.parent = node;
+      _linkParents(child);
+    }
+    if (node is ComponentNode) {
+      for (final slot in node.slots.values) {
+        slot.parent = node;
+        _linkParents(slot);
+      }
+    }
   }
 
   /// Report an error (T036)

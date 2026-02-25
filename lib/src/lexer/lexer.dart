@@ -10,7 +10,6 @@ enum _LexerState {
   echo,
   rawEcho,
   legacyEcho,
-  verbatim,
   componentTag,
   htmlTag,
   done,
@@ -73,9 +72,6 @@ class BladeLexer {
         case _LexerState.legacyEcho:
           state = _lexLegacyEcho();
           break;
-        case _LexerState.verbatim:
-          state = _lexVerbatim();
-          break;
         case _LexerState.componentTag:
           state = _lexComponentTag();
           break;
@@ -133,15 +129,29 @@ class BladeLexer {
           _advance(); // {
           _advance(); // {
 
-          // Scan until we find }}
-          int braceDepth = 2; // We have {{
-          while (!_isAtEnd() && braceDepth > 0) {
-            if (_peek() == '{') {
-              braceDepth++;
-            } else if (_peek() == '}') {
-              braceDepth--;
-              if (braceDepth == 0) {
-                _advance(); // Last }
+          // Scan until we find }} (with string tracking)
+          bool inSingleQuote = false;
+          bool inDoubleQuote = false;
+
+          while (!_isAtEnd()) {
+            final c = _peek();
+
+            if (inSingleQuote) {
+              if (c == "'" && _isUnescapedAt(_position)) {
+                inSingleQuote = false;
+              }
+            } else if (inDoubleQuote) {
+              if (c == '"' && _isUnescapedAt(_position)) {
+                inDoubleQuote = false;
+              }
+            } else {
+              if (c == "'") {
+                inSingleQuote = true;
+              } else if (c == '"') {
+                inDoubleQuote = true;
+              } else if (c == '}' && _peekNext() == '}') {
+                _advance(); // first }
+                _advance(); // second }
                 break;
               }
             }
@@ -399,34 +409,16 @@ class BladeLexer {
       final ch = _peek();
 
       if (inSingleQuote) {
-        if (ch == "'") {
-          int backslashCount = 0;
-          int checkPos = _position - 1;
-          while (checkPos >= 0 && input[checkPos] == '\\') {
-            backslashCount++;
-            checkPos--;
-          }
-          if (backslashCount % 2 == 0) inSingleQuote = false;
+        if (ch == "'" && _isUnescapedAt(_position)) {
+          inSingleQuote = false;
         }
       } else if (inDoubleQuote) {
-        if (ch == '"') {
-          int backslashCount = 0;
-          int checkPos = _position - 1;
-          while (checkPos >= 0 && input[checkPos] == '\\') {
-            backslashCount++;
-            checkPos--;
-          }
-          if (backslashCount % 2 == 0) inDoubleQuote = false;
+        if (ch == '"' && _isUnescapedAt(_position)) {
+          inDoubleQuote = false;
         }
       } else if (inTemplateLiteral) {
-        if (ch == '`') {
-          int backslashCount = 0;
-          int checkPos = _position - 1;
-          while (checkPos >= 0 && input[checkPos] == '\\') {
-            backslashCount++;
-            checkPos--;
-          }
-          if (backslashCount % 2 == 0) inTemplateLiteral = false;
+        if (ch == '`' && _isUnescapedAt(_position)) {
+          inTemplateLiteral = false;
         }
       } else {
         if (ch == "'") inSingleQuote = true;
@@ -559,14 +551,7 @@ class BladeLexer {
       // Check for quotes
       if (ch == '"' || ch == "'") {
         // Check if this quote is escaped
-        bool isEscaped = false;
-        int backslashCount = 0;
-        int escapePos = pos - 1;
-        while (escapePos >= 0 && input[escapePos] == '\\') {
-          backslashCount++;
-          escapePos--;
-        }
-        isEscaped = backslashCount % 2 == 1;
+        bool isEscaped = !_isUnescapedAt(pos);
 
         if (!isEscaped) {
           if (openQuote == null) {
@@ -601,14 +586,7 @@ class BladeLexer {
       // Track quote state as we scan backward
       if (ch == '"' || ch == "'") {
         // Check if escaped
-        bool isEscaped = false;
-        int backslashCount = 0;
-        int escapePos = pos - 1;
-        while (escapePos >= 0 && input[escapePos] == '\\') {
-          backslashCount++;
-          escapePos--;
-        }
-        isEscaped = backslashCount % 2 == 1;
+        bool isEscaped = !_isUnescapedAt(pos);
 
         if (!isEscaped) {
           if (currentQuote == null) {
@@ -694,24 +672,12 @@ class BladeLexer {
         final ch = _peek();
 
         if (inSingleQuote) {
-          if (ch == "'") {
-            int backslashCount = 0;
-            int checkPos = _position - 1;
-            while (checkPos >= 0 && input[checkPos] == '\\') {
-              backslashCount++;
-              checkPos--;
-            }
-            if (backslashCount % 2 == 0) inSingleQuote = false;
+          if (ch == "'" && _isUnescapedAt(_position)) {
+            inSingleQuote = false;
           }
         } else if (inDoubleQuote) {
-          if (ch == '"') {
-            int backslashCount = 0;
-            int checkPos = _position - 1;
-            while (checkPos >= 0 && input[checkPos] == '\\') {
-              backslashCount++;
-              checkPos--;
-            }
-            if (backslashCount % 2 == 0) inDoubleQuote = false;
+          if (ch == '"' && _isUnescapedAt(_position)) {
+            inDoubleQuote = false;
           }
         } else {
           if (ch == "'") {
@@ -796,24 +762,12 @@ class BladeLexer {
       final ch = _peek();
 
       if (inSingleQuote) {
-        if (ch == "'") {
-          int backslashCount = 0;
-          int checkPos = _position - 1;
-          while (checkPos >= 0 && input[checkPos] == '\\') {
-            backslashCount++;
-            checkPos--;
-          }
-          if (backslashCount % 2 == 0) inSingleQuote = false;
+        if (ch == "'" && _isUnescapedAt(_position)) {
+          inSingleQuote = false;
         }
       } else if (inDoubleQuote) {
-        if (ch == '"') {
-          int backslashCount = 0;
-          int checkPos = _position - 1;
-          while (checkPos >= 0 && input[checkPos] == '\\') {
-            backslashCount++;
-            checkPos--;
-          }
-          if (backslashCount % 2 == 0) inDoubleQuote = false;
+        if (ch == '"' && _isUnescapedAt(_position)) {
+          inDoubleQuote = false;
         }
       } else {
         if (ch == "'") {
@@ -926,13 +880,6 @@ class BladeLexer {
     return _LexerState.done;
   }
 
-  /// Lex @verbatim content (already handled in _lexText when _inVerbatim is true)
-  _LexerState _lexVerbatim() {
-    // This state is not used in current implementation
-    // Verbatim handling is done in _lexText
-    return _LexerState.text;
-  }
-
   /// Lex component tag <x-component>
   _LexerState _lexComponentTag() {
     _start = _position;
@@ -967,25 +914,13 @@ class BladeLexer {
       _emitToken(TokenType.componentTagOpen, '<x-$componentName');
     }
 
-    // Skip whitespace
-    while (_peek() == ' ' ||
-        _peek() == '\t' ||
-        _peek() == '\n' ||
-        _peek() == '\r') {
-      _advance();
-    }
+    _skipWhitespace();
 
     // Parse attributes
     while (!_isAtEnd() && _peek() != '>' && _peek() != '/') {
       _lexAttribute();
 
-      // Skip whitespace
-      while (_peek() == ' ' ||
-          _peek() == '\t' ||
-          _peek() == '\n' ||
-          _peek() == '\r') {
-        _advance();
-      }
+      _skipWhitespace();
     }
 
     // Check for self-closing />
@@ -1041,24 +976,14 @@ class BladeLexer {
     _emitToken(TokenType.htmlTagName, tagName);
 
     // Skip whitespace before attributes or tag close
-    while (_peek() == ' ' ||
-        _peek() == '\t' ||
-        _peek() == '\n' ||
-        _peek() == '\r') {
-      _advance();
-    }
+    _skipWhitespace();
 
     // Lex attributes (reuse existing _lexAttribute)
     while (!_isAtEnd() && _peek() != '>' && _peek() != '/') {
       _lexAttribute();
 
       // Skip whitespace after attribute
-      while (_peek() == ' ' ||
-          _peek() == '\t' ||
-          _peek() == '\n' ||
-          _peek() == '\r') {
-        _advance();
-      }
+      _skipWhitespace();
     }
 
     // Check for self-closing: />
@@ -1240,6 +1165,25 @@ class BladeLexer {
   }
 
   // Helper methods
+
+  /// Check if the character at [position] is NOT escaped by backslashes.
+  /// Returns true if the character is unescaped (even number of preceding backslashes).
+  bool _isUnescapedAt(int position) {
+    int backslashCount = 0;
+    int checkPos = position - 1;
+    while (checkPos >= 0 && input[checkPos] == '\\') {
+      backslashCount++;
+      checkPos--;
+    }
+    return backslashCount % 2 == 0;
+  }
+
+  /// Skip whitespace characters (spaces, tabs, newlines).
+  void _skipWhitespace() {
+    while (_peek() == ' ' || _peek() == '\t' || _peek() == '\n' || _peek() == '\r') {
+      _advance();
+    }
+  }
 
   bool _isAtEnd() => _position >= input.length;
 

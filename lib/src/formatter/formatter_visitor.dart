@@ -89,6 +89,15 @@ class FormatterVisitor implements AstVisitor<String> {
     'wbr',
   };
 
+  /// Block-level directives that are intermediate (no @end tag of their own).
+  /// These appear inside other block directives (e.g., @elseif inside @if/@endif).
+  static const Set<String> _intermediateDirectives = {
+    'elseif',
+    'else',
+    'case',
+    'default',
+  };
+
   /// Blade directives that are block-level (require children).
   static const Set<String> _blockDirectives = {
     'if',
@@ -115,6 +124,17 @@ class FormatterVisitor implements AstVisitor<String> {
     'once',
     'php',
     'verbatim',
+    'error',
+    'component',
+    'fragment',
+    'session',
+    'pushOnce',
+    'prependOnce',
+    'pushIf',
+    'script',
+    'assets',
+    'isset',
+    'empty',
   };
 
   /// Blade directives that are inline (no children, single line).
@@ -822,7 +842,6 @@ class FormatterVisitor implements AstVisitor<String> {
     _indent.increase();
 
     // If there's a default slot, render it instead of children
-    // (parser puts content in both places, but we only want to render once)
     final hasDefaultSlot = node.slots.containsKey('default');
 
     if (hasDefaultSlot) {
@@ -1128,30 +1147,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
   /// Checks if a directive has a closing tag.
   bool _hasClosingDirective(String name) {
-    // List of directives that have @end{name} closing tags
-    const closingDirectives = {
-      'if',
-      'unless',
-      'foreach',
-      'forelse',
-      'for',
-      'while',
-      'switch',
-      'auth',
-      'guest',
-      'can',
-      'cannot',
-      'canany',
-      'env',
-      'production',
-      'section',
-      'push',
-      'prepend',
-      'once',
-      'php',
-      'verbatim',
-    };
-
-    return closingDirectives.contains(name);
+    return _blockDirectives.contains(name) &&
+        !_intermediateDirectives.contains(name);
   }
 }
