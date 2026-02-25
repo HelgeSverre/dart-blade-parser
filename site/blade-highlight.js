@@ -69,10 +69,13 @@
         // Tokenize tag internals
         tokenizeTag(tagText, tokens);
       }
-      // Plain text
+      // Plain text (including bare @ not followed by a letter)
       else {
         const start = i;
-        while (i < code.length && code[i] !== '<' && code[i] !== '@' && !code.startsWith('{{', i) && !code.startsWith('{!!', i)) i++;
+        while (i < code.length && code[i] !== '<' && !code.startsWith('{{', i) && !code.startsWith('{!!', i)) {
+          if (code[i] === '@' && i + 1 < code.length && /[a-zA-Z]/.test(code[i + 1])) break;
+          i++;
+        }
         if (i > start) tokens.push({ type: 'text', text: code.slice(start, i) });
       }
     }
