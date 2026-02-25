@@ -21,6 +21,9 @@ blade-parser
 tool/acid/reports/*.html
 *.html
 !site/*.html
+!site/data/
+!site/dist/
+!site/e2e/
 test-results/
 .last_run.json
 

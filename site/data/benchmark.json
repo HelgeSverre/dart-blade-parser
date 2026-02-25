@@ -2,1966 +2,3800 @@
   "performance": {
     "A": {
       "alpine/01-billing": {
-        "avg": 1.82,
-        "min": 1.32,
-        "max": 2.13,
-        "runs": 5
+        "avg": 0.71,
+        "min": 0.44,
+        "max": 1.95,
+        "runs": 100,
+        "cpuUser": 167.34,
+        "cpuSystem": 5.97,
+        "heapUsed": 16046520,
+        "heapTotal": 23216128,
+        "rss": 90079232,
+        "heapDelta": 8110080
       },
       "alpine/02-faq": {
-        "avg": 0.9,
-        "min": 0.65,
-        "max": 1.24,
-        "runs": 5
+        "avg": 0.45,
+        "min": 0.26,
+        "max": 1.37,
+        "runs": 100,
+        "cpuUser": 157.12,
+        "cpuSystem": 2.5,
+        "heapUsed": 14283680,
+        "heapTotal": 18759680,
+        "rss": 95961088,
+        "heapDelta": 5776096
       },
       "components/01-form": {
-        "avg": 0.48,
-        "min": 0.44,
-        "max": 0.53,
-        "runs": 5
+        "avg": 0.34,
+        "min": 0.22,
+        "max": 0.99,
+        "runs": 100,
+        "cpuUser": 118.66,
+        "cpuSystem": 1.5,
+        "heapUsed": 13140992,
+        "heapTotal": 22953984,
+        "rss": 101269504,
+        "heapDelta": 4486600
       },
       "components/02-billing": {
-        "avg": 1.79,
-        "min": 1.56,
-        "max": 2.22,
-        "runs": 5
+        "avg": 0.7,
+        "min": 0.48,
+        "max": 2.54,
+        "runs": 100,
+        "cpuUser": 204.94,
+        "cpuSystem": 2.97,
+        "heapUsed": 20562800,
+        "heapTotal": 31604736,
+        "rss": 113901568,
+        "heapDelta": 11820456
       },
       "edge_cases/alpine_shorthand": {
-        "avg": 0.33,
-        "min": 0.3,
-        "max": 0.38,
-        "runs": 5
+        "avg": 0.29,
+        "min": 0.19,
+        "max": 0.85,
+        "runs": 100,
+        "cpuUser": 110.11,
+        "cpuSystem": 1.69,
+        "heapUsed": 18360136,
+        "heapTotal": 30294016,
+        "rss": 118554624,
+        "heapDelta": 9880984
       },
       "edge_cases/blade_comments": {
-        "avg": 0.26,
-        "min": 0.25,
-        "max": 0.29,
-        "runs": 5
+        "avg": 0.22,
+        "min": 0.16,
+        "max": 0.74,
+        "runs": 100,
+        "cpuUser": 73.21,
+        "cpuSystem": 0.69,
+        "heapUsed": 16648384,
+        "heapTotal": 30031872,
+        "rss": 118816768,
+        "heapDelta": 7856944
       },
       "edge_cases/crlf_line_endings": {
-        "avg": 0.34,
-        "min": 0.27,
-        "max": 0.52,
-        "runs": 5
+        "avg": 0.31,
+        "min": 0.17,
+        "max": 1.62,
+        "runs": 100,
+        "cpuUser": 87.02,
+        "cpuSystem": 2.15,
+        "heapUsed": 16653592,
+        "heapTotal": 30031872,
+        "rss": 122273792,
+        "heapDelta": 7936144
       },
       "edge_cases/email_addresses": {
-        "avg": 0.27,
-        "min": 0.25,
-        "max": 0.27,
-        "runs": 5
+        "avg": 0.3,
+        "min": 0.22,
+        "max": 0.77,
+        "runs": 100,
+        "cpuUser": 58.76,
+        "cpuSystem": 2.39,
+        "heapUsed": 14395528,
+        "heapTotal": 21643264,
+        "rss": 74612736,
+        "heapDelta": 6755096
       },
       "edge_cases/ternary_or": {
-        "avg": 0.26,
-        "min": 0.23,
-        "max": 0.3,
-        "runs": 5
+        "avg": 0.24,
+        "min": 0.17,
+        "max": 0.82,
+        "runs": 100,
+        "cpuUser": 67.79,
+        "cpuSystem": 1.45,
+        "heapUsed": 12596576,
+        "heapTotal": 30294016,
+        "rss": 84918272,
+        "heapDelta": 4594176
       },
       "edge_cases/utf8_content": {
-        "avg": 0.33,
-        "min": 0.25,
-        "max": 0.59,
-        "runs": 5
+        "avg": 0.23,
+        "min": 0.18,
+        "max": 0.68,
+        "runs": 100,
+        "cpuUser": 57.61,
+        "cpuSystem": 1.07,
+        "heapUsed": 15972720,
+        "heapTotal": 29507584,
+        "rss": 90046464,
+        "heapDelta": 7850568
       },
       "edge_cases/verbatim_blocks": {
-        "avg": 0.23,
-        "min": 0.21,
-        "max": 0.27,
-        "runs": 5
+        "avg": 0.21,
+        "min": 0.15,
+        "max": 0.66,
+        "runs": 100,
+        "cpuUser": 58.81,
+        "cpuSystem": 1.18,
+        "heapUsed": 16001240,
+        "heapTotal": 29507584,
+        "rss": 95420416,
+        "heapDelta": 7779776
       },
       "error/malformed-dashboard": {
-        "avg": 0.37,
-        "min": 0.35,
-        "max": 0.41,
-        "runs": 5
+        "avg": 0.28,
+        "min": 0.21,
+        "max": 0.79,
+        "runs": 100,
+        "cpuUser": 86.09,
+        "cpuSystem": 0.75,
+        "heapUsed": 18727448,
+        "heapTotal": 29507584,
+        "rss": 99090432,
+        "heapDelta": 10450416
       },
       "format/01-basic-messy": {
-        "avg": 0.29,
-        "min": 0.27,
-        "max": 0.32,
-        "runs": 5
+        "avg": 0.26,
+        "min": 0.18,
+        "max": 1.11,
+        "runs": 100,
+        "cpuUser": 82.84,
+        "cpuSystem": 0.82,
+        "heapUsed": 17024864,
+        "heapTotal": 29769728,
+        "rss": 102121472,
+        "heapDelta": 8602248
       },
       "format/02-indentation-chaos": {
-        "avg": 0.28,
-        "min": 0.27,
-        "max": 0.3,
-        "runs": 5
+        "avg": 0.26,
+        "min": 0.17,
+        "max": 1.49,
+        "runs": 100,
+        "cpuUser": 103.81,
+        "cpuSystem": 0.92,
+        "heapUsed": 18384816,
+        "heapTotal": 46809088,
+        "rss": 107528192,
+        "heapDelta": 9841536
       },
       "format/03-whitespace-hell": {
-        "avg": 0.32,
-        "min": 0.24,
-        "max": 0.56,
-        "runs": 5
+        "avg": 0.21,
+        "min": 0.16,
+        "max": 0.57,
+        "runs": 100,
+        "cpuUser": 58.82,
+        "cpuSystem": 1.26,
+        "heapUsed": 15780960,
+        "heapTotal": 46022656,
+        "rss": 118276096,
+        "heapDelta": 7218544
       },
       "format/04-nested-directives-ugly": {
-        "avg": 0.26,
-        "min": 0.24,
-        "max": 0.29,
-        "runs": 5
+        "avg": 0.22,
+        "min": 0.17,
+        "max": 0.65,
+        "runs": 100,
+        "cpuUser": 68.02,
+        "cpuSystem": 0.44,
+        "heapUsed": 16772336,
+        "heapTotal": 46022656,
+        "rss": 119341056,
+        "heapDelta": 8316512
       },
       "format/05-components-messy": {
-        "avg": 0.27,
-        "min": 0.25,
-        "max": 0.29,
-        "runs": 5
+        "avg": 0.23,
+        "min": 0.18,
+        "max": 0.71,
+        "runs": 100,
+        "cpuUser": 66.99,
+        "cpuSystem": 0.3,
+        "heapUsed": 16989952,
+        "heapTotal": 46284800,
+        "rss": 119668736,
+        "heapDelta": 8418704
       },
       "format/06-mixed-content": {
-        "avg": 0.37,
-        "min": 0.25,
-        "max": 0.78,
-        "runs": 5
+        "avg": 0.26,
+        "min": 0.18,
+        "max": 1.57,
+        "runs": 100,
+        "cpuUser": 88.53,
+        "cpuSystem": 0.71,
+        "heapUsed": 17475888,
+        "heapTotal": 46546944,
+        "rss": 122880000,
+        "heapDelta": 8878864
       },
       "format/07-real-world-mess": {
-        "avg": 0.37,
-        "min": 0.29,
-        "max": 0.49,
-        "runs": 5
+        "avg": 0.27,
+        "min": 0.18,
+        "max": 1.14,
+        "runs": 100,
+        "cpuUser": 111.01,
+        "cpuSystem": 0.71,
+        "heapUsed": 18183896,
+        "heapTotal": 46809088,
+        "rss": 125239296,
+        "heapDelta": 9467808
       },
       "format/08-edge-cases": {
-        "avg": 0.26,
-        "min": 0.24,
-        "max": 0.28,
-        "runs": 5
+        "avg": 0.23,
+        "min": 0.17,
+        "max": 0.81,
+        "runs": 100,
+        "cpuUser": 69.4,
+        "cpuSystem": 0.86,
+        "heapUsed": 16785912,
+        "heapTotal": 46809088,
+        "rss": 125403136,
+        "heapDelta": 8066840
       },
       "large/01-pagination": {
-        "avg": 0.98,
-        "min": 0.89,
-        "max": 1.12,
-        "runs": 5
+        "avg": 0.62,
+        "min": 0.45,
+        "max": 2.04,
+        "runs": 100,
+        "cpuUser": 219.41,
+        "cpuSystem": 1.81,
+        "heapUsed": 24179656,
+        "heapTotal": 47857664,
+        "rss": 134250496,
+        "heapDelta": 15429496
       },
       "legacy/laravel4-master-layout": {
-        "avg": 0.54,
-        "min": 0.45,
-        "max": 0.66,
-        "runs": 5
+        "avg": 0.6,
+        "min": 0.37,
+        "max": 1.52,
+        "runs": 100,
+        "cpuUser": 138.39,
+        "cpuSystem": 3.82,
+        "heapUsed": 16367904,
+        "heapTotal": 21905408,
+        "rss": 83197952,
+        "heapDelta": 8573528
       },
       "legacy/laravel5-auth-login": {
-        "avg": 0.74,
-        "min": 0.61,
-        "max": 1.12,
-        "runs": 5
+        "avg": 0.53,
+        "min": 0.31,
+        "max": 1.88,
+        "runs": 100,
+        "cpuUser": 174.02,
+        "cpuSystem": 3.02,
+        "heapUsed": 20244248,
+        "heapTotal": 31080448,
+        "rss": 100253696,
+        "heapDelta": 11869688
       },
       "legacy/laravel5-auth-register": {
-        "avg": 0.59,
-        "min": 0.56,
-        "max": 0.61,
-        "runs": 5
+        "avg": 0.51,
+        "min": 0.33,
+        "max": 2.26,
+        "runs": 100,
+        "cpuUser": 173.66,
+        "cpuSystem": 2.52,
+        "heapUsed": 14062224,
+        "heapTotal": 30818304,
+        "rss": 108969984,
+        "heapDelta": 5381632
       },
       "legacy/section-with-overwrite": {
-        "avg": 0.5,
-        "min": 0.39,
-        "max": 0.88,
-        "runs": 5
+        "avg": 0.46,
+        "min": 0.26,
+        "max": 1.39,
+        "runs": 100,
+        "cpuUser": 159.6,
+        "cpuSystem": 1.79,
+        "heapUsed": 17674672,
+        "heapTotal": 30818304,
+        "rss": 109494272,
+        "heapDelta": 9011320
       },
       "livewire/01-layout": {
-        "avg": 0.47,
-        "min": 0.44,
-        "max": 0.56,
-        "runs": 5
+        "avg": 0.5,
+        "min": 0.28,
+        "max": 1.49,
+        "runs": 100,
+        "cpuUser": 188.63,
+        "cpuSystem": 1.47,
+        "heapUsed": 13648968,
+        "heapTotal": 30818304,
+        "rss": 111902720,
+        "heapDelta": 4972088
       },
       "livewire/02-examples": {
-        "avg": 0.37,
-        "min": 0.35,
-        "max": 0.39,
-        "runs": 5
+        "avg": 0.4,
+        "min": 0.27,
+        "max": 1.29,
+        "runs": 100,
+        "cpuUser": 148.67,
+        "cpuSystem": 2.06,
+        "heapUsed": 25862544,
+        "heapTotal": 48119808,
+        "rss": 130007040,
+        "heapDelta": 16934416
       },
       "livewire/03-dashboard-page": {
-        "avg": 0.78,
-        "min": 0.72,
-        "max": 0.85,
-        "runs": 5
+        "avg": 0.7,
+        "min": 0.45,
+        "max": 2.05,
+        "runs": 100,
+        "cpuUser": 196.21,
+        "cpuSystem": 2.87,
+        "heapUsed": 15036296,
+        "heapTotal": 48119808,
+        "rss": 134545408,
+        "heapDelta": 6154696
       },
       "medium/01-tooltip": {
-        "avg": 0.26,
-        "min": 0.23,
-        "max": 0.29,
-        "runs": 5
+        "avg": 0.38,
+        "min": 0.26,
+        "max": 0.95,
+        "runs": 100,
+        "cpuUser": 75.68,
+        "cpuSystem": 2.35,
+        "heapUsed": 13299360,
+        "heapTotal": 22167552,
+        "rss": 76562432,
+        "heapDelta": 5557632
       },
       "medium/02-select-button": {
-        "avg": 0.3,
-        "min": 0.28,
-        "max": 0.34,
-        "runs": 5
+        "avg": 0.38,
+        "min": 0.26,
+        "max": 0.99,
+        "runs": 100,
+        "cpuUser": 105.08,
+        "cpuSystem": 2.84,
+        "heapUsed": 19143272,
+        "heapTotal": 30556160,
+        "rss": 97239040,
+        "heapDelta": 11020848
       },
       "small/01-checkbox": {
-        "avg": 0.21,
-        "min": 0.19,
-        "max": 0.25,
-        "runs": 5
+        "avg": 0.22,
+        "min": 0.17,
+        "max": 0.82,
+        "runs": 100,
+        "cpuUser": 58.47,
+        "cpuSystem": 1.01,
+        "heapUsed": 15753208,
+        "heapTotal": 29245440,
+        "rss": 98238464,
+        "heapDelta": 7394376
       },
       "small/02-footer": {
-        "avg": 0.26,
-        "min": 0.23,
-        "max": 0.29,
-        "runs": 5
+        "avg": 0.24,
+        "min": 0.19,
+        "max": 0.7,
+        "runs": 100,
+        "cpuUser": 78.28,
+        "cpuSystem": 0.68,
+        "heapUsed": 17633800,
+        "heapTotal": 29507584,
+        "rss": 101613568,
+        "heapDelta": 9346456
       },
       "synthetic/01-blade-directives/auth/01-auth-guest": {
-        "avg": 0.48,
-        "min": 0.45,
-        "max": 0.51,
-        "runs": 5
+        "avg": 0.4,
+        "min": 0.26,
+        "max": 1.05,
+        "runs": 100,
+        "cpuUser": 140.87,
+        "cpuSystem": 1.55,
+        "heapUsed": 15641416,
+        "heapTotal": 30031872,
+        "rss": 107266048,
+        "heapDelta": 7222984
       },
       "synthetic/01-blade-directives/auth/02-can-cannot": {
         "avg": 0.42,
-        "min": 0.4,
-        "max": 0.43,
-        "runs": 5
+        "min": 0.25,
+        "max": 1.25,
+        "runs": 100,
+        "cpuUser": 167.53,
+        "cpuSystem": 1.73,
+        "heapUsed": 15853664,
+        "heapTotal": 30556160,
+        "rss": 112033792,
+        "heapDelta": 7112328
       },
       "synthetic/01-blade-directives/components/01-component-basic": {
-        "avg": 0.45,
-        "min": 0.42,
-        "max": 0.48,
-        "runs": 5
+        "avg": 0.43,
+        "min": 0.27,
+        "max": 1.28,
+        "runs": 100,
+        "cpuUser": 163.3,
+        "cpuSystem": 2.47,
+        "heapUsed": 27849296,
+        "heapTotal": 47857664,
+        "rss": 130400256,
+        "heapDelta": 19038000
       },
       "synthetic/01-blade-directives/components/02-component-props": {
-        "avg": 0.4,
-        "min": 0.39,
-        "max": 0.44,
-        "runs": 5
+        "avg": 0.44,
+        "min": 0.27,
+        "max": 1.48,
+        "runs": 100,
+        "cpuUser": 177.92,
+        "cpuSystem": 2.07,
+        "heapUsed": 13847328,
+        "heapTotal": 48119808,
+        "rss": 133971968,
+        "heapDelta": 4950960
       },
       "synthetic/01-blade-directives/components/03-component-slots": {
-        "avg": 0.66,
-        "min": 0.59,
-        "max": 0.93,
-        "runs": 5
+        "avg": 0.44,
+        "min": 0.29,
+        "max": 1.23,
+        "runs": 100,
+        "cpuUser": 152.73,
+        "cpuSystem": 1.92,
+        "heapUsed": 18048792,
+        "heapTotal": 48381952,
+        "rss": 136495104,
+        "heapDelta": 9155680
       },
       "synthetic/01-blade-directives/components/04-component-attributes": {
-        "avg": 0.47,
-        "min": 0.44,
-        "max": 0.5,
-        "runs": 5
+        "avg": 0.46,
+        "min": 0.31,
+        "max": 1.44,
+        "runs": 100,
+        "cpuUser": 171.64,
+        "cpuSystem": 1.7,
+        "heapUsed": 18777048,
+        "heapTotal": 48381952,
+        "rss": 140345344,
+        "heapDelta": 9704760
       },
       "synthetic/01-blade-directives/components/05-dynamic-component": {
-        "avg": 0.47,
-        "min": 0.45,
-        "max": 0.49,
-        "runs": 5
+        "avg": 0.61,
+        "min": 0.38,
+        "max": 1.54,
+        "runs": 100,
+        "cpuUser": 154.79,
+        "cpuSystem": 3.55,
+        "heapUsed": 16439344,
+        "heapTotal": 22691840,
+        "rss": 89128960,
+        "heapDelta": 8504432
       },
       "synthetic/01-blade-directives/control-structures/01-if-basic": {
-        "avg": 0.33,
-        "min": 0.3,
-        "max": 0.36,
-        "runs": 5
+        "avg": 0.46,
+        "min": 0.24,
+        "max": 1.82,
+        "runs": 100,
+        "cpuUser": 169.81,
+        "cpuSystem": 4.57,
+        "heapUsed": 15386992,
+        "heapTotal": 31604736,
+        "rss": 107036672,
+        "heapDelta": 6812200
       },
       "synthetic/01-blade-directives/control-structures/02-unless": {
-        "avg": 0.43,
-        "min": 0.35,
-        "max": 0.68,
-        "runs": 5
+        "avg": 0.4,
+        "min": 0.24,
+        "max": 1.26,
+        "runs": 100,
+        "cpuUser": 147.4,
+        "cpuSystem": 2.04,
+        "heapUsed": 19425640,
+        "heapTotal": 30818304,
+        "rss": 108871680,
+        "heapDelta": 10703584
       },
       "synthetic/01-blade-directives/control-structures/03-switch-case": {
-        "avg": 0.41,
-        "min": 0.35,
-        "max": 0.59,
-        "runs": 5
+        "avg": 0.45,
+        "min": 0.26,
+        "max": 1.25,
+        "runs": 100,
+        "cpuUser": 186.38,
+        "cpuSystem": 1.82,
+        "heapUsed": 13716424,
+        "heapTotal": 31866880,
+        "rss": 112394240,
+        "heapDelta": 4941928
       },
       "synthetic/01-blade-directives/control-structures/04-isset-empty": {
-        "avg": 0.33,
-        "min": 0.32,
-        "max": 0.35,
-        "runs": 5
+        "avg": 0.42,
+        "min": 0.24,
+        "max": 1.25,
+        "runs": 100,
+        "cpuUser": 170.81,
+        "cpuSystem": 2.2,
+        "heapUsed": 21029848,
+        "heapTotal": 48119808,
+        "rss": 118145024,
+        "heapDelta": 12121328
       },
       "synthetic/01-blade-directives/control-structures/05-if-nested": {
-        "avg": 0.38,
-        "min": 0.35,
-        "max": 0.4,
-        "runs": 5
+        "avg": 0.46,
+        "min": 0.26,
+        "max": 1.27,
+        "runs": 100,
+        "cpuUser": 162.33,
+        "cpuSystem": 3.44,
+        "heapUsed": 14556504,
+        "heapTotal": 47595520,
+        "rss": 137461760,
+        "heapDelta": 5631584
       },
       "synthetic/01-blade-directives/forms/01-csrf-method": {
-        "avg": 0.4,
-        "min": 0.3,
-        "max": 0.62,
-        "runs": 5
+        "avg": 0.42,
+        "min": 0.26,
+        "max": 1.3,
+        "runs": 100,
+        "cpuUser": 151.38,
+        "cpuSystem": 2.12,
+        "heapUsed": 16006736,
+        "heapTotal": 47595520,
+        "rss": 141656064,
+        "heapDelta": 7068960
       },
       "synthetic/01-blade-directives/includes/01-include-basic": {
-        "avg": 0.27,
+        "avg": 0.36,
         "min": 0.24,
-        "max": 0.29,
-        "runs": 5
+        "max": 1.45,
+        "runs": 100,
+        "cpuUser": 153.13,
+        "cpuSystem": 1.05,
+        "heapUsed": 22567008,
+        "heapTotal": 47595520,
+        "rss": 141918208,
+        "heapDelta": 13661360
       },
       "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
-        "avg": 0.25,
-        "min": 0.23,
-        "max": 0.28,
-        "runs": 5
+        "avg": 0.44,
+        "min": 0.28,
+        "max": 1.09,
+        "runs": 100,
+        "cpuUser": 103.15,
+        "cpuSystem": 2.98,
+        "heapUsed": 15500520,
+        "heapTotal": 21905408,
+        "rss": 79282176,
+        "heapDelta": 7731816
       },
       "synthetic/01-blade-directives/includes/03-include-first": {
-        "avg": 0.26,
-        "min": 0.24,
-        "max": 0.29,
-        "runs": 5
+        "avg": 0.38,
+        "min": 0.25,
+        "max": 1.48,
+        "runs": 100,
+        "cpuUser": 122.54,
+        "cpuSystem": 2.8,
+        "heapUsed": 13996104,
+        "heapTotal": 30556160,
+        "rss": 100368384,
+        "heapDelta": 5765960
       },
       "synthetic/01-blade-directives/includes/04-each": {
-        "avg": 0.32,
-        "min": 0.29,
-        "max": 0.34,
-        "runs": 5
+        "avg": 0.4,
+        "min": 0.24,
+        "max": 1.1,
+        "runs": 100,
+        "cpuUser": 140.75,
+        "cpuSystem": 2.58,
+        "heapUsed": 16855944,
+        "heapTotal": 29769728,
+        "rss": 103432192,
+        "heapDelta": 8471024
       },
       "synthetic/01-blade-directives/loops/01-foreach-basic": {
-        "avg": 0.32,
-        "min": 0.31,
-        "max": 0.33,
-        "runs": 5
+        "avg": 0.45,
+        "min": 0.27,
+        "max": 1.34,
+        "runs": 100,
+        "cpuUser": 171.96,
+        "cpuSystem": 1.63,
+        "heapUsed": 16081768,
+        "heapTotal": 31080448,
+        "rss": 106299392,
+        "heapDelta": 7549376
       },
       "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
-        "avg": 0.36,
-        "min": 0.33,
-        "max": 0.4,
-        "runs": 5
+        "avg": 0.46,
+        "min": 0.28,
+        "max": 2.02,
+        "runs": 100,
+        "cpuUser": 169.61,
+        "cpuSystem": 1.86,
+        "heapUsed": 19493064,
+        "heapTotal": 30818304,
+        "rss": 110723072,
+        "heapDelta": 10790872
       },
       "synthetic/01-blade-directives/loops/03-forelse": {
-        "avg": 0.43,
-        "min": 0.4,
-        "max": 0.48,
-        "runs": 5
+        "avg": 0.48,
+        "min": 0.3,
+        "max": 1.59,
+        "runs": 100,
+        "cpuUser": 169.34,
+        "cpuSystem": 2.71,
+        "heapUsed": 23303328,
+        "heapTotal": 47595520,
+        "rss": 128024576,
+        "heapDelta": 14571784
       },
       "synthetic/01-blade-directives/loops/04-for": {
-        "avg": 0.42,
-        "min": 0.39,
-        "max": 0.47,
-        "runs": 5
+        "avg": 0.48,
+        "min": 0.31,
+        "max": 1.88,
+        "runs": 100,
+        "cpuUser": 191.57,
+        "cpuSystem": 2.13,
+        "heapUsed": 21051976,
+        "heapTotal": 47857664,
+        "rss": 128614400,
+        "heapDelta": 12200880
       },
       "synthetic/01-blade-directives/loops/05-while": {
-        "avg": 0.37,
-        "min": 0.34,
-        "max": 0.41,
-        "runs": 5
+        "avg": 0.56,
+        "min": 0.35,
+        "max": 1.38,
+        "runs": 100,
+        "cpuUser": 145.22,
+        "cpuSystem": 3.36,
+        "heapUsed": 14962624,
+        "heapTotal": 22691840,
+        "rss": 81936384,
+        "heapDelta": 7138968
       },
       "synthetic/01-blade-directives/loops/06-loop-control": {
-        "avg": 0.47,
-        "min": 0.44,
-        "max": 0.53,
-        "runs": 5
+        "avg": 0.51,
+        "min": 0.33,
+        "max": 1.33,
+        "runs": 100,
+        "cpuUser": 153.17,
+        "cpuSystem": 2.63,
+        "heapUsed": 15161184,
+        "heapTotal": 31080448,
+        "rss": 102367232,
+        "heapDelta": 6765272
       },
       "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
-        "avg": 0.29,
-        "min": 0.27,
-        "max": 0.33,
-        "runs": 5
+        "avg": 0.39,
+        "min": 0.23,
+        "max": 1.16,
+        "runs": 100,
+        "cpuUser": 154.03,
+        "cpuSystem": 1.83,
+        "heapUsed": 17243968,
+        "heapTotal": 30556160,
+        "rss": 106070016,
+        "heapDelta": 8629744
       },
       "synthetic/01-blade-directives/stacks/02-once": {
-        "avg": 0.31,
-        "min": 0.29,
-        "max": 0.36,
-        "runs": 5
+        "avg": 0.37,
+        "min": 0.23,
+        "max": 0.95,
+        "runs": 100,
+        "cpuUser": 132,
+        "cpuSystem": 1.58,
+        "heapUsed": 15211672,
+        "heapTotal": 30556160,
+        "rss": 109477888,
+        "heapDelta": 6537456
       },
       "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
-        "avg": 0.59,
-        "min": 0.58,
-        "max": 0.61,
-        "runs": 5
+        "avg": 0.58,
+        "min": 0.38,
+        "max": 1.89,
+        "runs": 100,
+        "cpuUser": 197.64,
+        "cpuSystem": 1.85,
+        "heapUsed": 19983208,
+        "heapTotal": 31080448,
+        "rss": 114294784,
+        "heapDelta": 11213232
       },
       "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
-        "avg": 0.6,
-        "min": 0.57,
-        "max": 0.64,
-        "runs": 5
+        "avg": 0.61,
+        "min": 0.44,
+        "max": 1.94,
+        "runs": 100,
+        "cpuUser": 179.76,
+        "cpuSystem": 3.05,
+        "heapUsed": 27514584,
+        "heapTotal": 47595520,
+        "rss": 132923392,
+        "heapDelta": 19017648
       },
       "synthetic/01-blade-directives/template-inheritance/03-section-show": {
-        "avg": 0.9,
-        "min": 0.78,
-        "max": 1.19,
-        "runs": 5
+        "avg": 0.97,
+        "min": 0.65,
+        "max": 3.18,
+        "runs": 100,
+        "cpuUser": 217.75,
+        "cpuSystem": 5.87,
+        "heapUsed": 14715008,
+        "heapTotal": 31342592,
+        "rss": 95698944,
+        "heapDelta": 6770304
       },
       "synthetic/02-livewire/actions/01-wire-click": {
-        "avg": 0.3,
-        "min": 0.28,
-        "max": 0.34,
-        "runs": 5
+        "avg": 0.44,
+        "min": 0.26,
+        "max": 1.23,
+        "runs": 100,
+        "cpuUser": 146.51,
+        "cpuSystem": 2.58,
+        "heapUsed": 13639720,
+        "heapTotal": 19283968,
+        "rss": 99778560,
+        "heapDelta": 5047192
       },
       "synthetic/02-livewire/actions/02-wire-submit": {
-        "avg": 0.43,
-        "min": 0.4,
-        "max": 0.47,
-        "runs": 5
+        "avg": 0.51,
+        "min": 0.31,
+        "max": 1.4,
+        "runs": 100,
+        "cpuUser": 172.34,
+        "cpuSystem": 2.04,
+        "heapUsed": 16192848,
+        "heapTotal": 22691840,
+        "rss": 103972864,
+        "heapDelta": 7582840
       },
       "synthetic/02-livewire/actions/03-wire-keydown": {
-        "avg": 0.38,
-        "min": 0.36,
-        "max": 0.42,
-        "runs": 5
+        "avg": 0.46,
+        "min": 0.3,
+        "max": 1.44,
+        "runs": 100,
+        "cpuUser": 156.74,
+        "cpuSystem": 1.82,
+        "heapUsed": 14114824,
+        "heapTotal": 31342592,
+        "rss": 106823680,
+        "heapDelta": 5287648
       },
       "synthetic/02-livewire/actions/04-event-modifiers": {
-        "avg": 0.41,
-        "min": 0.39,
-        "max": 0.43,
-        "runs": 5
+        "avg": 0.49,
+        "min": 0.3,
+        "max": 1.53,
+        "runs": 100,
+        "cpuUser": 171.82,
+        "cpuSystem": 1.49,
+        "heapUsed": 14210608,
+        "heapTotal": 31342592,
+        "rss": 109461504,
+        "heapDelta": 5399584
       },
       "synthetic/02-livewire/data-binding/01-wire-model-basic": {
-        "avg": 0.38,
-        "min": 0.35,
-        "max": 0.42,
-        "runs": 5
+        "avg": 0.47,
+        "min": 0.27,
+        "max": 1.48,
+        "runs": 100,
+        "cpuUser": 180.68,
+        "cpuSystem": 1.57,
+        "heapUsed": 20391464,
+        "heapTotal": 31342592,
+        "rss": 110100480,
+        "heapDelta": 11509128
       },
       "synthetic/02-livewire/data-binding/02-wire-model-live": {
-        "avg": 0.34,
-        "min": 0.32,
-        "max": 0.36,
-        "runs": 5
+        "avg": 0.41,
+        "min": 0.25,
+        "max": 1.21,
+        "runs": 100,
+        "cpuUser": 144.06,
+        "cpuSystem": 1.05,
+        "heapUsed": 15371176,
+        "heapTotal": 31604736,
+        "rss": 110379008,
+        "heapDelta": 6505640
       },
       "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
-        "avg": 0.29,
-        "min": 0.27,
-        "max": 0.33,
-        "runs": 5
+        "avg": 0.54,
+        "min": 0.31,
+        "max": 1.41,
+        "runs": 100,
+        "cpuUser": 134.84,
+        "cpuSystem": 4.09,
+        "heapUsed": 14374624,
+        "heapTotal": 22429696,
+        "rss": 81543168,
+        "heapDelta": 6639648
       },
       "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
-        "avg": 0.36,
-        "min": 0.34,
-        "max": 0.4,
-        "runs": 5
+        "avg": 0.46,
+        "min": 0.29,
+        "max": 1.38,
+        "runs": 100,
+        "cpuUser": 159.37,
+        "cpuSystem": 3.11,
+        "heapUsed": 15086360,
+        "heapTotal": 30556160,
+        "rss": 103694336,
+        "heapDelta": 6737816
       },
       "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
-        "avg": 0.28,
+        "avg": 0.37,
         "min": 0.25,
-        "max": 0.32,
-        "runs": 5
+        "max": 1.12,
+        "runs": 100,
+        "cpuUser": 136.11,
+        "cpuSystem": 1.89,
+        "heapUsed": 18355312,
+        "heapTotal": 30556160,
+        "rss": 107528192,
+        "heapDelta": 9791824
       },
       "synthetic/03-alpine/data-reactivity/02-x-init": {
-        "avg": 0.38,
-        "min": 0.3,
-        "max": 0.62,
-        "runs": 5
+        "avg": 0.4,
+        "min": 0.26,
+        "max": 1.23,
+        "runs": 100,
+        "cpuUser": 151.42,
+        "cpuSystem": 1.66,
+        "heapUsed": 16254104,
+        "heapTotal": 30556160,
+        "rss": 110772224,
+        "heapDelta": 7604816
       },
       "synthetic/03-alpine/data-reactivity/03-x-effect": {
-        "avg": 0.45,
-        "min": 0.43,
-        "max": 0.49,
-        "runs": 5
+        "avg": 0.47,
+        "min": 0.29,
+        "max": 1.57,
+        "runs": 100,
+        "cpuUser": 172.74,
+        "cpuSystem": 2.02,
+        "heapUsed": 13281128,
+        "heapTotal": 30556160,
+        "rss": 113475584,
+        "heapDelta": 4666936
       },
       "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
-        "avg": 0.63,
-        "min": 0.59,
-        "max": 0.67,
-        "runs": 5
+        "avg": 0.59,
+        "min": 0.37,
+        "max": 2.19,
+        "runs": 100,
+        "cpuUser": 196.73,
+        "cpuSystem": 3.17,
+        "heapUsed": 19665128,
+        "heapTotal": 47857664,
+        "rss": 131678208,
+        "heapDelta": 10885584
       },
       "synthetic/03-alpine/data-reactivity/05-alpine-store": {
-        "avg": 0.67,
-        "min": 0.56,
-        "max": 0.91,
-        "runs": 5
+        "avg": 0.62,
+        "min": 0.44,
+        "max": 1.82,
+        "runs": 100,
+        "cpuUser": 168.72,
+        "cpuSystem": 2.13,
+        "heapUsed": 13621496,
+        "heapTotal": 48381952,
+        "rss": 132415488,
+        "heapDelta": 4880040
       },
       "synthetic/03-alpine/events/01-x-on-basic": {
-        "avg": 0.28,
-        "min": 0.25,
-        "max": 0.31,
-        "runs": 5
+        "avg": 0.37,
+        "min": 0.22,
+        "max": 1.25,
+        "runs": 100,
+        "cpuUser": 137.11,
+        "cpuSystem": 1.65,
+        "heapUsed": 24088800,
+        "heapTotal": 47857664,
+        "rss": 132743168,
+        "heapDelta": 15286704
       },
       "synthetic/03-alpine/events/02-x-on-modifiers": {
-        "avg": 0.28,
-        "min": 0.26,
-        "max": 0.3,
-        "runs": 5
+        "avg": 0.35,
+        "min": 0.22,
+        "max": 1.11,
+        "runs": 100,
+        "cpuUser": 149.95,
+        "cpuSystem": 1.19,
+        "heapUsed": 26848072,
+        "heapTotal": 47071232,
+        "rss": 133529600,
+        "heapDelta": 17983000
       },
       "synthetic/03-alpine/events/03-x-on-keyboard": {
-        "avg": 0.25,
+        "avg": 0.38,
         "min": 0.23,
-        "max": 0.27,
-        "runs": 5
+        "max": 1.53,
+        "runs": 100,
+        "cpuUser": 156.65,
+        "cpuSystem": 1.91,
+        "heapUsed": 24939624,
+        "heapTotal": 47595520,
+        "rss": 133742592,
+        "heapDelta": 16039216
       },
       "synthetic/04-combinations/level-1-simple/01-if-echo": {
-        "avg": 0.31,
-        "min": 0.29,
-        "max": 0.34,
-        "runs": 5
+        "avg": 0.4,
+        "min": 0.27,
+        "max": 1.29,
+        "runs": 100,
+        "cpuUser": 140.47,
+        "cpuSystem": 1.47,
+        "heapUsed": 15841680,
+        "heapTotal": 47595520,
+        "rss": 133906432,
+        "heapDelta": 6982528
       },
       "synthetic/04-combinations/level-1-simple/02-foreach-component": {
-        "avg": 0.27,
-        "min": 0.25,
-        "max": 0.3,
-        "runs": 5
+        "avg": 0.53,
+        "min": 0.33,
+        "max": 1.21,
+        "runs": 100,
+        "cpuUser": 122.59,
+        "cpuSystem": 3.81,
+        "heapUsed": 15730256,
+        "heapTotal": 22167552,
+        "rss": 81002496,
+        "heapDelta": 7948440
       },
       "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
-        "avg": 0.29,
-        "min": 0.26,
-        "max": 0.33,
-        "runs": 5
+        "avg": 0.44,
+        "min": 0.27,
+        "max": 1.49,
+        "runs": 100,
+        "cpuUser": 157.27,
+        "cpuSystem": 3.21,
+        "heapUsed": 13382328,
+        "heapTotal": 30556160,
+        "rss": 100876288,
+        "heapDelta": 5037936
       },
       "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
-        "avg": 0.3,
-        "min": 0.27,
-        "max": 0.34,
-        "runs": 5
+        "avg": 0.43,
+        "min": 0.28,
+        "max": 1.2,
+        "runs": 100,
+        "cpuUser": 146.1,
+        "cpuSystem": 2.42,
+        "heapUsed": 13038272,
+        "heapTotal": 30556160,
+        "rss": 106184704,
+        "heapDelta": 4535144
       },
       "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
-        "avg": 0.45,
-        "min": 0.44,
-        "max": 0.48,
-        "runs": 5
+        "avg": 0.6,
+        "min": 0.38,
+        "max": 2.34,
+        "runs": 100,
+        "cpuUser": 177.98,
+        "cpuSystem": 2.3,
+        "heapUsed": 14411096,
+        "heapTotal": 31080448,
+        "rss": 109297664,
+        "heapDelta": 5726008
       },
       "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
-        "avg": 0.36,
-        "min": 0.33,
-        "max": 0.38,
-        "runs": 5
+        "avg": 0.46,
+        "min": 0.29,
+        "max": 1.26,
+        "runs": 100,
+        "cpuUser": 149.65,
+        "cpuSystem": 1.76,
+        "heapUsed": 21528656,
+        "heapTotal": 47595520,
+        "rss": 112017408,
+        "heapDelta": 12773200
       },
       "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
-        "avg": 0.39,
-        "min": 0.37,
-        "max": 0.41,
-        "runs": 5
+        "avg": 0.5,
+        "min": 0.3,
+        "max": 1.43,
+        "runs": 100,
+        "cpuUser": 161.34,
+        "cpuSystem": 2.92,
+        "heapUsed": 20296488,
+        "heapTotal": 47333376,
+        "rss": 130875392,
+        "heapDelta": 11460272
       },
       "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
-        "avg": 0.41,
-        "min": 0.38,
-        "max": 0.43,
-        "runs": 5
+        "avg": 0.44,
+        "min": 0.31,
+        "max": 1.23,
+        "runs": 100,
+        "cpuUser": 137.74,
+        "cpuSystem": 1.41,
+        "heapUsed": 25906680,
+        "heapTotal": 47333376,
+        "rss": 130957312,
+        "heapDelta": 16910704
       },
       "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
-        "avg": 0.33,
-        "min": 0.3,
-        "max": 0.36,
-        "runs": 5
+        "avg": 0.55,
+        "min": 0.33,
+        "max": 1.45,
+        "runs": 100,
+        "cpuUser": 137.79,
+        "cpuSystem": 3.59,
+        "heapUsed": 14657856,
+        "heapTotal": 22429696,
+        "rss": 85835776,
+        "heapDelta": 6884824
       },
       "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
-        "avg": 0.39,
-        "min": 0.37,
-        "max": 0.44,
-        "runs": 5
+        "avg": 0.56,
+        "min": 0.35,
+        "max": 1.6,
+        "runs": 100,
+        "cpuUser": 191.72,
+        "cpuSystem": 3.88,
+        "heapUsed": 13840456,
+        "heapTotal": 31342592,
+        "rss": 106921984,
+        "heapDelta": 5497096
       },
       "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
-        "avg": 0.32,
-        "min": 0.3,
-        "max": 0.34,
-        "runs": 5
+        "avg": 0.5,
+        "min": 0.33,
+        "max": 1.23,
+        "runs": 100,
+        "cpuUser": 152.5,
+        "cpuSystem": 2.29,
+        "heapUsed": 18172032,
+        "heapTotal": 30294016,
+        "rss": 113033216,
+        "heapDelta": 9552208
       },
       "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
-        "avg": 0.36,
-        "min": 0.34,
-        "max": 0.4,
-        "runs": 5
+        "avg": 0.43,
+        "min": 0.31,
+        "max": 1.18,
+        "runs": 100,
+        "cpuUser": 133.97,
+        "cpuSystem": 1.5,
+        "heapUsed": 14573752,
+        "heapTotal": 30818304,
+        "rss": 113262592,
+        "heapDelta": 5718136
       },
       "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
-        "avg": 0.36,
+        "avg": 0.76,
         "min": 0.34,
-        "max": 0.4,
-        "runs": 5
+        "max": 3.79,
+        "runs": 100,
+        "cpuUser": 236.85,
+        "cpuSystem": 7.03,
+        "heapUsed": 17299968,
+        "heapTotal": 47857664,
+        "rss": 119029760,
+        "heapDelta": 8328840
       },
       "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
-        "avg": 0.45,
-        "min": 0.41,
-        "max": 0.49,
-        "runs": 5
+        "avg": 0.69,
+        "min": 0.45,
+        "max": 1.9,
+        "runs": 100,
+        "cpuUser": 174.7,
+        "cpuSystem": 4.69,
+        "heapUsed": 13953024,
+        "heapTotal": 22953984,
+        "rss": 94371840,
+        "heapDelta": 6059712
       },
       "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
-        "avg": 0.5,
-        "min": 0.47,
-        "max": 0.53,
-        "runs": 5
+        "avg": 0.65,
+        "min": 0.43,
+        "max": 1.9,
+        "runs": 100,
+        "cpuUser": 193.13,
+        "cpuSystem": 3.39,
+        "heapUsed": 15034752,
+        "heapTotal": 31866880,
+        "rss": 109903872,
+        "heapDelta": 6527552
       },
       "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
-        "avg": 0.4,
-        "min": 0.39,
-        "max": 0.42,
-        "runs": 5
+        "avg": 0.6,
+        "min": 0.36,
+        "max": 2.31,
+        "runs": 100,
+        "cpuUser": 203.81,
+        "cpuSystem": 2.94,
+        "heapUsed": 18764016,
+        "heapTotal": 30818304,
+        "rss": 118390784,
+        "heapDelta": 9903896
       },
       "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
-        "avg": 0.43,
-        "min": 0.42,
-        "max": 0.46,
-        "runs": 5
+        "avg": 0.54,
+        "min": 0.38,
+        "max": 1.46,
+        "runs": 100,
+        "cpuUser": 155.42,
+        "cpuSystem": 1.47,
+        "heapUsed": 16092576,
+        "heapTotal": 31342592,
+        "rss": 120930304,
+        "heapDelta": 7172032
       },
       "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
-        "avg": 0.55,
-        "min": 0.53,
-        "max": 0.59,
-        "runs": 5
+        "avg": 0.81,
+        "min": 0.54,
+        "max": 2.36,
+        "runs": 100,
+        "cpuUser": 190.49,
+        "cpuSystem": 4.17,
+        "heapUsed": 20165336,
+        "heapTotal": 31080448,
+        "rss": 90177536,
+        "heapDelta": 12226640
       },
       "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
-        "avg": 0.54,
-        "min": 0.5,
-        "max": 0.58,
-        "runs": 5
+        "avg": 0.69,
+        "min": 0.46,
+        "max": 2.17,
+        "runs": 100,
+        "cpuUser": 196.55,
+        "cpuSystem": 3.75,
+        "heapUsed": 13454912,
+        "heapTotal": 31342592,
+        "rss": 108625920,
+        "heapDelta": 4854016
       },
       "synthetic/04-combinations/level-3-complex/02-data-table": {
-        "avg": 0.73,
-        "min": 0.69,
-        "max": 0.78,
-        "runs": 5
+        "avg": 0.87,
+        "min": 0.64,
+        "max": 3.54,
+        "runs": 100,
+        "cpuUser": 230.44,
+        "cpuSystem": 2.57,
+        "heapUsed": 15273168,
+        "heapTotal": 31604736,
+        "rss": 110592000,
+        "heapDelta": 6367656
       },
       "synthetic/04-combinations/level-3-complex/03-modal-form": {
-        "avg": 0.85,
-        "min": 0.81,
-        "max": 0.91,
-        "runs": 5
+        "avg": 1.06,
+        "min": 0.74,
+        "max": 3.97,
+        "runs": 100,
+        "cpuUser": 269.4,
+        "cpuSystem": 4.42,
+        "heapUsed": 16158072,
+        "heapTotal": 48381952,
+        "rss": 137412608,
+        "heapDelta": 7177408
       },
       "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
-        "avg": 1.17,
-        "min": 1.14,
-        "max": 1.2,
-        "runs": 5
+        "avg": 1.43,
+        "min": 1.02,
+        "max": 4.63,
+        "runs": 100,
+        "cpuUser": 292.39,
+        "cpuSystem": 6.02,
+        "heapUsed": 20909920,
+        "heapTotal": 32129024,
+        "rss": 103596032,
+        "heapDelta": 12732808
       },
       "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
-        "avg": 1.63,
-        "min": 1.58,
-        "max": 1.67,
-        "runs": 5
+        "avg": 1.82,
+        "min": 1.42,
+        "max": 6.89,
+        "runs": 100,
+        "cpuUser": 341.64,
+        "cpuSystem": 7.6,
+        "heapUsed": 28822736,
+        "heapTotal": 48381952,
+        "rss": 124649472,
+        "heapDelta": 20579744
       },
       "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
-        "avg": 1.28,
-        "min": 1.03,
-        "max": 1.88,
-        "runs": 5
+        "avg": 0.55,
+        "min": 0.33,
+        "max": 1.41,
+        "runs": 100,
+        "cpuUser": 137.5,
+        "cpuSystem": 3.52,
+        "heapUsed": 15866784,
+        "heapTotal": 22429696,
+        "rss": 85639168,
+        "heapDelta": 8061872
       },
       "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
-        "avg": 0.93,
-        "min": 0.67,
-        "max": 1.29,
-        "runs": 5
+        "avg": 0.37,
+        "min": 0.24,
+        "max": 1,
+        "runs": 100,
+        "cpuUser": 117,
+        "cpuSystem": 2.12,
+        "heapUsed": 19136128,
+        "heapTotal": 31080448,
+        "rss": 104169472,
+        "heapDelta": 10732560
       },
       "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
-        "avg": 0.78,
-        "min": 0.7,
-        "max": 0.87,
-        "runs": 5
+        "avg": 0.45,
+        "min": 0.32,
+        "max": 1.57,
+        "runs": 100,
+        "cpuUser": 166.11,
+        "cpuSystem": 2.27,
+        "heapUsed": 13860776,
+        "heapTotal": 30818304,
+        "rss": 109314048,
+        "heapDelta": 5244008
       },
       "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
-        "avg": 0.67,
-        "min": 0.64,
-        "max": 0.7,
-        "runs": 5
+        "avg": 0.59,
+        "min": 0.37,
+        "max": 1.57,
+        "runs": 100,
+        "cpuUser": 143.48,
+        "cpuSystem": 3.31,
+        "heapUsed": 15482000,
+        "heapTotal": 22691840,
+        "rss": 82411520,
+        "heapDelta": 7651760
       },
       "valid/alpine_js": {
-        "avg": 0.42,
-        "min": 0.33,
-        "max": 0.55,
-        "runs": 5
+        "avg": 0.33,
+        "min": 0.18,
+        "max": 0.8,
+        "runs": 100,
+        "cpuUser": 123.04,
+        "cpuSystem": 3.07,
+        "heapUsed": 13031424,
+        "heapTotal": 17973248,
+        "rss": 88113152,
+        "heapDelta": 4853480
       },
       "valid/components": {
-        "avg": 0.49,
-        "min": 0.36,
-        "max": 0.59,
-        "runs": 5
+        "avg": 0.3,
+        "min": 0.2,
+        "max": 0.75,
+        "runs": 100,
+        "cpuUser": 93.86,
+        "cpuSystem": 2.06,
+        "heapUsed": 14619840,
+        "heapTotal": 22429696,
+        "rss": 99532800,
+        "heapDelta": 6084160
       },
       "valid/control_structures": {
-        "avg": 0.47,
-        "min": 0.39,
-        "max": 0.64,
-        "runs": 5
+        "avg": 0.3,
+        "min": 0.19,
+        "max": 0.88,
+        "runs": 100,
+        "cpuUser": 114.4,
+        "cpuSystem": 1.52,
+        "heapUsed": 15474568,
+        "heapTotal": 21905408,
+        "rss": 102776832,
+        "heapDelta": 6942120
       },
       "valid/livewire": {
-        "avg": 0.42,
-        "min": 0.29,
-        "max": 0.64,
-        "runs": 5
+        "avg": 0.36,
+        "min": 0.25,
+        "max": 0.92,
+        "runs": 100,
+        "cpuUser": 73.82,
+        "cpuSystem": 3.31,
+        "heapUsed": 15993568,
+        "heapTotal": 21381120,
+        "rss": 76644352,
+        "heapDelta": 8314328
       },
       "valid/nested_directives": {
-        "avg": 0.69,
-        "min": 0.62,
-        "max": 0.79,
-        "runs": 5
+        "avg": 0.41,
+        "min": 0.28,
+        "max": 1.11,
+        "runs": 100,
+        "cpuUser": 109.79,
+        "cpuSystem": 2.25,
+        "heapUsed": 16281736,
+        "heapTotal": 30818304,
+        "rss": 94978048,
+        "heapDelta": 8147112
       },
       "valid/simple_echo": {
-        "avg": 0.71,
-        "min": 0.36,
-        "max": 1.14,
-        "runs": 5
+        "avg": 0.3,
+        "min": 0.22,
+        "max": 0.98,
+        "runs": 100,
+        "cpuUser": 54.99,
+        "cpuSystem": 3.03,
+        "heapUsed": 14164040,
+        "heapTotal": 21643264,
+        "rss": 74678272,
+        "heapDelta": 6552656
       },
       "valid/template_inheritance": {
-        "avg": 0.7,
-        "min": 0.54,
-        "max": 1.03,
-        "runs": 5
+        "avg": 0.34,
+        "min": 0.22,
+        "max": 0.95,
+        "runs": 100,
+        "cpuUser": 100.49,
+        "cpuSystem": 2.73,
+        "heapUsed": 14637728,
+        "heapTotal": 30294016,
+        "rss": 92897280,
+        "heapDelta": 6553256
       }
     },
     "B": {
       "alpine/01-billing": {
-        "avg": 34.16,
-        "min": 28.91,
-        "max": 43.08,
-        "runs": 5
+        "avg": 22.3,
+        "min": 20.04,
+        "max": 41.38,
+        "runs": 100,
+        "cpuUser": 3270.31,
+        "cpuSystem": 71.07,
+        "heapUsed": 25651872,
+        "heapTotal": 129679360,
+        "rss": 259801088,
+        "heapDelta": 8994384
       },
       "alpine/02-faq": {
-        "avg": 10.51,
-        "min": 9.41,
-        "max": 11.74,
-        "runs": 5
+        "avg": 7.31,
+        "min": 5.9,
+        "max": 17.24,
+        "runs": 100,
+        "cpuUser": 1362.38,
+        "cpuSystem": 19.91,
+        "heapUsed": 36566504,
+        "heapTotal": 87212032,
+        "rss": 265060352,
+        "heapDelta": 17719872
       },
       "components/01-form": {
-        "avg": 3.72,
-        "min": 3.28,
-        "max": 4.31,
-        "runs": 5
+        "avg": 2.61,
+        "min": 2.11,
+        "max": 5.63,
+        "runs": 100,
+        "cpuUser": 680.34,
+        "cpuSystem": 8.7,
+        "heapUsed": 46964840,
+        "heapTotal": 76988416,
+        "rss": 272760832,
+        "heapDelta": 28873520
       },
       "components/02-billing": {
-        "avg": 15.41,
-        "min": 14.24,
-        "max": 16.98,
-        "runs": 5
+        "avg": 12.6,
+        "min": 11.01,
+        "max": 26.52,
+        "runs": 100,
+        "cpuUser": 2115.42,
+        "cpuSystem": 36.97,
+        "heapUsed": 115941024,
+        "heapTotal": 139116544,
+        "rss": 274202624,
+        "heapDelta": 97891792
       },
       "edge_cases/alpine_shorthand": {
-        "avg": 2.32,
-        "min": 2.09,
-        "max": 2.92,
-        "runs": 5
+        "avg": 2.34,
+        "min": 1.71,
+        "max": 5.21,
+        "runs": 100,
+        "cpuUser": 561.45,
+        "cpuSystem": 9.95,
+        "heapUsed": 58553784,
+        "heapTotal": 80396288,
+        "rss": 275038208,
+        "heapDelta": 39918280
       },
       "edge_cases/blade_comments": {
-        "avg": 0.63,
-        "min": 0.6,
-        "max": 0.64,
-        "runs": 5
+        "avg": 0.72,
+        "min": 0.52,
+        "max": 2.02,
+        "runs": 100,
+        "cpuUser": 235.56,
+        "cpuSystem": 3.44,
+        "heapUsed": 31913440,
+        "heapTotal": 60997632,
+        "rss": 274448384,
+        "heapDelta": 13911624
       },
       "edge_cases/crlf_line_endings": {
-        "avg": 0.96,
-        "min": 0.88,
-        "max": 1.11,
-        "runs": 5
-      },
-      "edge_cases/email_addresses": {
-        "avg": 0.53,
-        "min": 0.49,
-        "max": 0.57,
-        "runs": 5
-      },
-      "edge_cases/ternary_or": {
-        "avg": 2.25,
-        "min": 2.06,
-        "max": 2.74,
-        "runs": 5
-      },
-      "edge_cases/utf8_content": {
-        "avg": 2.01,
-        "min": 1.92,
-        "max": 2.18,
-        "runs": 5
-      },
-      "edge_cases/verbatim_blocks": {
-        "avg": 1.93,
-        "min": 1.68,
-        "max": 2.48,
-        "runs": 5
-      },
-      "error/malformed-dashboard": {
-        "avg": 5.68,
-        "min": 4.73,
-        "max": 6.96,
-        "runs": 5
-      },
-      "format/01-basic-messy": {
-        "avg": 1.57,
-        "min": 1.49,
-        "max": 1.71,
-        "runs": 5
-      },
-      "format/02-indentation-chaos": {
-        "avg": 3.12,
-        "min": 2.68,
-        "max": 4.17,
-        "runs": 5
-      },
-      "format/03-whitespace-hell": {
-        "avg": 0.9,
-        "min": 0.85,
-        "max": 0.96,
-        "runs": 5
-      },
-      "format/04-nested-directives-ugly": {
-        "avg": 3.31,
-        "min": 2.75,
-        "max": 4.22,
-        "runs": 5
-      },
-      "format/05-components-messy": {
-        "avg": 0.9,
-        "min": 0.81,
-        "max": 0.97,
-        "runs": 5
-      },
-      "format/06-mixed-content": {
-        "avg": 3.34,
-        "min": 3.05,
-        "max": 3.75,
-        "runs": 5
-      },
-      "format/07-real-world-mess": {
-        "avg": 3.77,
-        "min": 3.16,
-        "max": 4.68,
-        "runs": 5
-      },
-      "format/08-edge-cases": {
-        "avg": 1.17,
-        "min": 1.07,
-        "max": 1.26,
-        "runs": 5
-      },
-      "large/01-pagination": {
-        "avg": 82.81,
-        "min": 77.82,
-        "max": 87.89,
-        "runs": 5
-      },
-      "legacy/laravel4-master-layout": {
-        "avg": 7.06,
-        "min": 6.38,
-        "max": 7.54,
-        "runs": 5
-      },
-      "legacy/laravel5-auth-login": {
-        "avg": 9.96,
-        "min": 9.74,
-        "max": 10.46,
-        "runs": 5
-      },
-      "legacy/laravel5-auth-register": {
-        "avg": 9.72,
-        "min": 9.4,
-        "max": 10.08,
-        "runs": 5
-      },
-      "legacy/section-with-overwrite": {
-        "avg": 8.71,
-        "min": 7.83,
-        "max": 9.09,
-        "runs": 5
-      },
-      "livewire/01-layout": {
-        "avg": 8.26,
-        "min": 7.22,
-        "max": 8.94,
-        "runs": 5
-      },
-      "livewire/02-examples": {
-        "avg": 5.91,
-        "min": 5.51,
-        "max": 6.39,
-        "runs": 5
-      },
-      "livewire/03-dashboard-page": {
-        "avg": 12.91,
-        "min": 12.35,
-        "max": 13.42,
-        "runs": 5
-      },
-      "medium/01-tooltip": {
-        "avg": 4.73,
-        "min": 4.2,
-        "max": 5.21,
-        "runs": 5
-      },
-      "medium/02-select-button": {
-        "avg": 6.39,
-        "min": 5.45,
-        "max": 7.8,
-        "runs": 5
-      },
-      "small/01-checkbox": {
-        "avg": 0.39,
-        "min": 0.37,
-        "max": 0.43,
-        "runs": 5
-      },
-      "small/02-footer": {
-        "avg": 2.8,
-        "min": 2.23,
-        "max": 4.09,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/auth/01-auth-guest": {
-        "avg": 5.08,
-        "min": 4.51,
-        "max": 5.8,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/auth/02-can-cannot": {
-        "avg": 10.85,
-        "min": 10.12,
-        "max": 11.91,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/components/01-component-basic": {
-        "avg": 4.72,
-        "min": 4.27,
-        "max": 5.18,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/components/02-component-props": {
-        "avg": 8.87,
-        "min": 8.63,
-        "max": 9.29,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/components/03-component-slots": {
-        "avg": 7.76,
-        "min": 7.33,
-        "max": 8.25,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/components/04-component-attributes": {
-        "avg": 19.05,
-        "min": 17.66,
-        "max": 20.94,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/components/05-dynamic-component": {
-        "avg": 11.76,
-        "min": 11.05,
-        "max": 12.3,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/control-structures/01-if-basic": {
-        "avg": 6.34,
-        "min": 5.46,
-        "max": 7.45,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/control-structures/02-unless": {
-        "avg": 5.87,
-        "min": 5.39,
-        "max": 6.41,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/control-structures/03-switch-case": {
-        "avg": 8.25,
-        "min": 7.44,
-        "max": 9.18,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/control-structures/04-isset-empty": {
-        "avg": 8.11,
-        "min": 7.52,
-        "max": 8.38,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/control-structures/05-if-nested": {
-        "avg": 19.25,
-        "min": 18.18,
-        "max": 20.15,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/forms/01-csrf-method": {
-        "avg": 5.71,
-        "min": 5.23,
-        "max": 6.26,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/includes/01-include-basic": {
-        "avg": 5.59,
-        "min": 5.23,
-        "max": 6.07,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
-        "avg": 6.72,
-        "min": 6.39,
-        "max": 7.2,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/includes/03-include-first": {
-        "avg": 4.83,
-        "min": 4.45,
-        "max": 5.23,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/includes/04-each": {
-        "avg": 6.04,
-        "min": 5.68,
-        "max": 6.74,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/loops/01-foreach-basic": {
-        "avg": 13.13,
-        "min": 12.72,
-        "max": 13.49,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
-        "avg": 14.02,
-        "min": 13.57,
-        "max": 14.65,
-        "runs": 5
-      },
-      "synthetic/01-blade-directives/loops/03-forelse": {
         "avg": null,
         "error": true
       },
+      "edge_cases/email_addresses": {
+        "avg": 0.75,
+        "min": 0.55,
+        "max": 2.05,
+        "runs": 100,
+        "cpuUser": 170.93,
+        "cpuSystem": 4.57,
+        "heapUsed": 19445344,
+        "heapTotal": 36864000,
+        "rss": 96010240,
+        "heapDelta": 8095928
+      },
+      "edge_cases/ternary_or": {
+        "avg": 2.44,
+        "min": 1.96,
+        "max": 4.64,
+        "runs": 100,
+        "cpuUser": 440.06,
+        "cpuSystem": 9.44,
+        "heapUsed": 35915440,
+        "heapTotal": 65601536,
+        "rss": 127188992,
+        "heapDelta": 22560768
+      },
+      "edge_cases/utf8_content": {
+        "avg": 1.5,
+        "min": 1.16,
+        "max": 3.13,
+        "runs": 100,
+        "cpuUser": 346.38,
+        "cpuSystem": 4.67,
+        "heapUsed": 44701608,
+        "heapTotal": 67698688,
+        "rss": 136003584,
+        "heapDelta": 30615136
+      },
+      "edge_cases/verbatim_blocks": {
+        "avg": 1.28,
+        "min": 1,
+        "max": 3.01,
+        "runs": 100,
+        "cpuUser": 297.57,
+        "cpuSystem": 3.95,
+        "heapUsed": 30014088,
+        "heapTotal": 61931520,
+        "rss": 141836288,
+        "heapDelta": 15631816
+      },
+      "error/malformed-dashboard": {
+        "avg": 3.4,
+        "min": 2.65,
+        "max": 7.89,
+        "runs": 100,
+        "cpuUser": 700.83,
+        "cpuSystem": 11.38,
+        "heapUsed": 31143664,
+        "heapTotal": 71892992,
+        "rss": 152092672,
+        "heapDelta": 16388808
+      },
+      "format/01-basic-messy": {
+        "avg": 1.71,
+        "min": 1.21,
+        "max": 4.34,
+        "runs": 100,
+        "cpuUser": 449.47,
+        "cpuSystem": 7.34,
+        "heapUsed": 35052624,
+        "heapTotal": 68747264,
+        "rss": 159531008,
+        "heapDelta": 19449488
+      },
+      "format/02-indentation-chaos": {
+        "avg": 2.42,
+        "min": 1.77,
+        "max": 5.67,
+        "runs": 100,
+        "cpuUser": 635.92,
+        "cpuSystem": 7.4,
+        "heapUsed": 51775904,
+        "heapTotal": 74776576,
+        "rss": 164478976,
+        "heapDelta": 36219896
+      },
+      "format/03-whitespace-hell": {
+        "avg": 0.93,
+        "min": 0.73,
+        "max": 2.29,
+        "runs": 100,
+        "cpuUser": 232.97,
+        "cpuSystem": 2.67,
+        "heapUsed": 38530080,
+        "heapTotal": 62717952,
+        "rss": 164626432,
+        "heapDelta": 23849248
+      },
+      "format/04-nested-directives-ugly": {
+        "avg": 2.11,
+        "min": 1.69,
+        "max": 4.92,
+        "runs": 100,
+        "cpuUser": 473.38,
+        "cpuSystem": 4.98,
+        "heapUsed": 34928320,
+        "heapTotal": 71106560,
+        "rss": 165265408,
+        "heapDelta": 20751904
+      },
+      "format/05-components-messy": {
+        "avg": 0.76,
+        "min": 0.58,
+        "max": 1.92,
+        "runs": 100,
+        "cpuUser": 202.88,
+        "cpuSystem": 2.48,
+        "heapUsed": 32450952,
+        "heapTotal": 56688640,
+        "rss": 165396480,
+        "heapDelta": 18013160
+      },
+      "format/06-mixed-content": {
+        "avg": 2.93,
+        "min": 2.2,
+        "max": 6.79,
+        "runs": 100,
+        "cpuUser": 695.12,
+        "cpuSystem": 10.33,
+        "heapUsed": 26491784,
+        "heapTotal": 74792960,
+        "rss": 171081728,
+        "heapDelta": 10253072
+      },
+      "format/07-real-world-mess": {
+        "avg": 2.84,
+        "min": 2.26,
+        "max": 6.66,
+        "runs": 100,
+        "cpuUser": 660.45,
+        "cpuSystem": 8.41,
+        "heapUsed": 48510584,
+        "heapTotal": 75579392,
+        "rss": 171917312,
+        "heapDelta": 31368568
+      },
+      "format/08-edge-cases": {
+        "avg": 1.17,
+        "min": 0.85,
+        "max": 2.88,
+        "runs": 100,
+        "cpuUser": 354.04,
+        "cpuSystem": 4.27,
+        "heapUsed": 31330536,
+        "heapTotal": 66928640,
+        "rss": 173031424,
+        "heapDelta": 14993208
+      },
+      "large/01-pagination": {
+        "avg": null,
+        "error": true
+      },
+      "legacy/laravel4-master-layout": {
+        "avg": 6.97,
+        "min": 5.24,
+        "max": 14.68,
+        "runs": 100,
+        "cpuUser": 1160.95,
+        "cpuSystem": 31.58,
+        "heapUsed": 45549960,
+        "heapTotal": 96632832,
+        "rss": 172900352,
+        "heapDelta": 32274896
+      },
+      "legacy/laravel5-auth-login": {
+        "avg": 8.98,
+        "min": 7.51,
+        "max": 17.14,
+        "runs": 100,
+        "cpuUser": 1523.49,
+        "cpuSystem": 28.43,
+        "heapUsed": 26446496,
+        "heapTotal": 97157120,
+        "rss": 194691072,
+        "heapDelta": 11062912
+      },
+      "legacy/laravel5-auth-register": {
+        "avg": 8.94,
+        "min": 7.55,
+        "max": 20.2,
+        "runs": 100,
+        "cpuUser": 1622.79,
+        "cpuSystem": 27.61,
+        "heapUsed": 29820256,
+        "heapTotal": 97419264,
+        "rss": 211632128,
+        "heapDelta": 13134680
+      },
+      "legacy/section-with-overwrite": {
+        "avg": 8.1,
+        "min": 6.25,
+        "max": 17.67,
+        "runs": 100,
+        "cpuUser": 1516.6,
+        "cpuSystem": 29.68,
+        "heapUsed": 84750952,
+        "heapTotal": 121274368,
+        "rss": 238026752,
+        "heapDelta": 69274376
+      },
+      "livewire/01-layout": {
+        "avg": 7.48,
+        "min": 5.79,
+        "max": 16.45,
+        "runs": 100,
+        "cpuUser": 1485.17,
+        "cpuSystem": 18.28,
+        "heapUsed": 84711880,
+        "heapTotal": 110247936,
+        "rss": 242286592,
+        "heapDelta": 68401936
+      },
+      "livewire/02-examples": {
+        "avg": 5.72,
+        "min": 4.3,
+        "max": 12.93,
+        "runs": 100,
+        "cpuUser": 1164.55,
+        "cpuSystem": 17.78,
+        "heapUsed": 52835560,
+        "heapTotal": 76955648,
+        "rss": 246267904,
+        "heapDelta": 36196728
+      },
+      "livewire/03-dashboard-page": {
+        "avg": 11.96,
+        "min": 10.31,
+        "max": 27.93,
+        "runs": 100,
+        "cpuUser": 2060.85,
+        "cpuSystem": 34.28,
+        "heapUsed": 53146552,
+        "heapTotal": 103956480,
+        "rss": 246382592,
+        "heapDelta": 36443536
+      },
+      "medium/01-tooltip": {
+        "avg": 4.46,
+        "min": 3.2,
+        "max": 9.11,
+        "runs": 100,
+        "cpuUser": 782.06,
+        "cpuSystem": 23.18,
+        "heapUsed": 56133792,
+        "heapTotal": 85262336,
+        "rss": 161644544,
+        "heapDelta": 42913944
+      },
+      "medium/02-select-button": {
+        "avg": 4.62,
+        "min": 3.46,
+        "max": 11.94,
+        "runs": 100,
+        "cpuUser": 947.5,
+        "cpuSystem": 15.02,
+        "heapUsed": 35252368,
+        "heapTotal": 74252288,
+        "rss": 179339264,
+        "heapDelta": 20223344
+      },
+      "small/01-checkbox": {
+        "avg": 0.46,
+        "min": 0.34,
+        "max": 1.69,
+        "runs": 100,
+        "cpuUser": 128.59,
+        "cpuSystem": 1.84,
+        "heapUsed": 27059888,
+        "heapTotal": 67698688,
+        "rss": 179437568,
+        "heapDelta": 10995920
+      },
+      "small/02-footer": {
+        "avg": 2.14,
+        "min": 1.59,
+        "max": 4.69,
+        "runs": 100,
+        "cpuUser": 573.87,
+        "cpuSystem": 7.1,
+        "heapUsed": 41898800,
+        "heapTotal": 69009408,
+        "rss": 189710336,
+        "heapDelta": 26794712
+      },
+      "synthetic/01-blade-directives/auth/01-auth-guest": {
+        "avg": 4.5,
+        "min": 3.66,
+        "max": 10.8,
+        "runs": 100,
+        "cpuUser": 935.58,
+        "cpuSystem": 10.43,
+        "heapUsed": 41245760,
+        "heapTotal": 75300864,
+        "rss": 194592768,
+        "heapDelta": 25789096
+      },
+      "synthetic/01-blade-directives/auth/02-can-cannot": {
+        "avg": 9.46,
+        "min": 8.29,
+        "max": 20.11,
+        "runs": 100,
+        "cpuUser": 1693.47,
+        "cpuSystem": 34.81,
+        "heapUsed": 101990400,
+        "heapTotal": 134774784,
+        "rss": 256458752,
+        "heapDelta": 85656192
+      },
+      "synthetic/01-blade-directives/components/01-component-basic": {
+        "avg": 4.6,
+        "min": 3.7,
+        "max": 10.94,
+        "runs": 100,
+        "cpuUser": 968.03,
+        "cpuSystem": 14.54,
+        "heapUsed": 31019704,
+        "heapTotal": 77791232,
+        "rss": 263553024,
+        "heapDelta": 15060120
+      },
+      "synthetic/01-blade-directives/components/02-component-props": {
+        "avg": 7.15,
+        "min": 5.85,
+        "max": 16.73,
+        "runs": 100,
+        "cpuUser": 1407.16,
+        "cpuSystem": 19.13,
+        "heapUsed": 47239056,
+        "heapTotal": 80150528,
+        "rss": 270876672,
+        "heapDelta": 31389872
+      },
+      "synthetic/01-blade-directives/components/03-component-slots": {
+        "avg": 6.77,
+        "min": 5.52,
+        "max": 15.09,
+        "runs": 100,
+        "cpuUser": 1349.05,
+        "cpuSystem": 21.41,
+        "heapUsed": 46898976,
+        "heapTotal": 80150528,
+        "rss": 279642112,
+        "heapDelta": 29873952
+      },
+      "synthetic/01-blade-directives/components/04-component-attributes": {
+        "avg": 15.8,
+        "min": 13.82,
+        "max": 32.57,
+        "runs": 100,
+        "cpuUser": 2631.98,
+        "cpuSystem": 42.27,
+        "heapUsed": 106705608,
+        "heapTotal": 143507456,
+        "rss": 292519936,
+        "heapDelta": 87199136
+      },
+      "synthetic/01-blade-directives/components/05-dynamic-component": {
+        "avg": 11.42,
+        "min": 9.6,
+        "max": 24.51,
+        "runs": 100,
+        "cpuUser": 1856.67,
+        "cpuSystem": 41.63,
+        "heapUsed": 36831480,
+        "heapTotal": 103186432,
+        "rss": 216367104,
+        "heapDelta": 22825328
+      },
+      "synthetic/01-blade-directives/control-structures/01-if-basic": {
+        "avg": 5.84,
+        "min": 4.71,
+        "max": 13.64,
+        "runs": 100,
+        "cpuUser": 1193.53,
+        "cpuSystem": 16.29,
+        "heapUsed": 74067632,
+        "heapTotal": 95059968,
+        "rss": 234586112,
+        "heapDelta": 57866776
+      },
+      "synthetic/01-blade-directives/control-structures/02-unless": {
+        "avg": 5.99,
+        "min": 4.57,
+        "max": 13.53,
+        "runs": 100,
+        "cpuUser": 1311.94,
+        "cpuSystem": 20.76,
+        "heapUsed": 78281136,
+        "heapTotal": 101351424,
+        "rss": 255164416,
+        "heapDelta": 61423352
+      },
+      "synthetic/01-blade-directives/control-structures/03-switch-case": {
+        "avg": 7.74,
+        "min": 6.09,
+        "max": 15.84,
+        "runs": 100,
+        "cpuUser": 1519.54,
+        "cpuSystem": 25.52,
+        "heapUsed": 49758032,
+        "heapTotal": 102662144,
+        "rss": 271335424,
+        "heapDelta": 32698232
+      },
+      "synthetic/01-blade-directives/control-structures/04-isset-empty": {
+        "avg": 7.92,
+        "min": 6.17,
+        "max": 17.29,
+        "runs": 100,
+        "cpuUser": 1607.64,
+        "cpuSystem": 30.46,
+        "heapUsed": 25176216,
+        "heapTotal": 108691456,
+        "rss": 284082176,
+        "heapDelta": 9348336
+      },
+      "synthetic/01-blade-directives/control-structures/05-if-nested": {
+        "avg": 19.75,
+        "min": 17.14,
+        "max": 41.5,
+        "runs": 100,
+        "cpuUser": 3198.31,
+        "cpuSystem": 70.96,
+        "heapUsed": 91085472,
+        "heapTotal": 117342208,
+        "rss": 312295424,
+        "heapDelta": 74766288
+      },
+      "synthetic/01-blade-directives/forms/01-csrf-method": {
+        "avg": 5.81,
+        "min": 4.52,
+        "max": 12.21,
+        "runs": 100,
+        "cpuUser": 1210.19,
+        "cpuSystem": 23.58,
+        "heapUsed": 73291680,
+        "heapTotal": 97419264,
+        "rss": 312754176,
+        "heapDelta": 56833176
+      },
+      "synthetic/01-blade-directives/includes/01-include-basic": {
+        "avg": null,
+        "error": true
+      },
+      "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
+        "avg": 7.82,
+        "min": 5.88,
+        "max": 15.99,
+        "runs": 100,
+        "cpuUser": 1304.03,
+        "cpuSystem": 35.5,
+        "heapUsed": 64746128,
+        "heapTotal": 97157120,
+        "rss": 196263936,
+        "heapDelta": 51413448
+      },
+      "synthetic/01-blade-directives/includes/03-include-first": {
+        "avg": 5.21,
+        "min": 4.01,
+        "max": 12.34,
+        "runs": 100,
+        "cpuUser": 1058.98,
+        "cpuSystem": 15.96,
+        "heapUsed": 63540024,
+        "heapTotal": 87457792,
+        "rss": 216776704,
+        "heapDelta": 48052416
+      },
+      "synthetic/01-blade-directives/includes/04-each": {
+        "avg": 5.38,
+        "min": 4.24,
+        "max": 11.57,
+        "runs": 100,
+        "cpuUser": 1117.41,
+        "cpuSystem": 18.28,
+        "heapUsed": 65449824,
+        "heapTotal": 95846400,
+        "rss": 224755712,
+        "heapDelta": 49362088
+      },
+      "synthetic/01-blade-directives/loops/01-foreach-basic": {
+        "avg": 12.23,
+        "min": 10.63,
+        "max": 26.23,
+        "runs": 100,
+        "cpuUser": 2025.26,
+        "cpuSystem": 32.46,
+        "heapUsed": 64746632,
+        "heapTotal": 98992128,
+        "rss": 231407616,
+        "heapDelta": 48379632
+      },
+      "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
+        "avg": 13.02,
+        "min": 11.38,
+        "max": 28.27,
+        "runs": 100,
+        "cpuUser": 2180.7,
+        "cpuSystem": 39.48,
+        "heapUsed": 91369504,
+        "heapTotal": 123977728,
+        "rss": 271073280,
+        "heapDelta": 75294480
+      },
+      "synthetic/01-blade-directives/loops/03-forelse": {
+        "avg": 11.28,
+        "min": 9.79,
+        "max": 24.56,
+        "runs": 100,
+        "cpuUser": 2038,
+        "cpuSystem": 33.23,
+        "heapUsed": 45698864,
+        "heapTotal": 107724800,
+        "rss": 279592960,
+        "heapDelta": 29452656
+      },
       "synthetic/01-blade-directives/loops/04-for": {
-        "avg": 15.88,
-        "min": 15.23,
-        "max": 16.81,
-        "runs": 5
+        "avg": 14.73,
+        "min": 13.04,
+        "max": 28.19,
+        "runs": 100,
+        "cpuUser": 2467.67,
+        "cpuSystem": 42.45,
+        "heapUsed": 58937864,
+        "heapTotal": 114016256,
+        "rss": 301465600,
+        "heapDelta": 42872904
       },
       "synthetic/01-blade-directives/loops/05-while": {
-        "avg": 11,
-        "min": 10.31,
-        "max": 11.9,
-        "runs": 5
+        "avg": 11.24,
+        "min": 9.45,
+        "max": 22.69,
+        "runs": 100,
+        "cpuUser": 1813.22,
+        "cpuSystem": 48.52,
+        "heapUsed": 90145016,
+        "heapTotal": 123977728,
+        "rss": 225689600,
+        "heapDelta": 76253000
       },
       "synthetic/01-blade-directives/loops/06-loop-control": {
-        "avg": 19.99,
-        "min": 18.74,
-        "max": 23.51,
-        "runs": 5
+        "avg": 18.83,
+        "min": 16.64,
+        "max": 38.78,
+        "runs": 100,
+        "cpuUser": 3117.35,
+        "cpuSystem": 59.35,
+        "heapUsed": 96897800,
+        "heapTotal": 124502016,
+        "rss": 284590080,
+        "heapDelta": 81171160
       },
       "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
-        "avg": 5.57,
-        "min": 5.02,
-        "max": 5.92,
-        "runs": 5
+        "avg": 5.73,
+        "min": 4.53,
+        "max": 12.18,
+        "runs": 100,
+        "cpuUser": 1155.93,
+        "cpuSystem": 17.94,
+        "heapUsed": 94352280,
+        "heapTotal": 121815040,
+        "rss": 287866880,
+        "heapDelta": 76721336
       },
       "synthetic/01-blade-directives/stacks/02-once": {
-        "avg": 5.83,
-        "min": 5.3,
-        "max": 7.04,
-        "runs": 5
+        "avg": 5.69,
+        "min": 4.36,
+        "max": 12.54,
+        "runs": 100,
+        "cpuUser": 1220.82,
+        "cpuSystem": 18.31,
+        "heapUsed": 65057496,
+        "heapTotal": 101367808,
+        "rss": 291061760,
+        "heapDelta": 47550048
       },
       "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
-        "avg": 22.16,
-        "min": 21.24,
-        "max": 24.03,
-        "runs": 5
+        "avg": 22.52,
+        "min": 19.45,
+        "max": 40.74,
+        "runs": 100,
+        "cpuUser": 3622.38,
+        "cpuSystem": 71.4,
+        "heapUsed": 37420184,
+        "heapTotal": 129155072,
+        "rss": 313556992,
+        "heapDelta": 19349736
       },
       "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
-        "avg": 20.86,
-        "min": 20.34,
-        "max": 21.29,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/01-blade-directives/template-inheritance/03-section-show": {
-        "avg": 39.17,
-        "min": 37.15,
-        "max": 43.21,
-        "runs": 5
+        "avg": 36.81,
+        "min": 32.1,
+        "max": 64.24,
+        "runs": 100,
+        "cpuUser": 5397.05,
+        "cpuSystem": 127.54,
+        "heapUsed": 41965112,
+        "heapTotal": 143572992,
+        "rss": 284164096,
+        "heapDelta": 24969816
       },
       "synthetic/02-livewire/actions/01-wire-click": {
-        "avg": 5.22,
-        "min": 4.91,
-        "max": 5.6,
-        "runs": 5
+        "avg": 5.49,
+        "min": 4.25,
+        "max": 12.84,
+        "runs": 100,
+        "cpuUser": 1152.49,
+        "cpuSystem": 18.62,
+        "heapUsed": 75682248,
+        "heapTotal": 107659264,
+        "rss": 285900800,
+        "heapDelta": 56890624
       },
       "synthetic/02-livewire/actions/02-wire-submit": {
-        "avg": 7.83,
-        "min": 7.26,
-        "max": 8.25,
-        "runs": 5
+        "avg": 8.06,
+        "min": 6.61,
+        "max": 17.31,
+        "runs": 100,
+        "cpuUser": 1523.55,
+        "cpuSystem": 21.36,
+        "heapUsed": 127001152,
+        "heapTotal": 151437312,
+        "rss": 287457280,
+        "heapDelta": 108852944
       },
       "synthetic/02-livewire/actions/03-wire-keydown": {
-        "avg": 5.44,
-        "min": 4.82,
-        "max": 6.12,
-        "runs": 5
+        "avg": 5.37,
+        "min": 4.33,
+        "max": 11.63,
+        "runs": 100,
+        "cpuUser": 1088.39,
+        "cpuSystem": 15.94,
+        "heapUsed": 61813584,
+        "heapTotal": 90439680,
+        "rss": 287703040,
+        "heapDelta": 43253208
       },
       "synthetic/02-livewire/actions/04-event-modifiers": {
-        "avg": 4.31,
-        "min": 4.01,
-        "max": 4.63,
-        "runs": 5
+        "avg": 4.76,
+        "min": 3.81,
+        "max": 11.3,
+        "runs": 100,
+        "cpuUser": 993.09,
+        "cpuSystem": 15.25,
+        "heapUsed": 50549272,
+        "heapTotal": 84148224,
+        "rss": 289816576,
+        "heapDelta": 32154928
       },
       "synthetic/02-livewire/data-binding/01-wire-model-basic": {
-        "avg": 4.76,
-        "min": 4.2,
-        "max": 5.13,
-        "runs": 5
+        "avg": 5.38,
+        "min": 4.03,
+        "max": 11.49,
+        "runs": 100,
+        "cpuUser": 1137.44,
+        "cpuSystem": 21.49,
+        "heapUsed": 64336288,
+        "heapTotal": 94896128,
+        "rss": 290242560,
+        "heapDelta": 46161632
       },
       "synthetic/02-livewire/data-binding/02-wire-model-live": {
         "avg": null,
         "error": true
       },
       "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
-        "avg": 2.42,
-        "min": 2.2,
-        "max": 2.99,
-        "runs": 5
+        "avg": 3.25,
+        "min": 2.44,
+        "max": 8.37,
+        "runs": 100,
+        "cpuUser": 605.69,
+        "cpuSystem": 15.53,
+        "heapUsed": 34848360,
+        "heapTotal": 65863680,
+        "rss": 135938048,
+        "heapDelta": 22198192
       },
       "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
-        "avg": 4,
-        "min": 3.64,
-        "max": 4.76,
-        "runs": 5
+        "avg": 4.47,
+        "min": 3.78,
+        "max": 12.03,
+        "runs": 100,
+        "cpuUser": 838.08,
+        "cpuSystem": 13.67,
+        "heapUsed": 48356824,
+        "heapTotal": 75300864,
+        "rss": 157270016,
+        "heapDelta": 33940192
       },
       "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
-        "avg": 6.4,
-        "min": 5.54,
-        "max": 7.28,
-        "runs": 5
+        "avg": 5.28,
+        "min": 4.28,
+        "max": 11.97,
+        "runs": 100,
+        "cpuUser": 1001.26,
+        "cpuSystem": 14.68,
+        "heapUsed": 43365168,
+        "heapTotal": 78725120,
+        "rss": 166592512,
+        "heapDelta": 25806008
       },
       "synthetic/03-alpine/data-reactivity/02-x-init": {
-        "avg": 8.23,
-        "min": 7.61,
-        "max": 8.66,
-        "runs": 5
+        "avg": 7.35,
+        "min": 6.05,
+        "max": 16.02,
+        "runs": 100,
+        "cpuUser": 1427.53,
+        "cpuSystem": 26.07,
+        "heapUsed": 70657256,
+        "heapTotal": 99696640,
+        "rss": 190611456,
+        "heapDelta": 51586288
       },
       "synthetic/03-alpine/data-reactivity/03-x-effect": {
-        "avg": 8.33,
-        "min": 7.8,
-        "max": 8.77,
-        "runs": 5
+        "avg": 7.52,
+        "min": 6.32,
+        "max": 16.02,
+        "runs": 100,
+        "cpuUser": 1505.93,
+        "cpuSystem": 21.08,
+        "heapUsed": 77796856,
+        "heapTotal": 101187584,
+        "rss": 201080832,
+        "heapDelta": 57764728
       },
       "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
-        "avg": 13.02,
-        "min": 12.14,
-        "max": 13.76,
-        "runs": 5
+        "avg": 12.17,
+        "min": 10.55,
+        "max": 24.69,
+        "runs": 100,
+        "cpuUser": 2122.18,
+        "cpuSystem": 37.04,
+        "heapUsed": 54552984,
+        "heapTotal": 102154240,
+        "rss": 214597632,
+        "heapDelta": 34163296
       },
       "synthetic/03-alpine/data-reactivity/05-alpine-store": {
-        "avg": 14.48,
-        "min": 13.71,
-        "max": 15.87,
-        "runs": 5
+        "avg": 13.77,
+        "min": 11.95,
+        "max": 28.15,
+        "runs": 100,
+        "cpuUser": 2354.11,
+        "cpuSystem": 35.79,
+        "heapUsed": 65827616,
+        "heapTotal": 99270656,
+        "rss": 218710016,
+        "heapDelta": 46364248
       },
       "synthetic/03-alpine/events/01-x-on-basic": {
-        "avg": 3.28,
-        "min": 2.93,
-        "max": 3.74,
-        "runs": 5
+        "avg": 3.64,
+        "min": 2.81,
+        "max": 9.04,
+        "runs": 100,
+        "cpuUser": 857.7,
+        "cpuSystem": 13,
+        "heapUsed": 38591976,
+        "heapTotal": 83017728,
+        "rss": 220315648,
+        "heapDelta": 18541328
       },
       "synthetic/03-alpine/events/02-x-on-modifiers": {
-        "avg": 3.41,
-        "min": 3.12,
-        "max": 3.91,
-        "runs": 5
+        "avg": 3.91,
+        "min": 3.01,
+        "max": 9.85,
+        "runs": 100,
+        "cpuUser": 892.32,
+        "cpuSystem": 14.76,
+        "heapUsed": 26303352,
+        "heapTotal": 80658432,
+        "rss": 219971584,
+        "heapDelta": 6978440
       },
       "synthetic/03-alpine/events/03-x-on-keyboard": {
-        "avg": 3.6,
-        "min": 3.26,
-        "max": 4.06,
-        "runs": 5
+        "avg": 3.86,
+        "min": 2.97,
+        "max": 10.44,
+        "runs": 100,
+        "cpuUser": 889.78,
+        "cpuSystem": 15.52,
+        "heapUsed": 28692200,
+        "heapTotal": 81444864,
+        "rss": 220151808,
+        "heapDelta": 9093616
       },
       "synthetic/04-combinations/level-1-simple/01-if-echo": {
-        "avg": 7.47,
-        "min": 6.81,
-        "max": 8.14,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/04-combinations/level-1-simple/02-foreach-component": {
-        "avg": 3.87,
-        "min": 3.56,
-        "max": 4.21,
-        "runs": 5
+        "avg": 4.7,
+        "min": 3.46,
+        "max": 13.38,
+        "runs": 100,
+        "cpuUser": 863.53,
+        "cpuSystem": 21.95,
+        "heapUsed": 61210184,
+        "heapTotal": 80805888,
+        "rss": 155385856,
+        "heapDelta": 48269040
       },
       "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
-        "avg": 3.95,
-        "min": 3.65,
-        "max": 4.3,
-        "runs": 5
+        "avg": 4.47,
+        "min": 3.53,
+        "max": 13.98,
+        "runs": 100,
+        "cpuUser": 863.53,
+        "cpuSystem": 13.11,
+        "heapUsed": 50720176,
+        "heapTotal": 75563008,
+        "rss": 163627008,
+        "heapDelta": 36137048
       },
       "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
-        "avg": 12.36,
-        "min": 11.87,
-        "max": 12.89,
-        "runs": 5
+        "avg": 13.7,
+        "min": 11.12,
+        "max": 30.35,
+        "runs": 100,
+        "cpuUser": 2225.56,
+        "cpuSystem": 49.18,
+        "heapUsed": 94364200,
+        "heapTotal": 127090688,
+        "rss": 235094016,
+        "heapDelta": 76499280
       },
       "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
-        "avg": 8.74,
-        "min": 8.61,
-        "max": 8.98,
-        "runs": 5
+        "avg": 9.96,
+        "min": 8.37,
+        "max": 26.65,
+        "runs": 100,
+        "cpuUser": 1622.77,
+        "cpuSystem": 29.37,
+        "heapUsed": 66793256,
+        "heapTotal": 102711296,
+        "rss": 238698496,
+        "heapDelta": 46922392
       },
       "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
-        "avg": null,
-        "error": true
+        "avg": 17.44,
+        "min": 14.22,
+        "max": 35.98,
+        "runs": 100,
+        "cpuUser": 2938.65,
+        "cpuSystem": 56.52,
+        "heapUsed": 62144560,
+        "heapTotal": 118702080,
+        "rss": 263979008,
+        "heapDelta": 44262392
       },
       "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
-        "avg": 3.16,
-        "min": 2.91,
-        "max": 3.56,
-        "runs": 5
+        "avg": 3.44,
+        "min": 2.8,
+        "max": 10.94,
+        "runs": 100,
+        "cpuUser": 656.66,
+        "cpuSystem": 10.18,
+        "heapUsed": 33964880,
+        "heapTotal": 89866240,
+        "rss": 265191424,
+        "heapDelta": 14519672
       },
       "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
-        "avg": 24.74,
-        "min": 24.01,
-        "max": 25.86,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
-        "avg": 7.48,
-        "min": 7.33,
-        "max": 7.64,
-        "runs": 5
+        "avg": 8.55,
+        "min": 7.03,
+        "max": 18.81,
+        "runs": 100,
+        "cpuUser": 1434.96,
+        "cpuSystem": 35.77,
+        "heapUsed": 60798776,
+        "heapTotal": 95322112,
+        "rss": 195395584,
+        "heapDelta": 47352120
       },
       "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
-        "avg": 26.88,
-        "min": 25.52,
-        "max": 28.16,
-        "runs": 5
+        "avg": 28.67,
+        "min": 24.07,
+        "max": 57.64,
+        "runs": 100,
+        "cpuUser": 4307.35,
+        "cpuSystem": 96.2,
+        "heapUsed": 82996400,
+        "heapTotal": 139460608,
+        "rss": 265732096,
+        "heapDelta": 64288920
       },
       "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
-        "avg": 12.33,
-        "min": 11.73,
-        "max": 13.25,
-        "runs": 5
+        "avg": 12.8,
+        "min": 11.17,
+        "max": 26.97,
+        "runs": 100,
+        "cpuUser": 2051.03,
+        "cpuSystem": 29.9,
+        "heapUsed": 92377120,
+        "heapTotal": 128712704,
+        "rss": 267091968,
+        "heapDelta": 73846056
       },
       "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
-        "avg": 13.2,
-        "min": 12.4,
-        "max": 14.17,
-        "runs": 5
+        "avg": 14.82,
+        "min": 11.9,
+        "max": 32.96,
+        "runs": 100,
+        "cpuUser": 2475.49,
+        "cpuSystem": 49.84,
+        "heapUsed": 49722488,
+        "heapTotal": 115081216,
+        "rss": 273645568,
+        "heapDelta": 30952864
       },
       "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
-        "avg": null,
-        "error": true
+        "avg": 17.48,
+        "min": 14.21,
+        "max": 48.5,
+        "runs": 100,
+        "cpuUser": 2850.68,
+        "cpuSystem": 67.37,
+        "heapUsed": 47679744,
+        "heapTotal": 123207680,
+        "rss": 281608192,
+        "heapDelta": 28592824
       },
       "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
-        "avg": 17.66,
-        "min": 16.02,
-        "max": 22.27,
-        "runs": 5
+        "avg": 19.95,
+        "min": 16.06,
+        "max": 46.47,
+        "runs": 100,
+        "cpuUser": 2966.84,
+        "cpuSystem": 74.28,
+        "heapUsed": 51328608,
+        "heapTotal": 125042688,
+        "rss": 236077056,
+        "heapDelta": 34746536
       },
       "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
-        "avg": 18.25,
-        "min": 17.66,
-        "max": 18.78,
-        "runs": 5
+        "avg": 19.86,
+        "min": 16.3,
+        "max": 41.52,
+        "runs": 100,
+        "cpuUser": 3184.4,
+        "cpuSystem": 70.03,
+        "heapUsed": 66586816,
+        "heapTotal": 127303680,
+        "rss": 269205504,
+        "heapDelta": 46077976
       },
       "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
-        "avg": 27.83,
-        "min": 27.42,
-        "max": 28.72,
-        "runs": 5
+        "avg": 29.87,
+        "min": 26.64,
+        "max": 56.94,
+        "runs": 100,
+        "cpuUser": 4417.06,
+        "cpuSystem": 78.68,
+        "heapUsed": 129956048,
+        "heapTotal": 153780224,
+        "rss": 287981568,
+        "heapDelta": 109395960
       },
       "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
-        "avg": 22.01,
-        "min": 21.64,
-        "max": 22.73,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
-        "avg": 25.94,
-        "min": 23.84,
-        "max": 30.74,
-        "runs": 5
+        "avg": 26.47,
+        "min": 22.87,
+        "max": 52.62,
+        "runs": 100,
+        "cpuUser": 3881.71,
+        "cpuSystem": 85.76,
+        "heapUsed": 112660600,
+        "heapTotal": 138330112,
+        "rss": 251215872,
+        "heapDelta": 95811944
       },
       "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
-        "avg": 22.51,
-        "min": 22.33,
-        "max": 22.92,
-        "runs": 5
+        "avg": 23.73,
+        "min": 20.37,
+        "max": 44.32,
+        "runs": 100,
+        "cpuUser": 3696.1,
+        "cpuSystem": 71.05,
+        "heapUsed": 120941248,
+        "heapTotal": 146456576,
+        "rss": 281018368,
+        "heapDelta": 102627640
       },
       "synthetic/04-combinations/level-3-complex/02-data-table": {
-        "avg": null,
-        "error": true
+        "avg": 28.2,
+        "min": 25.75,
+        "max": 53.15,
+        "runs": 100,
+        "cpuUser": 4326.75,
+        "cpuSystem": 72.81,
+        "heapUsed": 31863256,
+        "heapTotal": 132825088,
+        "rss": 294862848,
+        "heapDelta": 12516536
       },
       "synthetic/04-combinations/level-3-complex/03-modal-form": {
-        "avg": 40.95,
-        "min": 40.6,
-        "max": 41.28,
-        "runs": 5
-      },
-      "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
         "avg": null,
         "error": true
+      },
+      "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
+        "avg": 114.89,
+        "min": 106.51,
+        "max": 179.45,
+        "runs": 100,
+        "cpuUser": 15888.28,
+        "cpuSystem": 421.62,
+        "heapUsed": 96635424,
+        "heapTotal": 158154752,
+        "rss": 352878592,
+        "heapDelta": 77722216
       },
       "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
         "avg": null,
         "error": true
       },
       "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
-        "avg": 21.09,
-        "min": 17.04,
-        "max": 27.48,
-        "runs": 5
+        "avg": 11.16,
+        "min": 9.31,
+        "max": 23.26,
+        "runs": 100,
+        "cpuUser": 1774.57,
+        "cpuSystem": 41.03,
+        "heapUsed": 36480056,
+        "heapTotal": 103284736,
+        "rss": 199819264,
+        "heapDelta": 20393168
       },
       "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
-        "avg": 11.41,
-        "min": 10.07,
-        "max": 14.04,
-        "runs": 5
+        "avg": 6.87,
+        "min": 5.51,
+        "max": 13.67,
+        "runs": 100,
+        "cpuUser": 1300.93,
+        "cpuSystem": 18.47,
+        "heapUsed": 74696040,
+        "heapTotal": 95420416,
+        "rss": 216760320,
+        "heapDelta": 56106952
       },
       "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
-        "avg": 423.02,
-        "min": 409.5,
-        "max": 433.67,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
-        "avg": 45.19,
-        "min": 41.7,
-        "max": 50.46,
-        "runs": 5
+        "avg": 41.61,
+        "min": 38.24,
+        "max": 69.65,
+        "runs": 100,
+        "cpuUser": 6554.55,
+        "cpuSystem": 171.14,
+        "heapUsed": 90930264,
+        "heapTotal": 120389632,
+        "rss": 257409024,
+        "heapDelta": 77089792
       },
       "valid/alpine_js": {
-        "avg": 1.74,
-        "min": 1.39,
-        "max": 2.59,
-        "runs": 5
+        "avg": 1.82,
+        "min": 1.18,
+        "max": 4.67,
+        "runs": 100,
+        "cpuUser": 459.91,
+        "cpuSystem": 9.41,
+        "heapUsed": 36296448,
+        "heapTotal": 67190784,
+        "rss": 183910400,
+        "heapDelta": 20890448
       },
       "valid/components": {
-        "avg": 1.13,
-        "min": 1.05,
-        "max": 1.22,
-        "runs": 5
+        "avg": 1.22,
+        "min": 0.77,
+        "max": 4.33,
+        "runs": 100,
+        "cpuUser": 386.62,
+        "cpuSystem": 5.39,
+        "heapUsed": 43696080,
+        "heapTotal": 74530816,
+        "rss": 184631296,
+        "heapDelta": 27322272
       },
       "valid/control_structures": {
-        "avg": 4.65,
-        "min": 4.07,
-        "max": 5.44,
-        "runs": 5
+        "avg": 4.27,
+        "min": 3,
+        "max": 9.63,
+        "runs": 100,
+        "cpuUser": 1005.64,
+        "cpuSystem": 21.79,
+        "heapUsed": 97615096,
+        "heapTotal": 130367488,
+        "rss": 233193472,
+        "heapDelta": 81500416
       },
       "valid/livewire": {
-        "avg": 0.66,
-        "min": 0.62,
-        "max": 0.72,
-        "runs": 5
+        "avg": 1.01,
+        "min": 0.67,
+        "max": 2.43,
+        "runs": 100,
+        "cpuUser": 215.08,
+        "cpuSystem": 7.17,
+        "heapUsed": 19292392,
+        "heapTotal": 37388288,
+        "rss": 100646912,
+        "heapDelta": 7887104
       },
       "valid/nested_directives": {
         "avg": null,
         "error": true
       },
       "valid/simple_echo": {
-        "avg": 3.58,
-        "min": 2.2,
-        "max": 4.73,
-        "runs": 5
+        "avg": 1.78,
+        "min": 1.22,
+        "max": 4.01,
+        "runs": 100,
+        "cpuUser": 336.13,
+        "cpuSystem": 11.97,
+        "heapUsed": 46231504,
+        "heapTotal": 69533696,
+        "rss": 137150464,
+        "heapDelta": 33792864
       },
       "valid/template_inheritance": {
-        "avg": 9.51,
-        "min": 8.55,
-        "max": 10.98,
-        "runs": 5
+        "avg": 5.5,
+        "min": 4.22,
+        "max": 10.17,
+        "runs": 100,
+        "cpuUser": 930.44,
+        "cpuSystem": 21.7,
+        "heapUsed": 71216856,
+        "heapTotal": 104841216,
+        "rss": 182206464,
+        "heapDelta": 57225248
       }
     },
     "C": {
       "alpine/01-billing": {
-        "avg": 41.31,
-        "min": 39.69,
-        "max": 44.99,
-        "runs": 5
+        "avg": 36.19,
+        "min": 33.16,
+        "max": 45.24,
+        "runs": 100,
+        "cpuUser": 4639.1,
+        "cpuSystem": 117.45,
+        "heapUsed": 35900960,
+        "heapTotal": 67862528,
+        "rss": 507428864,
+        "heapDelta": 10165040
       },
       "alpine/02-faq": {
-        "avg": 14.01,
-        "min": 13.22,
-        "max": 15.46,
-        "runs": 5
+        "avg": 12.2,
+        "min": 10.83,
+        "max": 16.26,
+        "runs": 100,
+        "cpuUser": 1878.71,
+        "cpuSystem": 53.37,
+        "heapUsed": 31103672,
+        "heapTotal": 72056832,
+        "rss": 574259200,
+        "heapDelta": 5807376
       },
       "components/01-form": {
-        "avg": 10.33,
-        "min": 8.93,
-        "max": 12.95,
-        "runs": 5
+        "avg": 8.11,
+        "min": 7.06,
+        "max": 11.81,
+        "runs": 100,
+        "cpuUser": 1325.27,
+        "cpuSystem": 44.82,
+        "heapUsed": 55280344,
+        "heapTotal": 81674240,
+        "rss": 636895232,
+        "heapDelta": 29773216
       },
       "components/02-billing": {
-        "avg": 20.12,
-        "min": 19.31,
-        "max": 21.35,
-        "runs": 5
+        "avg": 17.85,
+        "min": 16.19,
+        "max": 22.74,
+        "runs": 100,
+        "cpuUser": 2564.75,
+        "cpuSystem": 61.38,
+        "heapUsed": 50950112,
+        "heapTotal": 77185024,
+        "rss": 693370880,
+        "heapDelta": 24945456
       },
       "edge_cases/alpine_shorthand": {
-        "avg": 7.73,
-        "min": 7.39,
-        "max": 8.2,
-        "runs": 5
+        "avg": 7.65,
+        "min": 6.67,
+        "max": 11.7,
+        "runs": 100,
+        "cpuUser": 1146.07,
+        "cpuSystem": 42.36,
+        "heapUsed": 39963520,
+        "heapTotal": 77561856,
+        "rss": 741244928,
+        "heapDelta": 13817000
       },
       "edge_cases/blade_comments": {
-        "avg": 3.39,
-        "min": 3.04,
-        "max": 4.61,
-        "runs": 5
+        "avg": 3.35,
+        "min": 2.67,
+        "max": 6.24,
+        "runs": 100,
+        "cpuUser": 531.97,
+        "cpuSystem": 29.65,
+        "heapUsed": 59621232,
+        "heapTotal": 81854464,
+        "rss": 757727232,
+        "heapDelta": 33700408
       },
       "edge_cases/crlf_line_endings": {
-        "avg": 6.91,
-        "min": 6.76,
-        "max": 7.12,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "edge_cases/email_addresses": {
-        "avg": 3.25,
-        "min": 3.06,
-        "max": 3.82,
-        "runs": 5
+        "avg": 3.34,
+        "min": 2.72,
+        "max": 6.33,
+        "runs": 100,
+        "cpuUser": 478.59,
+        "cpuSystem": 31.17,
+        "heapUsed": 31811464,
+        "heapTotal": 78381056,
+        "rss": 226754560,
+        "heapDelta": 7475296
       },
       "edge_cases/ternary_or": {
-        "avg": 3.7,
-        "min": 3.42,
-        "max": 4.56,
-        "runs": 5
+        "avg": 3.71,
+        "min": 3.05,
+        "max": 6.41,
+        "runs": 100,
+        "cpuUser": 609.06,
+        "cpuSystem": 31.32,
+        "heapUsed": 69853184,
+        "heapTotal": 91783168,
+        "rss": 248070144,
+        "heapDelta": 43996496
       },
       "edge_cases/utf8_content": {
-        "avg": 3.57,
-        "min": 3.17,
-        "max": 4.9,
-        "runs": 5
+        "avg": 3.48,
+        "min": 2.81,
+        "max": 6.81,
+        "runs": 100,
+        "cpuUser": 590.69,
+        "cpuSystem": 27.89,
+        "heapUsed": 54199680,
+        "heapTotal": 78561280,
+        "rss": 265994240,
+        "heapDelta": 27420640
       },
       "edge_cases/verbatim_blocks": {
         "avg": null,
         "error": true
       },
       "error/malformed-dashboard": {
-        "avg": 15.05,
-        "min": 14.71,
-        "max": 15.8,
-        "runs": 5
+        "avg": 15.28,
+        "min": 13.86,
+        "max": 19.57,
+        "runs": 100,
+        "cpuUser": 2080.62,
+        "cpuSystem": 65.99,
+        "heapUsed": 37410160,
+        "heapTotal": 71155712,
+        "rss": 438091776,
+        "heapDelta": 12781496
       },
       "format/01-basic-messy": {
-        "avg": 7.55,
-        "min": 7.05,
-        "max": 8.19,
-        "runs": 5
+        "avg": 7.53,
+        "min": 6.59,
+        "max": 11.88,
+        "runs": 100,
+        "cpuUser": 1148.3,
+        "cpuSystem": 46.44,
+        "heapUsed": 54483568,
+        "heapTotal": 80625664,
+        "rss": 485982208,
+        "heapDelta": 29356616
       },
       "format/02-indentation-chaos": {
-        "avg": 7.82,
-        "min": 7.41,
-        "max": 8.44,
-        "runs": 5
+        "avg": 7.84,
+        "min": 6.9,
+        "max": 12.29,
+        "runs": 100,
+        "cpuUser": 1175.37,
+        "cpuSystem": 40.59,
+        "heapUsed": 48675656,
+        "heapTotal": 79691776,
+        "rss": 537919488,
+        "heapDelta": 23641928
       },
       "format/03-whitespace-hell": {
-        "avg": 3.47,
-        "min": 3.08,
-        "max": 4.17,
-        "runs": 5
+        "avg": 3.5,
+        "min": 2.88,
+        "max": 6.5,
+        "runs": 100,
+        "cpuUser": 602.59,
+        "cpuSystem": 29.24,
+        "heapUsed": 32278376,
+        "heapTotal": 79429632,
+        "rss": 554057728,
+        "heapDelta": 6995800
       },
       "format/04-nested-directives-ugly": {
-        "avg": 8.07,
-        "min": 7.43,
-        "max": 9.01,
-        "runs": 5
+        "avg": 7.73,
+        "min": 6.78,
+        "max": 10.82,
+        "runs": 100,
+        "cpuUser": 1210.41,
+        "cpuSystem": 38,
+        "heapUsed": 43236688,
+        "heapTotal": 81117184,
+        "rss": 607862784,
+        "heapDelta": 18286856
       },
       "format/05-components-messy": {
-        "avg": 3.01,
-        "min": 2.96,
-        "max": 3.04,
-        "runs": 5
+        "avg": 3.29,
+        "min": 2.74,
+        "max": 5.75,
+        "runs": 100,
+        "cpuUser": 587,
+        "cpuSystem": 27.68,
+        "heapUsed": 59673832,
+        "heapTotal": 93290496,
+        "rss": 623312896,
+        "heapDelta": 34137232
       },
       "format/06-mixed-content": {
-        "avg": 8.71,
-        "min": 7.02,
-        "max": 11.74,
-        "runs": 5
+        "avg": 7.35,
+        "min": 6.69,
+        "max": 10.49,
+        "runs": 100,
+        "cpuUser": 1114.93,
+        "cpuSystem": 34.95,
+        "heapUsed": 46282112,
+        "heapTotal": 78643200,
+        "rss": 671973376,
+        "heapDelta": 21174520
       },
       "format/07-real-world-mess": {
-        "avg": 8.19,
-        "min": 7.81,
-        "max": 8.66,
-        "runs": 5
+        "avg": 8.01,
+        "min": 7.03,
+        "max": 11.87,
+        "runs": 100,
+        "cpuUser": 1266.21,
+        "cpuSystem": 41.64,
+        "heapUsed": 60710120,
+        "heapTotal": 88604672,
+        "rss": 718323712,
+        "heapDelta": 34975392
       },
       "format/08-edge-cases": {
-        "avg": 3.5,
-        "min": 3.14,
-        "max": 4.65,
-        "runs": 5
+        "avg": 3.46,
+        "min": 2.87,
+        "max": 5.96,
+        "runs": 100,
+        "cpuUser": 616.21,
+        "cpuSystem": 26.76,
+        "heapUsed": 48797488,
+        "heapTotal": 81756160,
+        "rss": 735625216,
+        "heapDelta": 22842520
       },
       "large/01-pagination": {
-        "avg": 46.91,
-        "min": 46.24,
-        "max": 49.12,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "legacy/laravel4-master-layout": {
-        "avg": 10.73,
-        "min": 9.28,
-        "max": 13.37,
-        "runs": 5
+        "avg": 9.48,
+        "min": 8.23,
+        "max": 13.25,
+        "runs": 100,
+        "cpuUser": 1410.37,
+        "cpuSystem": 52.22,
+        "heapUsed": 61776904,
+        "heapTotal": 86769664,
+        "rss": 260210688,
+        "heapDelta": 36428992
       },
       "legacy/laravel5-auth-login": {
-        "avg": 13.88,
-        "min": 13.12,
-        "max": 14.84,
-        "runs": 5
+        "avg": 13.55,
+        "min": 12.17,
+        "max": 19.63,
+        "runs": 100,
+        "cpuUser": 1946.33,
+        "cpuSystem": 57.62,
+        "heapUsed": 34565784,
+        "heapTotal": 67862528,
+        "rss": 351649792,
+        "heapDelta": 7493584
       },
       "legacy/laravel5-auth-register": {
-        "avg": 13.96,
-        "min": 13.24,
-        "max": 15.22,
-        "runs": 5
+        "avg": 13.44,
+        "min": 12.16,
+        "max": 16.85,
+        "runs": 100,
+        "cpuUser": 1907.58,
+        "cpuSystem": 55.84,
+        "heapUsed": 45758312,
+        "heapTotal": 81264640,
+        "rss": 438157312,
+        "heapDelta": 20963200
       },
       "legacy/section-with-overwrite": {
-        "avg": 9.47,
-        "min": 8.9,
-        "max": 10.35,
-        "runs": 5
+        "avg": 9.43,
+        "min": 8.26,
+        "max": 13.52,
+        "runs": 100,
+        "cpuUser": 1470.16,
+        "cpuSystem": 46.22,
+        "heapUsed": 95133240,
+        "heapTotal": 118489088,
+        "rss": 499236864,
+        "heapDelta": 69943160
       },
       "livewire/01-layout": {
-        "avg": 11,
-        "min": 9.52,
-        "max": 12.56,
-        "runs": 5
+        "avg": 9.23,
+        "min": 8.03,
+        "max": 13,
+        "runs": 100,
+        "cpuUser": 1461.91,
+        "cpuSystem": 45.74,
+        "heapUsed": 46184216,
+        "heapTotal": 88195072,
+        "rss": 553566208,
+        "heapDelta": 20886592
       },
       "livewire/02-examples": {
-        "avg": 9.82,
-        "min": 9.15,
-        "max": 10.64,
-        "runs": 5
+        "avg": 9.32,
+        "min": 8.06,
+        "max": 14.88,
+        "runs": 100,
+        "cpuUser": 1416.77,
+        "cpuSystem": 46.45,
+        "heapUsed": 45718128,
+        "heapTotal": 84525056,
+        "rss": 603684864,
+        "heapDelta": 20093064
       },
       "livewire/03-dashboard-page": {
-        "avg": 15.43,
-        "min": 14.81,
-        "max": 16.55,
-        "runs": 5
+        "avg": 14.35,
+        "min": 12.8,
+        "max": 20.54,
+        "runs": 100,
+        "cpuUser": 2046.29,
+        "cpuSystem": 62.61,
+        "heapUsed": 88901272,
+        "heapTotal": 119242752,
+        "rss": 674316288,
+        "heapDelta": 63125784
       },
       "medium/01-tooltip": {
-        "avg": 4.89,
-        "min": 4.57,
-        "max": 5.62,
-        "runs": 5
+        "avg": 5.59,
+        "min": 4.24,
+        "max": 9.96,
+        "runs": 100,
+        "cpuUser": 897.37,
+        "cpuSystem": 47.78,
+        "heapUsed": 54465904,
+        "heapTotal": 92651520,
+        "rss": 248397824,
+        "heapDelta": 29128736
       },
       "medium/02-select-button": {
-        "avg": 5.86,
-        "min": 5.39,
-        "max": 6.52,
-        "runs": 5
+        "avg": 5.72,
+        "min": 4.84,
+        "max": 9.74,
+        "runs": 100,
+        "cpuUser": 979.98,
+        "cpuSystem": 37.55,
+        "heapUsed": 47467336,
+        "heapTotal": 86769664,
+        "rss": 273022976,
+        "heapDelta": 20480000
       },
       "small/01-checkbox": {
-        "avg": 2.89,
-        "min": 2.79,
-        "max": 2.94,
-        "runs": 5
+        "avg": 3.15,
+        "min": 2.76,
+        "max": 5.62,
+        "runs": 100,
+        "cpuUser": 478.05,
+        "cpuSystem": 23.16,
+        "heapUsed": 53142824,
+        "heapTotal": 81821696,
+        "rss": 289816576,
+        "heapDelta": 25472968
       },
       "small/02-footer": {
-        "avg": 4.55,
-        "min": 3.9,
-        "max": 5.51,
-        "runs": 5
+        "avg": 4.2,
+        "min": 3.52,
+        "max": 9.25,
+        "runs": 100,
+        "cpuUser": 774.53,
+        "cpuSystem": 31.04,
+        "heapUsed": 70308784,
+        "heapTotal": 92569600,
+        "rss": 310722560,
+        "heapDelta": 45069016
       },
       "synthetic/01-blade-directives/auth/01-auth-guest": {
-        "avg": 8.45,
-        "min": 8,
-        "max": 9.04,
-        "runs": 5
+        "avg": 8.33,
+        "min": 7.49,
+        "max": 16.4,
+        "runs": 100,
+        "cpuUser": 1254.79,
+        "cpuSystem": 37.05,
+        "heapUsed": 43748040,
+        "heapTotal": 73515008,
+        "rss": 359759872,
+        "heapDelta": 18937920
       },
       "synthetic/01-blade-directives/auth/02-can-cannot": {
-        "avg": 13.6,
-        "min": 13.04,
-        "max": 14.3,
-        "runs": 5
+        "avg": 13.24,
+        "min": 12.06,
+        "max": 17.34,
+        "runs": 100,
+        "cpuUser": 1915.94,
+        "cpuSystem": 51.83,
+        "heapUsed": 48527584,
+        "heapTotal": 74563584,
+        "rss": 441843712,
+        "heapDelta": 23390704
       },
       "synthetic/01-blade-directives/components/01-component-basic": {
-        "avg": 9.55,
-        "min": 8.33,
-        "max": 10.78,
-        "runs": 5
+        "avg": 8.49,
+        "min": 7.57,
+        "max": 11.79,
+        "runs": 100,
+        "cpuUser": 1278.61,
+        "cpuSystem": 41.19,
+        "heapUsed": 33401944,
+        "heapTotal": 75874304,
+        "rss": 487981056,
+        "heapDelta": 7882000
       },
       "synthetic/01-blade-directives/components/02-component-props": {
-        "avg": 10.44,
-        "min": 9.66,
-        "max": 11.23,
-        "runs": 5
+        "avg": 9.78,
+        "min": 8.65,
+        "max": 13.5,
+        "runs": 100,
+        "cpuUser": 1467.21,
+        "cpuSystem": 45,
+        "heapUsed": 95880320,
+        "heapTotal": 116916224,
+        "rss": 538066944,
+        "heapDelta": 70506344
       },
       "synthetic/01-blade-directives/components/03-component-slots": {
-        "avg": 10.43,
-        "min": 9.7,
-        "max": 11.15,
-        "runs": 5
+        "avg": 10.22,
+        "min": 9.13,
+        "max": 13.67,
+        "runs": 100,
+        "cpuUser": 1531.73,
+        "cpuSystem": 43.82,
+        "heapUsed": 65015280,
+        "heapTotal": 96960512,
+        "rss": 596000768,
+        "heapDelta": 39330720
       },
       "synthetic/01-blade-directives/components/04-component-attributes": {
-        "avg": 13.06,
-        "min": 12.32,
-        "max": 13.94,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/01-blade-directives/components/05-dynamic-component": {
-        "avg": 12.7,
-        "min": 12.29,
-        "max": 13.35,
-        "runs": 5
+        "avg": 12.9,
+        "min": 11.25,
+        "max": 18.21,
+        "runs": 100,
+        "cpuUser": 1883.25,
+        "cpuSystem": 64.07,
+        "heapUsed": 39174536,
+        "heapTotal": 86212608,
+        "rss": 279838720,
+        "heapDelta": 13530784
       },
       "synthetic/01-blade-directives/control-structures/01-if-basic": {
-        "avg": 8.69,
-        "min": 8.25,
-        "max": 9.07,
-        "runs": 5
+        "avg": 9.04,
+        "min": 7.72,
+        "max": 14.05,
+        "runs": 100,
+        "cpuUser": 1468.76,
+        "cpuSystem": 50.83,
+        "heapUsed": 54690896,
+        "heapTotal": 79953920,
+        "rss": 339935232,
+        "heapDelta": 29540240
       },
       "synthetic/01-blade-directives/control-structures/02-unless": {
-        "avg": 9.05,
-        "min": 8.29,
-        "max": 9.89,
-        "runs": 5
+        "avg": 8.94,
+        "min": 7.64,
+        "max": 12.46,
+        "runs": 100,
+        "cpuUser": 1441.44,
+        "cpuSystem": 45.36,
+        "heapUsed": 70275280,
+        "heapTotal": 94371840,
+        "rss": 393789440,
+        "heapDelta": 45202352
       },
       "synthetic/01-blade-directives/control-structures/03-switch-case": {
-        "avg": 8.39,
-        "min": 7.95,
-        "max": 9.02,
-        "runs": 5
+        "avg": 8.8,
+        "min": 7.63,
+        "max": 13.47,
+        "runs": 100,
+        "cpuUser": 1401.48,
+        "cpuSystem": 44.69,
+        "heapUsed": 54415448,
+        "heapTotal": 80101376,
+        "rss": 441171968,
+        "heapDelta": 29142080
       },
       "synthetic/01-blade-directives/control-structures/04-isset-empty": {
-        "avg": 11.24,
-        "min": 9.97,
-        "max": 13.05,
-        "runs": 5
+        "avg": 9.92,
+        "min": 8.61,
+        "max": 14.05,
+        "runs": 100,
+        "cpuUser": 1587.41,
+        "cpuSystem": 49.7,
+        "heapUsed": 44148848,
+        "heapTotal": 84672512,
+        "rss": 498794496,
+        "heapDelta": 18802792
       },
       "synthetic/01-blade-directives/control-structures/05-if-nested": {
-        "avg": 11.05,
-        "min": 10.45,
-        "max": 11.85,
-        "runs": 5
+        "avg": 11.19,
+        "min": 9.53,
+        "max": 15.46,
+        "runs": 100,
+        "cpuUser": 1775.43,
+        "cpuSystem": 62.51,
+        "heapUsed": 47406296,
+        "heapTotal": 81788928,
+        "rss": 549928960,
+        "heapDelta": 21925264
       },
       "synthetic/01-blade-directives/forms/01-csrf-method": {
-        "avg": 5.32,
-        "min": 4.84,
-        "max": 6.02,
-        "runs": 5
+        "avg": 5.26,
+        "min": 4.4,
+        "max": 9.85,
+        "runs": 100,
+        "cpuUser": 964.06,
+        "cpuSystem": 37.47,
+        "heapUsed": 71807488,
+        "heapTotal": 101302272,
+        "rss": 566935552,
+        "heapDelta": 46058264
       },
       "synthetic/01-blade-directives/includes/01-include-basic": {
-        "avg": 4.98,
-        "min": 4.63,
-        "max": 5.58,
-        "runs": 5
+        "avg": 5.3,
+        "min": 4.15,
+        "max": 9.16,
+        "runs": 100,
+        "cpuUser": 1043.86,
+        "cpuSystem": 42.29,
+        "heapUsed": 43042736,
+        "heapTotal": 80625664,
+        "rss": 587186176,
+        "heapDelta": 17656504
       },
       "synthetic/01-blade-directives/includes/02-include-if-when-unless": {
-        "avg": 5.23,
-        "min": 4.62,
-        "max": 6.04,
-        "runs": 5
+        "avg": 5.69,
+        "min": 4.67,
+        "max": 10.26,
+        "runs": 100,
+        "cpuUser": 986.22,
+        "cpuSystem": 43.85,
+        "heapUsed": 54876800,
+        "heapTotal": 93814784,
+        "rss": 253460480,
+        "heapDelta": 29576048
       },
       "synthetic/01-blade-directives/includes/03-include-first": {
-        "avg": 8.18,
-        "min": 7.69,
-        "max": 9.12,
-        "runs": 5
+        "avg": 8.55,
+        "min": 7.38,
+        "max": 12.37,
+        "runs": 100,
+        "cpuUser": 1347.4,
+        "cpuSystem": 47.43,
+        "heapUsed": 42008704,
+        "heapTotal": 76660736,
+        "rss": 316456960,
+        "heapDelta": 14858568
       },
       "synthetic/01-blade-directives/includes/04-each": {
-        "avg": 4.7,
-        "min": 4.22,
-        "max": 5.61,
-        "runs": 5
+        "avg": 4.74,
+        "min": 3.93,
+        "max": 9.03,
+        "runs": 100,
+        "cpuUser": 880.55,
+        "cpuSystem": 33.63,
+        "heapUsed": 84389216,
+        "heapTotal": 107626496,
+        "rss": 341131264,
+        "heapDelta": 59755888
       },
       "synthetic/01-blade-directives/loops/01-foreach-basic": {
-        "avg": 11.29,
-        "min": 10.45,
-        "max": 12.99,
-        "runs": 5
+        "avg": 10.55,
+        "min": 9.26,
+        "max": 18.01,
+        "runs": 100,
+        "cpuUser": 1647.62,
+        "cpuSystem": 49.04,
+        "heapUsed": 41187144,
+        "heapTotal": 95387648,
+        "rss": 397082624,
+        "heapDelta": 15905408
       },
       "synthetic/01-blade-directives/loops/02-foreach-loop-variable": {
-        "avg": 11.75,
-        "min": 11.09,
-        "max": 12.28,
-        "runs": 5
+        "avg": 11.55,
+        "min": 10.24,
+        "max": 16.86,
+        "runs": 100,
+        "cpuUser": 1743.63,
+        "cpuSystem": 51.4,
+        "heapUsed": 94077664,
+        "heapTotal": 125009920,
+        "rss": 451002368,
+        "heapDelta": 68079384
       },
       "synthetic/01-blade-directives/loops/03-forelse": {
-        "avg": 10.98,
-        "min": 10.51,
-        "max": 11.64,
-        "runs": 5
+        "avg": 11.2,
+        "min": 9.87,
+        "max": 15.46,
+        "runs": 100,
+        "cpuUser": 1693.55,
+        "cpuSystem": 48.73,
+        "heapUsed": 41243816,
+        "heapTotal": 88047616,
+        "rss": 510935040,
+        "heapDelta": 14951280
       },
       "synthetic/01-blade-directives/loops/04-for": {
-        "avg": 12.05,
-        "min": 11.58,
-        "max": 12.67,
-        "runs": 5
+        "avg": 12.12,
+        "min": 10.76,
+        "max": 17.64,
+        "runs": 100,
+        "cpuUser": 1802.37,
+        "cpuSystem": 52.62,
+        "heapUsed": 53156760,
+        "heapTotal": 93814784,
+        "rss": 564527104,
+        "heapDelta": 26886680
       },
       "synthetic/01-blade-directives/loops/05-while": {
-        "avg": 10.62,
-        "min": 10.19,
-        "max": 11.45,
-        "runs": 5
+        "avg": 11.85,
+        "min": 10.18,
+        "max": 18.32,
+        "runs": 100,
+        "cpuUser": 1778.17,
+        "cpuSystem": 60.41,
+        "heapUsed": 32929944,
+        "heapTotal": 82657280,
+        "rss": 274071552,
+        "heapDelta": 7355392
       },
       "synthetic/01-blade-directives/loops/06-loop-control": {
-        "avg": 16.74,
-        "min": 14.52,
-        "max": 19.31,
-        "runs": 5
+        "avg": 15.82,
+        "min": 14.02,
+        "max": 21.6,
+        "runs": 100,
+        "cpuUser": 2449.49,
+        "cpuSystem": 68.66,
+        "heapUsed": 68114744,
+        "heapTotal": 103628800,
+        "rss": 354959360,
+        "heapDelta": 43100744
       },
       "synthetic/01-blade-directives/stacks/01-push-prepend-stack": {
-        "avg": 8.93,
-        "min": 8.48,
-        "max": 9.49,
-        "runs": 5
+        "avg": 9.38,
+        "min": 8.09,
+        "max": 16.78,
+        "runs": 100,
+        "cpuUser": 1687.4,
+        "cpuSystem": 51.77,
+        "heapUsed": 34908688,
+        "heapTotal": 84377600,
+        "rss": 402063360,
+        "heapDelta": 9689584
       },
       "synthetic/01-blade-directives/stacks/02-once": {
-        "avg": 9.05,
-        "min": 8.33,
-        "max": 10.04,
-        "runs": 5
+        "avg": 9.16,
+        "min": 7.88,
+        "max": 13.88,
+        "runs": 100,
+        "cpuUser": 1498.01,
+        "cpuSystem": 48.85,
+        "heapUsed": 47809776,
+        "heapTotal": 80183296,
+        "rss": 451149824,
+        "heapDelta": 22225728
       },
       "synthetic/01-blade-directives/template-inheritance/01-extends-sections": {
-        "avg": 13.73,
-        "min": 13.1,
-        "max": 14.21,
-        "runs": 5
+        "avg": 14.34,
+        "min": 12.41,
+        "max": 22.52,
+        "runs": 100,
+        "cpuUser": 2113.14,
+        "cpuSystem": 65.39,
+        "heapUsed": 116564176,
+        "heapTotal": 146685952,
+        "rss": 536526848,
+        "heapDelta": 90565992
       },
       "synthetic/01-blade-directives/template-inheritance/02-yield-parent": {
-        "avg": 14.26,
-        "min": 13.69,
-        "max": 14.9,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/01-blade-directives/template-inheritance/03-section-show": {
-        "avg": 20.86,
-        "min": 20.48,
-        "max": 21.07,
-        "runs": 5
+        "avg": 21.71,
+        "min": 19.67,
+        "max": 30.69,
+        "runs": 100,
+        "cpuUser": 3127.84,
+        "cpuSystem": 85.25,
+        "heapUsed": 51097496,
+        "heapTotal": 108756992,
+        "rss": 290226176,
+        "heapDelta": 24846000
       },
       "synthetic/02-livewire/actions/01-wire-click": {
-        "avg": 4.89,
-        "min": 4.5,
-        "max": 5.56,
-        "runs": 5
+        "avg": 5.18,
+        "min": 4.31,
+        "max": 8.44,
+        "runs": 100,
+        "cpuUser": 945.47,
+        "cpuSystem": 37.97,
+        "heapUsed": 66999568,
+        "heapTotal": 95797248,
+        "rss": 318275584,
+        "heapDelta": 40738712
       },
       "synthetic/02-livewire/actions/02-wire-submit": {
-        "avg": 9.28,
-        "min": 8.82,
-        "max": 9.88,
-        "runs": 5
+        "avg": 9.74,
+        "min": 8.61,
+        "max": 15.33,
+        "runs": 100,
+        "cpuUser": 1486.47,
+        "cpuSystem": 45.15,
+        "heapUsed": 48777056,
+        "heapTotal": 84901888,
+        "rss": 364642304,
+        "heapDelta": 23445032
       },
       "synthetic/02-livewire/actions/03-wire-keydown": {
-        "avg": 8.91,
-        "min": 8.38,
-        "max": 9.78,
-        "runs": 5
+        "avg": 9.35,
+        "min": 8.21,
+        "max": 13.08,
+        "runs": 100,
+        "cpuUser": 1401.64,
+        "cpuSystem": 48.08,
+        "heapUsed": 51502848,
+        "heapTotal": 81149952,
+        "rss": 419561472,
+        "heapDelta": 25738360
       },
       "synthetic/02-livewire/actions/04-event-modifiers": {
-        "avg": 9.03,
-        "min": 8.48,
-        "max": 9.82,
-        "runs": 5
+        "avg": 9.57,
+        "min": 8.45,
+        "max": 15.92,
+        "runs": 100,
+        "cpuUser": 1517.44,
+        "cpuSystem": 48.74,
+        "heapUsed": 41178464,
+        "heapTotal": 76251136,
+        "rss": 466288640,
+        "heapDelta": 15593856
       },
       "synthetic/02-livewire/data-binding/01-wire-model-basic": {
-        "avg": 7.74,
-        "min": 7.47,
-        "max": 8.3,
-        "runs": 5
+        "avg": 8.42,
+        "min": 7.31,
+        "max": 13.55,
+        "runs": 100,
+        "cpuUser": 1296.64,
+        "cpuSystem": 46.65,
+        "heapUsed": 53554184,
+        "heapTotal": 77742080,
+        "rss": 514031616,
+        "heapDelta": 27967872
       },
       "synthetic/02-livewire/data-binding/02-wire-model-live": {
-        "avg": 7.79,
-        "min": 7.45,
-        "max": 8.3,
-        "runs": 5
+        "avg": 8.26,
+        "min": 7.39,
+        "max": 11.95,
+        "runs": 100,
+        "cpuUser": 1213.79,
+        "cpuSystem": 41.66,
+        "heapUsed": 60963304,
+        "heapTotal": 84819968,
+        "rss": 560611328,
+        "heapDelta": 35147416
       },
       "synthetic/02-livewire/data-binding/03-wire-model-debounce": {
-        "avg": 4.13,
-        "min": 3.76,
-        "max": 4.85,
-        "runs": 5
+        "avg": 4.57,
+        "min": 3.71,
+        "max": 8.05,
+        "runs": 100,
+        "cpuUser": 822.87,
+        "cpuSystem": 41.84,
+        "heapUsed": 33658888,
+        "heapTotal": 75988992,
+        "rss": 575160320,
+        "heapDelta": 8019792
       },
       "synthetic/02-livewire/data-binding/04-wire-model-modifiers": {
-        "avg": 9.36,
-        "min": 7.72,
-        "max": 10.75,
-        "runs": 5
+        "avg": 8.59,
+        "min": 7.57,
+        "max": 15.64,
+        "runs": 100,
+        "cpuUser": 1364.03,
+        "cpuSystem": 46.64,
+        "heapUsed": 43408936,
+        "heapTotal": 77299712,
+        "rss": 621674496,
+        "heapDelta": 17229920
       },
       "synthetic/03-alpine/data-reactivity/01-x-data-basic": {
-        "avg": 4.65,
-        "min": 4.22,
-        "max": 5.32,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/03-alpine/data-reactivity/02-x-init": {
-        "avg": 5.17,
-        "min": 4.71,
-        "max": 6.52,
-        "runs": 5
+        "avg": 5.56,
+        "min": 4.52,
+        "max": 10.84,
+        "runs": 100,
+        "cpuUser": 860.22,
+        "cpuSystem": 43.25,
+        "heapUsed": 44353840,
+        "heapTotal": 89309184,
+        "rss": 237633536,
+        "heapDelta": 19556176
       },
       "synthetic/03-alpine/data-reactivity/03-x-effect": {
-        "avg": 6.49,
-        "min": 5.9,
-        "max": 7.75,
-        "runs": 5
+        "avg": 6.72,
+        "min": 5.69,
+        "max": 12.03,
+        "runs": 100,
+        "cpuUser": 1071.77,
+        "cpuSystem": 45.37,
+        "heapUsed": 43052296,
+        "heapTotal": 77742080,
+        "rss": 258408448,
+        "heapDelta": 16509144
       },
       "synthetic/03-alpine/data-reactivity/04-x-data-nested": {
-        "avg": 9.24,
-        "min": 8.92,
-        "max": 9.64,
-        "runs": 5
+        "avg": 9.68,
+        "min": 8.45,
+        "max": 14.93,
+        "runs": 100,
+        "cpuUser": 1475.15,
+        "cpuSystem": 47.44,
+        "heapUsed": 37002152,
+        "heapTotal": 75988992,
+        "rss": 277577728,
+        "heapDelta": 12541912
       },
       "synthetic/03-alpine/data-reactivity/05-alpine-store": {
-        "avg": 14.76,
-        "min": 14.11,
-        "max": 15.53,
-        "runs": 5
+        "avg": 14.89,
+        "min": 13.56,
+        "max": 20.5,
+        "runs": 100,
+        "cpuUser": 2011.83,
+        "cpuSystem": 53.85,
+        "heapUsed": 37957040,
+        "heapTotal": 71680000,
+        "rss": 294125568,
+        "heapDelta": 13696376
       },
       "synthetic/03-alpine/events/01-x-on-basic": {
-        "avg": 4.1,
-        "min": 3.89,
-        "max": 4.73,
-        "runs": 5
+        "avg": 4.74,
+        "min": 3.85,
+        "max": 8.48,
+        "runs": 100,
+        "cpuUser": 884.6,
+        "cpuSystem": 35.26,
+        "heapUsed": 45348328,
+        "heapTotal": 77037568,
+        "rss": 311066624,
+        "heapDelta": 20561112
       },
       "synthetic/03-alpine/events/02-x-on-modifiers": {
-        "avg": 4.02,
-        "min": 3.79,
-        "max": 4.79,
-        "runs": 5
+        "avg": 4.66,
+        "min": 3.83,
+        "max": 8.26,
+        "runs": 100,
+        "cpuUser": 777.9,
+        "cpuSystem": 33.92,
+        "heapUsed": 65551896,
+        "heapTotal": 96321536,
+        "rss": 329252864,
+        "heapDelta": 40848072
       },
       "synthetic/03-alpine/events/03-x-on-keyboard": {
-        "avg": 4.4,
-        "min": 4.02,
-        "max": 5.5,
-        "runs": 5
+        "avg": 4.73,
+        "min": 3.9,
+        "max": 8.37,
+        "runs": 100,
+        "cpuUser": 838.16,
+        "cpuSystem": 34.45,
+        "heapUsed": 58178864,
+        "heapTotal": 88457216,
+        "rss": 346243072,
+        "heapDelta": 33507376
       },
       "synthetic/04-combinations/level-1-simple/01-if-echo": {
-        "avg": 9.94,
-        "min": 8.94,
-        "max": 10.89,
-        "runs": 5
+        "avg": 10.43,
+        "min": 8.96,
+        "max": 14.97,
+        "runs": 100,
+        "cpuUser": 1540.31,
+        "cpuSystem": 52.91,
+        "heapUsed": 55474544,
+        "heapTotal": 81903616,
+        "rss": 402112512,
+        "heapDelta": 30346584
       },
       "synthetic/04-combinations/level-1-simple/02-foreach-component": {
-        "avg": 9.12,
-        "min": 8.69,
-        "max": 9.66,
-        "runs": 5
+        "avg": 9.71,
+        "min": 8.54,
+        "max": 13.68,
+        "runs": 100,
+        "cpuUser": 1483.05,
+        "cpuSystem": 45.5,
+        "heapUsed": 101369232,
+        "heapTotal": 123731968,
+        "rss": 457424896,
+        "heapDelta": 75873136
       },
       "synthetic/04-combinations/level-1-simple/03-if-livewire-click": {
-        "avg": 9.18,
-        "min": 8.71,
-        "max": 9.79,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/04-combinations/level-1-simple/04-foreach-alpine-data": {
-        "avg": 9.4,
-        "min": 8.95,
-        "max": 10.16,
-        "runs": 5
+        "avg": 10.66,
+        "min": 9.22,
+        "max": 14.8,
+        "runs": 100,
+        "cpuUser": 1577.93,
+        "cpuSystem": 62.89,
+        "heapUsed": 41038312,
+        "heapTotal": 79429632,
+        "rss": 266846208,
+        "heapDelta": 15396088
       },
       "synthetic/04-combinations/level-1-simple/05-switch-wire-model": {
-        "avg": 9.92,
-        "min": 9.63,
-        "max": 10.6,
-        "runs": 5
+        "avg": 11.22,
+        "min": 9.74,
+        "max": 15.92,
+        "runs": 100,
+        "cpuUser": 1547.61,
+        "cpuSystem": 56.49,
+        "heapUsed": 49178464,
+        "heapTotal": 77185024,
+        "rss": 316358656,
+        "heapDelta": 20974144
       },
       "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
-        "avg": 10.65,
-        "min": 10.2,
-        "max": 11.72,
-        "runs": 5
+        "avg": 11.49,
+        "min": 10.01,
+        "max": 17.48,
+        "runs": 100,
+        "cpuUser": 1668.22,
+        "cpuSystem": 56.96,
+        "heapUsed": 65791800,
+        "heapTotal": 93175808,
+        "rss": 365019136,
+        "heapDelta": 41054640
       },
       "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
-        "avg": 6,
-        "min": 5.74,
-        "max": 6.69,
-        "runs": 5
+        "avg": 6.74,
+        "min": 5.64,
+        "max": 10.6,
+        "runs": 100,
+        "cpuUser": 1120.13,
+        "cpuSystem": 44.54,
+        "heapUsed": 86722008,
+        "heapTotal": 114671616,
+        "rss": 393281536,
+        "heapDelta": 61008928
       },
       "synthetic/04-combinations/level-1-simple/08-isset-alpine-if": {
-        "avg": 11.44,
-        "min": 10.65,
-        "max": 12,
-        "runs": 5
+        "avg": 12.24,
+        "min": 10.64,
+        "max": 17.61,
+        "runs": 100,
+        "cpuUser": 1901.02,
+        "cpuSystem": 52.37,
+        "heapUsed": 47459664,
+        "heapTotal": 93323264,
+        "rss": 456687616,
+        "heapDelta": 22229424
       },
       "synthetic/04-combinations/level-1-simple/09-include-wire-poll": {
-        "avg": 5.48,
-        "min": 5.06,
-        "max": 6.34,
-        "runs": 5
+        "avg": 6.39,
+        "min": 5.2,
+        "max": 10.54,
+        "runs": 100,
+        "cpuUser": 1139.47,
+        "cpuSystem": 49.36,
+        "heapUsed": 57710328,
+        "heapTotal": 85835776,
+        "rss": 479297536,
+        "heapDelta": 31763160
       },
       "synthetic/04-combinations/level-1-simple/10-auth-alpine-bind": {
-        "avg": 11.84,
-        "min": 11.26,
-        "max": 12.56,
-        "runs": 5
+        "avg": 12.95,
+        "min": 11.33,
+        "max": 18.69,
+        "runs": 100,
+        "cpuUser": 1857.33,
+        "cpuSystem": 57.11,
+        "heapUsed": 40994824,
+        "heapTotal": 80183296,
+        "rss": 265863168,
+        "heapDelta": 15055872
       },
       "synthetic/04-combinations/level-2-moderate/01-foreach-component-wire-key": {
-        "avg": 11.53,
-        "min": 10.93,
-        "max": 12.1,
-        "runs": 5
+        "avg": 12.41,
+        "min": 10.83,
+        "max": 16.48,
+        "runs": 100,
+        "cpuUser": 1898.77,
+        "cpuSystem": 60.11,
+        "heapUsed": 54067904,
+        "heapTotal": 84262912,
+        "rss": 320290816,
+        "heapDelta": 25954104
       },
       "synthetic/04-combinations/level-2-moderate/02-if-alpine-data-wire-model": {
-        "avg": 12.29,
-        "min": 10.71,
-        "max": 14.46,
-        "runs": 5
+        "avg": 11.95,
+        "min": 10.32,
+        "max": 16.48,
+        "runs": 100,
+        "cpuUser": 1809.22,
+        "cpuSystem": 58.8,
+        "heapUsed": 58510488,
+        "heapTotal": 84787200,
+        "rss": 373637120,
+        "heapDelta": 32680176
       },
       "synthetic/04-combinations/level-2-moderate/03-forelse-wire-loading-alpine-transition": {
-        "avg": 13.56,
-        "min": 11.85,
-        "max": 16.05,
-        "runs": 5
+        "avg": 13.59,
+        "min": 11.58,
+        "max": 19.03,
+        "runs": 100,
+        "cpuUser": 2085.89,
+        "cpuSystem": 72.85,
+        "heapUsed": 53254352,
+        "heapTotal": 84115456,
+        "rss": 425017344,
+        "heapDelta": 26961096
       },
       "synthetic/04-combinations/level-2-moderate/04-component-slots-wire-model-alpine": {
-        "avg": 14.97,
-        "min": 14.53,
-        "max": 15.6,
-        "runs": 5
+        "avg": 15.71,
+        "min": 14.21,
+        "max": 20.73,
+        "runs": 100,
+        "cpuUser": 2333.64,
+        "cpuSystem": 59.65,
+        "heapUsed": 45770864,
+        "heapTotal": 77824000,
+        "rss": 471105536,
+        "heapDelta": 19263784
       },
       "synthetic/04-combinations/level-2-moderate/05-extends-sections-wire-poll-push": {
-        "avg": 14.28,
-        "min": 13.78,
-        "max": 14.69,
-        "runs": 5
+        "avg": 17,
+        "min": 14.05,
+        "max": 28.24,
+        "runs": 100,
+        "cpuUser": 2401.94,
+        "cpuSystem": 88.17,
+        "heapUsed": 39230664,
+        "heapTotal": 88834048,
+        "rss": 273416192,
+        "heapDelta": 13232400
       },
       "synthetic/04-combinations/level-2-moderate/06-foreach-loop-var-alpine-foreach-wire": {
-        "avg": 17.71,
-        "min": 17.16,
-        "max": 18.22,
-        "runs": 5
+        "avg": 19.01,
+        "min": 16.71,
+        "max": 26.74,
+        "runs": 100,
+        "cpuUser": 2815.46,
+        "cpuSystem": 64.34,
+        "heapUsed": 39938952,
+        "heapTotal": 79921152,
+        "rss": 334479360,
+        "heapDelta": 13707232
       },
       "synthetic/04-combinations/level-2-moderate/07-auth-can-wire-click-alpine-confirm": {
-        "avg": 16.37,
-        "min": 15.72,
-        "max": 17.47,
-        "runs": 5
+        "avg": 17.84,
+        "min": 15.61,
+        "max": 25.03,
+        "runs": 100,
+        "cpuUser": 2663.85,
+        "cpuSystem": 73.53,
+        "heapUsed": 46188352,
+        "heapTotal": 74563584,
+        "rss": 392462336,
+        "heapDelta": 20203632
       },
       "synthetic/04-combinations/level-2-moderate/08-switch-component-wire-model-alpine-show": {
-        "avg": 16.57,
-        "min": 16.01,
-        "max": 17,
-        "runs": 5
+        "avg": null,
+        "error": true
       },
       "synthetic/04-combinations/level-3-complex/01-dashboard-page": {
-        "avg": 17.58,
-        "min": 16.91,
-        "max": 18.22,
-        "runs": 5
+        "avg": 18.95,
+        "min": 16.78,
+        "max": 26.18,
+        "runs": 100,
+        "cpuUser": 2588.92,
+        "cpuSystem": 73.02,
+        "heapUsed": 40444952,
+        "heapTotal": 86212608,
+        "rss": 273006592,
+        "heapDelta": 14388904
       },
       "synthetic/04-combinations/level-3-complex/02-data-table": {
-        "avg": 23.77,
-        "min": 23.04,
-        "max": 24.5,
-        "runs": 5
+        "avg": 24.05,
+        "min": 21.95,
+        "max": 30.49,
+        "runs": 100,
+        "cpuUser": 3367.55,
+        "cpuSystem": 65.11,
+        "heapUsed": 49159416,
+        "heapTotal": 76513280,
+        "rss": 354222080,
+        "heapDelta": 23386528
       },
       "synthetic/04-combinations/level-3-complex/03-modal-form": {
-        "avg": 34.61,
-        "min": 33.74,
-        "max": 35.64,
-        "runs": 5
+        "avg": 37.32,
+        "min": 33.64,
+        "max": 53.66,
+        "runs": 100,
+        "cpuUser": 4886.68,
+        "cpuSystem": 122.35,
+        "heapUsed": 41073792,
+        "heapTotal": 72056832,
+        "rss": 409419776,
+        "heapDelta": 14421088
       },
       "synthetic/04-combinations/level-4-comprehensive/01-admin-panel": {
-        "avg": 51.34,
-        "min": 50.82,
-        "max": 52.16,
-        "runs": 5
+        "avg": 53.72,
+        "min": 49.62,
+        "max": 64.42,
+        "runs": 100,
+        "cpuUser": 7095.41,
+        "cpuSystem": 148.73,
+        "heapUsed": 46048616,
+        "heapTotal": 75841536,
+        "rss": 337592320,
+        "heapDelta": 19220576
       },
       "synthetic/04-combinations/level-4-comprehensive/02-e-commerce-checkout": {
-        "avg": null,
-        "error": true
+        "avg": 86.41,
+        "min": 82.32,
+        "max": 102.36,
+        "runs": 100,
+        "cpuUser": 10009.66,
+        "cpuSystem": 146.94,
+        "heapUsed": 92424928,
+        "heapTotal": 135708672,
+        "rss": 359268352,
+        "heapDelta": 65329736
       },
       "synthetic/05-edge-cases/conflicts/01-alpine-blade-at-symbol": {
-        "avg": 14.5,
-        "min": 13.12,
-        "max": 17.12,
-        "runs": 5
+        "avg": 10.25,
+        "min": 8.97,
+        "max": 14.58,
+        "runs": 100,
+        "cpuUser": 1620.49,
+        "cpuSystem": 50.69,
+        "heapUsed": 44900224,
+        "heapTotal": 90013696,
+        "rss": 417398784,
+        "heapDelta": 18227776
       },
       "synthetic/05-edge-cases/conflicts/02-verbatim-blade-syntax": {
-        "avg": 12.91,
-        "min": 12.2,
-        "max": 13.57,
-        "runs": 5
+        "avg": 10.08,
+        "min": 8.98,
+        "max": 14.57,
+        "runs": 100,
+        "cpuUser": 1488.97,
+        "cpuSystem": 43.87,
+        "heapUsed": 83860024,
+        "heapTotal": 115933184,
+        "rss": 466108416,
+        "heapDelta": 57308632
       },
       "synthetic/05-edge-cases/nesting/01-deep-nesting-if": {
-        "avg": 18.23,
-        "min": 16.87,
-        "max": 19.57,
-        "runs": 5
+        "avg": 16.04,
+        "min": 14.37,
+        "max": 21.68,
+        "runs": 100,
+        "cpuUser": 2293.09,
+        "cpuSystem": 64.07,
+        "heapUsed": 38286024,
+        "heapTotal": 85426176,
+        "rss": 279592960,
+        "heapDelta": 12693776
       },
       "synthetic/05-edge-cases/nesting/02-mixed-nesting": {
-        "avg": 84.32,
-        "min": 82.64,
-        "max": 86.2,
-        "runs": 5
-      },
-      "valid/alpine_js": {
-        "avg": 3.84,
-        "min": 3.56,
-        "max": 4.41,
-        "runs": 5
-      },
-      "valid/components": {
-        "avg": 3.8,
-        "min": 3.42,
-        "max": 4.96,
-        "runs": 5
-      },
-      "valid/control_structures": {
-        "avg": 8.8,
-        "min": 8.27,
-        "max": 9.4,
-        "runs": 5
-      },
-      "valid/livewire": {
-        "avg": 3.46,
-        "min": 3.07,
-        "max": 4.42,
-        "runs": 5
-      },
-      "valid/nested_directives": {
         "avg": null,
         "error": true
       },
+      "valid/alpine_js": {
+        "avg": 3.87,
+        "min": 3.28,
+        "max": 6.93,
+        "runs": 100,
+        "cpuUser": 559.3,
+        "cpuSystem": 37.9,
+        "heapUsed": 34816312,
+        "heapTotal": 81412096,
+        "rss": 233357312,
+        "heapDelta": 10181560
+      },
+      "valid/components": {
+        "avg": 3.52,
+        "min": 2.93,
+        "max": 6.16,
+        "runs": 100,
+        "cpuUser": 557.3,
+        "cpuSystem": 28.56,
+        "heapUsed": 63561944,
+        "heapTotal": 87326720,
+        "rss": 251838464,
+        "heapDelta": 37524304
+      },
+      "valid/control_structures": {
+        "avg": 8.9,
+        "min": 7.56,
+        "max": 16.94,
+        "runs": 100,
+        "cpuUser": 1372.89,
+        "cpuSystem": 51.83,
+        "heapUsed": 53296008,
+        "heapTotal": 79429632,
+        "rss": 305758208,
+        "heapDelta": 26511080
+      },
+      "valid/livewire": {
+        "avg": 3.82,
+        "min": 3.16,
+        "max": 6.63,
+        "runs": 100,
+        "cpuUser": 664.14,
+        "cpuSystem": 40.16,
+        "heapUsed": 59806408,
+        "heapTotal": 89767936,
+        "rss": 323796992,
+        "heapDelta": 35185968
+      },
+      "valid/nested_directives": {
+        "avg": 54.51,
+        "min": 51.96,
+        "max": 59.89,
+        "runs": 100,
+        "cpuUser": 6478.49,
+        "cpuSystem": 122.44,
+        "heapUsed": 36138552,
+        "heapTotal": 73744384,
+        "rss": 272547840,
+        "heapDelta": 10617464
+      },
       "valid/simple_echo": {
-        "avg": 6.71,
-        "min": 5.13,
-        "max": 9.91,
-        "runs": 5
+        "avg": 3.95,
+        "min": 3.15,
+        "max": 6.39,
+        "runs": 100,
+        "cpuUser": 658.28,
+        "cpuSystem": 38.9,
+        "heapUsed": 56859864,
+        "heapTotal": 87408640,
+        "rss": 293453824,
+        "heapDelta": 32102240
       },
       "valid/template_inheritance": {
-        "avg": 11.75,
-        "min": 10.61,
-        "max": 13.33,
-        "runs": 5
+        "avg": 8.82,
+        "min": 7.44,
+        "max": 15.46,
+        "runs": 100,
+        "cpuUser": 1423.9,
+        "cpuSystem": 54.07,
+        "heapUsed": 54763104,
+        "heapTotal": 76169216,
+        "rss": 345489408,
+        "heapDelta": 30508728
       }
     }
   },
@@ -2927,7 +4761,7 @@
         "pass2Length": 3827
       },
       "synthetic/04-combinations/level-1-simple/06-forelse-alpine-show": {
-        "error": "Unpaired condition control structure\n\n  63|                         <p>{{ $notification->message }}</p>\n  64|                     </div>\n  65|                 </div>\n >66|             @empty\n  67|                 <div class=\"empty-state\" x-show=\"BwYPbIl6MUB\">\n  68|                     <p>No read notifications.</p>\n  69|                 </div>\n"
+        "error": "Unpaired condition control structure\n\n  63|                         <p>{{ $notification->message }}</p>\n  64|                     </div>\n  65|                 </div>\n >66|             @empty\n  67|                 <div class=\"empty-state\" x-show=\"BHEAaFXavyB\">\n  68|                     <p>No read notifications.</p>\n  69|                 </div>\n"
       },
       "synthetic/04-combinations/level-1-simple/07-component-wire-loading": {
         "idempotent": true,
@@ -3603,9 +5437,7 @@
         "pass2Length": 230
       },
       "valid/nested_directives": {
-        "idempotent": true,
-        "pass1Length": 2054,
-        "pass2Length": 2054
+        "error": "worker crashed"
       },
       "valid/simple_echo": {
         "idempotent": true,
@@ -3619,5 +5451,5 @@
       }
     }
   },
-  "generatedAt": "2026-02-25T21:38:26.056Z"
+  "generatedAt": "2026-02-25T21:46:18.453Z"
 }
