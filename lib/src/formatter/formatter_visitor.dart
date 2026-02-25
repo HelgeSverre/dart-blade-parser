@@ -26,8 +26,7 @@ class _TrackedBuffer {
     if (s.length >= 2) {
       _lastTwo = s.substring(s.length - 2);
     } else {
-      _lastTwo =
-          (_lastTwo.isNotEmpty ? _lastTwo[_lastTwo.length - 1] : '') + s;
+      _lastTwo = (_lastTwo.isNotEmpty ? _lastTwo[_lastTwo.length - 1] : '') + s;
     }
   }
 
@@ -64,11 +63,37 @@ class FormatterVisitor implements AstVisitor<String> {
 
   /// Block-level HTML elements that should get blank line spacing between siblings.
   static const Set<String> _blockElements = {
-    'div', 'p', 'section', 'article', 'aside', 'header', 'footer',
-    'nav', 'main', 'figure', 'figcaption', 'details', 'summary',
-    'form', 'fieldset', 'table', 'blockquote', 'pre', 'address',
-    'dl', 'ol', 'ul', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'hgroup', 'dialog', 'search',
+    'div',
+    'p',
+    'section',
+    'article',
+    'aside',
+    'header',
+    'footer',
+    'nav',
+    'main',
+    'figure',
+    'figcaption',
+    'details',
+    'summary',
+    'form',
+    'fieldset',
+    'table',
+    'blockquote',
+    'pre',
+    'address',
+    'dl',
+    'ol',
+    'ul',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'hgroup',
+    'dialog',
+    'search',
   };
 
   /// Raw text elements whose content indentation should be preserved.
@@ -309,7 +334,8 @@ class FormatterVisitor implements AstVisitor<String> {
         return list;
 
       case AttributeSort.alphabetical:
-        list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        list.sort(
+            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
         return list;
 
       case AttributeSort.byType:
@@ -331,11 +357,33 @@ class FormatterVisitor implements AstVisitor<String> {
     if (attr.value == null) {
       return attr.name;
     }
+    // Blade attribute directives use expression syntax: @class(['dark' => true])
+    // No = sign or quotes needed, just append the expression directly
+    if (attr.name.startsWith('@') &&
+        _isBladeAttributeDirectiveName(attr.name)) {
+      return '${attr.name}${attr.value}';
+    }
     return '${attr.name}=${_formatAttributeValue(attr.value!)}';
   }
 
+  /// Check if an attribute name is a Blade attribute directive.
+  bool _isBladeAttributeDirectiveName(String name) {
+    const bladeAttrDirectives = {
+      '@class',
+      '@style',
+      '@checked',
+      '@selected',
+      '@disabled',
+      '@readonly',
+      '@required',
+    };
+    return bladeAttrDirectives.contains(name);
+  }
+
   /// Calculates the length of the opening tag if all attributes were on one line.
-  int _calculateSingleLineTagLength(String tagName, List<AttributeNode> attributes, {bool isComponent = false, bool isSelfClosing = false}) {
+  int _calculateSingleLineTagLength(
+      String tagName, List<AttributeNode> attributes,
+      {bool isComponent = false, bool isSelfClosing = false}) {
     final prefix = isComponent ? '<x-$tagName' : '<$tagName';
     var length = _indent.current.length + prefix.length;
 
@@ -348,7 +396,8 @@ class FormatterVisitor implements AstVisitor<String> {
   }
 
   /// Determines if attributes should be wrapped to multiple lines.
-  bool _shouldWrapAttributes(String tagName, List<AttributeNode> attributes, {bool isComponent = false, bool isSelfClosing = false}) {
+  bool _shouldWrapAttributes(String tagName, List<AttributeNode> attributes,
+      {bool isComponent = false, bool isSelfClosing = false}) {
     if (attributes.isEmpty) return false;
 
     switch (config.wrapAttributes) {
@@ -370,7 +419,8 @@ class FormatterVisitor implements AstVisitor<String> {
   }
 
   /// Writes attributes, either inline or wrapped to multiple lines.
-  void _writeAttributes(List<AttributeNode> attributes, {required bool wrap, required String closingBracket}) {
+  void _writeAttributes(List<AttributeNode> attributes,
+      {required bool wrap, required String closingBracket}) {
     if (attributes.isEmpty) {
       _output.write(closingBracket);
       return;
@@ -442,7 +492,9 @@ class FormatterVisitor implements AstVisitor<String> {
 
       // Handle whitespace-only text nodes that represent blank lines
       // Only apply this logic when formatting is enabled
-      if (_formattingEnabled && child is TextNode && child.content.trim().isEmpty) {
+      if (_formattingEnabled &&
+          child is TextNode &&
+          child.content.trim().isEmpty) {
         // Count the number of newlines in this text node
         final newlineCount = '\n'.allMatches(child.content).length;
 
@@ -468,7 +520,8 @@ class FormatterVisitor implements AstVisitor<String> {
           }
         }
 
-        if (nextMeaningful != null && _needsSpacingBetween(child, nextMeaningful)) {
+        if (nextMeaningful != null &&
+            _needsSpacingBetween(child, nextMeaningful)) {
           _output.writeln();
         }
       }
@@ -498,7 +551,8 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     // Known block directives, or unknown directives that were parsed with children
-    final isBlock = _blockDirectives.contains(node.name) || node.children.isNotEmpty;
+    final isBlock =
+        _blockDirectives.contains(node.name) || node.children.isNotEmpty;
 
     // Write the directive opening
     _output.write(_indent.current);
@@ -525,8 +579,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
         // Intermediate directives (@else, @elseif, @case, @default, @empty inside @forelse)
         // should align with the parent directive, not be indented inside it.
-        if (child is DirectiveNode &&
-            _isIntermediateDirective(child)) {
+        if (child is DirectiveNode && _isIntermediateDirective(child)) {
           _indent.decrease();
           child.accept(this);
           _indent.increase();
@@ -548,7 +601,9 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Write closing directive if this is a block directive with children
     // Inline directives (like @section('title', 'value')) don't get closing tags
-    if (isBlock && node.children.isNotEmpty && _hasClosingDirective(node.name, expression: node.expression)) {
+    if (isBlock &&
+        node.children.isNotEmpty &&
+        _hasClosingDirective(node.name, expression: node.expression)) {
       _output.write(_indent.current);
       if (node.closedBy != null) {
         _output.write('@${node.closedBy}');
@@ -566,6 +621,22 @@ class FormatterVisitor implements AstVisitor<String> {
     // If formatting is disabled, output raw
     if (!_formattingEnabled) {
       _outputRaw(node);
+      return '';
+    }
+
+    // Inside raw text elements (script/style/textarea/pre), echo expressions
+    // should be output inline without indentation or trailing newline,
+    // preserving the surrounding raw text context.
+    final parent = node.parent;
+    final inRawText = parent is HtmlElementNode &&
+        _rawTextElements.contains(parent.tagName.toLowerCase());
+
+    if (inRawText) {
+      if (node.isRaw) {
+        _output.write('{!! ${node.expression} !!}');
+      } else {
+        _output.write('{{ ${node.expression} }}');
+      }
       return '';
     }
 
@@ -675,6 +746,11 @@ class FormatterVisitor implements AstVisitor<String> {
           if (i < lines.length - 1) {
             _output.writeln();
           }
+        } else if (lines.length > 1) {
+          // Empty first line (content starts with newline) - output the newline
+          if (!_output.endsWithNewline()) {
+            _output.writeln();
+          }
         }
         continue;
       }
@@ -722,7 +798,8 @@ class FormatterVisitor implements AstVisitor<String> {
     );
 
     // Determine if we should format as self-closing
-    final shouldSelfClose = !isVoid && !hasContent && _shouldSelfClose(node.isSelfClosing);
+    final shouldSelfClose =
+        !isVoid && !hasContent && _shouldSelfClose(node.isSelfClosing);
 
     // Write opening tag
     _output.write(_indent.current);
@@ -750,6 +827,48 @@ class FormatterVisitor implements AstVisitor<String> {
 
     _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
 
+    // Raw text elements (script/style/textarea/pre): reconstruct full content
+    // from all children (text + echo + comment nodes) and preserve indentation.
+    // Only use this path if all children are raw-text-safe (text, echo, comment).
+    if (_rawTextElements.contains(tagName) && node.children.isNotEmpty) {
+      final allRawTextSafe = node.children.every(
+        (child) =>
+            child is TextNode || child is EchoNode || child is CommentNode,
+      );
+
+      if (allRawTextSafe) {
+        // Reconstruct the full raw content including Blade expressions
+        final rawContent = StringBuffer();
+        for (final child in node.children) {
+          if (child is TextNode) {
+            rawContent.write(child.content);
+          } else if (child is EchoNode) {
+            if (child.isRaw) {
+              rawContent.write('{!! ${child.expression} !!}');
+            } else {
+              rawContent.write('{{ ${child.expression} }}');
+            }
+          } else if (child is CommentNode) {
+            rawContent.write(child.content);
+          }
+        }
+
+        // Use the same raw text content rendering as visitText
+        _indent.increase();
+        _visitRawTextContent(rawContent.toString());
+        _indent.decrease();
+
+        // Write closing tag
+        if (!_output.endsWithNewline()) {
+          _output.writeln();
+        }
+        _output.write(_indent.current);
+        _output.write('</${node.tagName}>');
+        _output.writeln();
+        return '';
+      }
+    }
+
     // Format children
     if (node.children.isNotEmpty) {
       // Filter out whitespace-only text nodes for inline check
@@ -761,8 +880,9 @@ class FormatterVisitor implements AstVisitor<String> {
       // Allow inline if: single simple child, or multiple children that are all inline-safe
       // BUT: if there are newlines in whitespace between meaningful children, don't inline
       var canKeepInline = meaningfulChildren.isNotEmpty &&
-          meaningfulChildren.every((child) =>
-              _isSimpleTextNode(child) || _isSimpleEchoNode(child),);
+          meaningfulChildren.every(
+            (child) => _isSimpleTextNode(child) || _isSimpleEchoNode(child),
+          );
 
       // Check for newlines between meaningful children
       if (canKeepInline && meaningfulChildren.length > 1) {
@@ -844,7 +964,8 @@ class FormatterVisitor implements AstVisitor<String> {
             }
           }
 
-          if (nextMeaningful != null && _needsSpacingBetween(child, nextMeaningful)) {
+          if (nextMeaningful != null &&
+              _needsSpacingBetween(child, nextMeaningful)) {
             _output.writeln();
           }
         }
@@ -967,9 +1088,11 @@ class FormatterVisitor implements AstVisitor<String> {
       }
 
       // Find the first meaningful child for spacing between last slot and children
-      final meaningfulChildren = node.children.where(
-        (child) => child is! TextNode || child.content.trim().isNotEmpty,
-      ).toList();
+      final meaningfulChildren = node.children
+          .where(
+            (child) => child is! TextNode || child.content.trim().isNotEmpty,
+          )
+          .toList();
 
       // Add spacing between last slot and first child if needed
       if (slotList.isNotEmpty && meaningfulChildren.isNotEmpty) {
@@ -1046,6 +1169,14 @@ class FormatterVisitor implements AstVisitor<String> {
     // If formatting is disabled, output raw
     if (!_formattingEnabled) {
       _outputRaw(node);
+      return '';
+    }
+
+    // Inside raw text elements, output inline
+    final parent = node.parent;
+    if (parent is HtmlElementNode &&
+        _rawTextElements.contains(parent.tagName.toLowerCase())) {
+      _formatComment(node);
       return '';
     }
 
@@ -1141,7 +1272,8 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     // Check if we should use compact formatting
-    final useCompactFormatting = config.slotFormatting == SlotFormatting.compact;
+    final useCompactFormatting =
+        config.slotFormatting == SlotFormatting.compact;
 
     if (useCompactFormatting) {
       // Filter out whitespace-only text nodes for inline check
@@ -1176,7 +1308,8 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     // Block formatting (either SlotFormatting.block config, or complex content with compact config)
-    final useBlockWithExtraNewlines = config.slotFormatting == SlotFormatting.block;
+    final useBlockWithExtraNewlines =
+        config.slotFormatting == SlotFormatting.block;
 
     _output.writeln();
 
@@ -1209,7 +1342,8 @@ class FormatterVisitor implements AstVisitor<String> {
           }
         }
 
-        if (nextMeaningful != null && _needsSpacingBetween(child, nextMeaningful)) {
+        if (nextMeaningful != null &&
+            _needsSpacingBetween(child, nextMeaningful)) {
           _output.writeln();
         }
       }
@@ -1308,14 +1442,14 @@ class FormatterVisitor implements AstVisitor<String> {
       // Spacing after a slot (slot followed by any node)
       if (current is SlotNode &&
           (config.slotSpacing == SlotSpacing.after ||
-           config.slotSpacing == SlotSpacing.around)) {
+              config.slotSpacing == SlotSpacing.around)) {
         return true;
       }
 
       // Spacing before a slot (any node followed by slot)
       if (next is SlotNode &&
           (config.slotSpacing == SlotSpacing.before ||
-           config.slotSpacing == SlotSpacing.around)) {
+              config.slotSpacing == SlotSpacing.around)) {
         return true;
       }
     }

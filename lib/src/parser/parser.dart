@@ -125,9 +125,11 @@ class BladeParser {
       case TokenType.directiveUnless:
         return _parseGenericDirective('unless', TokenType.directiveEndunless);
       case TokenType.directiveIsset:
-        return _parseGenericDirective('isset', TokenType.directiveEndisset, supportsElse: true);
+        return _parseGenericDirective('isset', TokenType.directiveEndisset,
+            supportsElse: true);
       case TokenType.directiveEmpty:
-        return _parseGenericDirective('empty', TokenType.directiveEndempty, supportsElse: true);
+        return _parseGenericDirective('empty', TokenType.directiveEndempty,
+            supportsElse: true);
 
       // Authorization - paired directives
       case TokenType.directiveCan:
@@ -719,9 +721,8 @@ class BladeParser {
         final closingToken = _advance();
         // Closing token is like "</x-slot:header" or "</x-slot"
         // For named slots (e.g., <x-slot:title>), both </x-slot:title> and </x-slot> are valid
-        final expectedClosing = isColonSyntax
-            ? '</x-slot:$slotName'
-            : '</x-slot';
+        final expectedClosing =
+            isColonSyntax ? '</x-slot:$slotName' : '</x-slot';
         const genericClosing = '</x-slot'; // Generic closing is always valid
 
         // Accept either the specific closing tag or the generic </x-slot>
@@ -849,7 +850,8 @@ class BladeParser {
     final expression = _extractExpression();
     final children = <AstNode>[];
 
-    while (!_check(closingType) && !_check(TokenType.eof) &&
+    while (!_check(closingType) &&
+        !_check(TokenType.eof) &&
         !(supportsElse && _check(TokenType.directiveElse))) {
       final node = _parseNode();
       if (node != null) children.add(node);
@@ -1218,7 +1220,22 @@ class BladeParser {
     // Livewire attributes
     if (_isLivewireAttributeToken(type)) return true;
 
+    // Blade attribute directives (@class, @style, @checked, etc.)
+    if (_isBladeAttributeDirective(type)) return true;
+
     return false;
+  }
+
+  /// Check if a token type is a Blade attribute directive.
+  /// These are directives designed to be used inside HTML tags.
+  bool _isBladeAttributeDirective(TokenType type) {
+    return type == TokenType.directiveClass ||
+        type == TokenType.directiveStyle ||
+        type == TokenType.directiveChecked ||
+        type == TokenType.directiveSelected ||
+        type == TokenType.directiveDisabled ||
+        type == TokenType.directiveReadonly ||
+        type == TokenType.directiveRequired;
   }
 
   /// Parse attributes from current token position into a map.
@@ -1232,7 +1249,15 @@ class BladeParser {
       Position attrEndPos = attrToken.endPosition;
 
       String? attrValue;
-      if (_check(TokenType.attributeValue)) {
+
+      // Blade attribute directives use expression tokens, not attributeValue
+      if (_isBladeAttributeDirective(attrToken.type)) {
+        if (_check(TokenType.expression)) {
+          final exprToken = _advance();
+          attrValue = exprToken.value;
+          attrEndPos = exprToken.endPosition;
+        }
+      } else if (_check(TokenType.attributeValue)) {
         final valueToken = _advance();
         attrValue = valueToken.value;
         attrEndPos = valueToken.endPosition;
@@ -1257,6 +1282,16 @@ class BladeParser {
     Position startPos,
     Position endPos,
   ) {
+    // Check Blade attribute directives first (before Alpine, since @class starts with @)
+    if (_isBladeAttributeDirective(attrToken.type)) {
+      return StandardAttribute(
+        name: attrName,
+        value: attrValue,
+        startPosition: startPos,
+        endPosition: endPos,
+      );
+    }
+
     final isAlpineToken = attrToken.type == TokenType.alpineShorthandOn ||
         attrToken.type == TokenType.alpineShorthandBind ||
         attrToken.type == TokenType.alpineData ||

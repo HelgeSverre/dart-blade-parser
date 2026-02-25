@@ -33,10 +33,21 @@ class BladeLexer {
   // Raw text mode tracking
   String? _rawTextTagName;
 
+  // Raw text quote tracking (persists across re-entries after Blade expressions)
+  bool _rawTextInSingleQuote = false;
+  bool _rawTextInDoubleQuote = false;
+  bool _rawTextInTemplateLiteral = false;
+
   // Verbatim mode tracking
   bool _inVerbatim = false;
 
   BladeLexer(this.input);
+
+  /// Returns the appropriate text-mode state: rawText if inside a raw text
+  /// element (script/style/textarea), otherwise text.
+  _LexerState _textOrRawTextState() {
+    return _rawTextTagName != null ? _LexerState.rawText : _LexerState.text;
+  }
 
   /// Tokenize the input string into a list of tokens.
   List<Token> tokenize() {
@@ -46,6 +57,9 @@ class BladeLexer {
     _line = 1;
     _column = 1;
     _inVerbatim = false;
+    _rawTextInSingleQuote = false;
+    _rawTextInDoubleQuote = false;
+    _rawTextInTemplateLiteral = false;
 
     // Iterative state machine - prevents stack overflow
     var state = _LexerState.text;
@@ -395,37 +409,78 @@ class BladeLexer {
   }
 
   /// Raw text lexing state (for <script>, <style>, <textarea>)
+  /// Blade expressions ({{ }}, {!! !!}, {{-- --}}) are still tokenized
+  /// inside raw text elements, since Blade processes them before the browser.
   _LexerState _lexRawText() {
     _start = _position;
     _startLine = _line;
     _startColumn = _column;
 
     final closingTag = '</$_rawTextTagName>';
-    bool inSingleQuote = false;
-    bool inDoubleQuote = false;
-    bool inTemplateLiteral = false;
 
     while (!_isAtEnd()) {
       final ch = _peek();
 
-      if (inSingleQuote) {
+      // Blade expressions take priority over JS/CSS string context.
+      // Blade processes {{ }}, {!! !!}, {{-- --}} server-side before
+      // the browser sees the script/style content.
+
+      // Check for Blade comment {{-- --}}
+      if (ch == '{' &&
+          _peekNext() == '{' &&
+          _peekAhead(2) == '-' &&
+          _peekAhead(3) == '-') {
+        if (_position > _start) {
+          _emitToken(TokenType.text, input.substring(_start, _position));
+        }
+        return _LexerState.bladeComment;
+      }
+
+      // Check for {{{ legacy echo
+      if (ch == '{' && _peekNext() == '{' && _peekAhead(2) == '{') {
+        if (_position > _start) {
+          _emitToken(TokenType.text, input.substring(_start, _position));
+        }
+        return _LexerState.legacyEcho;
+      }
+
+      // Check for {{ echo
+      if (ch == '{' && _peekNext() == '{') {
+        if (_position > _start) {
+          _emitToken(TokenType.text, input.substring(_start, _position));
+        }
+        return _LexerState.echo;
+      }
+
+      // Check for {!! raw echo
+      if (ch == '{' && _peekNext() == '!' && _peekAhead(2) == '!') {
+        if (_position > _start) {
+          _emitToken(TokenType.text, input.substring(_start, _position));
+        }
+        return _LexerState.rawEcho;
+      }
+
+      // Track quote state for closing tag detection only.
+      // Quote state persists across re-entries (after Blade expressions)
+      // so that e.g. '{{ $var }}' correctly tracks the surrounding quotes.
+      if (_rawTextInSingleQuote) {
         if (ch == "'" && _isUnescapedAt(_position)) {
-          inSingleQuote = false;
+          _rawTextInSingleQuote = false;
         }
-      } else if (inDoubleQuote) {
+      } else if (_rawTextInDoubleQuote) {
         if (ch == '"' && _isUnescapedAt(_position)) {
-          inDoubleQuote = false;
+          _rawTextInDoubleQuote = false;
         }
-      } else if (inTemplateLiteral) {
+      } else if (_rawTextInTemplateLiteral) {
         if (ch == '`' && _isUnescapedAt(_position)) {
-          inTemplateLiteral = false;
+          _rawTextInTemplateLiteral = false;
         }
       } else {
-        if (ch == "'") inSingleQuote = true;
-        if (ch == '"') inDoubleQuote = true;
-        if (ch == '`') inTemplateLiteral = true;
+        if (ch == "'") _rawTextInSingleQuote = true;
+        if (ch == '"') _rawTextInDoubleQuote = true;
+        if (ch == '`') _rawTextInTemplateLiteral = true;
 
-        // Check for closing tag
+        // Check for closing tag (only outside quotes)
         if (ch == '<' &&
             _peekNext() == '/' &&
             input.substring(_position).startsWith(closingTag)) {
@@ -442,6 +497,10 @@ class BladeLexer {
           }
 
           _rawTextTagName = null; // Exit raw text mode
+          // Reset quote tracking for next raw text element
+          _rawTextInSingleQuote = false;
+          _rawTextInDoubleQuote = false;
+          _rawTextInTemplateLiteral = false;
           return _LexerState.text; // Let the main loop handle the closing tag
         }
       }
@@ -725,7 +784,7 @@ class BladeLexer {
         _advance(); // }
         _advance(); // }
         _emitToken(TokenType.bladeComment, '{{-- $content --}}');
-        return _LexerState.text;
+        return _textOrRawTextState();
       }
       _advance();
     }
@@ -790,7 +849,7 @@ class BladeLexer {
             _advance(); // }
             _advance(); // }
             _emitToken(TokenType.echoClose, '}}');
-            return _LexerState.text;
+            return _textOrRawTextState();
           }
         }
       }
@@ -831,7 +890,7 @@ class BladeLexer {
         _advance(); // !
         _advance(); // }
         _emitToken(TokenType.rawEchoClose, '!!}');
-        return _LexerState.text;
+        return _textOrRawTextState();
       }
       _advance();
     }
@@ -869,7 +928,7 @@ class BladeLexer {
         _advance(); // }
         _advance(); // }
         _emitToken(TokenType.legacyEchoClose, '}}}');
-        return _LexerState.text;
+        return _textOrRawTextState();
       }
       _advance();
     }
@@ -1030,15 +1089,73 @@ class BladeLexer {
       return;
     }
 
-    // Check for Alpine.js shorthand
+    // Check for @ in attribute position: Blade directive or Alpine.js shorthand
     if (_peek() == '@') {
-      _advance();
-      // Alpine.js @event shorthand
-      final eventStart = _position;
-      while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == '.') {
+      // Look ahead to get the name after @
+      final atStart = _position;
+      _advance(); // consume '@'
+      final nameStart = _position;
+      while (_isAlphaNumeric(_peek())) {
         _advance();
       }
-      final event = input.substring(eventStart, _position);
+      final name = input.substring(nameStart, _position);
+
+      // Check if this is a known Blade attribute directive (@class, @style, etc.)
+      final directiveType = _directiveNameToType(name);
+      if (directiveType != TokenType.identifier) {
+        // It's a Blade directive - emit directive token
+        _emitToken(directiveType, '@$name');
+
+        // Check for expression after directive: (...)
+        if (_peek() == '(') {
+          _start = _position;
+          _startLine = _line;
+          _startColumn = _column;
+
+          final exprStart = _position;
+          _advance(); // (
+          int parenCount = 1;
+          bool inSingleQuote = false;
+          bool inDoubleQuote = false;
+
+          while (!_isAtEnd() && parenCount > 0) {
+            final ch = _peek();
+
+            if (inSingleQuote) {
+              if (ch == "'" && _isUnescapedAt(_position)) {
+                inSingleQuote = false;
+              }
+            } else if (inDoubleQuote) {
+              if (ch == '"' && _isUnescapedAt(_position)) {
+                inDoubleQuote = false;
+              }
+            } else {
+              if (ch == "'") {
+                inSingleQuote = true;
+              } else if (ch == '"') {
+                inDoubleQuote = true;
+              } else if (ch == '(') {
+                parenCount++;
+              } else if (ch == ')') {
+                parenCount--;
+              }
+            }
+
+            _advance();
+          }
+
+          final expression = input.substring(exprStart, _position);
+          _emitToken(TokenType.expression, expression);
+        }
+        return;
+      }
+
+      // Not a Blade directive - treat as Alpine.js @event shorthand
+      // Continue scanning for Alpine event name chars (hyphens, dots)
+      while (_peek() == '-' || _peek() == '.' || _isAlphaNumeric(_peek())) {
+        _advance();
+      }
+      final event = input.substring(nameStart, _position);
       _emitToken(TokenType.alpineShorthandOn, '@$event');
 
       // Lex attribute value
@@ -1180,7 +1297,10 @@ class BladeLexer {
 
   /// Skip whitespace characters (spaces, tabs, newlines).
   void _skipWhitespace() {
-    while (_peek() == ' ' || _peek() == '\t' || _peek() == '\n' || _peek() == '\r') {
+    while (_peek() == ' ' ||
+        _peek() == '\t' ||
+        _peek() == '\n' ||
+        _peek() == '\r') {
       _advance();
     }
   }
