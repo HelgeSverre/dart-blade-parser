@@ -560,6 +560,8 @@ function renderChart(data,avgA,avgB,avgC){
   const avg=document.createElement('div');avg.className='speed-row speed-avg';
   avg.innerHTML=`<span class="speed-fixture" style="font-weight:600;color:var(--text)">Average</span><div class="speed-bars"><div class="speed-bar ours" style="width:${(avgA/mx*100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${(avgB/mx*100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${(avgC/mx*100).toFixed(1)}%"></div></div><span class="speed-ms" style="font-weight:600;color:var(--accent)">${avgA.toFixed(2)}ms</span>`;
   ch.appendChild(avg);
+  // Observe after bars exist so the IntersectionObserver can animate them
+  speedObs.observe(ch);
 }
 
 function updateMetrics(avgA,fixtureCount,idemPct){
@@ -650,7 +652,6 @@ const speedObs=new IntersectionObserver(entries=>{
     speedObs.unobserve(e.target);
   }});
 },{threshold:.2});
-speedObs.observe(ch);
 
 // Reveal on scroll
 const revObs=new IntersectionObserver(entries=>{

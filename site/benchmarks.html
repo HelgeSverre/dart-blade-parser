@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benchmarks — prettier-plugin-laravel-blade</title>
+<meta name="description" content="Full benchmark results: 109 fixtures, 3 plugins, performance and idempotency data for the fastest Prettier Blade plugin.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050507;--surface:#0c0c10;--surface2:#111116;
+  --border:#1a1a22;--border-light:#252530;
+  --text:#e8e8ec;--text-dim:#8a8a96;--text-muted:#555560;
+  --accent:#b5f542;--accent-dim:rgba(181,245,66,.10);--accent-glow:rgba(181,245,66,.04);
+  --accent2:#8bf03c;
+  --red:#f87171;--blue:#60a5fa;--yellow:#fbbf24;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.02;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat:repeat;background-size:256px}
+a{color:var(--accent);text-decoration:none}
+::selection{background:var(--accent);color:var(--bg)}
+
+.w{max-width:1080px;margin:0 auto;padding:0 1.5rem}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(14px);background:rgba(5,5,7,.82);border-bottom:1px solid var(--border)}
+nav .w{display:flex;align-items:center;height:48px;gap:2rem}
+.nav-brand{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:1.5rem;list-style:none;margin-left:auto}
+.nav-links a{color:var(--text-muted);font-size:.8rem;font-weight:500;transition:color .12s}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-gh{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--border);padding:.3rem .7rem;border-radius:4px;color:var(--text-muted)!important;font-size:.78rem;transition:all .12s}
+.nav-gh:hover{border-color:var(--text-muted);color:var(--text)!important}
+
+/* ── HERO ── */
+.bench-hero{padding:7rem 0 3rem}
+.stag{font-family:var(--mono);font-size:.65rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.6rem}
+.sh{font-family:var(--serif);font-size:2.2rem;font-weight:400;letter-spacing:-.02em;margin-bottom:.4rem;line-height:1.15}
+.sd{color:var(--text-dim);font-weight:300;line-height:1.5;max-width:640px;margin-bottom:2rem;font-size:.95rem}
+
+/* ── METRICS ── */
+.metrics{padding:2rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:3rem}
+.metrics .w{display:grid;grid-template-columns:repeat(5,1fr);gap:1.5rem}
+.metric{text-align:center}
+.metric-val{font-family:var(--mono);font-size:1.5rem;font-weight:700;letter-spacing:-.03em}
+.metric-val.accent{color:var(--accent)}
+.metric-label{font-size:.7rem;color:var(--text-muted);margin-top:.15rem}
+
+/* ── SECTIONS ── */
+section{padding:3rem 0}
+section+section{border-top:1px solid var(--border)}
+
+/* ── LEGEND ── */
+.legend{display:flex;gap:1.2rem;margin:1rem 0 1.5rem;font-size:.72rem;color:var(--text-muted)}
+.legend span{display:inline-flex;align-items:center;gap:.35rem}
+.legend span::before{content:'';width:8px;height:8px;border-radius:1px}
+.legend .l-a::before{background:var(--accent)}
+.legend .l-b::before{background:var(--blue);opacity:.5}
+.legend .l-c::before{background:var(--yellow);opacity:.4}
+
+/* ── CATEGORY GROUPS ── */
+.bench-group{margin-bottom:1px}
+.bench-group-header{
+  display:grid;grid-template-columns:200px 1fr 80px 80px 80px;align-items:center;gap:.75rem;
+  padding:.65rem .75rem;background:var(--surface2);border:1px solid var(--border);
+  cursor:pointer;user-select:none;transition:background .12s;
+  font-size:.78rem;
+}
+.bench-group-header:hover{background:var(--surface)}
+.bench-group-header .cat-name{font-family:var(--mono);font-weight:600;color:var(--text);display:flex;align-items:center;gap:.5rem}
+.bench-group-header .cat-name::before{content:'';display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--text-muted);transition:transform .15s}
+.bench-group-header.collapsed .cat-name::before{transform:rotate(-90deg)}
+.bench-group-header .cat-count{color:var(--text-muted);font-family:var(--mono);font-size:.68rem}
+.bench-group-header .cat-avg{font-family:var(--mono);font-size:.72rem;text-align:right}
+.bench-group-body{overflow:hidden;transition:max-height .25s ease}
+.bench-group-body.collapsed{max-height:0!important;overflow:hidden}
+
+/* ── FIXTURE ROWS ── */
+.bench-row{
+  display:grid;grid-template-columns:200px 1fr 80px 80px 80px;align-items:center;gap:.75rem;
+  padding:.4rem .75rem .4rem 1.5rem;border-bottom:1px solid var(--border);
+  font-size:.78rem;
+}
+.bench-row:last-child{border-bottom:none}
+.bench-fixture{font-family:var(--mono);font-size:.68rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bench-bars{display:flex;flex-direction:column;gap:2px}
+.bench-bar{height:6px;border-radius:1px;min-width:2px;transform-origin:left;transform:scaleX(0);transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.bench-bar.anim{transform:scaleX(1)}
+.bench-bar.a{background:var(--accent)}
+.bench-bar.b{background:var(--blue);opacity:.5}
+.bench-bar.c{background:var(--yellow);opacity:.4}
+.bench-ms{font-family:var(--mono);font-size:.68rem;text-align:right;color:var(--text-muted)}
+.bench-ms.best{color:var(--accent);font-weight:600}
+.bench-ms.err{color:var(--text-muted);font-style:italic}
+
+/* ── SUMMARY ROW ── */
+.bench-summary{
+  display:grid;grid-template-columns:200px 1fr 80px 80px 80px;align-items:center;gap:.75rem;
+  padding:.75rem;border-top:2px solid var(--border);margin-top:.5rem;
+  font-size:.82rem;font-weight:600;
+}
+.bench-summary .bench-fixture{color:var(--text);font-weight:600;font-size:.72rem}
+
+/* ── IDEMPOTENCY TABLE ── */
+.idem-summary{display:flex;gap:2rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.idem-stat{font-size:.82rem}
+.idem-stat strong{font-family:var(--mono);font-size:.78rem;margin-right:.35rem}
+
+.idem-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.idem-table th{text-align:left;padding:.5rem .6rem;border-bottom:2px solid var(--border);color:var(--text-muted);font-weight:600;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em}
+.idem-table td{padding:.35rem .6rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:.72rem}
+.idem-table tr:last-child td{border-bottom:none}
+.idem-table .fix{color:var(--text-dim);font-weight:400}
+.idem-table .pass{color:var(--accent)}
+.idem-table .fail{color:var(--red)}
+.idem-table .error{color:var(--red);opacity:.6}
+.idem-table .cat-row td{background:var(--surface2);font-weight:600;color:var(--text);font-size:.7rem;letter-spacing:.02em}
+
+/* ── ERROR CATALOG ── */
+.error-section{margin-top:1rem}
+.error-plugin{margin-bottom:2rem}
+.error-plugin-name{font-family:var(--mono);font-size:.85rem;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.error-card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:.75rem 1rem;margin-bottom:.5rem;font-size:.78rem}
+.error-card .ec-fixture{font-family:var(--mono);font-size:.72rem;color:var(--text);font-weight:500;margin-bottom:.25rem}
+.error-card .ec-type{font-size:.68rem;color:var(--red);font-family:var(--mono);margin-bottom:.2rem}
+.error-card .ec-detail{font-size:.68rem;color:var(--text-muted);font-family:var(--mono);white-space:pre-wrap;word-break:break-all;max-height:3em;overflow:hidden}
+.no-errors{color:var(--accent);font-family:var(--mono);font-size:.82rem}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:2rem 0;text-align:center;margin-top:2rem}
+footer p{font-size:.78rem;color:var(--text-muted)}
+footer a{color:var(--text-dim)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .metrics .w{grid-template-columns:repeat(2,1fr)}
+  .bench-group-header,.bench-row,.bench-summary{grid-template-columns:120px 1fr 55px 55px 55px;gap:.4rem}
+  .bench-fixture{font-size:.6rem}
+  .nav-links{display:none}
+}
+
+/* ── ANIM ── */
+.reveal{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+*{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+::-webkit-scrollbar{height:6px;width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:3rem;color:var(--text-muted);font-family:var(--mono);font-size:.82rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="w">
+    <a href="index.html" class="nav-brand"><span>prettier</span>-plugin-laravel-blade</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#speed">Speed</a></li>
+      <li><a href="index.html#comparison">Comparison</a></li>
+      <li><a href="benchmarks.html" class="active">Benchmarks</a></li>
+      <li><a href="formatter.html">Try Live</a></li>
+    </ul>
+    <a href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/prettier-plugin-laravel-blade" class="nav-gh" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="bench-hero">
+  <div class="w">
+    <div class="stag">Benchmark Results</div>
+    <div class="sh">Every fixture. Every plugin.</div>
+    <div class="sd">
+      <span id="hero-subtitle">109 fixtures across 3 plugins. 20 timed runs after 5 warmup.</span>
+      <a href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/benchmark">Run it yourself</a> — all data loaded from benchmark.json.
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<div class="metrics">
+  <div class="w" id="metricsBar">
+    <div class="metric"><div class="metric-val accent" id="m-avg">--</div><div class="metric-label">Avg format time (ours)</div></div>
+    <div class="metric"><div class="metric-val" id="m-ratio-b">--</div><div class="metric-label">Faster vs stillat</div></div>
+    <div class="metric"><div class="metric-val" id="m-ratio-c">--</div><div class="metric-label">Faster vs shufo</div></div>
+    <div class="metric"><div class="metric-val" id="m-fixtures">--</div><div class="metric-label">Fixtures tested</div></div>
+    <div class="metric"><div class="metric-val accent" id="m-idem">--</div><div class="metric-label">Idempotent (ours)</div></div>
+  </div>
+</div>
+
+<!-- PERFORMANCE -->
+<section id="performance" class="reveal">
+  <div class="w">
+    <div class="stag">Performance</div>
+    <div class="sh">Format time per fixture</div>
+    <div class="sd">Horizontal bars show relative time. Click a category to collapse.</div>
+    <div class="legend">
+      <span class="l-a">This plugin (A)</span>
+      <span class="l-b">stillat (B)</span>
+      <span class="l-c">shufo (C)</span>
+    </div>
+    <div id="perfContainer"><div class="loading">Loading benchmark data...</div></div>
+  </div>
+</section>
+
+<!-- IDEMPOTENCY -->
+<section id="idempotency" class="reveal">
+  <div class="w">
+    <div class="stag">Idempotency</div>
+    <div class="sh">Format once or a hundred times</div>
+    <div class="sd">Does formatting the output again produce the same result? Pass means yes.</div>
+    <div id="idemSummary" class="idem-summary"></div>
+    <div style="overflow-x:auto">
+      <table class="idem-table" id="idemTable">
+        <thead><tr><th style="width:300px">Fixture</th><th>A</th><th>B</th><th>C</th></tr></thead>
+        <tbody id="idemBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ERROR CATALOG -->
+<section id="errors" class="reveal">
+  <div class="w">
+    <div class="stag">Reliability</div>
+    <div class="sh">Where competitors break</div>
+    <div class="sd">Fixtures that cause errors, crashes, or non-idempotent output.</div>
+    <div id="errorContainer" class="error-section"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="w">
+    <p>Built by <a href="https://github.com/HelgeSverre">Helge Sverre</a> · <a href="https://github.com/HelgeSverre/dart-blade-parser">Source</a> · MIT</p>
+  </div>
+</footer>
+
+<script>
+(async function(){
+  let json;
+  try {
+    const res = await fetch('data/benchmark.json');
+    json = await res.json();
+  } catch(e) {
+    document.getElementById('perfContainer').innerHTML = '<div class="loading">Failed to load benchmark data. Run: just site-build</div>';
+    return;
+  }
+
+  const perf = json.performance;
+  const idem = json.idempotency;
+
+  // ── Helpers ──
+  function avg(entries) {
+    const vals = Object.values(entries).filter(e => e.avg != null && !e.error).map(e => e.avg);
+    return vals.length ? vals.reduce((a,b) => a+b, 0) / vals.length : 0;
+  }
+
+  function countIdem(entries) {
+    let pass=0, fail=0, error=0;
+    for (const v of Object.values(entries)) {
+      if (v.error) error++;
+      else if (v.idempotent === true) pass++;
+      else fail++;
+    }
+    return { pass, fail, error, total: pass+fail+error };
+  }
+
+  function category(name) {
+    return name.split('/')[0];
+  }
+
+  function shortName(name) {
+    const parts = name.split('/');
+    return parts.length > 1 ? parts.slice(1).join('/') : name;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── Compute stats ──
+  const avgA = avg(perf.A), avgB = avg(perf.B), avgC = avg(perf.C);
+  const ratioB = avgA > 0 ? Math.round(avgB / avgA) : 0;
+  const ratioC = avgA > 0 ? Math.round(avgC / avgA) : 0;
+  const fixtureCount = Object.keys(perf.A).length;
+  const idemA = countIdem(idem.A), idemB = countIdem(idem.B), idemC = countIdem(idem.C);
+
+  // ── Metrics bar ──
+  document.getElementById('m-avg').textContent = avgA.toFixed(2) + 'ms';
+  document.getElementById('m-ratio-b').textContent = ratioB + 'x';
+  document.getElementById('m-ratio-c').textContent = ratioC + 'x';
+  const idemTotal = idemA.pass + idemA.fail;
+  document.getElementById('m-fixtures').textContent = idemA.total;
+  document.getElementById('m-idem').textContent = idemA.pass + '/' + idemTotal;
+  document.getElementById('hero-subtitle').textContent = idemA.total + ' fixtures across 3 plugins. 20 timed runs after 5 warmup.';
+
+  // ── Performance section ──
+  const allFixtures = Object.keys(perf.A).sort();
+  const categories = [...new Set(allFixtures.map(category))];
+
+  // Global max for bar scaling
+  let globalMax = 0;
+  for (const f of allFixtures) {
+    for (const p of ['A','B','C']) {
+      const v = perf[p]?.[f]?.avg;
+      if (v != null && v > globalMax) globalMax = v;
+    }
+  }
+
+  const container = document.getElementById('perfContainer');
+  container.innerHTML = '';
+
+  for (const cat of categories) {
+    const fixtures = allFixtures.filter(f => category(f) === cat);
+
+    // Category averages
+    const catAvgs = {};
+    for (const p of ['A','B','C']) {
+      const vals = fixtures.map(f => perf[p]?.[f]?.avg).filter(v => v != null);
+      catAvgs[p] = vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2) : '--';
+    }
+
+    // Group wrapper
+    const group = document.createElement('div');
+    group.className = 'bench-group';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'bench-group-header';
+    header.innerHTML =
+      '<div class="cat-name">' + cat + ' <span class="cat-count">(' + fixtures.length + ')</span></div>' +
+      '<div></div>' +
+      '<div class="cat-avg" style="color:var(--accent)">' + catAvgs.A + '</div>' +
+      '<div class="cat-avg" style="color:var(--blue);opacity:.7">' + catAvgs.B + '</div>' +
+      '<div class="cat-avg" style="color:var(--yellow);opacity:.6">' + catAvgs.C + '</div>';
+
+    header.addEventListener('click', () => {
+      header.classList.toggle('collapsed');
+      body.classList.toggle('collapsed');
+    });
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'bench-group-body';
+
+    for (const f of fixtures) {
+      const a = perf.A?.[f]?.avg;
+      const b = perf.B?.[f]?.avg;
+      const c = perf.C?.[f]?.avg;
+      const aOk = a != null, bOk = b != null, cOk = c != null;
+      const localMax = Math.max(aOk ? a : 0, bOk ? b : 0, cOk ? c : 0);
+      const best = Math.min(aOk ? a : Infinity, bOk ? b : Infinity, cOk ? c : Infinity);
+
+      const row = document.createElement('div');
+      row.className = 'bench-row';
+      row.innerHTML =
+        '<span class="bench-fixture" title="' + f + '">' + shortName(f) + '</span>' +
+        '<div class="bench-bars">' +
+          '<div class="bench-bar a" style="width:' + (aOk ? (a/globalMax*100).toFixed(1) : 0) + '%"></div>' +
+          '<div class="bench-bar b" style="width:' + (bOk ? (b/globalMax*100).toFixed(1) : 0) + '%"></div>' +
+          '<div class="bench-bar c" style="width:' + (cOk ? (c/globalMax*100).toFixed(1) : 0) + '%"></div>' +
+        '</div>' +
+        '<span class="bench-ms' + (aOk && a===best ? ' best' : '') + (aOk ? '' : ' err') + '">' + (aOk ? a.toFixed(2) : '--') + '</span>' +
+        '<span class="bench-ms' + (bOk && b===best ? ' best' : '') + (bOk ? '' : ' err') + '">' + (bOk ? b.toFixed(2) : '--') + '</span>' +
+        '<span class="bench-ms' + (cOk && c===best ? ' best' : '') + (cOk ? '' : ' err') + '">' + (cOk ? c.toFixed(2) : '--') + '</span>';
+      body.appendChild(row);
+    }
+
+    // Set initial max-height for animation
+    group.appendChild(header);
+    group.appendChild(body);
+    container.appendChild(group);
+  }
+
+  // Overall summary row
+  const summary = document.createElement('div');
+  summary.className = 'bench-summary';
+  summary.innerHTML =
+    '<span class="bench-fixture">Overall Average</span><div></div>' +
+    '<span class="bench-ms best">' + avgA.toFixed(2) + '</span>' +
+    '<span class="bench-ms" style="color:var(--blue);opacity:.7">' + avgB.toFixed(2) + '</span>' +
+    '<span class="bench-ms" style="color:var(--yellow);opacity:.6">' + avgC.toFixed(2) + '</span>';
+  container.appendChild(summary);
+
+  // Set max-heights after render
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.bench-group-body').forEach(b => {
+      b.style.maxHeight = b.scrollHeight + 'px';
+    });
+  });
+
+  // ── Idempotency section ──
+  const summaryEl = document.getElementById('idemSummary');
+  summaryEl.innerHTML =
+    '<div class="idem-stat"><strong style="color:var(--accent)">A:</strong> ' + idemA.pass + ' pass' + (idemA.fail ? ', <span style="color:var(--red)">' + idemA.fail + ' fail</span>' : '') + (idemA.error ? ', ' + idemA.error + ' errors' : '') + '</div>' +
+    '<div class="idem-stat"><strong style="color:var(--blue)">B:</strong> ' + idemB.pass + ' pass' + (idemB.fail ? ', <span style="color:var(--red)">' + idemB.fail + ' fail</span>' : '') + (idemB.error ? ', <span style="color:var(--red)">' + idemB.error + ' errors</span>' : '') + '</div>' +
+    '<div class="idem-stat"><strong style="color:var(--yellow)">C:</strong> ' + idemC.pass + ' pass' + (idemC.fail ? ', <span style="color:var(--red)">' + idemC.fail + ' fail</span>' : '') + (idemC.error ? ', <span style="color:var(--red)">' + idemC.error + ' errors</span>' : '') + '</div>';
+
+  const idemBody = document.getElementById('idemBody');
+  const allIdemFixtures = Object.keys(idem.A).sort();
+  let prevCat = '';
+
+  for (const f of allIdemFixtures) {
+    const cat = category(f);
+    if (cat !== prevCat) {
+      prevCat = cat;
+      const catRow = document.createElement('tr');
+      catRow.className = 'cat-row';
+      catRow.innerHTML = '<td colspan="4">' + cat + '</td>';
+      idemBody.appendChild(catRow);
+    }
+
+    const tr = document.createElement('tr');
+    const cells = [f];
+    for (const p of ['A','B','C']) {
+      const entry = idem[p]?.[f];
+      if (!entry) { cells.push({ cls: 'error', text: '--' }); continue; }
+      if (entry.error) cells.push({ cls: 'error', text: 'ERR' });
+      else if (entry.idempotent === true) cells.push({ cls: 'pass', text: '[v] Pass' });
+      else cells.push({ cls: 'fail', text: '[x] Fail' });
+    }
+    tr.innerHTML =
+      '<td class="fix">' + shortName(f) + '</td>' +
+      '<td class="' + cells[1].cls + '">' + cells[1].text + '</td>' +
+      '<td class="' + cells[2].cls + '">' + cells[2].text + '</td>' +
+      '<td class="' + cells[3].cls + '">' + cells[3].text + '</td>';
+    idemBody.appendChild(tr);
+  }
+
+  // ── Error catalog ──
+  const errorContainer = document.getElementById('errorContainer');
+
+  function collectErrors(pluginIdem, pluginLabel) {
+    const failures = [];
+    for (const [f, entry] of Object.entries(pluginIdem)) {
+      if (entry.error) {
+        const msg = typeof entry.error === 'string' ? entry.error.split('\n')[0] : 'Unknown error';
+        failures.push({ fixture: f, type: 'Error / Crash', detail: msg });
+      } else if (entry.idempotent === false) {
+        let detail = 'Differs at char ' + entry.diffAt;
+        if (entry.pass1Snippet) detail += '\n  Pass 1: ...' + entry.pass1Snippet.replace(/\n/g, '\\n').slice(0,60) + '...';
+        if (entry.pass2Snippet) detail += '\n  Pass 2: ...' + entry.pass2Snippet.replace(/\n/g, '\\n').slice(0,60) + '...';
+        failures.push({ fixture: f, type: 'Idempotency failure', detail });
+      }
+    }
+    return failures;
+  }
+
+  // Plugin A
+  const errorsA = collectErrors(idem.A, 'A');
+  const pluginADiv = document.createElement('div');
+  pluginADiv.className = 'error-plugin';
+  pluginADiv.innerHTML = '<div class="error-plugin-name" style="color:var(--accent)">A — prettier-plugin-laravel-blade</div>';
+  if (errorsA.length === 0) {
+    pluginADiv.innerHTML += '<div class="no-errors">No errors. No failures.</div>';
+  } else {
+    for (const e of errorsA) {
+      pluginADiv.innerHTML += '<div class="error-card"><div class="ec-fixture">' + escHtml(e.fixture) + '</div><div class="ec-type">' + e.type + '</div><div class="ec-detail">' + escHtml(e.detail) + '</div></div>';
+    }
+  }
+  errorContainer.appendChild(pluginADiv);
+
+  // Plugin B
+  const errorsB = collectErrors(idem.B, 'B');
+  const pluginBDiv = document.createElement('div');
+  pluginBDiv.className = 'error-plugin';
+  pluginBDiv.innerHTML = '<div class="error-plugin-name" style="color:var(--blue)">B — prettier-plugin-blade (stillat)</div>';
+  for (const e of errorsB) {
+    pluginBDiv.innerHTML += '<div class="error-card"><div class="ec-fixture">' + e.fixture + '</div><div class="ec-type">' + e.type + '</div><div class="ec-detail">' + escHtml(e.detail) + '</div></div>';
+  }
+  if (errorsB.length === 0) pluginBDiv.innerHTML += '<div class="no-errors">No errors.</div>';
+  errorContainer.appendChild(pluginBDiv);
+
+  // Plugin C
+  const errorsC = collectErrors(idem.C, 'C');
+  const pluginCDiv = document.createElement('div');
+  pluginCDiv.className = 'error-plugin';
+  pluginCDiv.innerHTML = '<div class="error-plugin-name" style="color:var(--yellow)">C — @shufo/prettier-plugin-blade</div>';
+  for (const e of errorsC) {
+    pluginCDiv.innerHTML += '<div class="error-card"><div class="ec-fixture">' + e.fixture + '</div><div class="ec-type">' + e.type + '</div><div class="ec-detail">' + escHtml(e.detail) + '</div></div>';
+  }
+  if (errorsC.length === 0) pluginCDiv.innerHTML += '<div class="no-errors">No errors.</div>';
+  errorContainer.appendChild(pluginCDiv);
+
+  // ── Animations ──
+  // Bar animation on scroll
+  const barObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.bench-bar').forEach((b,i) => {
+          setTimeout(() => b.classList.add('anim'), i * 40);
+        });
+        barObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.bench-group').forEach(g => barObs.observe(g));
+
+  // Reveal on scroll
+  const revObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); revObs.unobserve(e.target); }});
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+})();
+</script>
+</body>
+</html>
