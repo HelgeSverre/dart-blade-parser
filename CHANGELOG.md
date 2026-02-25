@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Slot name style** (`slotNameStyle`): Control how slot names are rendered — `colon` (`<x-slot:header>`), `attribute` (`<x-slot name="header">`), or `preserve` original syntax
+- **Slot spacing** (`slotSpacing`): Control blank lines around slot elements — `after` (default), `before`, `around`, or `none`
+- Livewire dashboard page fixture and playground example
+
+### Fixed
+- `<x-slot name="header">` no longer produces `<x-slot:header name="header">` (duplicate name attribute)
+
 ## [1.0.0] - 2025-02-25
 
 ### Parser

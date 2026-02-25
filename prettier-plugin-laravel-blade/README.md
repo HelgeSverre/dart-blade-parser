@@ -63,6 +63,8 @@ Or configure in `.prettierrc`:
 | `bladeQuoteStyle` | `"preserve"` | `single`, `double`, `preserve` | Quote style for HTML attributes |
 | `bladeDirectiveSpacing` | `"between_blocks"` | `between_blocks`, `none`, `preserve` | Spacing between directive blocks |
 | `bladeSlotFormatting` | `"compact"` | `compact`, `block` | Formatting style for component slots |
+| `bladeSlotNameStyle` | `"colon"` | `colon`, `attribute`, `preserve` | Slot name syntax (colon vs attribute) |
+| `bladeSlotSpacing` | `"after"` | `none`, `after`, `before`, `around` | Blank lines around slot elements |
 | `bladeWrapAttributes` | `"auto"` | `auto`, `always`, `never` | When to wrap attributes to multiple lines |
 | `bladeAttributeSort` | `"none"` | `none`, `alphabetical`, `by_type` | How to sort HTML attributes |
 | `bladeClosingBracketStyle` | `"same_line"` | `same_line`, `new_line` | Closing bracket position when attributes wrap |

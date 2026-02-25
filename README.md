@@ -343,6 +343,8 @@ final config = FormatterConfig(
   quoteStyle: QuoteStyle.preserve,            // or QuoteStyle.single, QuoteStyle.double
   directiveSpacing: DirectiveSpacing.betweenBlocks,  // Default: betweenBlocks
   slotFormatting: SlotFormatting.compact,     // Default: compact
+  slotNameStyle: SlotNameStyle.colon,         // Default: colon
+  slotSpacing: SlotSpacing.after,             // Default: after
   maxLineLength: 120,                         // Default: 120
   wrapAttributes: WrapAttributes.auto,        // Default: auto
   attributeSort: AttributeSort.none,          // Default: none
@@ -368,6 +370,15 @@ final formatter = BladeFormatter(config: config);
 - `slotFormatting`: Control formatting style for component slots
   - `SlotFormatting.compact`: Smart detection - compact for simple slots (default)
   - `SlotFormatting.block`: Always use block formatting with extra blank lines
+- `slotNameStyle`: Control how slot names are rendered
+  - `SlotNameStyle.colon`: Always use colon syntax `<x-slot:header>` (default)
+  - `SlotNameStyle.attribute`: Always use attribute syntax `<x-slot name="header">`
+  - `SlotNameStyle.preserve`: Preserve the original syntax from the source
+- `slotSpacing`: Control blank lines around slot elements
+  - `SlotSpacing.after`: Add a blank line after each slot (default)
+  - `SlotSpacing.before`: Add a blank line before each slot
+  - `SlotSpacing.around`: Add blank lines both before and after slots
+  - `SlotSpacing.none`: No blank lines around slots
 - `maxLineLength`: Maximum line length before wrapping attributes (default: 120)
 - `wrapAttributes`: Control when to wrap attributes to multiple lines
   - `WrapAttributes.auto`: Wrap when line exceeds maxLineLength (default)
@@ -415,6 +426,8 @@ if (formatter.needsFormatting(source)) {
 - Smart inline vs block formatting (simple content stays inline)
 - Configurable directive spacing (blank lines between directives)
 - Configurable slot formatting (compact vs block style)
+- **Slot name style** - Control colon syntax (`<x-slot:header>`) vs attribute syntax (`<x-slot name="header">`)
+- **Slot spacing** - Control blank lines around slot elements (after, before, around, none)
 - Normalizes attribute quoting (single, double, or preserve)
 - **Line wrapping** - Wrap long attribute lists when exceeding maxLineLength
 - **Multi-line attributes** - Format attributes one per line when wrapping
@@ -504,6 +517,60 @@ if (formatter.needsFormatting(source)) {
     </x-slot>
 
     <p>Card content</p>
+</x-card>
+```
+
+#### Slot Name Style
+
+**With `SlotNameStyle.colon` (default):**
+
+```blade
+<x-card>
+    <x-slot:header>
+        <h2>Card Title</h2>
+    </x-slot>
+</x-card>
+```
+
+**With `SlotNameStyle.attribute`:**
+
+```blade
+<x-card>
+    <x-slot name="header">
+        <h2>Card Title</h2>
+    </x-slot>
+</x-card>
+```
+
+#### Slot Spacing
+
+**With `SlotSpacing.after` (default):**
+
+```blade
+<x-card>
+    <x-slot:header>
+        <h2>Title</h2>
+    </x-slot>
+
+    <x-slot:footer>
+        <button>Save</button>
+    </x-slot>
+
+    <p>Content</p>
+</x-card>
+```
+
+**With `SlotSpacing.none`:**
+
+```blade
+<x-card>
+    <x-slot:header>
+        <h2>Title</h2>
+    </x-slot>
+    <x-slot:footer>
+        <button>Save</button>
+    </x-slot>
+    <p>Content</p>
 </x-card>
 ```
 

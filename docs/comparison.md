@@ -23,7 +23,7 @@
 | **Avg format time** | **0.33 ms** | 7.31 ms | 10.45 ms |
 | **Idempotent** | ✅ 104/104 pass | ❌ 4 failures | ❌ 1 failure |
 | **Extra dependencies** | None | None | `blade-formatter`, `php-parser` |
-| **Custom options** | `bladeQuoteStyle`, `bladeDirectiveSpacing`, `bladeSlotFormatting`, `bladeWrapAttributes` | Standard Prettier options | `wrapAttributes`, `sortTailwindcssClasses`, `sortHtmlAttributes`, `phpVersion`, + many more |
+| **Custom options** | `bladeQuoteStyle`, `bladeDirectiveSpacing`, `bladeSlotFormatting`, `bladeSlotNameStyle`, `bladeSlotSpacing`, `bladeWrapAttributes` | Standard Prettier options | `wrapAttributes`, `sortTailwindcssClasses`, `sortHtmlAttributes`, `phpVersion`, + many more |
 
 ---
 
