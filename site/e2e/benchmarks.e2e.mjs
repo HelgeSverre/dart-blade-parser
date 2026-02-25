@@ -9,8 +9,9 @@ import assert from 'node:assert/strict';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Load benchmark data for validation
+const siteDir = resolve(__dirname, '..');
 const benchmarkData = JSON.parse(
-  readFileSync(resolve(__dirname, 'data', 'benchmark.json'), 'utf8')
+  readFileSync(resolve(siteDir, 'data', 'benchmark.json'), 'utf8')
 );
 const hasIdempotency = benchmarkData.idempotency && Object.keys(benchmarkData.idempotency.A || {}).length > 0;
 const hasPerformance = benchmarkData.performance && Object.keys(benchmarkData.performance.A || {}).length > 0;
@@ -48,7 +49,7 @@ describe('benchmarks.html e2e', () => {
   const errors = [];
 
   before(async () => {
-    server = await startServer(__dirname, PORT);
+    server = await startServer(siteDir, PORT);
     browser = await chromium.launch();
     page = await browser.newPage();
     page.on('pageerror', (e) => errors.push(e.message));

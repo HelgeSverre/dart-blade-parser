@@ -39,6 +39,11 @@ coverage-html: coverage
     @echo "✅ HTML report generated: coverage/html/index.html"
     @open coverage/html/index.html
 
+# Run site e2e tests (Playwright)
+[group('testing')]
+e2e:
+    node --test site/e2e/*.e2e.mjs
+
 # Run benchmarks
 [group('testing')]
 bench:
@@ -232,7 +237,7 @@ bench-install:
 # Run the full benchmark comparison
 [group('benchmark')]
 bench-plugins: bench-install
-    @cd benchmark && node run.mjs --full
+    @cd benchmark && node run.mjs --full --json
 
 # Run performance benchmark only
 [group('benchmark')]
