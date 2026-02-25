@@ -3,10 +3,10 @@
 Prettier plugin for formatting Laravel Blade templates, powered by a real AST parser.
 
 Unlike regex-based alternatives, this plugin uses a full recursive-descent parser that correctly handles:
-- 108 Blade directives
-- Blade components (`<x-alert>`) with slots
-- Alpine.js attributes (`x-data`, `@click`, `:bind`)
-- Livewire attributes (`wire:model`, `wire:click`)
+- 108 Blade directives (`@if`, `@foreach`, `@auth`, `@switch`, `@push`, `@section`, etc.)
+- Blade components (`<x-alert>`) with named slots and nested content
+- Alpine.js attributes (`x-data`, `@click`, `:bind`, `x-show`, `x-transition`)
+- Livewire attributes (`wire:model`, `wire:click`, `wire:poll`)
 - Echo statements (`{{ }}`, `{!! !!}`)
 - Nested and interleaved HTML/Blade structures
 - Error recovery for malformed templates
@@ -25,7 +25,7 @@ The plugin automatically formats `.blade.php` files:
 # Format all Blade files
 prettier --write "**/*.blade.php"
 
-# Check formatting
+# Check formatting (CI)
 prettier --check "**/*.blade.php"
 ```
 
@@ -39,7 +39,13 @@ Or configure in `.prettierrc`:
       "files": "*.blade.php",
       "options": {
         "tabWidth": 4,
-        "printWidth": 120
+        "printWidth": 120,
+        "bladeSlotFormatting": "compact",
+        "bladeSlotNameStyle": "colon",
+        "bladeSlotSpacing": "after",
+        "bladeWrapAttributes": "auto",
+        "bladeAttributeSort": "by_type",
+        "bladeSelfClosingStyle": "preserve"
       }
     }
   ]
@@ -60,19 +66,19 @@ Or configure in `.prettierrc`:
 
 | Option | Default | Choices | Description |
 |--------|---------|---------|-------------|
-| `bladeQuoteStyle` | `"preserve"` | `single`, `double`, `preserve` | Quote style for HTML attributes |
-| `bladeDirectiveSpacing` | `"between_blocks"` | `between_blocks`, `none`, `preserve` | Spacing between directive blocks |
-| `bladeSlotFormatting` | `"compact"` | `compact`, `block` | Formatting style for component slots |
-| `bladeSlotNameStyle` | `"colon"` | `colon`, `attribute`, `preserve` | Slot name syntax (colon vs attribute) |
-| `bladeSlotSpacing` | `"after"` | `none`, `after`, `before`, `around` | Blank lines around slot elements |
-| `bladeWrapAttributes` | `"auto"` | `auto`, `always`, `never` | When to wrap attributes to multiple lines |
-| `bladeAttributeSort` | `"none"` | `none`, `alphabetical`, `by_type` | How to sort HTML attributes |
-| `bladeClosingBracketStyle` | `"same_line"` | `same_line`, `new_line` | Closing bracket position when attributes wrap |
-| `bladeSelfClosingStyle` | `"preserve"` | `preserve`, `always`, `never` | How to format empty elements |
+| `bladeQuoteStyle` | `"preserve"` | `single`, `double`, `preserve` | `'` vs `"` in attribute values |
+| `bladeDirectiveSpacing` | `"between_blocks"` | `between_blocks`, `none`, `preserve` | Blank lines between `@if`, `@foreach`, etc. |
+| `bladeSlotFormatting` | `"compact"` | `compact`, `block` | Extra newlines inside `<x-slot>` blocks |
+| `bladeSlotNameStyle` | `"colon"` | `colon`, `attribute`, `preserve` | `<x-slot:name>` vs `<x-slot name="...">` |
+| `bladeSlotSpacing` | `"after"` | `none`, `after`, `before`, `around` | Blank lines before/after `<x-slot>` tags |
+| `bladeWrapAttributes` | `"auto"` | `auto`, `always`, `never` | Multi-line attributes when line is too long |
+| `bladeAttributeSort` | `"none"` | `none`, `alphabetical`, `by_type` | Reorder attributes (HTML, Alpine, Livewire) |
+| `bladeClosingBracketStyle` | `"same_line"` | `same_line`, `new_line` | Where `>` sits when attributes wrap |
+| `bladeSelfClosingStyle` | `"preserve"` | `preserve`, `always`, `never` | `<x-icon />` vs `<x-icon></x-icon>` for empty tags |
 
 ## How It Works
 
-This plugin compiles a Dart-based Blade parser/formatter to JavaScript (via `dart2js`), running entirely in-process with zero IPC overhead. The parser produces a full AST and the formatter is idempotent and deterministic.
+This plugin compiles a Dart-based Blade parser/formatter to JavaScript via `dart2js`, running entirely in-process with zero IPC overhead. The parser produces a full AST and the formatter is idempotent and deterministic.
 
 ## License
 
