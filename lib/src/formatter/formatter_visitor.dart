@@ -856,13 +856,43 @@ class FormatterVisitor implements AstVisitor<String> {
 
     if (hasDefaultSlot) {
       // Render all named slots (including default)
-      for (final slotEntry in node.slots.entries) {
-        slotEntry.value.accept(this);
+      final slotList = node.slots.values.toList();
+      for (var i = 0; i < slotList.length; i++) {
+        final slot = slotList[i];
+        slot.accept(this);
+
+        // Add spacing between slots if needed
+        if (i < slotList.length - 1) {
+          if (_needsSpacingBetween(slot, slotList[i + 1])) {
+            _output.writeln();
+          }
+        }
       }
     } else {
       // First, format named slots (non-default)
-      for (final slotEntry in node.slots.entries) {
-        slotEntry.value.accept(this);
+      final slotList = node.slots.values.toList();
+      for (var i = 0; i < slotList.length; i++) {
+        final slot = slotList[i];
+        slot.accept(this);
+
+        // Add spacing between slots if needed
+        if (i < slotList.length - 1) {
+          if (_needsSpacingBetween(slot, slotList[i + 1])) {
+            _output.writeln();
+          }
+        }
+      }
+
+      // Find the first meaningful child for spacing between last slot and children
+      final meaningfulChildren = node.children.where(
+        (child) => child is! TextNode || child.content.trim().isNotEmpty,
+      ).toList();
+
+      // Add spacing between last slot and first child if needed
+      if (slotList.isNotEmpty && meaningfulChildren.isNotEmpty) {
+        if (_needsSpacingBetween(slotList.last, meaningfulChildren.first)) {
+          _output.writeln();
+        }
       }
 
       // Then format regular children
@@ -877,11 +907,23 @@ class FormatterVisitor implements AstVisitor<String> {
 
         // Add spacing between children if needed
         if (i < node.children.length - 1) {
-          final next = node.children[i + 1];
-          if (_needsSpacingBetween(child, next)) {
+          // Find next meaningful node
+          AstNode? nextMeaningful;
+          for (var j = i + 1; j < node.children.length; j++) {
+            final candidate = node.children[j];
+            if (candidate is! TextNode || candidate.content.trim().isNotEmpty) {
+              nextMeaningful = candidate;
+              break;
+            }
+          }
+
+          if (nextMeaningful != null &&
+              _needsSpacingBetween(child, nextMeaningful)) {
             _output.writeln();
           }
         }
+
+        // Add spacing before last slot's closing bracket (child followed by nothing = end)
       }
     }
 
@@ -1176,6 +1218,23 @@ class FormatterVisitor implements AstVisitor<String> {
     // Add spacing between block directives and non-directives
     if (current is DirectiveNode && _blockDirectives.contains(current.name)) {
       return next is! DirectiveNode;
+    }
+
+    // Handle slot spacing based on configuration
+    if (config.slotSpacing != SlotSpacing.none) {
+      // Spacing after a slot (slot followed by any node)
+      if (current is SlotNode &&
+          (config.slotSpacing == SlotSpacing.after ||
+           config.slotSpacing == SlotSpacing.around)) {
+        return true;
+      }
+
+      // Spacing before a slot (any node followed by slot)
+      if (next is SlotNode &&
+          (config.slotSpacing == SlotSpacing.before ||
+           config.slotSpacing == SlotSpacing.around)) {
+        return true;
+      }
     }
 
     return false;

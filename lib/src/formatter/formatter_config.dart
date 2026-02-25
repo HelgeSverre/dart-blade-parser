@@ -34,6 +34,9 @@ class FormatterConfig {
   /// Controls how slot names are rendered (colon vs attribute syntax).
   final SlotNameStyle slotNameStyle;
 
+  /// Controls spacing (blank lines) around slot elements.
+  final SlotSpacing slotSpacing;
+
   /// Controls when to wrap attributes to multiple lines.
   final WrapAttributes wrapAttributes;
 
@@ -56,6 +59,7 @@ class FormatterConfig {
     this.directiveSpacing = DirectiveSpacing.betweenBlocks,
     this.slotFormatting = SlotFormatting.compact,
     this.slotNameStyle = SlotNameStyle.colon,
+    this.slotSpacing = SlotSpacing.after,
     this.wrapAttributes = WrapAttributes.auto,
     this.attributeSort = AttributeSort.none,
     this.closingBracketStyle = ClosingBracketStyle.sameLine,
@@ -94,6 +98,8 @@ class FormatterConfig {
           SlotFormatting.fromString(map['slot_formatting'] as String?),
       slotNameStyle:
           SlotNameStyle.fromString(map['slot_name_style'] as String?),
+      slotSpacing:
+          SlotSpacing.fromString(map['slot_spacing'] as String?),
       wrapAttributes:
           WrapAttributes.fromString(map['wrap_attributes'] as String?),
       attributeSort: AttributeSort.fromString(map['attribute_sort'] as String?),
@@ -115,6 +121,7 @@ class FormatterConfig {
       'directive_spacing': directiveSpacing.value,
       'slot_formatting': slotFormatting.value,
       'slot_name_style': slotNameStyle.value,
+      'slot_spacing': slotSpacing.value,
       'wrap_attributes': wrapAttributes.value,
       'attribute_sort': attributeSort.value,
       'closing_bracket_style': closingBracketStyle.value,
@@ -133,6 +140,7 @@ class FormatterConfig {
         'directiveSpacing: $directiveSpacing, '
         'slotFormatting: $slotFormatting, '
         'slotNameStyle: $slotNameStyle, '
+        'slotSpacing: $slotSpacing, '
         'wrapAttributes: $wrapAttributes, '
         'attributeSort: $attributeSort, '
         'closingBracketStyle: $closingBracketStyle, '
@@ -291,6 +299,62 @@ enum SlotNameStyle {
         'attribute' => attribute,
         'preserve' => preserve,
         _ => colon,
+      };
+}
+
+/// Controls spacing (blank lines) around slot elements.
+enum SlotSpacing {
+  /// No extra blank lines around slots.
+  none('none'),
+
+  /// Add a blank line after each slot's closing tag.
+  ///
+  /// This visually separates slots from subsequent content.
+  /// Example:
+  /// ```blade
+  /// <x-slot:header>
+  ///     <h2>Title</h2>
+  /// </x-slot>
+  ///
+  /// <p>Content after slot</p>
+  /// ```
+  after('after'),
+
+  /// Add a blank line before each slot's opening tag.
+  ///
+  /// Example:
+  /// ```blade
+  /// <p>Content before slot</p>
+  ///
+  /// <x-slot:header>
+  ///     <h2>Title</h2>
+  /// </x-slot>
+  /// ```
+  before('before'),
+
+  /// Add blank lines both before and after slots.
+  ///
+  /// Example:
+  /// ```blade
+  /// <p>Content before</p>
+  ///
+  /// <x-slot:header>
+  ///     <h2>Title</h2>
+  /// </x-slot>
+  ///
+  /// <p>Content after</p>
+  /// ```
+  around('around');
+
+  final String value;
+  const SlotSpacing(this.value);
+
+  static SlotSpacing fromString(String? s) => switch (s) {
+        'none' => none,
+        'after' => after,
+        'before' => before,
+        'around' => around,
+        _ => after,
       };
 }
 

@@ -829,9 +829,11 @@ void main() {
             '    <x-slot:header>\n'
             '        <h2>Card Title</h2>\n'
             '    </x-slot>\n'
+            '\n'
             '    <x-slot:footer>\n'
             '        <button>Action</button>\n'
             '    </x-slot>\n'
+            '\n'
             '    <p>Card content goes here</p>\n'
             '</x-card>\n';
 
