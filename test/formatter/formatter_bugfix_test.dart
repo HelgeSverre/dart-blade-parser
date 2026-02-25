@@ -149,6 +149,21 @@ indent_size = 2
     });
   });
 
+  group('Bug: duplicate name attribute in x-slot formatting', () {
+    late BladeFormatter formatter;
+
+    setUp(() {
+      formatter = BladeFormatter();
+    });
+
+    test('does not duplicate name attribute when converting slot syntax', () {
+      const input = '<x-card><x-slot name="header">Content</x-slot></x-card>';
+      final result = formatter.format(input);
+      expect(result, contains('<x-slot:header>'));
+      expect(result, isNot(contains('name="header"')));
+    });
+  });
+
   group('Bug 20: visitText hidden caller coupling', () {
     late BladeFormatter formatter;
 

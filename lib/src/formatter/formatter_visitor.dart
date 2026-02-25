@@ -959,7 +959,10 @@ class FormatterVisitor implements AstVisitor<String> {
       return '';
     }
 
-    final attributes = node.attributes.values.toList();
+    final attributes = node.attributes.entries
+        .where((e) => e.key != 'name')
+        .map((e) => e.value)
+        .toList();
 
     // Write opening slot tag
     _output.write(_indent.current);
