@@ -18,7 +18,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  blade_parser: ^1.1.0
+  blade_parser: ^1.0.0
 ```
 
 Then install:
