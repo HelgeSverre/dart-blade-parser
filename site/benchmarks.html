@@ -81,7 +81,9 @@ section{padding:3rem 0}
 section+section{border-top:1px solid var(--border)}
 
 /* ── LEGEND ── */
-.legend{display:flex;gap:1.2rem;margin:1rem 0 1.5rem;font-size:.72rem;color:var(--text-muted)}
+.legend{display:flex;gap:1.2rem;margin:1rem 0 1.5rem;font-size:.72rem;color:var(--text-muted);flex-wrap:wrap;justify-content:space-between;align-items:center}
+.legend-plugins{display:flex;gap:1.2rem}
+.legend-meta{color:var(--text-muted);font-size:.68rem;opacity:.6}
 .legend span{display:inline-flex;align-items:center;gap:.35rem}
 .legend span::before{content:'';width:8px;height:8px;border-radius:1px}
 .legend .l-a::before{background:var(--accent)}
@@ -231,9 +233,12 @@ footer a{color:var(--text-dim)}
     <div class="sh">Format time per fixture</div>
     <div class="sd">Horizontal bars show relative time. Click a category to collapse.</div>
     <div class="legend">
-      <span class="l-a">This plugin (A)</span>
-      <span class="l-b">stillat (B)</span>
-      <span class="l-c">shufo (C)</span>
+      <div class="legend-plugins">
+        <span class="l-a">This plugin (A)</span>
+        <span class="l-b">stillat (B)</span>
+        <span class="l-c">shufo (C)</span>
+      </div>
+      <div class="legend-meta" id="benchGeneratedAt"></div>
     </div>
     <div id="perfContainer"><div class="loading">Loading benchmark data...</div></div>
   </div>
@@ -284,6 +289,14 @@ footer a{color:var(--text-dim)}
 
   const perf = json.performance;
   const idem = json.idempotency;
+
+  // ── Generated at ──
+  if (json.generatedAt) {
+    const d = new Date(json.generatedAt);
+    document.getElementById('benchGeneratedAt').textContent =
+      'Generated ' + d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }) +
+      ' at ' + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+  }
 
   // ── Helpers ──
   function avg(entries) {
