@@ -489,7 +489,8 @@ class FormatterVisitor implements AstVisitor<String> {
       return '';
     }
 
-    final isBlock = _blockDirectives.contains(node.name);
+    // Known block directives, or unknown directives that were parsed with children
+    final isBlock = _blockDirectives.contains(node.name) || node.children.isNotEmpty;
 
     // Write the directive opening
     _output.write(_indent.current);
@@ -1269,6 +1270,8 @@ class FormatterVisitor implements AstVisitor<String> {
     // @empty without expression is intermediate (inside @forelse)
     // @empty with expression is standalone and needs @endempty
     if (name == 'empty' && expression == null) return false;
-    return _blockDirectives.contains(name);
+    // Known block directives, or unknown directives treated as blocks
+    // (if we reach here with isBlock=true, it has children and needs closing)
+    return true;
   }
 }

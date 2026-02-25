@@ -268,6 +268,11 @@ class BladeParser {
       // Lexer emits these as TokenType.identifier with '@name' value
       case TokenType.identifier:
         if (token.value.startsWith('@')) {
+          final name = token.value.substring(1);
+          // If not an @end* and a matching @end{name} exists ahead, parse as block
+          if (!name.startsWith('end') && _hasMatchingEndAhead(name)) {
+            return _parseUnknownBlockDirective(name);
+          }
           return _parseInlineDirective();
         }
         _advance();
@@ -1008,6 +1013,64 @@ class BladeParser {
     }
 
     return false;
+  }
+
+  /// Check if a matching @end{name} identifier exists ahead, with nesting awareness.
+  bool _hasMatchingEndAhead(String name) {
+    final open = '@$name';
+    final close = '@end$name';
+    int depth = 0;
+    for (int i = _current + 1; i < _tokens.length; i++) {
+      final t = _tokens[i];
+      if (t.type != TokenType.identifier) continue;
+      if (t.value == open) {
+        depth++;
+      } else if (t.value == close) {
+        if (depth == 0) return true;
+        depth--;
+      }
+    }
+    return false;
+  }
+
+  /// Check if the current token is an identifier with a specific value.
+  bool _checkIdentifierValue(String value) {
+    if (_isAtEnd()) return false;
+    final t = _peek();
+    return t.type == TokenType.identifier && t.value == value;
+  }
+
+  /// Parse an unknown/custom block directive (@foo...@endfoo).
+  DirectiveNode _parseUnknownBlockDirective(String name) {
+    final startToken = _advance();
+    final expression = _extractExpression();
+    final children = <AstNode>[];
+    final closingValue = '@end$name';
+
+    while (!_checkIdentifierValue(closingValue) && !_check(TokenType.eof)) {
+      final node = _parseNode();
+      if (node != null) children.add(node);
+    }
+
+    if (_checkIdentifierValue(closingValue)) {
+      _advance(); // consume @end{name}
+    } else {
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @$name directive',
+          position: startToken.startPosition,
+          hint: 'Add @end$name to close the block',
+        ),
+      );
+    }
+
+    return DirectiveNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      name: name,
+      expression: expression,
+      children: children,
+    );
   }
 
   /// Parse inline directive (no closing tag).

@@ -260,4 +260,78 @@ indent_size = 2
       expect(output, contains('@vite'));
     });
   });
+
+  group('Custom block directives (@foo...@endfoo)', () {
+    late BladeFormatter formatter;
+
+    setUp(() {
+      formatter = BladeFormatter();
+    });
+
+    test('custom block directive with @endcard is nested properly', () {
+      final input = "@card('primary')\n<h3>Title</h3>\n<p>Content</p>\n@endcard";
+      final output = formatter.format(input);
+      expect(output, contains("@card('primary')"));
+      expect(output, contains('@endcard'));
+      expect(output, contains('<h3>Title</h3>'));
+    });
+
+    test('custom block directive children are indented', () {
+      final input = "@card('primary')\n<h3>Title</h3>\n@endcard";
+      final output = formatter.format(input);
+      expect(output, equals("@card('primary')\n    <h3>Title</h3>\n@endcard\n"));
+    });
+
+    test('nested custom block directives', () {
+      final input = '@panel\n@card\n<p>Inner</p>\n@endcard\n@endpanel';
+      final output = formatter.format(input);
+      expect(output, contains('@panel'));
+      expect(output, contains('@endpanel'));
+      expect(output, contains('@card'));
+      expect(output, contains('@endcard'));
+      expect(output, contains('<p>Inner</p>'));
+    });
+
+    test('nested same-name custom block directives', () {
+      final input = '@card\n@card\n<p>Inner</p>\n@endcard\n@endcard';
+      final output = formatter.format(input);
+      // Both @card and both @endcard must be present
+      expect('@card'.allMatches(output).length, greaterThanOrEqualTo(2));
+      expect('@endcard'.allMatches(output).length, equals(2));
+    });
+
+    test('custom block directive with known directives inside', () {
+      final input = "@card('primary')\n@if(\$show)\n<p>Visible</p>\n@endif\n@endcard";
+      final output = formatter.format(input);
+      expect(output, contains("@card('primary')"));
+      expect(output, contains('@if'));
+      expect(output, contains('@endif'));
+      expect(output, contains('@endcard'));
+    });
+
+    test('custom block without matching @end stays inline', () {
+      final input = '@standalone\n<p>Text</p>';
+      final output = formatter.format(input);
+      expect(output, contains('@standalone'));
+      expect(output, contains('<p>Text</p>'));
+    });
+
+    test('custom block directive without expression', () {
+      final input = '@widget\n<div>Content</div>\n@endwidget';
+      final output = formatter.format(input);
+      expect(output, equals('@widget\n    <div>Content</div>\n@endwidget\n'));
+    });
+
+    test('@end* directive without matching opener stays inline', () {
+      final output = formatter.format('@endfoo');
+      expect(output, contains('@endfoo'));
+    });
+
+    test('custom block directive preserves complex expression', () {
+      final input = "@modal('lg', ['backdrop' => true])\n<p>Modal body</p>\n@endmodal";
+      final output = formatter.format(input);
+      expect(output, contains("@modal('lg', ['backdrop' => true])"));
+      expect(output, contains('@endmodal'));
+    });
+  });
 }
