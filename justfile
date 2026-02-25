@@ -210,6 +210,11 @@ prettier-test: prettier-build
 prettier-install:
     @cd prettier-plugin-laravel-blade && npm install
 
+# Publish the Prettier plugin to npm (builds, tests, then publishes)
+[group('prettier')]
+prettier-publish: prettier-test
+    @cd prettier-plugin-laravel-blade && npm publish
+
 # Benchmark
 
 # Sync test fixtures into benchmark/fixtures/
@@ -254,7 +259,7 @@ site-build:
     @cp benchmark/results/benchmark.json site/data/benchmark.json
     @echo "Site built. Serve with: just site-serve"
 
-# Install site dependencies and serve locally
+# Serve site locally
 [group('site')]
 site-serve: site-build
     @cd site && npx -y serve .
@@ -263,3 +268,10 @@ site-serve: site-build
 [group('site')]
 site-open:
     @open site/index.html
+
+# Deploy site to Vercel (builds benchmark data, then deploys)
+[group('site')]
+site-deploy: site-build
+    @echo "Deploying site to Vercel..."
+    @cd site && vercel --prod
+    @echo "Site deployed."

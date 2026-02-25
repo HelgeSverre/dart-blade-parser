@@ -1,6 +1,6 @@
 {
   "name": "prettier-plugin-laravel-blade",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Prettier plugin for Laravel Blade templates, powered by a real AST parser",
   "author": "Helge Sverre <helge.sverre@gmail.com>",
   "license": "MIT",
