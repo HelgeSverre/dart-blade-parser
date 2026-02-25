@@ -388,15 +388,15 @@ footer a{color:var(--text-dim)}
       <table class="opts">
         <thead><tr><th>Option</th><th>Default</th><th>Choices</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td class="m">bladeQuoteStyle</td><td class="m">"preserve"</td><td class="m">single, double, preserve</td><td>Quote style for HTML attributes</td></tr>
-          <tr><td class="m">bladeDirectiveSpacing</td><td class="m">"between_blocks"</td><td class="m">between_blocks, none, preserve</td><td>Spacing between directive blocks</td></tr>
-          <tr><td class="m">bladeSlotFormatting</td><td class="m">"compact"</td><td class="m">compact, block</td><td>Component slot formatting</td></tr>
-          <tr><td class="m">bladeSlotNameStyle</td><td class="m">"colon"</td><td class="m">colon, attribute, preserve</td><td>Slot name syntax (colon vs attribute)</td></tr>
-          <tr><td class="m">bladeSlotSpacing</td><td class="m">"after"</td><td class="m">none, after, before, around</td><td>Blank lines around slot elements</td></tr>
-          <tr><td class="m">bladeWrapAttributes</td><td class="m">"auto"</td><td class="m">auto, always, never</td><td>When to wrap attributes</td></tr>
-          <tr><td class="m">bladeAttributeSort</td><td class="m">"none"</td><td class="m">none, alphabetical, by_type</td><td>Attribute sorting strategy</td></tr>
-          <tr><td class="m">bladeClosingBracketStyle</td><td class="m">"same_line"</td><td class="m">same_line, new_line</td><td>Closing bracket position</td></tr>
-          <tr><td class="m">bladeSelfClosingStyle</td><td class="m">"preserve"</td><td class="m">preserve, always, never</td><td>Self-closing element handling</td></tr>
+          <tr><td class="m">bladeQuoteStyle</td><td class="m">"preserve"</td><td class="m">single, double, preserve</td><td>' vs " in attribute values</td></tr>
+          <tr><td class="m">bladeDirectiveSpacing</td><td class="m">"between_blocks"</td><td class="m">between_blocks, none, preserve</td><td>Blank lines between @if, @foreach, etc.</td></tr>
+          <tr><td class="m">bladeSlotFormatting</td><td class="m">"compact"</td><td class="m">compact, block</td><td>Extra newlines inside &lt;x-slot&gt; blocks</td></tr>
+          <tr><td class="m">bladeSlotNameStyle</td><td class="m">"colon"</td><td class="m">colon, attribute, preserve</td><td>&lt;x-slot:name&gt; vs &lt;x-slot name="..."&gt;</td></tr>
+          <tr><td class="m">bladeSlotSpacing</td><td class="m">"after"</td><td class="m">none, after, before, around</td><td>Blank lines before/after &lt;x-slot&gt; tags</td></tr>
+          <tr><td class="m">bladeWrapAttributes</td><td class="m">"auto"</td><td class="m">auto, always, never</td><td>Multi-line attributes when line is too long</td></tr>
+          <tr><td class="m">bladeAttributeSort</td><td class="m">"none"</td><td class="m">none, alphabetical, by_type</td><td>Reorder attributes (HTML → Alpine → Livewire)</td></tr>
+          <tr><td class="m">bladeClosingBracketStyle</td><td class="m">"same_line"</td><td class="m">same_line, new_line</td><td>Where &gt; sits when attributes wrap</td></tr>
+          <tr><td class="m">bladeSelfClosingStyle</td><td class="m">"preserve"</td><td class="m">preserve, always, never</td><td>&lt;x-icon /&gt; vs &lt;x-icon&gt;&lt;/x-icon&gt; for empty tags</td></tr>
         </tbody>
       </table>
     </div>
