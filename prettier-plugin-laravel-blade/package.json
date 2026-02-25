@@ -1,0 +1,50 @@
+{
+  "name": "prettier-plugin-laravel-blade",
+  "version": "0.1.0",
+  "description": "Prettier plugin for Laravel Blade templates, powered by a real AST parser",
+  "author": "Helge Sverre <helge.sverre@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "exports": "./src/index.mjs",
+  "main": "./src/index.mjs",
+  "files": [
+    "src/",
+    "dist/blade-formatter.js",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "test": "node --test test/*.test.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "prettier",
+    "prettier-plugin",
+    "plugin",
+    "blade",
+    "laravel",
+    "formatter",
+    "template",
+    "alpine",
+    "livewire"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HelgeSverre/dart-blade-parser",
+    "directory": "prettier-plugin-laravel-blade"
+  },
+  "homepage": "https://github.com/HelgeSverre/dart-blade-parser/tree/main/prettier-plugin-laravel-blade",
+  "bugs": {
+    "url": "https://github.com/HelgeSverre/dart-blade-parser/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "prettier": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.0"
+  }
+}

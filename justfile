@@ -192,3 +192,20 @@ deploy-playground: build-playground
     @echo "🚀 Deploying playground to Vercel..."
     @cd tool/playground/build/web && vercel --prod
     @echo "✅ Playground deployed!"
+
+# Prettier Plugin
+
+# Build the Prettier plugin (compile Dart to JS)
+[group('prettier')]
+prettier-build:
+    @bash prettier-plugin-laravel-blade/scripts/build.sh
+
+# Run Prettier plugin tests
+[group('prettier')]
+prettier-test: prettier-build
+    @cd prettier-plugin-laravel-blade && npm test
+
+# Install Prettier plugin dependencies
+[group('prettier')]
+prettier-install:
+    @cd prettier-plugin-laravel-blade && npm install
