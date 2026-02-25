@@ -4,7 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>prettier-plugin-laravel-blade — Sub-millisecond Blade formatting</title>
-<meta name="description" content="The fastest Prettier plugin for Laravel Blade. 16-24× faster, 144KB, 100% idempotent. Powered by a real recursive-descent parser.">
+<meta name="description" content="The fastest Prettier plugin for Laravel Blade. 22–32× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser.">
+<meta name="keywords" content="prettier, blade, laravel, formatter, plugin, prettier-plugin, blade-formatter, code-formatter, php, template">
+<meta name="author" content="Helge Sverre">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#050507">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="prettier-plugin-laravel-blade — Sub-millisecond Blade formatting">
+<meta property="og:description" content="The fastest Prettier plugin for Laravel Blade. 22–32× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="prettier-plugin-laravel-blade: Your Blade formatter is 22–32× too slow. Sub-millisecond formatting with a real recursive-descent parser.">
+<meta property="og:site_name" content="prettier-plugin-laravel-blade">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="prettier-plugin-laravel-blade — Sub-millisecond Blade formatting">
+<meta name="twitter:description" content="22–32× faster than alternatives. ~140 KB, 0 dependencies, 100% idempotent. A real recursive-descent Dart parser compiled to JS.">
+<meta name="twitter:image" content="og-image.png">
+<meta name="twitter:image:alt" content="prettier-plugin-laravel-blade: Your Blade formatter is 22–32× too slow.">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -241,7 +263,7 @@ footer a{color:var(--text-dim)}
 <div class="metrics">
   <div class="w">
     <div class="metric"><div class="metric-val accent" id="metric-avg-time" data-count="0.33" data-suffix="ms">0.33ms</div><div class="metric-label">Avg format time</div></div>
-    <div class="metric"><div class="metric-val" data-count="144" data-suffix="KB">144KB</div><div class="metric-label">Package size</div></div>
+    <div class="metric"><div class="metric-val" data-count="140" data-suffix="KB">~140 KB</div><div class="metric-label">Package size</div></div>
     <div class="metric"><div class="metric-val" id="metric-fixture-count" data-count="109">109</div><div class="metric-label">Fixtures tested</div></div>
     <div class="metric"><div class="metric-val accent" id="metric-idempotent" data-count="100" data-suffix="%">100%</div><div class="metric-label">Idempotent</div></div>
   </div>
@@ -267,10 +289,10 @@ footer a{color:var(--text-dim)}
         <ul>
           <li><strong>0 IPC</strong> Runs in-process, no child processes</li>
           <li><strong>dart2js</strong> Dart parser compiled to optimized JS</li>
-          <li><strong>1 pass</strong> Parse and format in a single traversal</li>
+          <li><strong>In-process</strong> Lexer → Parser → Formatter, all in-memory</li>
           <li><strong>No regex</strong> Real recursive-descent, no backtracking</li>
-          <li><strong>144 KB</strong> vs 768 KB vs 12+ MB</li>
-          <li><strong>0 deps</strong> No blade-formatter, php-parser, or JSONata</li>
+          <li><strong>~140 KB</strong> vs 777 KB vs 12+ MB</li>
+          <li><strong>0 deps</strong> No blade-formatter or php-parser</li>
         </ul>
       </div>
     </div>
@@ -342,9 +364,9 @@ footer a{color:var(--text-dim)}
       <table class="tbl">
         <thead><tr><th></th><th>This plugin</th><th>stillat</th><th>shufo</th></tr></thead>
         <tbody>
-          <tr><td class="lbl">Package size</td><td class="win m">144 KB</td><td class="m">768 KB</td><td class="m">12+ MB</td></tr>
+          <tr><td class="lbl">Package size</td><td class="win m">~140 KB</td><td class="m">777 KB</td><td class="m">12+ MB</td></tr>
           <tr><td class="lbl">Avg format time</td><td class="win m" id="cmp-avg-a">0.33 ms</td><td class="m" id="cmp-avg-b">7.31 ms</td><td class="m" id="cmp-avg-c">10.45 ms</td></tr>
-          <tr><td class="lbl">Parser</td><td class="win">Real recursive-descent AST</td><td>TypeScript AST (JSONata)</td><td>Regex-based rewriting</td></tr>
+          <tr><td class="lbl">Parser</td><td class="win">Real recursive-descent AST</td><td>TypeScript AST (Prettier IR)</td><td>Heuristic-based (no AST)</td></tr>
           <tr><td class="lbl">Idempotent</td><td class="ok" id="cmp-idem-a">✓ 104/104</td><td class="no" id="cmp-idem-b">✗ 4 failures</td><td class="no" id="cmp-idem-c">✗ 1 failure</td></tr>
           <tr><td class="lbl">Dependencies</td><td class="win">None</td><td>None</td><td>blade-formatter, php-parser</td></tr>
           <tr><td class="lbl">Trailing whitespace</td><td class="ok">✓ None</td><td class="no">✗ Present</td><td class="ok">✓ None</td></tr>
@@ -371,7 +393,7 @@ footer a{color:var(--text-dim)}
       <div class="arch-arrow">→</div>
       <div class="arch-step highlight"><div class="as-label">Step 2</div><div class="as-title">Dart AST</div><div class="as-detail">Recursive-descent parser</div></div>
       <div class="arch-arrow">→</div>
-      <div class="arch-step"><div class="as-label">Step 3</div><div class="as-title">Format</div><div class="as-detail">Single-pass traversal</div></div>
+      <div class="arch-step"><div class="as-label">Step 3</div><div class="as-title">Format</div><div class="as-detail">Visitor traversal</div></div>
       <div class="arch-arrow">→</div>
       <div class="arch-step"><div class="as-label">Output</div><div class="as-title">Done</div><div class="as-detail">&lt; 1ms</div></div>
     </div>

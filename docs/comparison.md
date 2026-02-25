@@ -7,7 +7,7 @@
 | # | Plugin | Version | Author |
 |---|--------|---------|--------|
 | A | `prettier-plugin-laravel-blade` | 0.1.0 | helgesverre (this project) |
-| B | `prettier-plugin-blade` | 2.1.21 | stillat (John Googly) |
+| B | `prettier-plugin-blade` | 2.1.21 | stillat (John Koster) |
 | C | `@shufo/prettier-plugin-blade` | 1.16.1 | shufo |
 
 ---
@@ -16,9 +16,9 @@
 
 | | **A — laravel-blade** | **B — stillat** | **C — shufo** |
 |---|---|---|---|
-| **Package size** | **144 KB** | 768 KB | 10 MB (+2 MB `blade-formatter`) |
-| **Architecture** | Compiled Dart AST (dart2js) | TypeScript AST (JSONata-based parser, Prettier IR) | Wrapper around `blade-formatter` (regex/heuristic) |
-| **Parser type** | Real recursive-descent AST | Structural AST with Prettier doc IR | Regex-based string rewriting |
+| **Package size** | **~140 KB** | 777 KB | 10 MB (+2 MB `blade-formatter`) |
+| **Architecture** | Compiled Dart AST (dart2js) | TypeScript AST (Prettier IR) | Wrapper around `blade-formatter` (heuristic-based) |
+| **Parser type** | Real recursive-descent AST | Structural AST with Prettier doc IR | Heuristic-based string rewriting (no AST) |
 | **Prettier integration** | Preprocess → formatted string | Full Prettier doc IR (group/indent/line) | Preprocess → formatted string |
 | **Avg format time** | **0.33 ms** | 7.31 ms | 10.45 ms |
 | **Idempotent** | ✅ 104/104 pass | ❌ 4 failures | ❌ 1 failure |
@@ -365,7 +365,7 @@ Tested across 109 fixtures (format once, format again, compare output):
 - **Formatting**: The Dart formatter handles indentation, attribute wrapping, and whitespace normalization in a single pass
 - **Prettier integration**: Uses `preprocess` to format, then passes the result as a string node
 - **Strengths**: Fastest by far (sub-millisecond), zero external dependencies, always idempotent, correctly handles deeply nested directive/HTML interleaving
-- **Bundle**: 144 KB total (Dart compiled to optimized JS)
+- **Bundle**: ~140 KB total (Dart compiled to optimized JS)
 
 ### B — prettier-plugin-blade (TypeScript AST)
 
@@ -375,16 +375,16 @@ Tested across 109 fixtures (format once, format again, compare output):
 - **Prettier integration**: Full AST → Prettier doc IR pipeline (most "Prettier-native" of the three)
 - **Strengths**: Most Prettier-idiomatic output, good HTML attribute formatting
 - **Weaknesses**: Idempotency bugs (trailing spaces, inconsistent blank lines), 16× slower, converts quote styles
-- **Bundle**: 768 KB (includes JSONata expression parser)
+- **Bundle**: 777 KB
 
-### C — @shufo/prettier-plugin-blade (Regex/blade-formatter wrapper)
+### C — @shufo/prettier-plugin-blade (Heuristic/blade-formatter wrapper)
 
-- **Parser**: Delegates to `blade-formatter` (a standalone regex-based formatter)
-- **AST**: No real AST — uses regex patterns to match Blade directives and rewrite whitespace
+- **Parser**: Delegates to `blade-formatter` (a standalone heuristic-based formatter)
+- **AST**: No real AST — uses heuristic patterns to match Blade directives and rewrite whitespace
 - **Formatting**: `blade-formatter` handles the actual formatting; the plugin just wraps it for Prettier
 - **Prettier integration**: Uses `parse` to format via blade-formatter, returns formatted string
 - **Strengths**: Most configuration options (Tailwind sorting, HTML attribute ordering, PHP version), mature ecosystem
-- **Weaknesses**: 24× slower, largest bundle (12+ MB), regex approach produces inconsistent formatting for edge cases (collapsed nesting, misaligned closing tags)
+- **Weaknesses**: 24× slower, largest bundle (12+ MB), heuristic approach produces inconsistent formatting for edge cases (collapsed nesting, misaligned closing tags)
 - **Bundle**: 12+ MB (plugin + blade-formatter + php-parser)
 
 ---
@@ -410,7 +410,7 @@ Tested across 109 fixtures (format once, format again, compare output):
 | Criterion | Winner |
 |---|---|
 | **Performance** | A — 22-32× faster than alternatives |
-| **Bundle size** | A — 144 KB vs 768 KB / 12 MB |
+| **Bundle size** | A — ~140 KB vs 777 KB / 12 MB |
 | **Idempotency** | A — 0 failures (B has 4, C has 1) |
 | **Nesting correctness** | A — proper hierarchy at all levels |
 | **Prettier-native output** | B — uses full Prettier doc IR |

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="0.8" fill="rgba(181,245,66,0.06)"/>
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="35%" r="50%">
+      <stop offset="0%" stop-color="rgba(181,245,66,0.05)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#050507"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Top border accent -->
+  <rect width="1200" height="2" fill="#b5f542" opacity="0.3"/>
+
+  <!-- Brand -->
+  <text x="80" y="100" font-family="monospace" font-size="18" font-weight="700" letter-spacing="-0.2">
+    <tspan fill="#b5f542">prettier</tspan><tspan fill="#e8e8ec">-plugin-laravel-blade</tspan>
+  </text>
+
+  <!-- Eyebrow -->
+  <text x="80" y="185" font-family="monospace" font-size="13" font-weight="600" fill="#b5f542" letter-spacing="2.5" text-transform="uppercase">PRETTIER PLUGIN FOR BLADE</text>
+
+  <!-- Headline -->
+  <text x="80" y="260" font-family="Georgia, 'Times New Roman', serif" font-size="62" fill="#e8e8ec" letter-spacing="-2">Your Blade formatter is</text>
+  <text x="80" y="340" font-family="Georgia, 'Times New Roman', serif" font-size="62" fill="#b5f542" font-style="italic" letter-spacing="-2">22–32× too slow.</text>
+
+  <!-- Subtitle -->
+  <text x="80" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#8a8a96" font-weight="300">A real recursive-descent parser. Sub-millisecond. No regex. No compromises.</text>
+
+  <!-- Metric boxes -->
+  <!-- Box 1 -->
+  <rect x="80" y="460" width="240" height="100" rx="4" fill="#0c0c10" stroke="#1a1a22" stroke-width="1"/>
+  <text x="200" y="505" font-family="monospace" font-size="30" font-weight="700" fill="#b5f542" text-anchor="middle">0.33ms</text>
+  <text x="200" y="535" font-family="system-ui, sans-serif" font-size="13" fill="#555560" text-anchor="middle" letter-spacing="0.5">AVG FORMAT TIME</text>
+
+  <!-- Box 2 -->
+  <rect x="340" y="460" width="240" height="100" rx="4" fill="#0c0c10" stroke="#1a1a22" stroke-width="1"/>
+  <text x="460" y="505" font-family="monospace" font-size="30" font-weight="700" fill="#e8e8ec" text-anchor="middle">~140 KB</text>
+  <text x="460" y="535" font-family="system-ui, sans-serif" font-size="13" fill="#555560" text-anchor="middle" letter-spacing="0.5">PACKAGE SIZE</text>
+
+  <!-- Box 3 -->
+  <rect x="600" y="460" width="240" height="100" rx="4" fill="#0c0c10" stroke="#1a1a22" stroke-width="1"/>
+  <text x="720" y="505" font-family="monospace" font-size="30" font-weight="700" fill="#b5f542" text-anchor="middle">100%</text>
+  <text x="720" y="535" font-family="system-ui, sans-serif" font-size="13" fill="#555560" text-anchor="middle" letter-spacing="0.5">IDEMPOTENT</text>
+
+  <!-- Box 4 -->
+  <rect x="860" y="460" width="240" height="100" rx="4" fill="#0c0c10" stroke="#1a1a22" stroke-width="1"/>
+  <text x="980" y="505" font-family="monospace" font-size="30" font-weight="700" fill="#e8e8ec" text-anchor="middle">0 deps</text>
+  <text x="980" y="535" font-family="system-ui, sans-serif" font-size="13" fill="#555560" text-anchor="middle" letter-spacing="0.5">ZERO DEPENDENCIES</text>
+
+  <!-- Bottom border -->
+  <rect y="628" width="1200" height="2" fill="#1a1a22"/>
+</svg>
