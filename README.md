@@ -2,7 +2,7 @@
 
 [![Playground](https://img.shields.io/badge/Try_Playground-Live-blue?style=for-the-badge)](http://dart-blade-parser-playground.vercel.app/)
 
-> **Note:** This project is stable and production-ready. The core parser and formatter are well-tested with 1343 tests covering edge cases, performance, and real-world scenarios. API breaking changes will follow semantic versioning.
+> **Note:** This project is stable and production-ready. The core parser and formatter are well-tested with 1450+ tests covering edge cases, performance, and real-world scenarios. API breaking changes will follow semantic versioning.
 
 A pure Dart parser for Laravel Blade templates. Produces a typed AST with full support for Blade directives, components, Alpine.js, and Livewire attributes. Includes robust error recovery, JSON serialization, and an idempotent formatter.
 
@@ -11,6 +11,17 @@ A pure Dart parser for Laravel Blade templates. Produces a typed AST with full s
 This library tokenizes and parses Blade templates into a traversable abstract syntax tree. It handles the full complexity of modern Blade templates including nested directives, component slots, Alpine.js event handlers, and Livewire wire:model bindings.
 
 Unlike simple regex-based approaches, this parser uses an iterative state machine lexer and recursive descent parser that correctly handles context-aware parsing: emails vs directives, quoted attributes, raw text elements (`<script>`, `<style>`), and verbatim blocks.
+
+## Prettier Plugin
+
+This parser powers a Prettier plugin for Blade templates. Install it directly from npm:
+
+```bash
+npm install --save-dev prettier-plugin-laravel-blade prettier
+npx prettier --write "**/*.blade.php"
+```
+
+See [prettier-plugin-laravel-blade/](prettier-plugin-laravel-blade/) for full documentation and configuration options.
 
 ## Installation
 
@@ -158,7 +169,7 @@ just cross-compile
 # Run interactive playground (Flutter web app)
 just playground
 
-# Run acid test suite (parse all 112 fixtures)
+# Run acid test suite (parse all 117 fixtures)
 just acid
 
 # Get/upgrade dependencies
@@ -190,7 +201,7 @@ See [justfile](justfile) for complete command reference and additional options.
 - JSON serialization for interoperability
 - Zero external parsing dependencies
 - Idempotent formatter with configurable style
-- 112 test fixtures (17,500+ lines) with 1235 tests covering real-world and synthetic cases
+- 117 test fixtures (17,500+ lines) with 1450+ tests covering real-world and synthetic cases
 
 ## Use Cases
 
@@ -744,7 +755,7 @@ Measured on typical hardware with the benchmark suite. All claims verified by au
 
 ## Test Fixtures
 
-112 test fixtures (17,500+ lines) covering real-world and synthetic cases.
+117 test fixtures (17,500+ lines) covering real-world and synthetic cases.
 
 - **Real-world fixtures**: Production templates from Laravel apps (chatflow, reflow, boatflow, unlimit, crescat, kassalapp)
 - **Synthetic fixtures**: Systematically generated feature tests covering all directives and edge cases
@@ -781,7 +792,7 @@ Located in [tool/playground/](tool/playground/).
 
 ### Acid Test (Bulk Parse Testing)
 
-Bulk parse testing across all 112 fixtures with console and HTML reporting. Validates parser correctness across the entire fixture suite.
+Bulk parse testing across all 117 fixtures with console and HTML reporting. Validates parser correctness across the entire fixture suite.
 
 ```shell
 just acid
@@ -825,7 +836,12 @@ Located in [tool/format_file.dart](tool/format_file.dart).
 
 ## API Documentation
 
-Full API documentation: [pub.dev/documentation/blade_parser](https://pub.dev/documentation/blade_parser/latest/)
+Generate API docs locally:
+
+```shell
+just docs
+# Outputs to doc/api/
+```
 
 ## Platform Support
 
