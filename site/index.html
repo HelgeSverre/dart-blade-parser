@@ -8,7 +8,7 @@
     </title>
     <meta
       name="description"
-      content="The fastest Prettier plugin for Laravel Blade. 22–32× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser."
+      content="The fastest Prettier plugin for Laravel Blade. 19–23× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser."
     />
     <meta
       name="keywords"
@@ -26,7 +26,7 @@
     />
     <meta
       property="og:description"
-      content="The fastest Prettier plugin for Laravel Blade. 22–32× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser."
+      content="The fastest Prettier plugin for Laravel Blade. 19–23× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser."
     />
     <meta property="og:image" content="og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -45,7 +45,7 @@
     />
     <meta
       name="twitter:description"
-      content="22–32× faster than alternatives. ~140 KB, 0 dependencies, 100% idempotent. A real recursive-descent Dart parser compiled to JS."
+      content="19–23× faster than alternatives. ~140 KB, 0 dependencies, 100% idempotent. A real recursive-descent Dart parser compiled to JS."
     />
     <meta name="twitter:image" content="og-image.png" />
     <meta
@@ -991,7 +991,7 @@
         <div class="stag">Performance</div>
         <div class="sh">Measured, not claimed</div>
         <div class="sd">
-          Average format time across 109 fixtures. 20 timed runs after warmup.
+          Average format time across 110 fixtures. 100 timed runs after warmup.
           <a
             href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/benchmark"
             >Run it yourself →</a
@@ -1190,9 +1190,9 @@
               </tr>
               <tr>
                 <td class="lbl">Avg format time</td>
-                <td class="win m" id="cmp-avg-a">0.33 ms</td>
-                <td class="m" id="cmp-avg-b">7.31 ms</td>
-                <td class="m" id="cmp-avg-c">10.45 ms</td>
+                <td class="win m" id="cmp-avg-a">0.48 ms</td>
+                <td class="m" id="cmp-avg-b">9.03 ms</td>
+                <td class="m" id="cmp-avg-c">10.76 ms</td>
               </tr>
               <tr>
                 <td class="lbl">Parser</td>
@@ -1202,9 +1202,9 @@
               </tr>
               <tr>
                 <td class="lbl">Idempotent</td>
-                <td class="ok" id="cmp-idem-a">✓ 104/104</td>
-                <td class="no" id="cmp-idem-b">✗ 4 failures</td>
-                <td class="no" id="cmp-idem-c">✗ 1 failure</td>
+                <td class="ok" id="cmp-idem-a">✓ 110/110</td>
+                <td class="no" id="cmp-idem-b">✗ 10 failures</td>
+                <td class="no" id="cmp-idem-c">✗ 3 failures</td>
               </tr>
               <tr>
                 <td class="lbl">Dependencies</td>
@@ -1728,7 +1728,7 @@ npx prettier --check "**/*.blade.php"</pre>
             { f: "real world mess", a: 0.23, b: 2.91, c: 8.33 },
             { f: "mixed content", a: 0.18, b: 2.95, c: 7.9 },
           ];
-          renderChart(data, 0.33, 7.31, 10.45);
+          renderChart(data, 0.48, 9.03, 10.76);
         }
       }
       loadBenchmarkData();
