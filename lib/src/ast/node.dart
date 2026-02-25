@@ -14,7 +14,7 @@ sealed class AstNode {
   Position get endPosition;
 
   /// The parent node, or null if this is the root document node.
-  AstNode? get parent;
+  AstNode? parent;
 
   /// Child nodes contained within this node.
   List<AstNode> get children;
@@ -89,7 +89,7 @@ final class DocumentNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent = null;
+  AstNode? parent;
   @override
   final List<AstNode> children;
 
@@ -129,7 +129,7 @@ final class DirectiveNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent;
+  AstNode? parent;
   @override
   final List<AstNode> children;
 
@@ -165,7 +165,6 @@ final class DirectiveNode extends AstNode {
   DirectiveNode({
     required this.startPosition,
     required this.endPosition,
-    this.parent,
     required this.name,
     this.expression,
     required this.children,
@@ -200,7 +199,7 @@ final class EchoNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent;
+  AstNode? parent;
   @override
   final List<AstNode> children = const [];
 
@@ -221,7 +220,6 @@ final class EchoNode extends AstNode {
   EchoNode({
     required this.startPosition,
     required this.endPosition,
-    this.parent,
     required this.expression,
     required this.isRaw,
   });
@@ -252,7 +250,7 @@ final class TextNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent;
+  AstNode? parent;
   @override
   final List<AstNode> children = const [];
 
@@ -265,7 +263,6 @@ final class TextNode extends AstNode {
   TextNode({
     required this.startPosition,
     required this.endPosition,
-    this.parent,
     required this.content,
   });
 
@@ -425,7 +422,7 @@ final class ComponentNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent;
+  AstNode? parent;
   @override
   final List<AstNode> children;
 
@@ -453,7 +450,6 @@ final class ComponentNode extends AstNode {
   ComponentNode({
     required this.startPosition,
     required this.endPosition,
-    this.parent,
     required this.name,
     this.attributes = const {},
     this.slots = const {},
@@ -489,7 +485,7 @@ final class SlotNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent;
+  AstNode? parent;
   @override
   final List<AstNode> children;
 
@@ -507,7 +503,6 @@ final class SlotNode extends AstNode {
   SlotNode({
     required this.startPosition,
     required this.endPosition,
-    this.parent,
     required this.name,
     this.attributes = const {},
     required this.children,
@@ -539,7 +534,7 @@ final class HtmlElementNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent;
+  AstNode? parent;
   @override
   final List<AstNode> children;
 
@@ -565,7 +560,6 @@ final class HtmlElementNode extends AstNode {
   HtmlElementNode({
     required this.startPosition,
     required this.endPosition,
-    this.parent,
     required String tagName,
     this.attributes = const {},
     this.isSelfClosing = false,
@@ -601,7 +595,7 @@ final class CommentNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent;
+  AstNode? parent;
   @override
   final List<AstNode> children = const [];
 
@@ -620,7 +614,6 @@ final class CommentNode extends AstNode {
   CommentNode({
     required this.startPosition,
     required this.endPosition,
-    this.parent,
     required this.content,
     required this.isBladeComment,
   });
@@ -651,7 +644,7 @@ final class ErrorNode extends AstNode {
   @override
   final Position endPosition;
   @override
-  final AstNode? parent;
+  AstNode? parent;
   @override
   final List<AstNode> children = const [];
 
@@ -668,7 +661,6 @@ final class ErrorNode extends AstNode {
   ErrorNode({
     required this.startPosition,
     required this.endPosition,
-    this.parent,
     required this.error,
     this.partialContent,
   });

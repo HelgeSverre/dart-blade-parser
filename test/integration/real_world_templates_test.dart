@@ -77,7 +77,10 @@ void main() {
       expect(guestLayout.name, equals('guest-layout'));
 
       // Verify nested authentication-card component
-      final authCard = guestLayout.children.whereType<ComponentNode>().first;
+      // Children without named slots are moved to the default slot
+      final guestLayoutChildren =
+          guestLayout.slots['default']?.children ?? guestLayout.children;
+      final authCard = guestLayoutChildren.whereType<ComponentNode>().first;
       expect(authCard.name, equals('authentication-card'));
 
       // Verify slot presence
@@ -1439,6 +1442,15 @@ List<T> _findNodesRecursive<T extends AstNode>(AstNode node) {
 
     for (final child in current.children) {
       visit(child);
+    }
+
+    // Also traverse slot children for components
+    if (current is ComponentNode) {
+      for (final slot in current.slots.values) {
+        for (final child in slot.children) {
+          visit(child);
+        }
+      }
     }
   }
 

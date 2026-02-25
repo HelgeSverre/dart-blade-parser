@@ -285,5 +285,11 @@ void main() {
       expect(result, contains('*'));
       expect(result, contains('/'));
     });
+
+    test('handles empty token list without crashing', () {
+      final parser = ExpressionParser([]);
+      // Should not throw RangeError
+      expect(() => parser.parse(), returnsNormally);
+    });
   });
 }

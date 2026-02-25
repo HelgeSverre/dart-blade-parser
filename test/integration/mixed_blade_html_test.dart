@@ -132,7 +132,10 @@ void main() {
 
       final alert = div.children.whereType<ComponentNode>().first;
       expect(alert.name, 'alert');
-      expect(alert.children.whereType<HtmlElementNode>(), hasLength(1));
+      // Children without named slots are moved to the default slot
+      final alertChildren =
+          alert.slots['default']?.children ?? alert.children;
+      expect(alertChildren.whereType<HtmlElementNode>(), hasLength(1));
     });
 
     test('Parse deeply nested Blade and HTML structure', () {

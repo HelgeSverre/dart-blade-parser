@@ -293,7 +293,11 @@ class ExpressionParser {
 
   /// Advance to next token.
   Token _advance() {
-    if (!_isAtEnd()) _current++;
-    return _tokens[_current - 1];
+    if (!_isAtEnd()) {
+      final token = _tokens[_current];
+      _current++;
+      return token;
+    }
+    return _peek(); // Return EOF sentinel when at end
   }
 }

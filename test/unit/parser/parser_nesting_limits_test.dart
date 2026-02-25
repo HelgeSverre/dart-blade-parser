@@ -1,6 +1,12 @@
 import 'package:test/test.dart';
 import 'package:blade_parser/blade_parser.dart';
 
+/// Gets the effective children of a ComponentNode, checking the default slot
+/// since children without named slots are moved there.
+List<AstNode> _effectiveChildren(ComponentNode component) {
+  return component.slots['default']?.children ?? component.children;
+}
+
 /// Tests for deep nesting edge cases in the parser
 ///
 /// This test suite validates that the parser can handle extreme nesting depths
@@ -243,7 +249,7 @@ void main() {
 
         while (currentChildren.whereType<ComponentNode>().isNotEmpty) {
           final component = currentChildren.whereType<ComponentNode>().first;
-          currentChildren = component.children;
+          currentChildren = _effectiveChildren(component);
           componentDepth++;
 
           // Safety limit
@@ -356,7 +362,7 @@ void main() {
           );
 
           if (nextNode is ComponentNode) {
-            currentChildren = nextNode.children;
+            currentChildren = _effectiveChildren(nextNode);
             totalDepth++;
           } else if (nextNode is HtmlElementNode) {
             currentChildren = nextNode.children;
@@ -436,7 +442,7 @@ void main() {
 
           // Navigate deeper - next directive is inside the component
           final nextDirective =
-              component.children.whereType<DirectiveNode>().firstOrNull;
+              _effectiveChildren(component).whereType<DirectiveNode>().firstOrNull;
           if (nextDirective != null && nextDirective.name == 'if') {
             currentNode = nextDirective;
             mixedDepth++;
@@ -493,7 +499,8 @@ void main() {
               currentChildren.whereType<ComponentNode>().firstOrNull;
           if (component != null) {
             // Component should contain directive
-            final hasDirective = component.children.any(
+            final compChildren = _effectiveChildren(component);
+            final hasDirective = compChildren.any(
               (c) => c is DirectiveNode,
             );
             expect(
@@ -505,7 +512,7 @@ void main() {
 
             // Navigate to directive's children
             final directive =
-                component.children.whereType<DirectiveNode>().firstOrNull;
+                compChildren.whereType<DirectiveNode>().firstOrNull;
             if (directive != null) {
               currentChildren = directive.children;
               nestingLevel++;

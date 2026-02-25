@@ -42,6 +42,28 @@ void main() {
       expect(exprToken.value, contains("hello}}"));
     });
 
+    test('escaped echo handles }} inside double-quoted string', () {
+      final lexer = BladeLexer('@{{ "}}" {{ \$var }} }}');
+      final tokens = lexer.tokenize();
+
+      // The entire @{{ ... }} should be a single text token
+      // without the {{ $var }} being interpreted as an echo
+      expect(tokens.any((t) => t.type == TokenType.echoOpen), isFalse);
+      final textTokens =
+          tokens.where((t) => t.type == TokenType.text).toList();
+      expect(textTokens.length, equals(1));
+    });
+
+    test('escaped echo handles }} inside single-quoted string', () {
+      final lexer = BladeLexer("@{{ '}}' {{ \$var }} }}");
+      final tokens = lexer.tokenize();
+
+      expect(tokens.any((t) => t.type == TokenType.echoOpen), isFalse);
+      final textTokens =
+          tokens.where((t) => t.type == TokenType.text).toList();
+      expect(textTokens.length, equals(1));
+    });
+
     test('directive expression handles nested parens in string', () {
       final lexer = BladeLexer(
           "@if(preg_match('/\\(test\\)/', \$str)) hello @endif");
