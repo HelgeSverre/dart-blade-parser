@@ -1,6 +1,6 @@
 # Edge Cases and Known Limitations
 
-**Last Updated:** 2025-11-27
+**Last Updated:** 2025-02-25
 
 This document catalogs all edge cases, limitations, and known issues in the dart-blade-parser. Issues are prioritized by severity and implementation complexity.
 
@@ -159,7 +159,7 @@ _(No medium priority issues at this time)_
   - ✅ Formatter Wrapping Tests (33 tests)
   - ✅ Formatter Sorting Tests (39 tests)
   - ✅ Idempotency Tests (verified across all fixtures)
-  - ✅ **Test Suite: 984 tests, 100% passing**
+  - ✅ **Test Suite: 1343 tests, 100% passing**
 
 **Completed - Formatter Enhancements (2025-11-27):**
 
@@ -263,40 +263,13 @@ _(No medium priority issues at this time)_
   - Detects slot usage and descriptions from comments
   - Generates table of contents, props tables, usage examples
 
-### High Priority - Quick Wins (Code Cleanup)
+### Code Cleanup (Previously Listed - Now Resolved)
 
-1. ✂️ **Remove unused variable `tagStartPos`** - 2 min
-   - File: `lib/src/lexer/lexer.dart:861`
-2. ✂️ **Remove unused variable `attrStart`** - 2 min
-   - File: `lib/src/lexer/lexer.dart:949`
-3. ✂️ **Remove unused method `_peekWord`** - 2 min
-   - File: `lib/src/lexer/lexer.dart:1093`
-4. ✂️ **Remove unused variable `startToken`** - 2 min
-   - File: `lib/src/parser/parser.dart:1072`
-
-5. 🗑️ **Delete old HTML reports** - 1 min
-   - Files: `my_report.html`, `test_report.html`
-6. 📝 **Add \*.html to .gitignore** - 1 min
-
-### Medium Priority - Polish & Cleanup
-
-7. **Remove unnecessary null assertions in tests** - 5 min
-   - 7 instances across test files
-8. **Remove unused test variables** - 3 min
-   - 3 instances in test files
-9. **Add explicit type arguments** - 10 min
-   - 13 places (List<dynamic>, Map<dynamic, dynamic>)
-10. **Fix Future.delayed type inference** - 30 min
-    - 6 instances in examples and tests
-11. **Fix asFuture type inference** - 15 min
-    - 2 instances in examples
-12. **Update CHANGELOG.md** - 15 min
-    - Add v1.0.1 entry with today's fixes
-13. **Archive outdated STATUS.md** - 5 min
-    - Move to archive/, keep IMPLEMENTATION_STATUS.md
-14. **Update version to 1.0.1** - 5 min
-    - File: `pubspec.yaml`
-15. **Commit changes and prepare release** - 30 min
+All previously listed quick-win cleanup items have been addressed:
+- ✅ Unused variables `tagStartPos`, `attrStart` removed
+- ✅ Unused method `_peekWord` removed
+- ✅ `startToken` verified as actively used (not unused)
+- ✅ Old HTML reports deleted, `*.html` in .gitignore
 
 ### Low Priority - Future Enhancements
 

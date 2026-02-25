@@ -2,7 +2,7 @@
 
 [![Playground](https://img.shields.io/badge/Try_Playground-Live-blue?style=for-the-badge)](http://dart-blade-parser-playground.vercel.app/)
 
-> **Note:** This project is stable and production-ready. The core parser and formatter are well-tested with 1235 tests covering edge cases, performance, and real-world scenarios. API breaking changes will follow semantic versioning.
+> **Note:** This project is stable and production-ready. The core parser and formatter are well-tested with 1343 tests covering edge cases, performance, and real-world scenarios. API breaking changes will follow semantic versioning.
 
 A pure Dart parser for Laravel Blade templates. Produces a typed AST with full support for Blade directives, components, Alpine.js, and Livewire attributes. Includes robust error recovery, JSON serialization, and an idempotent formatter.
 
