@@ -10,7 +10,7 @@
     />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#050507" />
-<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -720,12 +720,20 @@
         <div class="sd">
           Peak heap memory and total CPU time per plugin across all fixtures.
         </div>
-        <div id="resourceMetrics" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem"></div>
-        <div style="overflow-x:auto">
+        <div
+          id="resourceMetrics"
+          style="
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+          "
+        ></div>
+        <div style="overflow-x: auto">
           <table class="idem-table" id="resourceTable">
             <thead>
               <tr>
-                <th style="width:300px">Fixture</th>
+                <th style="width: 300px">Fixture</th>
                 <th>A Heap</th>
                 <th>B Heap</th>
                 <th>C Heap</th>
@@ -1029,71 +1037,115 @@
 
         // ── Resource Usage section ──
         function fmtBytes(b) {
-          if (b == null) return '--';
-          return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : (b / 1024).toFixed(0) + ' KB';
+          if (b == null) return "--";
+          return b > 1048576
+            ? (b / 1048576).toFixed(1) + " MB"
+            : (b / 1024).toFixed(0) + " KB";
         }
         function fmtCpu(ms) {
-          if (ms == null) return '--';
-          return ms.toFixed(0) + ' ms';
+          if (ms == null) return "--";
+          return ms.toFixed(0) + " ms";
         }
 
         // Aggregate per-plugin stats
         const resStats = {};
-        for (const p of ['A', 'B', 'C']) {
-          const entries = Object.values(perf[p] || {}).filter(e => e.cpuUser != null);
+        for (const p of ["A", "B", "C"]) {
+          const entries = Object.values(perf[p] || {}).filter(
+            (e) => e.cpuUser != null,
+          );
           resStats[p] = {
-            cpuTotal: entries.reduce((s, e) => s + (e.cpuUser || 0) + (e.cpuSystem || 0), 0),
+            cpuTotal: entries.reduce(
+              (s, e) => s + (e.cpuUser || 0) + (e.cpuSystem || 0),
+              0,
+            ),
             peakHeap: entries.reduce((m, e) => Math.max(m, e.heapUsed || 0), 0),
             peakRss: entries.reduce((m, e) => Math.max(m, e.rss || 0), 0),
-            avgHeap: entries.length ? entries.reduce((s, e) => s + (e.heapUsed || 0), 0) / entries.length : 0,
+            avgHeap: entries.length
+              ? entries.reduce((s, e) => s + (e.heapUsed || 0), 0) /
+                entries.length
+              : 0,
             count: entries.length,
           };
         }
 
         // Summary metrics cards
-        const resMetrics = document.getElementById('resourceMetrics');
-        const pluginColors = { A: 'var(--accent)', B: 'var(--blue)', C: 'var(--yellow)' };
-        const pluginNames = { A: 'This plugin', B: 'stillat', C: 'shufo' };
+        const resMetrics = document.getElementById("resourceMetrics");
+        const pluginColors = {
+          A: "var(--accent)",
+          B: "var(--blue)",
+          C: "var(--yellow)",
+        };
+        const pluginNames = { A: "This plugin", B: "stillat", C: "shufo" };
         if (resStats.A.count > 0) {
-          for (const p of ['A', 'B', 'C']) {
+          for (const p of ["A", "B", "C"]) {
             const s = resStats[p];
-            const card = document.createElement('div');
-            card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.2rem;text-align:center';
+            const card = document.createElement("div");
+            card.style.cssText =
+              "background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.2rem;text-align:center";
             card.innerHTML =
-              '<div style="font-size:.7rem;color:var(--text-muted);margin-bottom:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em">' + pluginNames[p] + ' (' + p + ')</div>' +
+              '<div style="font-size:.7rem;color:var(--text-muted);margin-bottom:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em">' +
+              pluginNames[p] +
+              " (" +
+              p +
+              ")</div>" +
               '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem">' +
-              '<div><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:' + pluginColors[p] + '">' + fmtBytes(s.peakHeap) + '</div><div style="font-size:.65rem;color:var(--text-muted)">Peak Heap</div></div>' +
-              '<div><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:' + pluginColors[p] + '">' + fmtCpu(s.cpuTotal) + '</div><div style="font-size:.65rem;color:var(--text-muted)">Total CPU</div></div>' +
-              '</div>';
+              '<div><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:' +
+              pluginColors[p] +
+              '">' +
+              fmtBytes(s.peakHeap) +
+              '</div><div style="font-size:.65rem;color:var(--text-muted)">Peak Heap</div></div>' +
+              '<div><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:' +
+              pluginColors[p] +
+              '">' +
+              fmtCpu(s.cpuTotal) +
+              '</div><div style="font-size:.65rem;color:var(--text-muted)">Total CPU</div></div>' +
+              "</div>";
             resMetrics.appendChild(card);
           }
         }
 
         // Per-fixture table
-        const resBody = document.getElementById('resourceBody');
-        const resFixtures = Object.keys(perf.A).filter(f => {
-          const e = perf.A[f];
-          return e && e.cpuUser != null;
-        }).sort();
+        const resBody = document.getElementById("resourceBody");
+        const resFixtures = Object.keys(perf.A)
+          .filter((f) => {
+            const e = perf.A[f];
+            return e && e.cpuUser != null;
+          })
+          .sort();
 
         for (const f of resFixtures) {
-          const tr = document.createElement('tr');
-          const cells = ['<td class="fix">' + shortName(f) + '</td>'];
-          for (const p of ['A', 'B', 'C']) {
+          const tr = document.createElement("tr");
+          const cells = ['<td class="fix">' + shortName(f) + "</td>"];
+          for (const p of ["A", "B", "C"]) {
             const e = perf[p]?.[f];
             const heap = e?.heapUsed;
-            const best = Math.min(...['A','B','C'].map(x => perf[x]?.[f]?.heapUsed ?? Infinity).filter(v => v > 0));
-            const cls = heap === best ? ' style="color:var(--accent);font-weight:600"' : '';
-            cells.push('<td' + cls + '>' + fmtBytes(heap) + '</td>');
+            const best = Math.min(
+              ...["A", "B", "C"]
+                .map((x) => perf[x]?.[f]?.heapUsed ?? Infinity)
+                .filter((v) => v > 0),
+            );
+            const cls =
+              heap === best
+                ? ' style="color:var(--accent);font-weight:600"'
+                : "";
+            cells.push("<td" + cls + ">" + fmtBytes(heap) + "</td>");
           }
-          for (const p of ['A', 'B', 'C']) {
+          for (const p of ["A", "B", "C"]) {
             const e = perf[p]?.[f];
             const cpu = e ? (e.cpuUser || 0) + (e.cpuSystem || 0) : null;
-            const best = Math.min(...['A','B','C'].map(x => { const v = perf[x]?.[f]; return v?.cpuUser != null ? v.cpuUser + v.cpuSystem : Infinity; }));
-            const cls = cpu === best ? ' style="color:var(--accent);font-weight:600"' : '';
-            cells.push('<td' + cls + '>' + fmtCpu(cpu) + '</td>');
+            const best = Math.min(
+              ...["A", "B", "C"].map((x) => {
+                const v = perf[x]?.[f];
+                return v?.cpuUser != null ? v.cpuUser + v.cpuSystem : Infinity;
+              }),
+            );
+            const cls =
+              cpu === best
+                ? ' style="color:var(--accent);font-weight:600"'
+                : "";
+            cells.push("<td" + cls + ">" + fmtCpu(cpu) + "</td>");
           }
-          tr.innerHTML = cells.join('');
+          tr.innerHTML = cells.join("");
           resBody.appendChild(tr);
         }
 
