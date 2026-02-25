@@ -35,6 +35,11 @@ async function benchPerf(fixture) {
     try { await formatOnce(fixture.content); } catch {}
   }
 
+  // Snapshot memory and CPU before timed runs
+  if (global.gc) global.gc();
+  const memBefore = process.memoryUsage();
+  const cpuBefore = process.cpuUsage();
+
   const times = [];
   for (let i = 0; i < config.runs; i++) {
     const start = performance.now();
@@ -44,6 +49,10 @@ async function benchPerf(fixture) {
     } catch {}
   }
 
+  // Snapshot after
+  const cpuAfter = process.cpuUsage(cpuBefore);
+  const memAfter = process.memoryUsage();
+
   if (times.length > 0) {
     const avg = times.reduce((a, b) => a + b, 0) / times.length;
     return {
@@ -51,6 +60,15 @@ async function benchPerf(fixture) {
       min: parseFloat(Math.min(...times).toFixed(2)),
       max: parseFloat(Math.max(...times).toFixed(2)),
       runs: times.length,
+      // CPU time in ms (user + system) across all runs
+      cpuUser: parseFloat((cpuAfter.user / 1000).toFixed(2)),
+      cpuSystem: parseFloat((cpuAfter.system / 1000).toFixed(2)),
+      // Memory: peak heap used during runs (bytes)
+      heapUsed: memAfter.heapUsed,
+      heapTotal: memAfter.heapTotal,
+      rss: memAfter.rss,
+      // Memory delta (bytes allocated during runs)
+      heapDelta: memAfter.heapUsed - memBefore.heapUsed,
     };
   }
   return { avg: null, error: true };

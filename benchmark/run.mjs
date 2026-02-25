@@ -160,7 +160,7 @@ function spawnWorker(plugin) {
     const child = fork(workerPath, [
       JSON.stringify(plugin),
       JSON.stringify({ warmup: WARMUP_RUNS, runs: TIMED_RUNS }),
-    ], { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
+    ], { stdio: ['pipe', 'pipe', 'pipe', 'ipc'], execArgv: ['--expose-gc'] });
 
     child.stderr.on('data', () => {}); // suppress stderr noise
     child.stdout.on('data', () => {});
@@ -382,6 +382,47 @@ async function benchPerformance(workers) {
       console.log(`  ${colors.A('ours')} vs ${c(plugin.name)}: ${bold(ratio + 'x')} faster`);
     }
   }
+  console.log();
+
+  // Resource usage summary
+  const fmt = (bytes) => bytes > 1048576 ? (bytes / 1048576).toFixed(1) + ' MB' : (bytes / 1024).toFixed(0) + ' KB';
+  console.log(bold('RESOURCE USAGE') + dim(' (per-fixture snapshot after timed runs)'));
+  console.log();
+  const resTable = new Table({
+    head: ['', ...activePlugins.map(p => colors[p.short](p.short + ' CPU (ms)')), ...activePlugins.map(p => colors[p.short](p.short + ' Heap'))],
+    style: { head: [], border: ['dim'], compact: true },
+    chars: {
+      'top': dim('─'), 'top-mid': dim('┬'), 'top-left': dim('┌'), 'top-right': dim('┐'),
+      'bottom': dim('─'), 'bottom-mid': dim('┴'), 'bottom-left': dim('└'), 'bottom-right': dim('┘'),
+      'left': dim('│'), 'left-mid': dim('├'), 'mid': dim('─'), 'mid-mid': dim('┼'),
+      'right': dim('│'), 'right-mid': dim('┤'), 'middle': dim('│'),
+    },
+    colAligns: ['left', ...activePlugins.map(() => 'right'), ...activePlugins.map(() => 'right')],
+  });
+
+  // Aggregate resource stats
+  const resSummary = {};
+  for (const p of activePlugins) {
+    const entries = Object.values(results[p.short]).filter(e => e.cpuUser != null);
+    resSummary[p.short] = {
+      cpuTotal: entries.reduce((s, e) => s + e.cpuUser + e.cpuSystem, 0),
+      peakHeap: entries.reduce((m, e) => Math.max(m, e.heapUsed || 0), 0),
+      peakRss: entries.reduce((m, e) => Math.max(m, e.rss || 0), 0),
+      count: entries.length,
+    };
+  }
+
+  const summaryRow = [bold('Total / Peak')];
+  for (const p of activePlugins) {
+    const s = resSummary[p.short];
+    summaryRow.push(s.count > 0 ? dim(s.cpuTotal.toFixed(0) + ' ms') : dim('--'));
+  }
+  for (const p of activePlugins) {
+    const s = resSummary[p.short];
+    summaryRow.push(s.count > 0 ? dim(fmt(s.peakHeap)) : dim('--'));
+  }
+  resTable.push(summaryRow);
+  console.log(resTable.toString());
   console.log();
 
   return results;
