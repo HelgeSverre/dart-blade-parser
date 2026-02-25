@@ -548,6 +548,7 @@ async function main() {
   }
 
   if (outputJson) {
+    allResults.generatedAt = new Date().toISOString();
     const jsonFile = join(__dirname, 'results', 'benchmark.json');
     if (!existsSync(join(__dirname, 'results'))) mkdirSync(join(__dirname, 'results'), { recursive: true });
     writeFileSync(jsonFile, JSON.stringify(allResults, null, 2));
