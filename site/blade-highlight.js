@@ -17,8 +17,8 @@
         tokens.push({ type: 'echo', text: code.slice(i, stop) });
         i = stop;
       }
-      // Escaped echo {{ }}
-      else if (code.startsWith('{{', i) && !code.startsWith('{{{', i)) {
+      // Escaped echo {{ }} (also handles legacy {{{ }}} triple-brace)
+      else if (code.startsWith('{{', i)) {
         const end = code.indexOf('}}', i + 2);
         const stop = end === -1 ? code.length : end + 2;
         tokens.push({ type: 'echo', text: code.slice(i, stop) });
@@ -69,11 +69,12 @@
         // Tokenize tag internals
         tokenizeTag(tagText, tokens);
       }
-      // Plain text (including bare @ not followed by a letter)
+      // Plain text (including bare @/< not followed by valid syntax)
       else {
         const start = i;
-        while (i < code.length && code[i] !== '<' && !code.startsWith('{{', i) && !code.startsWith('{!!', i)) {
+        while (i < code.length && !code.startsWith('{{', i) && !code.startsWith('{!!', i)) {
           if (code[i] === '@' && i + 1 < code.length && /[a-zA-Z]/.test(code[i + 1])) break;
+          if (code[i] === '<' && i + 1 < code.length && (code[i+1] === '/' || code[i+1] === '!' || /[a-zA-Z]/.test(code[i+1]))) break;
           i++;
         }
         if (i > start) tokens.push({ type: 'text', text: code.slice(start, i) });

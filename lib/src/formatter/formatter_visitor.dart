@@ -71,6 +71,14 @@ class FormatterVisitor implements AstVisitor<String> {
     'hgroup', 'dialog', 'search',
   };
 
+  /// Raw text elements whose content indentation should be preserved.
+  static const Set<String> _rawTextElements = {
+    'script',
+    'style',
+    'textarea',
+    'pre',
+  };
+
   /// HTML void elements that should not have closing tags.
   static const Set<String> _voidElements = {
     'area',
@@ -597,6 +605,14 @@ class FormatterVisitor implements AstVisitor<String> {
       return '';
     }
 
+    // Check if we're inside a raw text element (script/style/textarea/pre)
+    // and should preserve relative indentation of the content.
+    final parent = node.parent;
+    if (parent is HtmlElementNode &&
+        _rawTextElements.contains(parent.tagName.toLowerCase())) {
+      return _visitRawTextContent(content);
+    }
+
     // Split text by lines to handle multi-line text
     final lines = content.split('\n');
 
@@ -617,6 +633,71 @@ class FormatterVisitor implements AstVisitor<String> {
         if (i < lines.length - 1) {
           _output.writeln();
         }
+      }
+    }
+
+    return '';
+  }
+
+  /// Handles text content inside raw text elements (script/style/textarea/pre).
+  ///
+  /// Preserves the relative indentation structure of the content while
+  /// re-basing it to the current formatter indent level.
+  String _visitRawTextContent(String content) {
+    final lines = content.split('\n');
+
+    // Find the minimum indentation of non-empty lines (excluding the first
+    // line which is typically on the same line as the opening tag).
+    int? minIndent;
+    for (var i = 1; i < lines.length; i++) {
+      final line = lines[i];
+      if (line.trim().isEmpty) continue;
+      final indent = line.length - line.trimLeft().length;
+      if (minIndent == null || indent < minIndent) {
+        minIndent = indent;
+      }
+    }
+    minIndent ??= 0;
+
+    for (var i = 0; i < lines.length; i++) {
+      final line = lines[i];
+
+      if (i == 0) {
+        // First line: typically right after <script>, may be empty or have content
+        final trimmed = line.trimLeft();
+        if (trimmed.isNotEmpty) {
+          if (!_output.endsWithNewline()) {
+            _output.write(trimmed);
+          } else {
+            _output.write(_indent.current);
+            _output.write(trimmed);
+          }
+          if (i < lines.length - 1) {
+            _output.writeln();
+          }
+        }
+        continue;
+      }
+
+      if (line.trim().isEmpty) {
+        // Preserve blank lines within the content
+        if (i < lines.length - 1) {
+          _output.writeln();
+        }
+        continue;
+      }
+
+      // Strip the base indentation and re-indent relative to current level
+      final currentLineIndent = line.length - line.trimLeft().length;
+      final relativeIndent = currentLineIndent - minIndent;
+      final extraIndent = relativeIndent > 0 ? ' ' * relativeIndent : '';
+
+      _output.write(_indent.current);
+      _output.write(extraIndent);
+      _output.write(line.trimLeft());
+
+      if (i < lines.length - 1) {
+        _output.writeln();
       }
     }
 
