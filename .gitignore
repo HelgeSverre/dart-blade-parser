@@ -20,6 +20,7 @@ blade-parser
 # Test reports
 tool/acid/reports/*.html
 *.html
+!site/*.html
 
 # Local settings
 .claude/settings.local.json
@@ -40,3 +41,7 @@ specs/
 
 doc/
 out/
+
+# Node
+node_modules/
+package-lock.json
