@@ -33,7 +33,7 @@
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="prettier-plugin-laravel-blade: Your Blade formatter is 22–32× too slow. Sub-millisecond formatting with a real recursive-descent parser."
+      content="prettier-plugin-laravel-blade: Your Blade formatter is 20× too slow. Sub-millisecond formatting with a real recursive-descent parser."
     />
     <meta property="og:site_name" content="prettier-plugin-laravel-blade" />
 
@@ -50,7 +50,7 @@
     <meta name="twitter:image" content="og-image.png" />
     <meta
       name="twitter:image:alt"
-      content="prettier-plugin-laravel-blade: Your Blade formatter is 22–32× too slow."
+      content="prettier-plugin-laravel-blade: Your Blade formatter is 20× too slow."
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -916,7 +916,7 @@
         <div class="hero-eyebrow">Prettier Plugin for Blade</div>
         <h1>
           Your Blade formatter is <br />
-          <em>22–32× too slow.</em>
+          <em>20× too slow.</em>
         </h1>
         <p class="hero-sub">
           A real recursive-descent parser — compiled from Dart to JavaScript —
@@ -1647,12 +1647,7 @@ npx prettier --check "**/*.blade.php"</pre>
       }
 
       function updateHeroSubtitle(ratioB, ratioC) {
-        const h1 = document.querySelector(".hero h1 em");
-        if (h1) {
-          const lo = Math.floor(Math.min(ratioB, ratioC));
-          const hi = Math.floor(Math.max(ratioB, ratioC));
-          h1.textContent = lo + "\u2013" + hi + "× too slow.";
-        }
+        // Static "20× too slow" — no dynamic update needed
       }
 
       function countIdem(entries) {
