@@ -21,6 +21,8 @@ blade-parser
 tool/acid/reports/*.html
 *.html
 !site/*.html
+test-results/
+.last_run.json
 
 # Local settings
 .claude/settings.local.json
