@@ -211,6 +211,7 @@ footer a{color:var(--text-dim)}
       <li><a href="#speed">Speed</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#comparison">Comparison</a></li>
+      <li><a href="benchmarks.html">Benchmarks</a></li>
       <li><a href="formatter.html">Try Live</a></li>
     </ul>
     <a href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/prettier-plugin-laravel-blade" class="nav-gh" target="_blank">
@@ -237,10 +238,10 @@ footer a{color:var(--text-dim)}
 <!-- METRICS -->
 <div class="metrics">
   <div class="w">
-    <div class="metric"><div class="metric-val accent" data-count="0.33" data-suffix="ms">0.33ms</div><div class="metric-label">Avg format time</div></div>
+    <div class="metric"><div class="metric-val accent" id="metric-avg-time" data-count="0.33" data-suffix="ms">0.33ms</div><div class="metric-label">Avg format time</div></div>
     <div class="metric"><div class="metric-val" data-count="144" data-suffix="KB">144KB</div><div class="metric-label">Package size</div></div>
-    <div class="metric"><div class="metric-val" data-count="109">109</div><div class="metric-label">Fixtures tested</div></div>
-    <div class="metric"><div class="metric-val accent" data-count="100" data-suffix="%">100%</div><div class="metric-label">Idempotent</div></div>
+    <div class="metric"><div class="metric-val" id="metric-fixture-count" data-count="109">109</div><div class="metric-label">Fixtures tested</div></div>
+    <div class="metric"><div class="metric-val accent" id="metric-idempotent" data-count="100" data-suffix="%">100%</div><div class="metric-label">Idempotent</div></div>
   </div>
 </div>
 
@@ -286,7 +287,7 @@ footer a{color:var(--text-dim)}
       <div class="card reveal"><div class="card-icon">::</div><h3>Alpine.js &amp; Livewire</h3><p>x-data, @click, :bind, x-show, x-transition, wire:model, wire:click, wire:poll — all modifiers handled correctly.</p></div>
       <div class="card reveal"><div class="card-icon">f(f(x))</div><h3>Always Idempotent</h3><p>Format once or a hundred times — identical output. No trailing spaces, no oscillating blank lines, no second-save diffs.</p></div>
       <div class="card reveal"><div class="card-icon">//</div><h3>Smart Attribute Wrapping</h3><p>Respects printWidth. Choose auto, always, or never. Configurable closing bracket position and self-closing style.</p></div>
-      <div class="card reveal"><div class="card-icon">*</div><h3>7 Custom Options</h3><p>Quote style, directive spacing, slot formatting, wrap attributes, attribute sorting, closing bracket, self-closing control.</p></div>
+      <div class="card reveal"><div class="card-icon">*</div><h3>9 Custom Options</h3><p>Quote style, directive spacing, slot formatting, slot name style, slot spacing, wrap attributes, attribute sorting, closing bracket, self-closing control.</p></div>
     </div>
   </div>
 </section>
@@ -340,9 +341,9 @@ footer a{color:var(--text-dim)}
         <thead><tr><th></th><th>This plugin</th><th>stillat</th><th>shufo</th></tr></thead>
         <tbody>
           <tr><td class="lbl">Package size</td><td class="win m">144 KB</td><td class="m">768 KB</td><td class="m">12+ MB</td></tr>
-          <tr><td class="lbl">Avg format time</td><td class="win m">0.33 ms</td><td class="m">7.31 ms</td><td class="m">10.45 ms</td></tr>
+          <tr><td class="lbl">Avg format time</td><td class="win m" id="cmp-avg-a">0.33 ms</td><td class="m" id="cmp-avg-b">7.31 ms</td><td class="m" id="cmp-avg-c">10.45 ms</td></tr>
           <tr><td class="lbl">Parser</td><td class="win">Real recursive-descent AST</td><td>TypeScript AST (JSONata)</td><td>Regex-based rewriting</td></tr>
-          <tr><td class="lbl">Idempotent</td><td class="ok">✓ 104/104</td><td class="no">✗ 4 failures</td><td class="no">✗ 1 failure</td></tr>
+          <tr><td class="lbl">Idempotent</td><td class="ok" id="cmp-idem-a">✓ 104/104</td><td class="no" id="cmp-idem-b">✗ 4 failures</td><td class="no" id="cmp-idem-c">✗ 1 failure</td></tr>
           <tr><td class="lbl">Dependencies</td><td class="win">None</td><td>None</td><td>blade-formatter, php-parser</td></tr>
           <tr><td class="lbl">Trailing whitespace</td><td class="ok">✓ None</td><td class="no">✗ Present</td><td class="ok">✓ None</td></tr>
           <tr><td class="lbl">Quote preservation</td><td class="ok">✓ Preserves</td><td class="no">✗ Converts ' → "</td><td class="ok">✓ Preserves</td></tr>
@@ -380,7 +381,7 @@ footer a{color:var(--text-dim)}
   <div class="w">
     <div class="stag">Configuration</div>
     <div class="sh">Fine-grained control</div>
-    <div class="sd">7 Blade-specific options alongside Prettier's standard tabWidth, useTabs, and printWidth.</div>
+    <div class="sd">9 Blade-specific options alongside Prettier's standard tabWidth, useTabs, and printWidth.</div>
     <div style="overflow-x:auto">
       <table class="opts">
         <thead><tr><th>Option</th><th>Default</th><th>Choices</th><th>Description</th></tr></thead>
@@ -388,12 +389,49 @@ footer a{color:var(--text-dim)}
           <tr><td class="m">bladeQuoteStyle</td><td class="m">"preserve"</td><td class="m">single, double, preserve</td><td>Quote style for HTML attributes</td></tr>
           <tr><td class="m">bladeDirectiveSpacing</td><td class="m">"between_blocks"</td><td class="m">between_blocks, none, preserve</td><td>Spacing between directive blocks</td></tr>
           <tr><td class="m">bladeSlotFormatting</td><td class="m">"compact"</td><td class="m">compact, block</td><td>Component slot formatting</td></tr>
+          <tr><td class="m">bladeSlotNameStyle</td><td class="m">"colon"</td><td class="m">colon, attribute, preserve</td><td>Slot name syntax (colon vs attribute)</td></tr>
+          <tr><td class="m">bladeSlotSpacing</td><td class="m">"after"</td><td class="m">none, after, before, around</td><td>Blank lines around slot elements</td></tr>
           <tr><td class="m">bladeWrapAttributes</td><td class="m">"auto"</td><td class="m">auto, always, never</td><td>When to wrap attributes</td></tr>
           <tr><td class="m">bladeAttributeSort</td><td class="m">"none"</td><td class="m">none, alphabetical, by_type</td><td>Attribute sorting strategy</td></tr>
           <tr><td class="m">bladeClosingBracketStyle</td><td class="m">"same_line"</td><td class="m">same_line, new_line</td><td>Closing bracket position</td></tr>
           <tr><td class="m">bladeSelfClosingStyle</td><td class="m">"preserve"</td><td class="m">preserve, always, never</td><td>Self-closing element handling</td></tr>
         </tbody>
       </table>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:2rem">
+      <div style="background:var(--surface);padding:1.25rem">
+        <div class="code-label">.prettierrc</div>
+<pre>{
+  "plugins": ["prettier-plugin-laravel-blade"],
+  "overrides": [{
+    "files": "*.blade.php",
+    "options": {
+      "tabWidth": 4,
+      "printWidth": 120,
+      "bladeSlotFormatting": "compact",
+      "bladeSlotNameStyle": "colon",
+      "bladeSlotSpacing": "after",
+      "bladeWrapAttributes": "auto",
+      "bladeAttributeSort": "by_type",
+      "bladeSelfClosingStyle": "preserve"
+    }
+  }]
+}</pre>
+      </div>
+      <div style="background:var(--surface);padding:1.25rem">
+        <div class="code-label">.blade.json</div>
+<pre>{
+  "indent_size": 4,
+  "indent_style": "spaces",
+  "max_line_length": 120,
+  "slot_formatting": "compact",
+  "slot_name_style": "colon",
+  "slot_spacing": "after",
+  "wrap_attributes": "auto",
+  "attribute_sort": "by_type",
+  "self_closing_style": "preserve"
+}</pre>
+      </div>
     </div>
   </div>
 </section>
@@ -432,9 +470,9 @@ npx prettier --check "**/*.blade.php"</pre>
   const { highlightBlade } = BladeHighlight;
   const fmtOpts = JSON.stringify({ tabWidth: 4, useTabs: false, printWidth: 120,
     quoteStyle: 'preserve', directiveSpacing: 'between_blocks',
-    slotFormatting: 'compact', wrapAttributes: 'auto',
-    attributeSort: 'none', closingBracketStyle: 'same_line',
-    selfClosingStyle: 'preserve' });
+    slotFormatting: 'compact', slotNameStyle: 'colon', slotSpacing: 'after',
+    wrapAttributes: 'auto', attributeSort: 'none',
+    closingBracketStyle: 'same_line', selfClosingStyle: 'preserve' });
 
   // Apply saved theme
   document.documentElement.dataset.theme = localStorage.getItem('blade-formatter-theme') || 'muted-steel';
@@ -500,25 +538,110 @@ npx prettier --check "**/*.blade.php"</pre>
   waitForFormatter();
 })();
 
-// Speed chart data (from benchmark/results/benchmark.json, 20 runs, 3 warmup)
-const data=[
-  {f:'alpine-billing',a:.58,b:9.10,c:13.41},
-  {f:'components-form',a:.40,b:3.11,c:9.44},
-  {f:'pagination',a:.83,b:84.44,c:47.10},
-  {f:'basic-messy',a:.22,b:1.42,c:7.94},
-  {f:'real-world-mess',a:.23,b:2.91,c:8.33},
-  {f:'livewire-layout',a:.36,b:8.03,c:10.02},
-];
-const mx=Math.max(...data.map(d=>Math.max(d.a,d.b,d.c)));
+// Speed chart — loads benchmark data dynamically, falls back to hardcoded defaults
 const ch=document.getElementById('speedChart');
-data.forEach(d=>{
-  const r=document.createElement('div');r.className='speed-row';
-  r.innerHTML=`<span class="speed-fixture">${d.f}</span><div class="speed-bars"><div class="speed-bar ours" style="width:${(d.a/mx*100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${(d.b/mx*100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${(d.c/mx*100).toFixed(1)}%"></div></div><span class="speed-ms">${d.a}ms</span>`;
-  ch.appendChild(r);
-});
-const avg=document.createElement('div');avg.className='speed-row speed-avg';
-avg.innerHTML=`<span class="speed-fixture" style="font-weight:600;color:var(--text)">Average</span><div class="speed-bars"><div class="speed-bar ours" style="width:${(.33/mx*100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${(7.31/mx*100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${(10.45/mx*100).toFixed(1)}%"></div></div><span class="speed-ms" style="font-weight:600;color:var(--accent)">0.33ms</span>`;
-ch.appendChild(avg);
+
+const heroFixtures=[
+  'large/01-pagination','alpine/01-billing','components/02-billing',
+  'legacy/laravel5-auth-login','livewire/01-layout','error/malformed-dashboard',
+  'format/07-real-world-mess','format/06-mixed-content'
+];
+
+function displayName(key){return key.split('/').pop().replace(/^\d+-/,'').replace(/[-_]/g,' ')}
+
+function renderChart(data,avgA,avgB,avgC){
+  ch.innerHTML='';
+  const mx=Math.max(...data.map(d=>Math.max(d.a,d.b,d.c)));
+  data.forEach(d=>{
+    const r=document.createElement('div');r.className='speed-row';
+    r.innerHTML=`<span class="speed-fixture">${d.f}</span><div class="speed-bars"><div class="speed-bar ours" style="width:${(d.a/mx*100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${(d.b/mx*100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${(d.c/mx*100).toFixed(1)}%"></div></div><span class="speed-ms">${d.a}ms</span>`;
+    ch.appendChild(r);
+  });
+  const avg=document.createElement('div');avg.className='speed-row speed-avg';
+  avg.innerHTML=`<span class="speed-fixture" style="font-weight:600;color:var(--text)">Average</span><div class="speed-bars"><div class="speed-bar ours" style="width:${(avgA/mx*100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${(avgB/mx*100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${(avgC/mx*100).toFixed(1)}%"></div></div><span class="speed-ms" style="font-weight:600;color:var(--accent)">${avgA.toFixed(2)}ms</span>`;
+  ch.appendChild(avg);
+}
+
+function updateMetrics(avgA,fixtureCount,idemPct){
+  const mAvg=document.getElementById('metric-avg-time');
+  if(mAvg){mAvg.textContent=avgA.toFixed(2)+'ms';mAvg.setAttribute('data-count',avgA.toFixed(2))}
+  const mFix=document.getElementById('metric-fixture-count');
+  if(mFix){mFix.textContent=String(fixtureCount);mFix.setAttribute('data-count',String(fixtureCount))}
+  const mIdem=document.getElementById('metric-idempotent');
+  if(mIdem){mIdem.textContent=idemPct+'%';mIdem.setAttribute('data-count',String(idemPct))}
+}
+
+function updateComparison(avgA,avgB,avgC,idemA,idemB,idemC){
+  const ca=document.getElementById('cmp-avg-a');if(ca)ca.textContent=avgA.toFixed(2)+' ms';
+  const cb=document.getElementById('cmp-avg-b');if(cb)cb.textContent=avgB.toFixed(2)+' ms';
+  const cc=document.getElementById('cmp-avg-c');if(cc)cc.textContent=avgC.toFixed(2)+' ms';
+  const ia=document.getElementById('cmp-idem-a');
+  const ib=document.getElementById('cmp-idem-b');
+  const ic=document.getElementById('cmp-idem-c');
+  if(ia){ia.className='ok';ia.textContent='\u2713 '+idemA.pass+'/'+idemA.total}
+  if(ib){const f=idemB.fail+idemB.error;ib.className=f?'no':'ok';ib.textContent=f?'\u2717 '+f+' failure'+(f>1?'s':''):'\u2713 '+idemB.pass+'/'+idemB.total}
+  if(ic){const f=idemC.fail+idemC.error;ic.className=f?'no':'ok';ic.textContent=f?'\u2717 '+f+' failure'+(f>1?'s':''):'\u2713 '+idemC.pass+'/'+idemC.total}
+}
+
+function updateHeroSubtitle(ratioB,ratioC){
+  const h1=document.querySelector('.hero h1 em');
+  if(h1){const lo=Math.floor(Math.min(ratioB,ratioC));const hi=Math.floor(Math.max(ratioB,ratioC));h1.textContent=lo+'\u2013'+hi+'× too slow.'}
+}
+
+function countIdem(entries){
+  let pass=0,fail=0,error=0;
+  for(const v of Object.values(entries)){
+    if(v.error){error++}else if(v.idempotent===true){pass++}else{fail++}
+  }
+  return {pass,fail,error,total:pass+fail+error};
+}
+
+function computeAvg(perfEntries){
+  const vals=Object.values(perfEntries).filter(e=>e.avg!=null&&!e.error).map(e=>e.avg);
+  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+}
+
+async function loadBenchmarkData(){
+  try{
+    const res=await fetch('data/benchmark.json');
+    const json=await res.json();
+    const perfA=json.performance.A,perfB=json.performance.B,perfC=json.performance.C;
+    const avgA=computeAvg(perfA),avgB=computeAvg(perfB),avgC=computeAvg(perfC);
+    const fixtureCount=Object.keys(perfA).length;
+
+    // Build selected fixtures, sorted by A time descending
+    const selected=heroFixtures
+      .filter(k=>perfA[k]&&perfA[k].avg!=null)
+      .map(k=>({f:displayName(k),a:perfA[k].avg,b:(perfB[k]&&perfB[k].avg)||0,c:(perfC[k]&&perfC[k].avg)||0}))
+      .sort((a,b)=>b.a-a.a);
+
+    renderChart(selected,avgA,avgB,avgC);
+
+    // Idempotency
+    const idemA=countIdem(json.idempotency.A);
+    const idemB=countIdem(json.idempotency.B);
+    const idemC=countIdem(json.idempotency.C);
+    const idemPct=idemA.total?Math.round(idemA.pass/idemA.total*100):100;
+
+    updateMetrics(avgA,fixtureCount,idemPct);
+    updateComparison(avgA,avgB,avgC,idemA,idemB,idemC);
+    updateHeroSubtitle(avgB/avgA,avgC/avgA);
+  }catch(e){
+    // Fallback to hardcoded defaults
+    const data=[
+      {f:'pagination',a:.83,b:84.44,c:47.10},
+      {f:'billing',a:1.15,b:29.50,c:40.93},
+      {f:'billing',a:.87,b:15.18,c:19.25},
+      {f:'auth login',a:.42,b:9.93,c:14.21},
+      {f:'layout',a:.36,b:8.03,c:10.02},
+      {f:'malformed dashboard',a:.26,b:3.79,c:15.65},
+      {f:'real world mess',a:.23,b:2.91,c:8.33},
+      {f:'mixed content',a:.18,b:2.95,c:7.90},
+    ];
+    renderChart(data,0.33,7.31,10.45);
+  }
+}
+loadBenchmarkData();
 
 // Animate bars on scroll
 const speedObs=new IntersectionObserver(entries=>{
