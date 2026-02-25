@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:blade_parser/blade_parser.dart';
+import 'package:blade_parser/src/docs/php_array_parser.dart';
 
 /// Generates documentation for Blade components.
 ///
@@ -88,53 +89,55 @@ class ComponentDocGenerator {
   }
 
   /// Parse the @props array content to extract prop names and defaults.
+  ///
+  /// Uses [PhpArrayParser] to properly handle comments, string escapes,
+  /// nested arrays, and all PHP literal value types.
   List<PropInfo> _parsePropsArray(String propsContent) {
+    final entries = PhpArrayParser(propsContent).parse();
     final props = <PropInfo>[];
 
-    // Match patterns like:
-    // 'propName' => 'default'
-    // 'propName' => null
-    // 'propName' => true
-    // 'propName' => false
-    // 'propName' => 123
-    // "propName" => "default"
-    final propPattern = RegExp(
-      r'''['"](\w+)['"]\s*=>\s*(.+?)(?=,\s*['"]|\s*\]|$)''',
-      multiLine: true,
-    );
-
-    for (final match in propPattern.allMatches(propsContent)) {
-      final name = match.group(1)!;
-      var defaultValue = match.group(2)?.trim();
-
-      // Clean up the default value
-      if (defaultValue != null) {
-        // Remove trailing commas
-        defaultValue = defaultValue.replaceAll(RegExp(r',\s*$'), '').trim();
+    for (final entry in entries) {
+      if (entry.key != null) {
+        // 'name' => defaultValue — optional prop
+        final defaultStr = _valueToString(entry.value);
+        props.add(PropInfo(
+          name: entry.key!,
+          defaultValue: defaultStr,
+          type: _inferTypeFromValue(entry.value),
+        ),);
+      } else if (entry.value is PhpString) {
+        // Standalone 'name' — required prop
+        props.add(PropInfo(
+          name: (entry.value as PhpString).value,
+          required: true,
+        ),);
       }
-
-      props.add(PropInfo(
-        name: name,
-        defaultValue: defaultValue,
-        type: _inferType(defaultValue),
-      ));
     }
 
     return props;
   }
 
-  /// Infer the type from a default value.
-  String? _inferType(String? defaultValue) {
-    if (defaultValue == null) return null;
-    if (defaultValue == 'null') return null;
-    if (defaultValue == 'true' || defaultValue == 'false') return 'bool';
-    if (RegExp(r'^\d+$').hasMatch(defaultValue)) return 'int';
-    if (RegExp(r'^\d+\.\d+$').hasMatch(defaultValue)) return 'float';
-    if (defaultValue.startsWith("'") || defaultValue.startsWith('"')) {
-      return 'string';
-    }
-    if (defaultValue.startsWith('[')) return 'array';
-    return null;
+  /// Convert a [PhpValue] to its string representation for display.
+  String _valueToString(PhpValue value) {
+    return switch (value) {
+      final PhpString v => "'${v.value}'",
+      final PhpNumber v =>
+        v.value is int ? v.value.toString() : v.value.toString(),
+      final PhpBool v => v.value.toString(),
+      PhpNull() => 'null',
+      final PhpArray v => v.entries.isEmpty ? '[]' : '[...]',
+    };
+  }
+
+  /// Infer the type from a parsed [PhpValue].
+  String? _inferTypeFromValue(PhpValue value) {
+    return switch (value) {
+      PhpString() => 'string',
+      final PhpNumber v => v.value is int ? 'int' : 'float',
+      PhpBool() => 'bool',
+      PhpNull() => null,
+      PhpArray() => 'array',
+    };
   }
 
   /// Generate markdown documentation.
@@ -147,7 +150,7 @@ class ComponentDocGenerator {
     buffer.writeln('# Component Reference');
     buffer.writeln();
     buffer.writeln(
-        'This document provides a reference for all Blade components.');
+        'This document provides a reference for all Blade components.',);
     buffer.writeln();
 
     // Table of contents
@@ -179,8 +182,9 @@ class ComponentDocGenerator {
         buffer.writeln('|------|------|---------|-------------|');
         for (final prop in component.props) {
           final type = prop.type ?? '-';
-          final defaultVal = prop.defaultValue ?? '-';
-          buffer.writeln('| `${prop.name}` | $type | `$defaultVal` | |');
+          final defaultVal =
+              prop.required ? '**required**' : '`${prop.defaultValue ?? '-'}`';
+          buffer.writeln('| `${prop.name}` | $type | $defaultVal | |');
         }
         buffer.writeln();
       }
@@ -220,8 +224,9 @@ class ComponentDocGenerator {
     buffer.write('<$tagName');
 
     // Add required props (those without defaults or with null default)
-    final requiredProps =
-        component.props.where((p) => p.defaultValue == 'null').toList();
+    final requiredProps = component.props
+        .where((p) => p.required || p.defaultValue == 'null')
+        .toList();
     for (final prop in requiredProps.take(3)) {
       buffer.write(' ${prop.name}="value"');
     }
@@ -299,11 +304,15 @@ class PropInfo {
   /// Optional description from doc comments.
   final String? description;
 
+  /// Whether this prop is required (no default value).
+  final bool required;
+
   PropInfo({
     required this.name,
     this.defaultValue,
     this.type,
     this.description,
+    this.required = false,
   });
 }
 

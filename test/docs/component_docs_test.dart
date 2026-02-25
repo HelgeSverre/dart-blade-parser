@@ -94,6 +94,56 @@ void main() {
         await tempDir.delete(recursive: true);
       });
 
+      test('extracts required props without defaults', () async {
+        final tempDir = await Directory.systemTemp.createTemp('blade_test_');
+        final file = File('${tempDir.path}/notification.blade.php');
+        await file.writeAsString('''
+@props(['message', 'dismissible' => true])
+
+<div>{{ \$slot }}</div>
+''');
+
+        final info = await generator.analyzeComponent(file);
+
+        expect(info, isNotNull);
+        expect(info!.props.length, equals(2));
+        expect(info.props[0].name, equals('message'));
+        expect(info.props[0].required, isTrue);
+        expect(info.props[0].defaultValue, isNull);
+        expect(info.props[1].name, equals('dismissible'));
+        expect(info.props[1].required, isFalse);
+        expect(info.props[1].type, equals('bool'));
+
+        await tempDir.delete(recursive: true);
+      });
+
+      test('ignores commented-out props', () async {
+        final tempDir = await Directory.systemTemp.createTemp('blade_test_');
+        final file = File('${tempDir.path}/widget.blade.php');
+        await file.writeAsString('''
+@props([
+    // 'old_name' => 'deprecated',
+    'type' => 'button',
+    'message', // like 'name' but required
+])
+
+<div>{{ \$slot }}</div>
+''');
+
+        final info = await generator.analyzeComponent(file);
+
+        expect(info, isNotNull);
+        expect(info!.props.length, equals(2));
+        expect(info.props[0].name, equals('type'));
+        expect(info.props[1].name, equals('message'));
+        // 'old_name' from comment must not appear
+        expect(info.props.where((p) => p.name == 'old_name'), isEmpty);
+        // 'name' from comment text must not appear
+        expect(info.props.where((p) => p.name == 'name'), isEmpty);
+
+        await tempDir.delete(recursive: true);
+      });
+
       test('infers types from defaults', () async {
         final tempDir = await Directory.systemTemp.createTemp('blade_test_');
         final file = File('${tempDir.path}/test.blade.php');
