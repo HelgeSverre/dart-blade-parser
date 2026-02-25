@@ -57,5 +57,53 @@ void main() {
       final output = format('@isset(\$var)\nContent\n@endisset');
       expect(output, contains('@endisset'));
     });
+
+    test('empty with else formats both branches', () {
+      final input = '@empty(\$items)\n<p>None</p>\n@else\n<p>Has items</p>\n@endempty';
+      final output = format(input);
+      expect(output, contains('@empty'));
+      expect(output, contains('@else'));
+      expect(output, contains('@endempty'));
+      expect(output, contains('None'));
+      expect(output, contains('Has items'));
+    });
+
+    test('empty with else is idempotent', () {
+      final input = '@empty(\$items)\n<p>None</p>\n@else\n<p>Has items</p>\n@endempty';
+      final first = format(input);
+      final second = format(first);
+      expect(first, equals(second), reason: '@empty/@else/@endempty should be idempotent');
+    });
+
+    test('forelse with @empty does not emit @endempty', () {
+      final output = format('@forelse(\$items as \$item)\n<li>{{ \$item }}</li>\n@empty\n<p>None</p>\n@endforelse');
+      expect(output, contains('@empty'));
+      expect(output, contains('@endforelse'));
+      expect(output, isNot(contains('@endempty')),
+          reason: '@empty inside @forelse must not produce @endempty');
+    });
+
+    test('forelse with @empty(\$expr) does not emit @endempty', () {
+      final output = format('@forelse(\$items as \$item)\n<li>{{ \$item }}</li>\n@empty(\$items)\n<p>None</p>\n@endforelse');
+      expect(output, contains('@empty'));
+      expect(output, contains('@endforelse'));
+      expect(output, isNot(contains('@endempty')),
+          reason: '@empty(\$expr) inside @forelse must not produce @endempty');
+    });
+
+    test('standalone @empty emits @endempty', () {
+      final output = format('@empty(\$items)\n<p>None</p>\n@endempty');
+      expect(output, contains('@empty'));
+      expect(output, contains('@endempty'));
+      expect(output, isNot(contains('@endforelse')));
+    });
+
+    test('isset with else formats both branches', () {
+      final input = '@isset(\$user)\n<p>{{ \$user->name }}</p>\n@else\n<p>Guest</p>\n@endisset';
+      final output = format(input);
+      expect(output, contains('@isset'));
+      expect(output, contains('@else'));
+      expect(output, contains('@endisset'));
+    });
   });
 }

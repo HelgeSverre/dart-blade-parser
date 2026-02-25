@@ -91,12 +91,13 @@ class FormatterVisitor implements AstVisitor<String> {
 
   /// Block-level directives that are intermediate (no @end tag of their own).
   /// These appear inside other block directives (e.g., @elseif inside @if/@endif).
+  /// Note: @empty is context-dependent — intermediate inside @forelse (no expression),
+  /// but standalone as @empty($var)...@endempty (has expression).
   static const Set<String> _intermediateDirectives = {
     'elseif',
     'else',
     'case',
     'default',
-    'empty',
   };
 
   /// Blade directives that are block-level (require children).
@@ -513,10 +514,10 @@ class FormatterVisitor implements AstVisitor<String> {
           continue;
         }
 
-        // Intermediate directives (@else, @elseif, @case, @default) should
-        // align with the parent directive, not be indented inside it.
+        // Intermediate directives (@else, @elseif, @case, @default, @empty inside @forelse)
+        // should align with the parent directive, not be indented inside it.
         if (child is DirectiveNode &&
-            _intermediateDirectives.contains(child.name)) {
+            _isIntermediateDirective(child)) {
           _indent.decrease();
           child.accept(this);
           _indent.increase();
@@ -538,7 +539,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Write closing directive if this is a block directive with children
     // Inline directives (like @section('title', 'value')) don't get closing tags
-    if (isBlock && node.children.isNotEmpty && _hasClosingDirective(node.name)) {
+    if (isBlock && node.children.isNotEmpty && _hasClosingDirective(node.name, expression: node.expression)) {
       _output.write(_indent.current);
       if (node.closedBy != null) {
         _output.write('@${node.closedBy}');
@@ -1193,8 +1194,8 @@ class FormatterVisitor implements AstVisitor<String> {
     // Handle directive spacing based on configuration
     if (current is DirectiveNode && next is DirectiveNode) {
       // Never add blank lines before intermediate directives (@else, @elseif,
-      // @case, @default) — they are branches of the same parent block.
-      if (_intermediateDirectives.contains(next.name)) {
+      // @case, @default, @empty inside @forelse) — they are branches of the same parent block.
+      if (_isIntermediateDirective(next)) {
         return false;
       }
 
@@ -1255,9 +1256,19 @@ class FormatterVisitor implements AstVisitor<String> {
     }
   }
 
+  /// Checks if a directive node is intermediate (no @end tag, aligned with parent).
+  /// @empty is intermediate only inside @forelse (when it has no expression).
+  bool _isIntermediateDirective(DirectiveNode node) {
+    if (_intermediateDirectives.contains(node.name)) return true;
+    return node.name == 'empty' && node.expression == null;
+  }
+
   /// Checks if a directive has a closing tag.
-  bool _hasClosingDirective(String name) {
-    return _blockDirectives.contains(name) &&
-        !_intermediateDirectives.contains(name);
+  bool _hasClosingDirective(String name, {String? expression}) {
+    if (_intermediateDirectives.contains(name)) return false;
+    // @empty without expression is intermediate (inside @forelse)
+    // @empty with expression is standalone and needs @endempty
+    if (name == 'empty' && expression == null) return false;
+    return _blockDirectives.contains(name);
   }
 }

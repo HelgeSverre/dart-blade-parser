@@ -125,9 +125,9 @@ class BladeParser {
       case TokenType.directiveUnless:
         return _parseGenericDirective('unless', TokenType.directiveEndunless);
       case TokenType.directiveIsset:
-        return _parseGenericDirective('isset', TokenType.directiveEndisset);
+        return _parseGenericDirective('isset', TokenType.directiveEndisset, supportsElse: true);
       case TokenType.directiveEmpty:
-        return _parseGenericDirective('empty', TokenType.directiveEndempty);
+        return _parseGenericDirective('empty', TokenType.directiveEndempty, supportsElse: true);
 
       // Authorization - paired directives
       case TokenType.directiveCan:
@@ -263,6 +263,14 @@ class BladeParser {
         );
       case TokenType.eof:
         _advance(); // Advance past EOF to terminate loop
+        return null;
+      // Unknown/custom directives (e.g. @inertia, @inertiaHead, @datetime)
+      // Lexer emits these as TokenType.identifier with '@name' value
+      case TokenType.identifier:
+        if (token.value.startsWith('@')) {
+          return _parseInlineDirective();
+        }
+        _advance();
         return null;
       default:
         _advance();
@@ -827,14 +835,39 @@ class BladeParser {
   }
 
   /// Parse generic directive with opening/closing tags.
-  DirectiveNode _parseGenericDirective(String name, TokenType closingType) {
+  DirectiveNode _parseGenericDirective(
+    String name,
+    TokenType closingType, {
+    bool supportsElse = false,
+  }) {
     final startToken = _advance();
     final expression = _extractExpression();
     final children = <AstNode>[];
 
-    while (!_check(closingType) && !_check(TokenType.eof)) {
+    while (!_check(closingType) && !_check(TokenType.eof) &&
+        !(supportsElse && _check(TokenType.directiveElse))) {
       final node = _parseNode();
       if (node != null) children.add(node);
+    }
+
+    // Handle @else
+    if (supportsElse && _check(TokenType.directiveElse)) {
+      final elseToken = _advance();
+      final elseChildren = <AstNode>[];
+
+      while (!_check(closingType) && !_check(TokenType.eof)) {
+        final node = _parseNode();
+        if (node != null) elseChildren.add(node);
+      }
+
+      children.add(
+        DirectiveNode(
+          startPosition: elseToken.startPosition,
+          endPosition: _previous().endPosition,
+          name: 'else',
+          children: elseChildren,
+        ),
+      );
     }
 
     if (!_check(closingType)) {

@@ -453,6 +453,51 @@ void main() {
       );
     });
 
+    test('@forelse/@empty with expression still treated as forelse branch', () {
+      // @empty($expr) inside @forelse is not valid Laravel syntax,
+      // but the parser should handle it gracefully by treating it as the
+      // forelse empty branch (same as @empty without expression).
+      final result = parser.parse('''
+@forelse(\$items as \$item)
+  <p>{{ \$item }}</p>
+@empty(\$items)
+  <p>No items</p>
+@endforelse
+''');
+
+      expect(result.isSuccess, isTrue, reason: 'Should parse without errors: ${result.errors}');
+
+      final forelseDirective = result.ast!.children
+          .whereType<DirectiveNode>()
+          .firstWhere((n) => n.name == 'forelse');
+
+      final hasEmptyBranch = forelseDirective.children
+          .whereType<DirectiveNode>()
+          .any((n) => n.name == 'empty');
+
+      expect(hasEmptyBranch, isTrue,
+          reason: '@empty(\$expr) inside @forelse should be absorbed as forelse empty branch');
+    });
+
+    test('@forelse/@empty does not emit @endempty', () {
+      final result = parser.parse('''
+@forelse(\$items as \$item)
+  <li>{{ \$item }}</li>
+@empty
+  <p>None</p>
+@endforelse
+''');
+
+      expect(result.isSuccess, isTrue);
+
+      // Should NOT have a standalone @empty directive at the top level
+      final topLevelEmpty = result.ast!.children
+          .whereType<DirectiveNode>()
+          .where((n) => n.name == 'empty');
+      expect(topLevelEmpty, isEmpty,
+          reason: '@empty inside @forelse should not appear as a top-level directive');
+    });
+
     test('Nested @unless directives', () {
       final result = parser.parse('''
         @unless(\$outer)
@@ -481,6 +526,52 @@ void main() {
         isNotEmpty,
         reason: 'Nested @unless should be found in outer @unless children',
       );
+    });
+
+    test('@empty with @else parses both branches', () {
+      final result = parser.parse('''
+@empty(\$items)
+  <p>No items</p>
+@else
+  <p>Has items</p>
+@endempty
+''');
+
+      expect(result.isSuccess, isTrue, reason: 'Should parse without errors: ${result.errors}');
+      expect(result.errors, isEmpty);
+
+      final emptyDirective = result.ast!.children
+          .whereType<DirectiveNode>()
+          .firstWhere((n) => n.name == 'empty');
+      expect(emptyDirective.expression, contains('items'));
+
+      // Should have an @else child
+      final elseNode = emptyDirective.children
+          .whereType<DirectiveNode>()
+          .where((n) => n.name == 'else');
+      expect(elseNode, isNotEmpty, reason: '@empty should have an @else child');
+    });
+
+    test('@isset with @else parses both branches', () {
+      final result = parser.parse('''
+@isset(\$user)
+  <p>{{ \$user->name }}</p>
+@else
+  <p>Guest</p>
+@endisset
+''');
+
+      expect(result.isSuccess, isTrue, reason: 'Should parse without errors: ${result.errors}');
+      expect(result.errors, isEmpty);
+
+      final issetDirective = result.ast!.children
+          .whereType<DirectiveNode>()
+          .firstWhere((n) => n.name == 'isset');
+
+      final elseNode = issetDirective.children
+          .whereType<DirectiveNode>()
+          .where((n) => n.name == 'else');
+      expect(elseNode, isNotEmpty, reason: '@isset should have an @else child');
     });
   });
 }
