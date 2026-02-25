@@ -209,3 +209,57 @@ prettier-test: prettier-build
 [group('prettier')]
 prettier-install:
     @cd prettier-plugin-laravel-blade && npm install
+
+# Benchmark
+
+# Sync test fixtures into benchmark/fixtures/
+[group('benchmark')]
+bench-sync:
+    @echo "Syncing fixtures from test/fixtures/ to benchmark/fixtures/..."
+    @rsync -a --delete --exclude='invalid/' --exclude='malformed/' test/fixtures/ benchmark/fixtures/
+    @echo "Synced $(find benchmark/fixtures -name '*.blade.php' | wc -l | tr -d ' ') fixtures."
+
+# Install benchmark dependencies
+[group('benchmark')]
+bench-install:
+    @cd benchmark && npm install
+
+# Run the full benchmark comparison
+[group('benchmark')]
+bench-plugins: bench-install
+    @cd benchmark && node run.mjs --full
+
+# Run performance benchmark only
+[group('benchmark')]
+bench-plugins-perf: bench-install
+    @cd benchmark && node run.mjs --perf-only
+
+# Run idempotency check only
+[group('benchmark')]
+bench-plugins-idempotency: bench-install
+    @cd benchmark && node run.mjs --idempotency-only
+
+# Quick benchmark (fewer runs, faster feedback)
+[group('benchmark')]
+bench-quick: bench-install
+    @cd benchmark && node run.mjs --perf-only --runs 5 --warmup 1
+
+# Site
+
+# Build site (copy benchmark data for pages to consume)
+[group('site')]
+site-build:
+    @echo "Copying benchmark data to site..."
+    @mkdir -p site/data
+    @cp benchmark/results/benchmark.json site/data/benchmark.json
+    @echo "Site built. Serve with: just site-serve"
+
+# Install site dependencies and serve locally
+[group('site')]
+site-serve: site-build
+    @cd site && npx -y serve .
+
+# Open site in browser
+[group('site')]
+site-open:
+    @open site/index.html
