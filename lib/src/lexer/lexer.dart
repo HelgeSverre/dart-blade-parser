@@ -727,10 +727,10 @@ class BladeLexer {
 
       if (ch == '{') {
         braceCount++;
-      } else if (ch == '}' && _peekNext() == '}') {
+      } else if (ch == '}') {
         if (braceCount > 0) {
           braceCount--;
-        } else {
+        } else if (_peekNext() == '}') {
           // End of echo
           if (_position > exprStart) {
             _emitToken(
