@@ -82,10 +82,9 @@ The benchmark runner (`run.mjs`) accepts the following arguments:
 
 ## Fixtures
 
-The `fixtures/` directory contains 109 Blade templates synced from
-`test/fixtures/` via `just bench-sync`. One fixture exceeding 100KB is skipped
-at runtime. The sync excludes files from `test/fixtures/invalid/` and
-`test/fixtures/malformed/`.
+The `fixtures/` directory is gitignored — run `just bench-sync` to populate it
+from `test/fixtures/`. The sync excludes `invalid/`, `malformed/`, `index.md`,
+and `README.md`. One fixture exceeding 100KB is skipped at runtime.
 
 ## Output
 

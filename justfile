@@ -216,7 +216,7 @@ prettier-install:
 [group('benchmark')]
 bench-sync:
     @echo "Syncing fixtures from test/fixtures/ to benchmark/fixtures/..."
-    @rsync -a --delete --exclude='invalid/' --exclude='malformed/' test/fixtures/ benchmark/fixtures/
+    @rsync -a --delete --exclude='invalid/' --exclude='malformed/' --exclude='index.md' --exclude='README.md' test/fixtures/ benchmark/fixtures/
     @echo "Synced $(find benchmark/fixtures -name '*.blade.php' | wc -l | tr -d ' ') fixtures."
 
 # Install benchmark dependencies
