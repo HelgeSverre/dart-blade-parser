@@ -255,8 +255,9 @@ bench-quick: bench-install
 [group('site')]
 site-build:
     @echo "Copying benchmark data to site..."
-    @mkdir -p site/data
+    @mkdir -p site/data site/dist
     @cp benchmark/results/benchmark.json site/data/benchmark.json
+    @cp prettier-plugin-laravel-blade/dist/blade-formatter.js site/dist/blade-formatter.js
     @echo "Site built. Serve with: just site-serve"
 
 # Serve site locally
