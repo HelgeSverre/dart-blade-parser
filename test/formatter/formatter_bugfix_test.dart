@@ -37,6 +37,7 @@ void main() {
       final output = formatter.format(input);
       expect(output, contains('Line 0'));
       expect(output, contains('Line 99'));
+      expect('<div>Line'.allMatches(output).length, equals(100));
     });
   });
 
@@ -104,6 +105,50 @@ indent_size = 2
     });
   });
 
+  group('Bug: @else/@elseif indented one level too deep', () {
+    late BladeFormatter formatter;
+
+    setUp(() {
+      formatter = BladeFormatter();
+    });
+
+    test('@else aligns with @if and @endif', () {
+      final input = '<td>@if(\$user->isVerified())<span class="text-green-600">Verified</span>@else<span class="text-gray-400">Pending</span>@endif</td>';
+      final output = formatter.format(input);
+      expect(
+        output,
+        equals(
+          '<td>\n'
+          '    @if(\$user->isVerified())\n'
+          '        <span class="text-green-600">Verified</span>\n'
+          '    @else\n'
+          '        <span class="text-gray-400">Pending</span>\n'
+          '    @endif\n'
+          '</td>\n',
+        ),
+      );
+    });
+
+    test('@elseif aligns with @if and @endif', () {
+      final input = '<div>@if(\$a)<p>A</p>@elseif(\$b)<p>B</p>@else<p>C</p>@endif</div>';
+      final output = formatter.format(input);
+      expect(
+        output,
+        equals(
+          '<div>\n'
+          '    @if(\$a)\n'
+          '        <p>A</p>\n'
+          '    @elseif(\$b)\n'
+          '        <p>B</p>\n'
+          '    @else\n'
+          '        <p>C</p>\n'
+          '    @endif\n'
+          '</div>\n',
+        ),
+      );
+    });
+  });
+
   group('Bug 20: visitText hidden caller coupling', () {
     late BladeFormatter formatter;
 
@@ -114,8 +159,14 @@ indent_size = 2
     test('text content is properly terminated', () {
       final input = '<div>\n  Hello World\n</div>';
       final output = formatter.format(input);
-      expect(output, contains('Hello World'));
-      expect(output, contains('</div>'));
+      expect(
+        output,
+        equals(
+          '<div>\n'
+          '    Hello World\n'
+          '</div>\n',
+        ),
+      );
     });
   });
 }

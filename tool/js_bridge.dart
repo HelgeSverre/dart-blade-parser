@@ -41,14 +41,38 @@ JSString _format(JSString source, JSString optionsJson) {
         SelfClosingStyle.fromString(opts['selfClosingStyle'] as String?),
   );
 
+  final cursorOffset = opts['cursorOffset'] as int? ?? -1;
+  final rangeStart = opts['rangeStart'] as int?;
+  final rangeEnd = opts['rangeEnd'] as int?;
+
   final formatter = BladeFormatter(config: config);
 
   try {
-    final formatted = formatter.format(text);
-    final result = {'formatted': formatted, 'error': null};
-    return jsonEncode(result).toJS;
+    if (rangeStart != null && rangeEnd != null) {
+      final res = formatter.formatRange(text, rangeStart, rangeEnd);
+      return jsonEncode({
+        'formatted': res.formatted,
+        'cursorOffset': res.cursorOffset,
+        'error': null,
+      }).toJS;
+    } else if (cursorOffset >= 0) {
+      final res = formatter.formatWithCursor(text, cursorOffset);
+      return jsonEncode({
+        'formatted': res.formatted,
+        'cursorOffset': res.cursorOffset,
+        'error': null,
+      }).toJS;
+    } else {
+      final formatted = formatter.format(text);
+      final result = {
+        'formatted': formatted,
+        'cursorOffset': -1,
+        'error': null,
+      };
+      return jsonEncode(result).toJS;
+    }
   } catch (e) {
-    final result = {'formatted': text, 'error': e.toString()};
+    final result = {'formatted': text, 'cursorOffset': -1, 'error': e.toString()};
     return jsonEncode(result).toJS;
   }
 }

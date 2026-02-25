@@ -75,7 +75,7 @@ void main() {
         final lines = result.split('\n');
         for (final line in lines) {
           if (!line.contains('"') && !line.contains("'")) {
-            expect(line.trimRight(), equals(line.trimRight()));
+            expect(line, equals(line.trimRight()));
           }
         }
       });
@@ -113,6 +113,13 @@ void main() {
         final result = formatter.format(input);
         expect(result, contains('@if'));
         expect(result, contains('@endif'));
+        expect(result, isNot(contains('@endelse')));
+        final lines = result.split('\n').where((l) => l.trim().isNotEmpty).toList();
+        final ifLine = lines.firstWhere((l) => l.contains('@if'));
+        final endifLine = lines.firstWhere((l) => l.contains('@endif'));
+        final ifIndent = ifLine.length - ifLine.trimLeft().length;
+        final endifIndent = endifLine.length - endifLine.trimLeft().length;
+        expect(ifIndent, equals(endifIndent));
       });
     });
 
@@ -407,6 +414,9 @@ wire:click="\$emit('{{ \$eventName }}', {{ \$eventData }})"
         expect(result, contains('<tbody>'));
         expect(result, contains('@forelse'));
         expect(result, contains('@empty'));
+        expect(result, isNot(contains('@endempty')));
+        expect(result, isNot(contains('@endcase')));
+        expect(result, isNot(contains('@enddefault')));
         expect(result, contains('<x-dropdown>'));
       });
     });
@@ -632,6 +642,8 @@ Content
         expect(result, contains('wire:loading.class'));
         expect(result, contains('@forelse'));
         expect(result, contains('@empty'));
+        expect(result, isNot(contains('@endempty')));
+        expect(result, isNot(contains('@endelse')));
         // Echo spacing should be normalized
         expect(result, contains('{{ \$item->title }}'));
       });

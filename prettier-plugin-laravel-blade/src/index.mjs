@@ -39,7 +39,7 @@ export const languages = [
 export const parsers = {
   blade: {
     preprocess(text, options) {
-      const result = formatBlade(text, {
+      const formatOpts = {
         tabWidth: options.tabWidth,
         useTabs: options.useTabs,
         printWidth: options.printWidth,
@@ -51,7 +51,30 @@ export const parsers = {
         attributeSort: options.bladeAttributeSort,
         closingBracketStyle: options.bladeClosingBracketStyle,
         selfClosingStyle: options.bladeSelfClosingStyle,
-      });
+      };
+
+      // Pass cursor offset if set
+      if (options.cursorOffset >= 0) {
+        formatOpts.cursorOffset = options.cursorOffset;
+      }
+
+      // Pass range if set
+      if (options.rangeStart > 0 || options.rangeEnd < text.length) {
+        if (options.rangeStart > 0) {
+          formatOpts.rangeStart = options.rangeStart;
+        }
+        if (options.rangeEnd < text.length) {
+          formatOpts.rangeEnd = options.rangeEnd;
+        }
+      }
+
+      const result = formatBlade(text, formatOpts);
+
+      // Store cursor offset for Prettier to pick up
+      if (result.cursorOffset >= 0) {
+        options.__bladeCursorOffset = result.cursorOffset;
+      }
+
       return result.formatted;
     },
 

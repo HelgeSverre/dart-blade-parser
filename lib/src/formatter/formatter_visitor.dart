@@ -96,6 +96,7 @@ class FormatterVisitor implements AstVisitor<String> {
     'else',
     'case',
     'default',
+    'empty',
   };
 
   /// Blade directives that are block-level (require children).
@@ -512,7 +513,16 @@ class FormatterVisitor implements AstVisitor<String> {
           continue;
         }
 
-        child.accept(this);
+        // Intermediate directives (@else, @elseif, @case, @default) should
+        // align with the parent directive, not be indented inside it.
+        if (child is DirectiveNode &&
+            _intermediateDirectives.contains(child.name)) {
+          _indent.decrease();
+          child.accept(this);
+          _indent.increase();
+        } else {
+          child.accept(this);
+        }
 
         // Add spacing between children if needed
         if (i < node.children.length - 1) {
@@ -1105,6 +1115,12 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Handle directive spacing based on configuration
     if (current is DirectiveNode && next is DirectiveNode) {
+      // Never add blank lines before intermediate directives (@else, @elseif,
+      // @case, @default) — they are branches of the same parent block.
+      if (_intermediateDirectives.contains(next.name)) {
+        return false;
+      }
+
       // Check if we should add spacing between block directives
       if (config.directiveSpacing == DirectiveSpacing.betweenBlocks) {
         // Add blank line between two block-level directives

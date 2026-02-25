@@ -121,9 +121,10 @@ void main() {
 
       test('formats boolean attributes with values', () {
         const input = '<input type="checkbox" checked="checked" disabled="disabled">';
+        const expected = '<input type="checkbox" checked="checked" disabled="disabled">\n';
 
         final result = formatter.format(input);
-        expect(result, isNotEmpty);
+        expect(result, equals(expected));
       });
     });
 
@@ -162,10 +163,17 @@ void main() {
 ''';
 
         final result = formatter.format(input);
-        expect(result, contains('@if(\$role === \'admin\')'));
-        expect(result, contains('@elseif(\$role === \'moderator\')'));
-        expect(result, contains('@elseif(\$role === \'user\')'));
-        expect(result, contains('@else'));
+        const expected = '''@if(\$role === 'admin')
+    <p>Admin</p>
+@elseif(\$role === 'moderator')
+    <p>Moderator</p>
+@elseif(\$role === 'user')
+    <p>User</p>
+@else
+    <p>Guest</p>
+@endif
+''';
+        expect(result, equals(expected));
       });
 
       test('formats @switch with multiple cases', () {
@@ -186,10 +194,21 @@ void main() {
 ''';
 
         final result = formatter.format(input);
-        expect(result, contains('@switch(\$type)'));
-        expect(result, contains('@case(\'info\')'));
-        expect(result, contains('@break'));
-        expect(result, contains('@default'));
+        const expected = '''@switch(\$type)
+@case('info')
+    <div class="info">Info</div>
+    @break
+@case('warning')
+    <div class="warning">Warning</div>
+    @break
+@case('error')
+    <div class="error">Error</div>
+    @break
+@default
+    <div>Default</div>
+@endswitch
+''';
+        expect(result, equals(expected));
       });
 
       test('formats @forelse with @empty', () {
@@ -202,9 +221,13 @@ void main() {
 ''';
 
         final result = formatter.format(input);
-        expect(result, contains('@forelse(\$users as \$user)'));
-        expect(result, contains('@empty'));
-        expect(result, contains('@endforelse'));
+        const expected = '''@forelse(\$users as \$user)
+    <p>{{ \$user->name }}</p>
+@empty
+    <p>No users found</p>
+@endforelse
+''';
+        expect(result, equals(expected));
       });
     });
 

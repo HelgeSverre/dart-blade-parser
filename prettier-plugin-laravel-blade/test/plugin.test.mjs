@@ -625,6 +625,74 @@ describe("real-world patterns", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Cursor tracking
+// ---------------------------------------------------------------------------
+describe("cursor tracking", () => {
+  it("formatWithCursor returns a cursor offset", async () => {
+    const input = "<div>@if($x) <p>Y</p> @endif</div>";
+    const result = await prettier.formatWithCursor(input, {
+      parser: "blade",
+      plugins: [pluginPath],
+      cursorOffset: 5,
+    });
+    assert.ok(typeof result.cursorOffset === "number");
+    assert.ok(result.cursorOffset >= 0);
+    assert.ok(result.cursorOffset <= result.formatted.length);
+  });
+
+  it("cursor at start stays at start", async () => {
+    const input = "<p>Hello</p>";
+    const result = await prettier.formatWithCursor(input, {
+      parser: "blade",
+      plugins: [pluginPath],
+      cursorOffset: 0,
+    });
+    assert.equal(result.cursorOffset, 0);
+  });
+
+  it("cursor is idempotent", async () => {
+    const input = "<div>@if($x) <p>Y</p> @endif</div>";
+    const first = await prettier.formatWithCursor(input, {
+      parser: "blade",
+      plugins: [pluginPath],
+      cursorOffset: 10,
+    });
+    const second = await prettier.formatWithCursor(first.formatted, {
+      parser: "blade",
+      plugins: [pluginPath],
+      cursorOffset: first.cursorOffset,
+    });
+    assert.equal(second.formatted, first.formatted);
+    assert.equal(second.cursorOffset, first.cursorOffset);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Range formatting
+// ---------------------------------------------------------------------------
+describe("range formatting", () => {
+  it("formats only the selected range", async () => {
+    const input = "<p>First</p>\n<div>@if($x) <p>Y</p> @endif</div>\n<p>Last</p>";
+    const rangeStart = input.indexOf("<div>");
+    const rangeEnd = input.indexOf("</div>") + "</div>".length;
+    const result = await format(input, { rangeStart, rangeEnd });
+    // The formatted output should contain the formatted directive
+    assert.ok(result.includes("@if($x)"));
+    assert.ok(result.includes("<p>Last</p>"));
+  });
+
+  it("full-range format matches normal format", async () => {
+    const input = "<div>@if($x) <p>Y</p> @endif</div>";
+    const rangeResult = await format(input, {
+      rangeStart: 0,
+      rangeEnd: input.length,
+    });
+    const fullResult = await format(input);
+    assert.equal(rangeResult, fullResult);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Prettier API integration
 // ---------------------------------------------------------------------------
 describe("prettier API", () => {
