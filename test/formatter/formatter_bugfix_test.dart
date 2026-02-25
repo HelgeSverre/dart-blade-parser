@@ -184,4 +184,80 @@ indent_size = 2
       );
     });
   });
+
+  group('Bug: unknown/custom directives are preserved', () {
+    late BladeFormatter formatter;
+
+    setUp(() {
+      formatter = BladeFormatter();
+    });
+
+    test('preserves @inertia directive (no expression)', () {
+      final output = formatter.format('@inertia');
+      expect(output, contains('@inertia'));
+    });
+
+    test('preserves @inertiaHead directive (no expression)', () {
+      final output = formatter.format('@inertiaHead');
+      expect(output, contains('@inertiaHead'));
+    });
+
+    test('preserves @inertiaHead in HTML context', () {
+      final input = '<head>\n@inertiaHead\n</head>';
+      final output = formatter.format(input);
+      expect(output, contains('@inertiaHead'));
+      expect(output, contains('<head>'));
+      expect(output, contains('</head>'));
+    });
+
+    test('preserves custom directive with expression', () {
+      final output = formatter.format(r'@customDirective($page)');
+      expect(output, contains('@customDirective'));
+      expect(output, contains(r'$page'));
+    });
+
+    test('preserves @datetime with complex expression', () {
+      final output = formatter.format(r'@datetime($post->created_at)');
+      expect(output, contains('@datetime'));
+      expect(output, contains(r'$post->created_at'));
+    });
+
+    test('preserves multiple unknown directives', () {
+      final input = '@one\n<div>@two(\$x)</div>\n@three(\'a\', \'b\')';
+      final output = formatter.format(input);
+      expect(output, contains('@one'));
+      expect(output, contains('@two'));
+      expect(output, contains('@three'));
+    });
+
+    test('preserves unknown @end* directives (treated as inline)', () {
+      final input = '@custom\nSome content\n@endcustom';
+      final output = formatter.format(input);
+      expect(output, contains('@custom'));
+      expect(output, contains('@endcustom'));
+    });
+
+    test('preserves @vite directive (already supported)', () {
+      final output =
+          formatter.format("@vite(['resources/js/app.ts'])");
+      expect(output, contains('@vite'));
+    });
+
+    test('preserves full Inertia layout with @inertiaHead and @inertia', () {
+      final input = '''<!DOCTYPE html>
+<html>
+<head>
+    @vite('resources/sass/app.scss')
+    @inertiaHead
+</head>
+<body>
+    @inertia
+</body>
+</html>''';
+      final output = formatter.format(input);
+      expect(output, contains('@inertiaHead'));
+      expect(output, contains('@inertia'));
+      expect(output, contains('@vite'));
+    });
+  });
 }
