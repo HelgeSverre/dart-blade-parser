@@ -47,6 +47,8 @@ export const parsers = {
         quoteStyle: options.bladeQuoteStyle,
         directiveSpacing: options.bladeDirectiveSpacing,
         slotFormatting: options.bladeSlotFormatting,
+        slotNameStyle: options.bladeSlotNameStyle,
+        slotSpacing: options.bladeSlotSpacing,
         wrapAttributes: options.bladeWrapAttributes,
         attributeSort: options.bladeAttributeSort,
         closingBracketStyle: options.bladeClosingBracketStyle,
@@ -147,6 +149,32 @@ export const options = {
         value: "block",
         description: "Always use block formatting with extra newlines",
       },
+    ],
+  },
+  bladeSlotNameStyle: {
+    type: "choice",
+    category: "Blade",
+    default: "colon",
+    description: "How slot names are rendered (colon vs attribute syntax).",
+    choices: [
+      { value: "colon", description: "Use colon syntax: <x-slot:header>" },
+      {
+        value: "attribute",
+        description: 'Use attribute syntax: <x-slot name="header">',
+      },
+      { value: "preserve", description: "Preserve original syntax" },
+    ],
+  },
+  bladeSlotSpacing: {
+    type: "choice",
+    category: "Blade",
+    default: "after",
+    description: "Spacing (blank lines) around slot elements.",
+    choices: [
+      { value: "none", description: "No blank lines around slots" },
+      { value: "after", description: "Blank line after slots" },
+      { value: "before", description: "Blank line before slots" },
+      { value: "around", description: "Blank lines before and after slots" },
     ],
   },
   bladeWrapAttributes: {

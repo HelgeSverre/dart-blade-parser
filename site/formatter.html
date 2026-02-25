@@ -188,6 +188,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
         <div class="settings-row"><label>Quote style</label><select id="opt-quoteStyle"><option value="preserve">preserve</option><option value="single">single</option><option value="double">double</option></select></div>
         <div class="settings-row"><label>Directive spacing</label><select id="opt-directiveSpacing"><option value="between_blocks">between_blocks</option><option value="none">none</option><option value="preserve">preserve</option></select></div>
         <div class="settings-row"><label>Slot formatting</label><select id="opt-slotFormatting"><option value="compact">compact</option><option value="block">block</option></select></div>
+        <div class="settings-row"><label>Slot name style</label><select id="opt-slotNameStyle"><option value="colon">colon</option><option value="attribute">attribute</option><option value="preserve">preserve</option></select></div>
+        <div class="settings-row"><label>Slot spacing</label><select id="opt-slotSpacing"><option value="after">after</option><option value="none">none</option><option value="before">before</option><option value="around">around</option></select></div>
         <div class="settings-row"><label>Wrap attributes</label><select id="opt-wrapAttributes"><option value="auto">auto</option><option value="always">always</option><option value="never">never</option></select></div>
         <div class="settings-row"><label>Attribute sort</label><select id="opt-attributeSort"><option value="none">none</option><option value="alphabetical">alphabetical</option><option value="by_type">by_type</option></select></div>
         <div class="settings-row"><label>Closing bracket</label><select id="opt-closingBracketStyle"><option value="same_line">same_line</option><option value="new_line">new_line</option></select></div>
@@ -398,6 +400,8 @@ function getOptions() {
     quoteStyle: document.getElementById('opt-quoteStyle').value,
     directiveSpacing: document.getElementById('opt-directiveSpacing').value,
     slotFormatting: document.getElementById('opt-slotFormatting').value,
+    slotNameStyle: document.getElementById('opt-slotNameStyle').value,
+    slotSpacing: document.getElementById('opt-slotSpacing').value,
     wrapAttributes: document.getElementById('opt-wrapAttributes').value,
     attributeSort: document.getElementById('opt-attributeSort').value,
     closingBracketStyle: document.getElementById('opt-closingBracketStyle').value,

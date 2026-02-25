@@ -31,6 +31,10 @@ JSString _format(JSString source, JSString optionsJson) {
         DirectiveSpacing.fromString(opts['directiveSpacing'] as String?),
     slotFormatting:
         SlotFormatting.fromString(opts['slotFormatting'] as String?),
+    slotNameStyle:
+        SlotNameStyle.fromString(opts['slotNameStyle'] as String?),
+    slotSpacing:
+        SlotSpacing.fromString(opts['slotSpacing'] as String?),
     wrapAttributes:
         WrapAttributes.fromString(opts['wrapAttributes'] as String?),
     attributeSort:
