@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 // Load the highlighter (it sets globalThis.BladeHighlight)
-const code = readFileSync(new URL('./blade-highlight.js', import.meta.url), 'utf8');
+const code = readFileSync(new URL('../blade-highlight.js', import.meta.url), 'utf8');
 new Function(code)();
 const { tokenizeBlade, highlightBlade } = globalThis.BladeHighlight;
 

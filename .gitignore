@@ -23,7 +23,7 @@ tool/acid/reports/*.html
 !site/*.html
 !site/data/
 !site/dist/
-!site/e2e/
+!site/tests/
 test-results/
 .last_run.json
 

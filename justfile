@@ -39,10 +39,10 @@ coverage-html: coverage
     @echo "✅ HTML report generated: coverage/html/index.html"
     @open coverage/html/index.html
 
-# Run site e2e tests (Playwright)
+# Run site tests (Playwright e2e + unit)
 [group('testing')]
-e2e:
-    node --test site/e2e/*.e2e.mjs
+site-test:
+    node --test site/tests/*.mjs
 
 # Run benchmarks
 [group('testing')]
