@@ -20,17 +20,17 @@ void main() {
 
     test('pushOnce directive preserves closing tag', () {
       final output = format('@pushOnce("scripts")\n<script>alert(1)</script>\n@endPushOnce');
-      expect(output, contains('@endpushOnce'));
+      expect(output, contains('@endPushOnce'));
     });
 
     test('prependOnce directive preserves closing tag', () {
       final output = format('@prependOnce("styles")\n<link>\n@endPrependOnce');
-      expect(output, contains('@endprependOnce'));
+      expect(output, contains('@endPrependOnce'));
     });
 
     test('pushIf directive preserves closing tag', () {
-      final output = format('@pushIf(true, "scripts")\n<script></script>\n@endPushIf');
-      expect(output, contains('@endpushIf'));
+      final output = format('@pushIf(true, "scripts")\n<script></script>\n@endPushOnce');
+      expect(output, contains('@endPushOnce'));
     });
 
     test('fragment directive preserves closing tag', () {

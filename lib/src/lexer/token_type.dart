@@ -226,5 +226,31 @@ enum TokenType {
   bladeComment, // {{-- --}}
   htmlComment, // <!-- -->
   eof,
-  error,
+  error;
+
+  /// The set of Blade directives that are designed to be used as HTML
+  /// attributes (e.g., `@class(...)`, `@checked(...)`).
+  ///
+  /// Single source of truth used by the lexer, parser, and formatter.
+  static const Set<TokenType> attributeDirectives = {
+    directiveClass,
+    directiveStyle,
+    directiveChecked,
+    directiveSelected,
+    directiveDisabled,
+    directiveReadonly,
+    directiveRequired,
+  };
+
+  /// Map from directive name (without @) to its [TokenType].
+  /// Only covers attribute directives.
+  static const Map<String, TokenType> attributeDirectivesByName = {
+    'class': directiveClass,
+    'style': directiveStyle,
+    'checked': directiveChecked,
+    'selected': directiveSelected,
+    'disabled': directiveDisabled,
+    'readonly': directiveReadonly,
+    'required': directiveRequired,
+  };
 }

@@ -476,11 +476,53 @@ class BladeLexer {
           _rawTextInTemplateLiteral = false;
         }
       } else {
+        // In script blocks, skip JS line comments (// ... \n) and block
+        // comments (/* ... */) so that quotes inside them (e.g. "don't")
+        // don't corrupt quote tracking state.
+        if (_rawTextTagName == 'script') {
+          if (ch == '/' && _peekNext() == '/') {
+            // Line comment: skip to end of line (but not past Blade expressions)
+            while (!_isAtEnd() && _peek() != '\n') {
+              // Still check for Blade expressions inside comments
+              // (unlikely but must not skip past them)
+              final c = _peek();
+              if (c == '{' &&
+                  (_peekNext() == '{' ||
+                      (_peekNext() == '!' && _peekAhead(2) == '!'))) {
+                break;
+              }
+              _advance();
+            }
+            continue;
+          }
+          if (ch == '/' && _peekNext() == '*') {
+            // Block comment: skip to */ (but not past Blade expressions)
+            _advance(); // /
+            _advance(); // *
+            while (!_isAtEnd()) {
+              final c = _peek();
+              if (c == '*' && _peekNext() == '/') {
+                _advance(); // *
+                _advance(); // /
+                break;
+              }
+              // Still check for Blade expressions inside comments
+              if (c == '{' &&
+                  (_peekNext() == '{' ||
+                      (_peekNext() == '!' && _peekAhead(2) == '!'))) {
+                break;
+              }
+              _advance();
+            }
+            continue;
+          }
+        }
+
         if (ch == "'") _rawTextInSingleQuote = true;
         if (ch == '"') _rawTextInDoubleQuote = true;
         if (ch == '`') _rawTextInTemplateLiteral = true;
 
-        // Check for closing tag (only outside quotes)
+        // Check for closing tag (only outside quotes and comments)
         if (ch == '<' &&
             _peekNext() == '/' &&
             input.substring(_position).startsWith(closingTag)) {
@@ -994,7 +1036,7 @@ class BladeLexer {
     // Regular closing >
     if (_peek() == '>') {
       _advance();
-      // Don't emit the > as text - it's part of the component tag structure
+      _emitToken(TokenType.htmlTagClose, '>');
       return _LexerState.text;
     }
 
@@ -1418,27 +1460,8 @@ class BladeLexer {
 
   /// Map a Blade attribute directive name to its token type.
   /// Returns null if the name is not a known attribute directive.
-  // TODO: Consolidate with the duplicate lists in formatter_visitor.dart
-  // (_isBladeAttributeDirectiveName) and parser.dart (_isBladeAttributeDirective).
   TokenType? _bladeAttributeDirectiveType(String name) {
-    switch (name) {
-      case 'class':
-        return TokenType.directiveClass;
-      case 'style':
-        return TokenType.directiveStyle;
-      case 'checked':
-        return TokenType.directiveChecked;
-      case 'selected':
-        return TokenType.directiveSelected;
-      case 'disabled':
-        return TokenType.directiveDisabled;
-      case 'readonly':
-        return TokenType.directiveReadonly;
-      case 'required':
-        return TokenType.directiveRequired;
-      default:
-        return null;
-    }
+    return TokenType.attributeDirectivesByName[name];
   }
 
   /// Map directive name to token type - ALL 75+ DIRECTIVES

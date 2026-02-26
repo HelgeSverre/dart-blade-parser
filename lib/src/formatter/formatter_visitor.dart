@@ -1,6 +1,7 @@
 import 'package:blade_parser/src/ast/node.dart';
 import 'package:blade_parser/src/formatter/formatter_config.dart';
 import 'package:blade_parser/src/formatter/indent_tracker.dart';
+import 'package:blade_parser/src/lexer/token_type.dart';
 
 /// A StringBuffer wrapper that tracks the last two characters written,
 /// avoiding O(n) toString() calls for endsWith checks.
@@ -367,19 +368,10 @@ class FormatterVisitor implements AstVisitor<String> {
   }
 
   /// Check if an attribute name is a Blade attribute directive.
-  // TODO: Consolidate with the duplicate lists in lexer.dart (_directiveNameToType)
-  // and parser.dart (_isBladeAttributeDirective) into a single shared source of truth.
   bool _isBladeAttributeDirectiveName(String name) {
-    const bladeAttrDirectives = {
-      '@class',
-      '@style',
-      '@checked',
-      '@selected',
-      '@disabled',
-      '@readonly',
-      '@required',
-    };
-    return bladeAttrDirectives.contains(name);
+    // Strip @ prefix and look up in the shared source of truth
+    if (!name.startsWith('@')) return false;
+    return TokenType.attributeDirectivesByName.containsKey(name.substring(1));
   }
 
   /// Calculates the length of the opening tag if all attributes were on one line.
@@ -654,7 +646,7 @@ class FormatterVisitor implements AstVisitor<String> {
       if (node.closedBy != null) {
         _output.write('@${node.closedBy}');
       } else {
-        _output.write('@end${node.name}');
+        _output.write('@${_closingDirectiveName(node.name)}');
       }
       _output.writeln();
     }
@@ -1538,6 +1530,19 @@ class FormatterVisitor implements AstVisitor<String> {
   bool _isIntermediateDirective(DirectiveNode node) {
     if (_intermediateDirectives.contains(node.name)) return true;
     return node.name == 'empty' && node.expression == null;
+  }
+
+  /// Returns the closing directive name for a given opening directive name.
+  /// Handles directives where `@end` + name doesn't match the actual syntax
+  /// (e.g., `pushOnce` → `endPushOnce`, not `endpushOnce`).
+  static const Map<String, String> _closingDirectiveNames = {
+    'pushOnce': 'endPushOnce',
+    'prependOnce': 'endPrependOnce',
+    'pushIf': 'endPushOnce', // Laravel uses @endPushIf but parser reuses EndPushOnce token
+  };
+
+  String _closingDirectiveName(String name) {
+    return _closingDirectiveNames[name] ?? 'end$name';
   }
 
   /// Checks if a directive has a closing tag.

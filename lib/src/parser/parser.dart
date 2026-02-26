@@ -679,7 +679,8 @@ class BladeParser {
     }
 
     // Parse attributes (handles both colon and attribute syntax)
-    final attributes = _parseAttributeMap();
+    final tagHeadResult = _parseTagHead();
+    final attributes = tagHeadResult.attributes;
 
     // For attribute syntax: extract name from attributes
     if (!isColonSyntax) {
@@ -694,6 +695,8 @@ class BladeParser {
     if (_check(TokenType.componentSelfClose)) {
       _advance(); // />
       isSelfClosing = true;
+    } else if (_check(TokenType.htmlTagClose)) {
+      _advance(); // >
     }
 
     // Parse slot content
@@ -761,14 +764,17 @@ class BladeParser {
       return _parseSlot(startToken, componentName);
     }
 
-    // Parse attributes - collect tokens until we hit > or />
-    final attributes = _parseAttributeMap();
+    // Parse tag head: attributes and structural directives
+    final tagHeadResult = _parseTagHead();
+    final attributes = tagHeadResult.attributes;
 
     // Check for self-closing
     bool isSelfClosing = false;
     if (_check(TokenType.componentSelfClose)) {
       _advance(); // />
       isSelfClosing = true;
+    } else if (_check(TokenType.htmlTagClose)) {
+      _advance(); // >
     }
 
     // Parse children if not self-closing
@@ -1229,13 +1235,7 @@ class BladeParser {
   /// Check if a token type is a Blade attribute directive.
   /// These are directives designed to be used inside HTML tags.
   bool _isBladeAttributeDirective(TokenType type) {
-    return type == TokenType.directiveClass ||
-        type == TokenType.directiveStyle ||
-        type == TokenType.directiveChecked ||
-        type == TokenType.directiveSelected ||
-        type == TokenType.directiveDisabled ||
-        type == TokenType.directiveReadonly ||
-        type == TokenType.directiveRequired;
+    return TokenType.attributeDirectives.contains(type);
   }
 
   /// Parse attributes from current token position into a map.
