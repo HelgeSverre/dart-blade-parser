@@ -833,6 +833,22 @@ class BladeLexer {
     final tokenType = _directiveNameToType(name);
     _emitToken(tokenType, '@$name');
 
+    // Skip optional horizontal whitespace between directive name and expression.
+    // Handles both `@if($x)` and `@if ($x)` styles (PSR-12 uses the space).
+    final posBeforeWhitespace = _position;
+    final lineBeforeWhitespace = _line;
+    final colBeforeWhitespace = _column;
+    while (!_isAtEnd() && (_peek() == ' ' || _peek() == '\t')) {
+      _advance();
+    }
+    // If we didn't find a `(`, restore position (the whitespace is significant
+    // text/separator, not part of the directive).
+    if (_isAtEnd() || _peek() != '(') {
+      _position = posBeforeWhitespace;
+      _line = lineBeforeWhitespace;
+      _column = colBeforeWhitespace;
+    }
+
     // Handle @php block: if no ( follows, scan to @endphp emitting raw text.
     // This prevents PHP code containing <tags> or directives from being
     // mis-parsed as Blade/HTML. Inline @php($expr) is handled below.
@@ -1136,6 +1152,12 @@ class BladeLexer {
 
     // Parse attributes (including Blade echo expressions like {{ $attributes }})
     while (!_isAtEnd() && _peek() != '>' && !(_peek() == '/' && _peekNext() == '>')) {
+      // PHP block inside component tag head: <?php ... ?> or <?= ... ?>
+      if (_peek() == '<' && _peekNext() == '?') {
+        _lexPhpBlockInTag();
+        _skipWhitespace();
+        continue;
+      }
       if (_lexInlineBladeInTag()) continue;
       _lexAttribute();
       _skipWhitespace();
@@ -1203,6 +1225,12 @@ class BladeLexer {
 
     // Lex attributes (including Blade echo expressions like {{ $attributes }})
     while (!_isAtEnd() && _peek() != '>' && !(_peek() == '/' && _peekNext() == '>')) {
+      // PHP block inside tag head: <?php ... ?> or <?= ... ?>
+      if (_peek() == '<' && _peekNext() == '?') {
+        _lexPhpBlockInTag();
+        _skipWhitespace();
+        continue;
+      }
       if (_lexInlineBladeInTag()) continue;
       _lexAttribute();
       _skipWhitespace();
@@ -1239,6 +1267,74 @@ class BladeLexer {
     // If we reach here, something went wrong
     _emitToken(TokenType.error, 'Unexpected character in HTML tag');
     return _LexerState.text;
+  }
+
+  /// Lex a PHP block (<?php ... ?> or <?= ... ?>) inside an HTML/component tag head.
+  /// Emits a single phpBlock token with the full source including delimiters.
+  void _lexPhpBlockInTag() {
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
+    _advance(); // <
+    _advance(); // ?
+
+    // Determine variant and advance past the marker
+    if (!_isAtEnd() && _peek() == '=') {
+      _advance(); // = (for <?=)
+    } else {
+      while (!_isAtEnd() && _isAlpha(_peek())) {
+        _advance();
+      }
+    }
+
+    // Scan until ?> or EOF, tracking string context
+    bool inSingleQuote = false;
+    bool inDoubleQuote = false;
+
+    while (!_isAtEnd()) {
+      final ch = _peek();
+
+      if (inSingleQuote) {
+        if (ch == '\\') {
+          _advance();
+          if (!_isAtEnd()) _advance();
+          continue;
+        }
+        if (ch == "'") inSingleQuote = false;
+        _advance();
+        continue;
+      }
+
+      if (inDoubleQuote) {
+        if (ch == '\\') {
+          _advance();
+          if (!_isAtEnd()) _advance();
+          continue;
+        }
+        if (ch == '"') inDoubleQuote = false;
+        _advance();
+        continue;
+      }
+
+      if (ch == '?' && _peekNext() == '>') {
+        _advance(); // ?
+        _advance(); // >
+        _emitToken(TokenType.phpBlock, input.substring(_start, _position));
+        return;
+      }
+
+      if (ch == "'") {
+        inSingleQuote = true;
+      } else if (ch == '"') {
+        inDoubleQuote = true;
+      }
+
+      _advance();
+    }
+
+    // Unclosed — emit to EOF
+    _emitToken(TokenType.phpBlock, input.substring(_start, _position));
   }
 
   /// Lex Blade echo/raw-echo expressions inside a tag attribute list.
@@ -1396,6 +1492,19 @@ class BladeLexer {
         // It's a Blade directive - emit directive token
         _emitToken(directiveType, '@$name');
 
+        // Skip optional horizontal whitespace before expression (PSR-12 style)
+        final posBeforeWs2 = _position;
+        final lineBeforeWs2 = _line;
+        final colBeforeWs2 = _column;
+        while (!_isAtEnd() && (_peek() == ' ' || _peek() == '\t')) {
+          _advance();
+        }
+        if (_isAtEnd() || _peek() != '(') {
+          _position = posBeforeWs2;
+          _line = lineBeforeWs2;
+          _column = colBeforeWs2;
+        }
+
         // Check for expression after directive: (...)
         if (_peek() == '(') {
           _start = _position;
@@ -1445,6 +1554,19 @@ class BladeLexer {
       final structuralType = _directiveNameToType(name);
       if (structuralType != TokenType.identifier) {
         _emitToken(structuralType, '@$name');
+
+        // Skip optional horizontal whitespace before expression (PSR-12 style)
+        final posBeforeWs = _position;
+        final lineBeforeWs = _line;
+        final colBeforeWs = _column;
+        while (!_isAtEnd() && (_peek() == ' ' || _peek() == '\t')) {
+          _advance();
+        }
+        if (_isAtEnd() || _peek() != '(') {
+          _position = posBeforeWs;
+          _line = lineBeforeWs;
+          _column = colBeforeWs;
+        }
 
         // Lex expression if present: (...)
         if (_peek() == '(') {
@@ -1519,9 +1641,12 @@ class BladeLexer {
         return;
       }
 
-      // Alpine.js :bind shorthand
+      // Alpine.js :bind shorthand (supports compound names like :wire:click, :wire:model.live)
       final bindStart = _position;
-      while (_isAlphaNumeric(_peek()) || _peek() == '-') {
+      while (_isAlphaNumeric(_peek()) ||
+          _peek() == '-' ||
+          _peek() == ':' ||
+          _peek() == '.') {
         _advance();
       }
       final attr = input.substring(bindStart, _position);
@@ -1584,11 +1709,88 @@ class BladeLexer {
       _advance(); // Skip opening quote
       final valueStart = _position;
 
-      // Handle escaped quotes within the string
+      // Handle escaped quotes and Blade echo boundaries within the string.
+      // Quotes inside {{ }}, {!! !!}, and {{-- --}} must not close the attribute.
       while (!_isAtEnd() && _peek() != quote) {
         if (_peek() == '\\' && _peekNext() == quote) {
           _advance(); // Skip backslash
           _advance(); // Skip escaped quote
+        } else if (_peek() == '{' && _peekNext() == '{') {
+          // Blade echo {{ ... }} or comment {{-- ... --}}
+          _advance(); // {
+          _advance(); // {
+          if (!_isAtEnd() && _peek() == '-' && _peekNext() == '-') {
+            // Blade comment {{-- ... --}}: scan to --}}
+            _advance(); // -
+            _advance(); // -
+            while (!_isAtEnd()) {
+              if (_peek() == '-' && _peekNext() == '-' &&
+                  _peekAhead(2) == '}' && _peekAhead(3) == '}') {
+                _advance(); // -
+                _advance(); // -
+                _advance(); // }
+                _advance(); // }
+                break;
+              }
+              _advance();
+            }
+          } else {
+            // Echo {{ ... }}: scan to }}, tracking nested braces and strings
+            int braceDepth = 0;
+            bool inSQ = false;
+            bool inDQ = false;
+            while (!_isAtEnd()) {
+              final c = _peek();
+              if (inSQ) {
+                if (c == '\\') {
+                  _advance();
+                  if (!_isAtEnd()) _advance();
+                  continue;
+                }
+                if (c == "'") inSQ = false;
+              } else if (inDQ) {
+                if (c == '\\') {
+                  _advance();
+                  if (!_isAtEnd()) _advance();
+                  continue;
+                }
+                if (c == '"') inDQ = false;
+              } else {
+                if (c == "'") {
+                  inSQ = true;
+                } else if (c == '"') {
+                  inDQ = true;
+                } else if (c == '{') {
+                  braceDepth++;
+                } else if (c == '}') {
+                  if (braceDepth > 0) {
+                    braceDepth--;
+                  } else if (_peekNext() == '}') {
+                    _advance(); // }
+                    _advance(); // }
+                    break;
+                  }
+                }
+              }
+              _advance();
+            }
+          }
+        } else if (_peek() == '{' && _peekNext() == '!' &&
+            _peekAhead(2) == '!') {
+          // Raw echo {!! ... !!}: scan to !!}
+          _advance(); // {
+          _advance(); // !
+          _advance(); // !
+          while (!_isAtEnd()) {
+            if (_peek() == '!' && _peekNext() == '!' &&
+                _peekAhead(2) == '}') {
+              _advance(); // !
+              _advance(); // !
+              _advance(); // }
+              break;
+            }
+            _advance();
+          }
         } else {
           _advance();
         }

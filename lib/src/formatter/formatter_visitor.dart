@@ -507,6 +507,10 @@ class FormatterVisitor implements AstVisitor<String> {
           // Expression already includes parentheses from the lexer
           _output.write(item.expression!);
         }
+      } else if (item is TagHeadComment) {
+        _output.write(item.content);
+      } else if (item is TagHeadPhpBlock) {
+        _output.write(item.content);
       }
 
       final isLast = i == items.length - 1;
@@ -578,15 +582,36 @@ class FormatterVisitor implements AstVisitor<String> {
   ///
   /// Handles escaping and quote style conversion based on config.quoteStyle.
   String _formatAttributeValue(String value) {
-    final quote = config.quoteStyle.quoteChar;
+    var quote = config.quoteStyle.quoteChar;
 
-    // Escape quotes in the value if needed
+    // If the value contains Blade echo expressions ({{ }}, {!! !!}), the echo
+    // content may contain quotes that must not be escaped (HTML doesn't support
+    // backslash escaping). Choose the quote style that avoids conflicts, or
+    // output the value as-is if it contains both.
+    if (value.contains('{{') || value.contains('{!!')) {
+      if (quote == '"' && value.contains('"')) {
+        // Try switching to single quotes if the value doesn't also contain them
+        if (!value.contains("'")) {
+          quote = "'";
+        }
+        // Otherwise keep double quotes — the value will be output as-is since
+        // the quotes are inside Blade expressions which are opaque to HTML.
+        return '$quote$value$quote';
+      }
+      if (quote == "'" && value.contains("'")) {
+        if (!value.contains('"')) {
+          quote = '"';
+        }
+        return '$quote$value$quote';
+      }
+      return '$quote$value$quote';
+    }
+
+    // Plain HTML attribute values: escape quotes normally
     String escaped = value;
     if (config.quoteStyle == QuoteStyle.single) {
-      // Escape single quotes, unescape double quotes if they were escaped
       escaped = value.replaceAll(r"\'", "'").replaceAll("'", r"\'");
     } else {
-      // Escape double quotes, unescape single quotes if they were escaped
       escaped = value.replaceAll(r'\"', '"').replaceAll('"', r'\"');
     }
 

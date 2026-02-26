@@ -312,6 +312,22 @@ final class TagHeadDirective extends TagHeadItem {
   TagHeadDirective(this.name, {this.expression});
 }
 
+/// A Blade comment in the tag head (e.g., `{{-- description --}}`).
+final class TagHeadComment extends TagHeadItem {
+  /// The comment content (including delimiters).
+  final String content;
+
+  TagHeadComment(this.content);
+}
+
+/// A PHP block in the tag head (e.g., `<?php if (...): ?>`, `<?php endif; ?>`).
+final class TagHeadPhpBlock extends TagHeadItem {
+  /// The full PHP block source (including delimiters).
+  final String content;
+
+  TagHeadPhpBlock(this.content);
+}
+
 /// Base class for HTML/component attribute nodes.
 ///
 /// Represents different types of attributes: standard HTML, Alpine.js,

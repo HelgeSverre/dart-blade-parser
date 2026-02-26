@@ -134,10 +134,12 @@ class BladeParser {
             alternateClosingTypes: [TokenType.directiveEndif]);
       case TokenType.directiveIsset:
         return _parseGenericDirective('isset', TokenType.directiveEndisset,
-            supportsElse: true);
+            supportsElse: true,
+            alternateClosingTypes: [TokenType.directiveEndif]);
       case TokenType.directiveEmpty:
         return _parseGenericDirective('empty', TokenType.directiveEndempty,
-            supportsElse: true);
+            supportsElse: true,
+            alternateClosingTypes: [TokenType.directiveEndif]);
 
       // Authorization - paired directives
       case TokenType.directiveCan:
@@ -1423,7 +1425,7 @@ class BladeParser {
         // Blade echo/raw-echo/comment inside tag attributes (e.g., {{ $attributes->class([...]) }})
         // Consume the echo tokens without creating an attribute node
         if (type == TokenType.echoOpen) {
-          _advance(); // echoOpen
+          hasDirectives = true;          _advance(); // echoOpen
           String expr = '';
           if (_check(TokenType.expression)) {
             expr = _advance().value;
@@ -1442,6 +1444,7 @@ class BladeParser {
           attributes[attrName] = attrNode;
           tagHead.add(TagHeadAttribute(attrName, attrNode));
         } else if (type == TokenType.rawEchoOpen) {
+          hasDirectives = true;
           _advance(); // rawEchoOpen
           String expr = '';
           if (_check(TokenType.expression)) {
@@ -1460,9 +1463,15 @@ class BladeParser {
           attributes[attrName] = attrNode;
           tagHead.add(TagHeadAttribute(attrName, attrNode));
         } else {
-          // Blade comment - skip it
-          _advance();
+          // Blade comment - preserve in tag head
+          hasDirectives = true;
+          final commentToken = _advance();
+          tagHead.add(TagHeadComment(commentToken.value));
         }
+      } else if (type == TokenType.phpBlock) {
+        hasDirectives = true;
+        final phpToken = _advance();
+        tagHead.add(TagHeadPhpBlock(phpToken.value));
       } else {
         // Skip unexpected tokens (whitespace, text between directives)
         _advance();
