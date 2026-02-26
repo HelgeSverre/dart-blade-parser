@@ -573,19 +573,19 @@ class BladeLexer {
       return false; // Email address like user@example.com
     }
 
-    // Check if inside a quoted attribute value
-    if (_isInsideQuotedValue()) {
-      return false; // @ in quoted values should be treated as literal text
-    }
-
-    // Check if inside raw text element (script/style/textarea)
+    // Check if inside raw text element (script/style/textarea) - cheap check
     if (_rawTextTagName != null) {
       return false; // @ in scripts/styles is literal text
     }
 
-    // @ at start of line or after whitespace -> likely directive
+    // @ at start of line or after whitespace -> likely directive - cheap check
     if (prev == '\n' || prev == '\r' || prev == ' ' || prev == '\t') {
       return true;
+    }
+
+    // Check if inside a quoted attribute value - expensive backward scan
+    if (_isInsideQuotedValue()) {
+      return false; // @ in quoted values should be treated as literal text
     }
 
     // Enhanced tag detection with quote awareness
