@@ -116,4 +116,25 @@ void main() {
       });
     }
   });
+
+  group('Contoso real-world stress test', () {
+    final files = findBladeFiles('test/fixtures/stress/contoso');
+
+    test('found Contoso blade files', () {
+      expect(files, isNotEmpty,
+          reason:
+              'Should have Contoso blade files in test/fixtures/stress/contoso');
+    });
+
+    for (final file in files) {
+      final relativePath =
+          file.path.replaceFirst('test/fixtures/stress/contoso/', '');
+      test('parses $relativePath without errors', () {
+        final source = file.readAsStringSync();
+        final result = parser.parse(source);
+        expect(result.ast, isNotNull,
+            reason: 'Parser should produce an AST for $relativePath');
+      });
+    }
+  });
 }
