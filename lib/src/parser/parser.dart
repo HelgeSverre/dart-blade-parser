@@ -1425,7 +1425,8 @@ class BladeParser {
         // Blade echo/raw-echo/comment inside tag attributes (e.g., {{ $attributes->class([...]) }})
         // Consume the echo tokens without creating an attribute node
         if (type == TokenType.echoOpen) {
-          hasDirectives = true;          _advance(); // echoOpen
+          hasDirectives = true;
+          _advance(); // echoOpen
           String expr = '';
           if (_check(TokenType.expression)) {
             expr = _advance().value;

@@ -73,5 +73,35 @@ void main() {
       expect(bindTokens, hasLength(1));
       expect(bindTokens.first.value, equals(':class'));
     });
+
+    test('compound colon attribute in component tag', () {
+      lexer = BladeLexer('<x-input :wire:model.live="name" />');
+      final tokens = lexer.tokenize();
+
+      final bindTokens = tokens
+          .where((t) => t.type == TokenType.alpineShorthandBind)
+          .toList();
+      expect(bindTokens, hasLength(1));
+      expect(bindTokens.first.value, equals(':wire:model.live'));
+
+      final attrValues = tokens
+          .where((t) => t.type == TokenType.attributeValue)
+          .toList();
+      expect(attrValues, hasLength(1));
+      expect(attrValues.first.value, equals('name'));
+    });
+
+    test('multiple compound colon attributes on same element', () {
+      lexer = BladeLexer(
+          '<div :wire:click="action" :x-bind:class="classes">');
+      final tokens = lexer.tokenize();
+
+      final bindTokens = tokens
+          .where((t) => t.type == TokenType.alpineShorthandBind)
+          .toList();
+      expect(bindTokens, hasLength(2));
+      expect(bindTokens[0].value, equals(':wire:click'));
+      expect(bindTokens[1].value, equals(':x-bind:class'));
+    });
   });
 }

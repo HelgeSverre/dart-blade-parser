@@ -565,6 +565,53 @@ void main() {
 
         expect(result, contains('title='));
       });
+
+      test('switches to single quotes when echo contains double quotes (default config)', () {
+        final result = formatter.format(
+            '<a href="{{ route("users.edit", \$user) }}">Link</a>');
+        // Default config uses double quotes, but echo content has double quotes
+        // so formatter should switch to single quotes for this attribute
+        expect(result, contains("href='{{ route("));
+        expect(result, contains("}}'>"));
+      });
+
+      test('switches to double quotes when echo contains single quotes (single config)', () {
+        final singleFormatter = BladeFormatter(
+          config: const FormatterConfig(quoteStyle: QuoteStyle.single),
+        );
+        final result = singleFormatter.format(
+            "<a href=\"{{ route('users.edit', \$user) }}\">Link</a>");
+        // Single config, but echo has single quotes — switch to double
+        expect(result, contains('href="{{ route('));
+      });
+
+      test('keeps preferred quotes when echo has no conflicting quotes', () {
+        final result = formatter.format(
+            '<div class="{{ \$classes }}">Content</div>');
+        // No conflicting quotes in echo, so keep default double quotes
+        expect(result, contains('class="{{ \$classes }}"'));
+      });
+
+      test('keeps preferred quotes when value has no echo expressions', () {
+        final result = formatter.format(
+            '<div class="container">Content</div>');
+        expect(result, contains('class="container"'));
+      });
+
+      test('handles raw echo with conflicting quotes', () {
+        final result = formatter.format(
+            '<div data-html="{!! \$items->map("fn") !!}">Content</div>');
+        expect(result, contains("data-html='{!! "));
+      });
+
+      test('echo attribute value is idempotent', () {
+        const source =
+            '<a href="{{ route("users.edit", \$user) }}">Link</a>';
+        final pass1 = formatter.format(source);
+        final pass2 = formatter.format(pass1);
+        expect(pass2, equals(pass1),
+            reason: 'Formatting with echo in attribute should be idempotent');
+      });
     });
 
     group('whitespace handling', () {

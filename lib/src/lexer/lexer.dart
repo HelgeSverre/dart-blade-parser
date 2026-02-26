@@ -49,29 +49,15 @@ class BladeLexer {
     return _rawTextTagName != null ? _LexerState.rawText : _LexerState.text;
   }
 
-  /// Scans a PHP block: `<?php ... ?>`, `<?= ... ?>`, or `<? ... ?>`.
-  /// Emits a single [TokenType.phpBlock] token with the full source
-  /// including delimiters. Handles unclosed blocks (scans to EOF).
-  _LexerState _lexPhpBlock() {
-    _start = _position;
-    _startLine = _line;
-    _startColumn = _column;
-
-    _advance(); // <
-    _advance(); // ?
-
-    // Determine variant and advance past the marker
-    if (!_isAtEnd() && _peek() == '=') {
-      _advance(); // = (for <?=)
-    } else {
-      // Scan identifier like "php" in <?php
-      while (!_isAtEnd() && _isAlpha(_peek())) {
-        _advance();
-      }
-    }
-
-    // Scan until ?> or EOF, tracking string context so we don't
-    // close on ?> inside quoted strings.
+  /// Scans PHP block body until `?>` or EOF, tracking string context
+  /// (single/double quotes with backslash escaping) so `?>` inside
+  /// strings is not treated as a closing delimiter.
+  ///
+  /// Assumes the caller has already consumed the `<?php`/`<?=`/`<?`
+  /// prefix and set `_start`, `_startLine`, `_startColumn`.
+  ///
+  /// Returns `true` if `?>` was found, `false` if EOF was reached.
+  bool _scanPhpBlockBody() {
     bool inSingleQuote = false;
     bool inDoubleQuote = false;
 
@@ -104,8 +90,7 @@ class BladeLexer {
       if (ch == '?' && _peekNext() == '>') {
         _advance(); // ?
         _advance(); // >
-        _emitToken(TokenType.phpBlock, input.substring(_start, _position));
-        return _textOrRawTextState();
+        return true;
       }
 
       // Enter string context
@@ -116,6 +101,35 @@ class BladeLexer {
       }
 
       _advance();
+    }
+
+    return false;
+  }
+
+  /// Scans a PHP block: `<?php ... ?>`, `<?= ... ?>`, or `<? ... ?>`.
+  /// Emits a single [TokenType.phpBlock] token with the full source
+  /// including delimiters. Handles unclosed blocks (scans to EOF).
+  _LexerState _lexPhpBlock() {
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
+    _advance(); // <
+    _advance(); // ?
+
+    // Determine variant and advance past the marker
+    if (!_isAtEnd() && _peek() == '=') {
+      _advance(); // = (for <?=)
+    } else {
+      // Scan identifier like "php" in <?php
+      while (!_isAtEnd() && _isAlpha(_peek())) {
+        _advance();
+      }
+    }
+
+    if (_scanPhpBlockBody()) {
+      _emitToken(TokenType.phpBlock, input.substring(_start, _position));
+      return _textOrRawTextState();
     }
 
     // Unclosed — emit to EOF
@@ -1288,52 +1302,7 @@ class BladeLexer {
       }
     }
 
-    // Scan until ?> or EOF, tracking string context
-    bool inSingleQuote = false;
-    bool inDoubleQuote = false;
-
-    while (!_isAtEnd()) {
-      final ch = _peek();
-
-      if (inSingleQuote) {
-        if (ch == '\\') {
-          _advance();
-          if (!_isAtEnd()) _advance();
-          continue;
-        }
-        if (ch == "'") inSingleQuote = false;
-        _advance();
-        continue;
-      }
-
-      if (inDoubleQuote) {
-        if (ch == '\\') {
-          _advance();
-          if (!_isAtEnd()) _advance();
-          continue;
-        }
-        if (ch == '"') inDoubleQuote = false;
-        _advance();
-        continue;
-      }
-
-      if (ch == '?' && _peekNext() == '>') {
-        _advance(); // ?
-        _advance(); // >
-        _emitToken(TokenType.phpBlock, input.substring(_start, _position));
-        return;
-      }
-
-      if (ch == "'") {
-        inSingleQuote = true;
-      } else if (ch == '"') {
-        inDoubleQuote = true;
-      }
-
-      _advance();
-    }
-
-    // Unclosed — emit to EOF
+    _scanPhpBlockBody();
     _emitToken(TokenType.phpBlock, input.substring(_start, _position));
   }
 

@@ -27,10 +27,12 @@ void main() {
           .where((t) => t.type == TokenType.attributeValue)
           .toList();
       expect(attrValues, hasLength(1));
-      // The entire value between the outer quotes should be captured
-      expect(attrValues.first.value, contains('isset'));
-      expect(attrValues.first.value, contains('modal'));
-      expect(attrValues.first.value, contains('.window'));
+      // Assert the exact full value — not just partial contains
+      expect(
+        attrValues.first.value,
+        equals(
+            "{{ isset(\$this) ? \"{\$this->getId()}.\" : '' }}modal.{{ \$id }}.window"),
+      );
     });
 
     test('raw echo in double-quoted attribute', () {
@@ -88,8 +90,41 @@ void main() {
           .where((t) => t.type == TokenType.attributeValue)
           .toList();
       expect(attrValues, hasLength(1));
-      expect(attrValues.first.value, contains('text-blue'));
-      expect(attrValues.first.value, contains('text-gray'));
+      expect(
+        attrValues.first.value,
+        equals('{{ \$active ? "text-blue" : "text-gray" }}'),
+      );
+    });
+
+    test('blade comment inside attribute value', () {
+      lexer = BladeLexer('<div title="before {{-- ignored --}} after">');
+      final tokens = lexer.tokenize();
+
+      final attrValues = tokens
+          .where((t) => t.type == TokenType.attributeValue)
+          .toList();
+      expect(attrValues, hasLength(1));
+      expect(attrValues.first.value,
+          equals('before {{-- ignored --}} after'));
+    });
+
+    test('unclosed echo in attribute value does not hang', () {
+      // The echo {{ is never closed — the lexer should not infinite-loop.
+      // It should consume to the end of input and produce some token.
+      lexer = BladeLexer('<div class="{{ \$broken">');
+      final tokens = lexer.tokenize();
+
+      // We just need to verify it terminates and produces tokens
+      expect(tokens, isNotEmpty);
+      expect(tokens.last.type, equals(TokenType.eof));
+    });
+
+    test('unclosed raw echo in attribute value does not hang', () {
+      lexer = BladeLexer('<div class="{!! \$broken">');
+      final tokens = lexer.tokenize();
+
+      expect(tokens, isNotEmpty);
+      expect(tokens.last.type, equals(TokenType.eof));
     });
   });
 }
