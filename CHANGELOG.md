@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-02-26
+
+### Added
+- **Livewire v4 support:** Full support for single-file components (SFC), functional API, and advanced attributes (`wire:navigate`, `wire:confirm`, `wire:stream`, etc.)
+- **Volt directive support:** `@volt` / `@endvolt` paired directives for Laravel Volt single-file components
+- **Blaze directive support:** `@blaze` (inline marker), `@unblaze` / `@endunblaze` (paired block) for Livewire Blaze component optimization
+- **LivewireAttribute sub-action parsing:** `wire:sort:item` now parses structured `action="sort"` and `subAction="item"` fields
+- **Component namespace syntax:** `<x-package::component>` and `</x-package::component>` with `::` namespace separator
+- **Livewire tag name support:** `<livewire:counter>`, `<livewire:post.create>`, and `<livewire:pages::post.create>` — colons and dots in HTML tag names
+- **`@livewire` directive:** Inline directive for embedding Livewire components
+- **Echo expressions in tag attributes:** `{{ $attributes->class([...]) }}` and `{!! $attributes !!}` inside component and HTML tag attribute lists
+- **Stress test suite:** 826 real-world Blade fixtures from Filament (v2/v3/v4) and FluxUI with 99.9% error-free parse rate
+
+### Fixed
+- **`@unless` / `@endif` compatibility:** `@unless` blocks can now be closed with `@endif`, matching real-world Laravel template conventions
+- **`@php` block raw content mode:** `@php` blocks (without expressions) scan to `@endphp` as raw text, preventing PHP comments and strings containing HTML-like tags from breaking the parser
+- **Component closing tag simplification:** Unified closing tag scanning for `</x-slot:name>` and `</x-package::component>` using consistent colon support
+
 ## [1.2.1] - 2026-02-26
 
 ### Fixed
