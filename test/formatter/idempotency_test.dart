@@ -114,6 +114,203 @@ void main() {
       });
     });
 
+    group('livewire fixtures', () {
+      test('formats all livewire fixtures idempotently', () {
+        final fixturesDir = Directory('test/fixtures/livewire');
+
+        if (!fixturesDir.existsSync()) {
+          print('Livewire fixtures directory not found, skipping');
+          return;
+        }
+
+        final bladeFiles = fixturesDir
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.blade.php'))
+            .toList();
+
+        print(
+          'Testing ${bladeFiles.length} livewire fixture files for idempotency',
+        );
+
+        for (final file in bladeFiles) {
+          final content = file.readAsStringSync();
+          final relativePath = file.path.replaceFirst(
+            '${Directory.current.path}/',
+            '',
+          );
+
+          try {
+            expectIdempotent(content, description: relativePath);
+          } catch (e) {
+            fail('Idempotency failed for $relativePath: $e');
+          }
+        }
+      });
+    });
+
+    group('volt fixtures', () {
+      test('formats all volt fixtures idempotently', () {
+        final fixturesDir = Directory('test/fixtures/volt');
+
+        if (!fixturesDir.existsSync()) {
+          print('Volt fixtures directory not found, skipping');
+          return;
+        }
+
+        final bladeFiles = fixturesDir
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.blade.php'))
+            .toList();
+
+        print(
+          'Testing ${bladeFiles.length} volt fixture files for idempotency',
+        );
+
+        for (final file in bladeFiles) {
+          final content = file.readAsStringSync();
+          final relativePath = file.path.replaceFirst(
+            '${Directory.current.path}/',
+            '',
+          );
+
+          try {
+            expectIdempotent(content, description: relativePath);
+          } catch (e) {
+            fail('Idempotency failed for $relativePath: $e');
+          }
+        }
+      });
+    });
+
+    group('synthetic livewire fixtures', () {
+      test('formats all synthetic livewire fixtures idempotently', () {
+        final fixturesDir = Directory('test/fixtures/synthetic/02-livewire');
+
+        if (!fixturesDir.existsSync()) {
+          print('Synthetic livewire fixtures directory not found, skipping');
+          return;
+        }
+
+        final bladeFiles = fixturesDir
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.blade.php'))
+            .toList();
+
+        print(
+          'Testing ${bladeFiles.length} synthetic livewire fixture files for idempotency',
+        );
+
+        for (final file in bladeFiles) {
+          final content = file.readAsStringSync();
+          final relativePath = file.path.replaceFirst(
+            '${Directory.current.path}/',
+            '',
+          );
+
+          try {
+            expectIdempotent(content, description: relativePath);
+          } catch (e) {
+            fail('Idempotency failed for $relativePath: $e');
+          }
+        }
+      });
+    });
+
+    group('stress fixtures - FluxUI', () {
+      test('formats FluxUI fixtures idempotently', () {
+        final fixturesDir = Directory('test/fixtures/stress/fluxui');
+
+        if (!fixturesDir.existsSync()) {
+          print('FluxUI stress fixtures directory not found, skipping');
+          return;
+        }
+
+        final bladeFiles = fixturesDir
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.blade.php'))
+            .toList()
+          ..sort((a, b) => a.path.compareTo(b.path));
+
+        print(
+          'Testing ${bladeFiles.length} FluxUI fixture files for idempotency',
+        );
+
+        final failures = <String>[];
+        for (final file in bladeFiles) {
+          final content = file.readAsStringSync();
+          final relativePath = file.path.replaceFirst(
+            '${Directory.current.path}/',
+            '',
+          );
+
+          try {
+            expectIdempotent(content, description: relativePath);
+          } catch (e) {
+            failures.add(relativePath);
+          }
+        }
+
+        if (failures.isNotEmpty) {
+          fail(
+            'Idempotency failed for ${failures.length}/${bladeFiles.length} FluxUI files:\n'
+            '${failures.map((f) => '  - $f').join('\n')}',
+          );
+        }
+      });
+    });
+
+    group('stress fixtures - Filament', () {
+      for (final version in ['v2', 'v3', 'v4']) {
+        test('formats Filament $version fixtures idempotently', () {
+          final fixturesDir =
+              Directory('test/fixtures/stress/filament/$version');
+
+          if (!fixturesDir.existsSync()) {
+            print(
+                'Filament $version stress fixtures directory not found, skipping');
+            return;
+          }
+
+          final bladeFiles = fixturesDir
+              .listSync(recursive: true)
+              .whereType<File>()
+              .where((f) => f.path.endsWith('.blade.php'))
+              .toList()
+            ..sort((a, b) => a.path.compareTo(b.path));
+
+          print(
+            'Testing ${bladeFiles.length} Filament $version fixture files for idempotency',
+          );
+
+          final failures = <String>[];
+          for (final file in bladeFiles) {
+            final content = file.readAsStringSync();
+            final relativePath = file.path.replaceFirst(
+              '${Directory.current.path}/',
+              '',
+            );
+
+            try {
+              expectIdempotent(content, description: relativePath);
+            } catch (e) {
+              failures.add(relativePath);
+            }
+          }
+
+          if (failures.isNotEmpty) {
+            fail(
+              'Idempotency failed for ${failures.length}/${bladeFiles.length} Filament $version files:\n'
+              '${failures.map((f) => '  - $f').join('\n')}',
+            );
+          }
+        });
+      }
+    });
+
     group('edge cases', () {
       test('empty file', () {
         expectIdempotent('');
