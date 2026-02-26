@@ -420,6 +420,50 @@ class FormatterVisitor implements AstVisitor<String> {
     }
   }
 
+  /// Writes tag head items (attributes + structural directives), always wrapped.
+  /// Used when the tag head contains structural directives like @if/@endif.
+  void _writeTagHead(List<TagHeadItem> items,
+      {required String closingBracket}) {
+    if (items.isEmpty) {
+      _output.write(closingBracket);
+      return;
+    }
+
+    // Tag heads with directives always wrap to multiple lines
+    _output.writeln();
+    _indent.increase();
+
+    for (var i = 0; i < items.length; i++) {
+      final item = items[i];
+      _output.write(_indent.current);
+
+      if (item is TagHeadAttribute) {
+        _output.write(_formatAttribute(item.attribute));
+      } else if (item is TagHeadDirective) {
+        _output.write('@${item.name}');
+        if (item.expression != null) {
+          // Expression already includes parentheses from the lexer
+          _output.write(item.expression!);
+        }
+      }
+
+      final isLast = i == items.length - 1;
+      if (isLast) {
+        if (config.closingBracketStyle == ClosingBracketStyle.newLine) {
+          _output.writeln();
+          _indent.decrease();
+          _output.write(_indent.current);
+          _output.write(closingBracket.trim());
+        } else {
+          _output.write(closingBracket);
+          _indent.decrease();
+        }
+      } else {
+        _output.writeln();
+      }
+    }
+  }
+
   /// Writes attributes, either inline or wrapped to multiple lines.
   void _writeAttributes(List<AttributeNode> attributes,
       {required bool wrap, required String closingBracket}) {
@@ -807,27 +851,42 @@ class FormatterVisitor implements AstVisitor<String> {
     _output.write(_indent.current);
     _output.write('<${node.tagName}');
 
-    // Determine if we should wrap attributes
-    final shouldWrap = _shouldWrapAttributes(
-      node.tagName,
-      attributes,
-      isSelfClosing: isVoid || shouldSelfClose,
-    );
+    // If tag head contains structural directives, use the ordered tag head
+    if (node.tagHead.isNotEmpty) {
+      final closingBracket = isVoid
+          ? '>'
+          : shouldSelfClose
+              ? ' />'
+              : '>';
+      _writeTagHead(node.tagHead, closingBracket: closingBracket);
 
-    if (isVoid) {
+      if (isVoid || shouldSelfClose) {
+        _output.writeln();
+        return '';
+      }
+    } else {
+      // Normal attribute-only formatting
+      final shouldWrap = _shouldWrapAttributes(
+        node.tagName,
+        attributes,
+        isSelfClosing: isVoid || shouldSelfClose,
+      );
+
+      if (isVoid) {
+        _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
+        _output.writeln();
+        return '';
+      }
+
+      if (shouldSelfClose) {
+        _writeAttributes(
+            attributes, wrap: shouldWrap, closingBracket: ' />');
+        _output.writeln();
+        return '';
+      }
+
       _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
-      _output.writeln();
-      return '';
     }
-
-    // Handle self-closing non-void elements
-    if (shouldSelfClose) {
-      _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
-      _output.writeln();
-      return '';
-    }
-
-    _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
 
     // Raw text elements (script/style/textarea/pre): reconstruct full content
     // from all children (text + echo + comment nodes) and preserve indentation.

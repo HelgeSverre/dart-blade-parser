@@ -280,6 +280,35 @@ final class TextNode extends AstNode {
       };
 }
 
+/// An item in an HTML/component opening tag head.
+///
+/// The tag head is the content between the tag name and the closing `>` or `/>`.
+/// It contains attributes and optionally Blade structural directives
+/// (e.g., `@if`/`@endif` wrapping conditional attributes).
+sealed class TagHeadItem {}
+
+/// An attribute in the tag head.
+final class TagHeadAttribute extends TagHeadItem {
+  /// The attribute name (used as key in the attributes map).
+  final String name;
+
+  /// The attribute node.
+  final AttributeNode attribute;
+
+  TagHeadAttribute(this.name, this.attribute);
+}
+
+/// A Blade directive in the tag head (e.g., `@if($x)`, `@endif`).
+final class TagHeadDirective extends TagHeadItem {
+  /// The directive name (e.g., "if", "endif", "else").
+  final String name;
+
+  /// The directive expression, if any (e.g., `($closeable)`).
+  final String? expression;
+
+  TagHeadDirective(this.name, {this.expression});
+}
+
 /// Base class for HTML/component attribute nodes.
 ///
 /// Represents different types of attributes: standard HTML, Alpine.js,
@@ -548,7 +577,14 @@ final class HtmlElementNode extends AstNode {
   final String tagName;
 
   /// Map of attributes on this element (HTML, Alpine.js, Livewire).
+  /// Contains only unconditional (top-level) attributes.
   final Map<String, AttributeNode> attributes;
+
+  /// Ordered list of items in the opening tag head.
+  /// Preserves the source order of attributes and structural directives
+  /// (e.g., `@if`/`@endif` wrapping conditional attributes).
+  /// Empty when no structural directives appear in the tag head.
+  final List<TagHeadItem> tagHead;
 
   /// Whether this element uses self-closing syntax (<br />).
   final bool isSelfClosing;
@@ -560,6 +596,7 @@ final class HtmlElementNode extends AstNode {
   ///
   /// [tagName] is automatically converted to lowercase.
   /// [attributes] include all types of attributes (standard, Alpine, Livewire).
+  /// [tagHead] preserves ordered tag head items when directives are present.
   /// [isSelfClosing] indicates self-closing syntax usage.
   /// [isVoid] marks void elements that cannot have closing tags.
   /// [children] contains nested content (empty for void elements).
@@ -568,6 +605,7 @@ final class HtmlElementNode extends AstNode {
     required this.endPosition,
     required String tagName,
     this.attributes = const {},
+    this.tagHead = const [],
     this.isSelfClosing = false,
     this.isVoid = false,
     required this.children,

@@ -1153,6 +1153,56 @@ class BladeLexer {
         return;
       }
 
+      // Check if this is a structural Blade directive (@if, @endif, @foreach, etc.)
+      // These can appear in HTML tags for conditional attributes.
+      final structuralType = _directiveNameToType(name);
+      if (structuralType != TokenType.identifier) {
+        _emitToken(structuralType, '@$name');
+
+        // Lex expression if present: (...)
+        if (_peek() == '(') {
+          _start = _position;
+          _startLine = _line;
+          _startColumn = _column;
+
+          final exprStart = _position;
+          _advance(); // (
+          int parenCount = 1;
+          bool inSingleQuote = false;
+          bool inDoubleQuote = false;
+
+          while (!_isAtEnd() && parenCount > 0) {
+            final ch = _peek();
+
+            if (inSingleQuote) {
+              if (ch == "'" && _isUnescapedAt(_position)) {
+                inSingleQuote = false;
+              }
+            } else if (inDoubleQuote) {
+              if (ch == '"' && _isUnescapedAt(_position)) {
+                inDoubleQuote = false;
+              }
+            } else {
+              if (ch == "'") {
+                inSingleQuote = true;
+              } else if (ch == '"') {
+                inDoubleQuote = true;
+              } else if (ch == '(') {
+                parenCount++;
+              } else if (ch == ')') {
+                parenCount--;
+              }
+            }
+
+            _advance();
+          }
+
+          final expression = input.substring(exprStart, _position);
+          _emitToken(TokenType.expression, expression);
+        }
+        return;
+      }
+
       // Not a Blade directive - treat as Alpine.js @event shorthand
       // Continue scanning for Alpine event name chars (hyphens, dots)
       while (_peek() == '-' || _peek() == '.' || _isAlphaNumeric(_peek())) {

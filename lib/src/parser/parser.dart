@@ -1274,6 +1274,81 @@ class BladeParser {
     return attributes;
   }
 
+  /// Check if a token type is a Blade structural directive that can appear in tag heads.
+  bool _isStructuralDirectiveToken(TokenType type) {
+    // This covers @if, @elseif, @else, @endif, @foreach, @endforeach,
+    // @unless, @endunless, @isset, @endisset, @empty, @endempty, etc.
+    // We match any directive that is NOT an attribute directive and NOT an identifier.
+    final name = type.name;
+    return name.startsWith('directive') && !_isBladeAttributeDirective(type);
+  }
+
+  /// Parse the tag head, handling both attributes and structural directives.
+  /// Returns attributes map (for backward compat) and ordered tag head items.
+  ({Map<String, AttributeNode> attributes, List<TagHeadItem> tagHead})
+      _parseTagHead() {
+    final attributes = <String, AttributeNode>{};
+    final tagHead = <TagHeadItem>[];
+    var hasDirectives = false;
+
+    while (!_checkAny([
+      TokenType.htmlTagClose,
+      TokenType.htmlSelfClose,
+      TokenType.componentSelfClose,
+      TokenType.eof,
+    ])) {
+      final type = _peek().type;
+
+      if (_isAttributeToken(type)) {
+        // Parse attribute (same logic as _parseAttributeMap)
+        final attrToken = _advance();
+        final attrName = attrToken.value;
+        final attrStartPos = attrToken.startPosition;
+        Position attrEndPos = attrToken.endPosition;
+
+        String? attrValue;
+
+        if (_isBladeAttributeDirective(attrToken.type)) {
+          if (_check(TokenType.expression)) {
+            final exprToken = _advance();
+            attrValue = exprToken.value;
+            attrEndPos = exprToken.endPosition;
+          }
+        } else if (_check(TokenType.attributeValue)) {
+          final valueToken = _advance();
+          attrValue = valueToken.value;
+          attrEndPos = valueToken.endPosition;
+        }
+
+        final attrNode = _classifyAttribute(
+            attrToken, attrName, attrValue, attrStartPos, attrEndPos);
+        attributes[attrName] = attrNode;
+        tagHead.add(TagHeadAttribute(attrName, attrNode));
+      } else if (_isStructuralDirectiveToken(type)) {
+        hasDirectives = true;
+        final token = _advance();
+        // Extract directive name from token value (e.g., "@if" → "if")
+        final directiveName = token.value.startsWith('@')
+            ? token.value.substring(1)
+            : token.value;
+        String? expression;
+        if (_check(TokenType.expression)) {
+          expression = _advance().value.trim();
+        }
+        tagHead.add(TagHeadDirective(directiveName, expression: expression));
+      } else {
+        // Skip unexpected tokens (whitespace, text between directives)
+        _advance();
+      }
+    }
+
+    // Only return tagHead if there are directives (optimization for common case)
+    return (
+      attributes: attributes,
+      tagHead: hasDirectives ? tagHead : const [],
+    );
+  }
+
   /// Classify an attribute token into the appropriate AttributeNode subclass.
   AttributeNode _classifyAttribute(
     Token attrToken,
@@ -1414,8 +1489,10 @@ class BladeParser {
 
     final isVoid = _isVoidElement(tagName);
 
-    // Parse attributes (T034)
-    final attributes = _parseAttributeMap();
+    // Parse tag head: attributes and structural directives (T034)
+    final tagHeadResult = _parseTagHead();
+    final attributes = tagHeadResult.attributes;
+    final tagHead = tagHeadResult.tagHead;
 
     // Check for self-closing or regular close
     bool isSelfClosing = false;
@@ -1428,6 +1505,7 @@ class BladeParser {
       return HtmlElementNode(
         tagName: tagName,
         attributes: attributes,
+        tagHead: tagHead,
         isSelfClosing: isSelfClosing,
         isVoid: isVoid,
         startPosition: openingTagPos,
@@ -1448,6 +1526,7 @@ class BladeParser {
       return HtmlElementNode(
         tagName: tagName,
         attributes: attributes,
+        tagHead: tagHead,
         isVoid: true,
         startPosition: openingTagPos,
         endPosition: endPosition,
@@ -1491,6 +1570,7 @@ class BladeParser {
         return HtmlElementNode(
           tagName: tagName,
           attributes: attributes,
+          tagHead: tagHead,
           startPosition: openingTagPos,
           endPosition: closingEndPos,
           children: children,
@@ -1520,6 +1600,7 @@ class BladeParser {
     return HtmlElementNode(
       tagName: tagName,
       attributes: attributes,
+      tagHead: tagHead,
       startPosition: openingTagPos,
       endPosition: endPosition,
       children: children,

@@ -150,4 +150,97 @@ void main() {
       expect(classIdx, lessThan(clickIdx));
     });
   });
+
+  group('Structural Blade directives inside HTML tags', () {
+    test('@if inside HTML tag is lexed as directive token', () {
+      final lexer = BladeLexer(
+        '<div @if(\$closeable) @click="close" @endif>',
+      );
+      final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
+
+      // @if and @endif should be proper directive tokens
+      expect(types, contains(TokenType.directiveIf));
+      expect(types, contains(TokenType.directiveEndif));
+      // @click between @if/@endif should still be Alpine shorthand
+      expect(types, contains(TokenType.alpineShorthandOn));
+
+      // Verify @if has its expression captured
+      final ifIdx =
+          tokens.indexWhere((t) => t.type == TokenType.directiveIf);
+      expect(tokens[ifIdx + 1].type, equals(TokenType.expression));
+      expect(tokens[ifIdx + 1].value, contains('\$closeable'));
+    });
+
+    test('conditional attributes with @if parse without errors', () {
+      const input = '''<div
+    x-show="show"
+    class="fixed inset-0"
+    @if(\$closeable)
+        @click="show = false"
+    @endif
+></div>''';
+
+      final parser = BladeParser();
+      final result = parser.parse(input);
+
+      expect(result.errors, isEmpty,
+          reason: '@if inside HTML tag should not cause parse errors');
+    });
+
+    test('complex component with conditional attributes formats correctly', () {
+      const input = '''<button
+    wire:click="addToCart({{ \$product->id }})"
+    class="btn btn-primary"
+    @if (\$product->stock === 0) disabled @endif
+>
+    Add to Cart
+</button>''';
+
+      final formatter = BladeFormatter();
+      expect(() => formatter.format(input), returnsNormally,
+          reason: '@if inside button tag should not crash formatter');
+    });
+
+    test('@class is attribute directive and @if is structural directive', () {
+      final lexer = BladeLexer(
+        '<div @class([\'active\']) @if(\$show) x-show="true" @endif>',
+      );
+      final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
+
+      expect(types, contains(TokenType.directiveClass));
+      expect(types, contains(TokenType.directiveIf));
+      expect(types, contains(TokenType.directiveEndif));
+    });
+
+    test('tagHead is populated when directives are present', () {
+      const input = '<div class="base" @if(\$x) disabled @endif>';
+      final parser = BladeParser();
+      final result = parser.parse(input);
+      final div = result.ast!.children.first as HtmlElementNode;
+
+      expect(div.tagHead, isNotEmpty);
+      // Should have: class attr, @if directive, disabled attr, @endif directive
+      expect(div.tagHead.length, equals(4));
+      expect(div.tagHead[0], isA<TagHeadAttribute>());
+      expect((div.tagHead[0] as TagHeadAttribute).name, equals('class'));
+      expect(div.tagHead[1], isA<TagHeadDirective>());
+      expect((div.tagHead[1] as TagHeadDirective).name, equals('if'));
+      expect(div.tagHead[2], isA<TagHeadAttribute>());
+      expect((div.tagHead[2] as TagHeadAttribute).name, equals('disabled'));
+      expect(div.tagHead[3], isA<TagHeadDirective>());
+      expect((div.tagHead[3] as TagHeadDirective).name, equals('endif'));
+    });
+
+    test('tagHead is empty when no directives are present', () {
+      const input = '<div class="base" id="el">';
+      final parser = BladeParser();
+      final result = parser.parse(input);
+      final div = result.ast!.children.first as HtmlElementNode;
+
+      expect(div.tagHead, isEmpty);
+      expect(div.attributes, hasLength(2));
+    });
+  });
 }
