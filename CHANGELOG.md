@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **`ExpressionParser` class:** Removed unused Pratt expression parser and its tests. The lexer emits PHP expressions as single opaque tokens, so the parser was never wired into production code. Expressions continue to be captured as raw text.
+
 ### Added
 - **Component `tagHead` support:** `ComponentNode` now has a `tagHead` field (like `HtmlElementNode`) that preserves structural directives (`@if`/`@endif`, `@class`, etc.) inside component opening tags. The formatter correctly renders these using `_writeTagHead`.
+
+### Fixed
+- **Echo expressions in tag heads now trigger `tagHead`:** Blade echo expressions (`{{ $attributes }}`, `{!! $attributes !!}`) inside component/HTML opening tags now populate `tagHead` to preserve attribute order, preventing the formatter's attribute sorting from reordering echoes relative to other attributes (which could alter CSS precedence or attribute merging behavior).
 - **Contoso real-world stress fixtures:** 3 anonymized production Blade templates (settings layout, contact detail, ticket detail) covering `@class` in component tags, deep nesting, Livewire/Alpine patterns, and complex slots.
 - **`PhpBlockNode` AST node:** Dedicated node for PHP code regions (`<?php ?>`, `<?= ?>`, `<? ?>`, `@php/@endphp`) with `PhpBlockSyntax` enum. PHP blocks are now structurally represented in the AST instead of being treated as raw text or generic directives. Inline `@php($expr)` remains a `DirectiveNode`.
 - **Livewire v4 compatibility:** Correctly handles single-file components (SFC) containing inline PHP classes without breaking the parser, and advanced `wire:*` attributes (`wire:navigate`, `wire:confirm`, `wire:stream`, etc.)
