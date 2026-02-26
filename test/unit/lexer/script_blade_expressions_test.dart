@@ -6,22 +6,24 @@ import 'package:test/test.dart';
 /// The lexer should tokenize these as echo expressions, not raw text.
 void main() {
   group('Blade expressions inside script blocks', () {
-    test('{{ }} echo inside script block is tokenized as echo', () {
+    test('{{ }} echo inside script block produces echo open/close tokens', () {
       final lexer = BladeLexer(
         '<script>\nconst x = \'{{ \$foo }}\';\n</script>',
       );
       final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.echoOpen),
-        isTrue,
-        reason: '{{ inside <script> should be tokenized as echo',
-      );
-      expect(
-        tokens.any((t) => t.type == TokenType.echoClose),
-        isTrue,
-        reason: '}} inside <script> should be tokenized as echo close',
-      );
+      expect(types, contains(TokenType.echoOpen));
+      expect(types, contains(TokenType.echoClose));
+
+      // Verify token sequence around the echo
+      final echoOpenIdx =
+          tokens.indexWhere((t) => t.type == TokenType.echoOpen);
+      expect(tokens[echoOpenIdx].value, equals('{{'));
+      expect(tokens[echoOpenIdx + 1].type, equals(TokenType.expression));
+      expect(tokens[echoOpenIdx + 1].value.trim(), equals('\$foo'));
+      expect(tokens[echoOpenIdx + 2].type, equals(TokenType.echoClose));
+      expect(tokens[echoOpenIdx + 2].value, equals('}}'));
     });
 
     test('{{ }} with null coalesce inside script block', () {
@@ -30,21 +32,11 @@ void main() {
       );
       final tokens = lexer.tokenize();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.echoOpen),
-        isTrue,
-        reason: '{{ inside <script> should be tokenized as echo',
+      final exprToken = tokens.firstWhere(
+        (t) =>
+            t.type == TokenType.expression && t.value.contains('appearance'),
       );
-
-      // The expression should contain the null coalesce
-      expect(
-        tokens.any(
-          (t) =>
-              t.type == TokenType.expression && t.value.contains('appearance'),
-        ),
-        isTrue,
-        reason: 'Expression content should be preserved',
-      );
+      expect(exprToken.value, contains('\$appearance ?? "system"'));
     });
 
     test('{!! !!} raw echo inside script block is tokenized', () {
@@ -52,12 +44,15 @@ void main() {
         '<script>\nconst data = {!! \$json !!};\n</script>',
       );
       final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.rawEchoOpen),
-        isTrue,
-        reason: '{!! inside <script> should be tokenized as raw echo',
-      );
+      expect(types, contains(TokenType.rawEchoOpen));
+      expect(types, contains(TokenType.rawEchoClose));
+
+      final rawOpenIdx =
+          tokens.indexWhere((t) => t.type == TokenType.rawEchoOpen);
+      expect(tokens[rawOpenIdx + 1].type, equals(TokenType.expression));
+      expect(tokens[rawOpenIdx + 1].value.trim(), equals('\$json'));
     });
 
     test('Blade comment inside script block is tokenized', () {
@@ -66,11 +61,9 @@ void main() {
       );
       final tokens = lexer.tokenize();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.bladeComment),
-        isTrue,
-        reason: '{{-- inside <script> should be tokenized as comment',
-      );
+      final commentToken =
+          tokens.firstWhere((t) => t.type == TokenType.bladeComment);
+      expect(commentToken.value, equals('{{-- This is a comment --}}'));
     });
 
     test('script content without Blade expressions is still raw text', () {
@@ -78,15 +71,10 @@ void main() {
         '<script>\nconst x = 1;\nif (x < 10) { alert("hi"); }\n</script>',
       );
       final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
 
-      // Should NOT have echo tokens
-      expect(
-        tokens.any((t) => t.type == TokenType.echoOpen),
-        isFalse,
-        reason: 'Plain JS should not produce echo tokens',
-      );
+      expect(types, isNot(contains(TokenType.echoOpen)));
 
-      // Content should be preserved as text
       final textTokens = tokens.where((t) => t.type == TokenType.text);
       final textContent = textTokens.map((t) => t.value).join();
       expect(textContent, contains('x < 10'));
@@ -100,11 +88,15 @@ void main() {
 
       final echoOpens =
           tokens.where((t) => t.type == TokenType.echoOpen).toList();
-      expect(
-        echoOpens.length,
-        equals(2),
-        reason: 'Should find two echo expressions in script',
-      );
+      expect(echoOpens.length, equals(2));
+
+      // Verify both expressions are captured
+      final expressions = tokens
+          .where((t) => t.type == TokenType.expression)
+          .map((t) => t.value.trim())
+          .toList();
+      expect(expressions, contains('\$foo'));
+      expect(expressions, contains('\$bar'));
     });
 
     test('real-world script block with Blade expression', () {
@@ -121,20 +113,15 @@ void main() {
 </script>''';
       final lexer = BladeLexer(input);
       final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
 
-      // Should have echo open/close tokens
-      expect(
-        tokens.any((t) => t.type == TokenType.echoOpen),
-        isTrue,
-        reason: 'Real-world script with {{ }} should tokenize echo',
-      );
+      expect(types, contains(TokenType.echoOpen));
+      expect(types, contains(TokenType.echoClose));
 
-      // JavaScript < and > comparisons should NOT create HTML tokens
-      expect(
-        tokens.where((t) => t.type == TokenType.htmlTagOpen).length,
-        equals(1), // Only the <script> tag itself
-        reason: 'JS comparison operators should not create HTML tag tokens',
-      );
+      // Only one <script> HTML tag — JS comparison operators should not create more
+      final htmlTagOpens =
+          tokens.where((t) => t.type == TokenType.htmlTagOpen).toList();
+      expect(htmlTagOpens.length, equals(1));
     });
 
     test('{{ }} in style block is tokenized as echo', () {
@@ -142,12 +129,29 @@ void main() {
         '<style>\nbody { color: {{ \$color }}; }\n</style>',
       );
       final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.echoOpen),
-        isTrue,
-        reason: '{{ inside <style> should be tokenized as echo',
+      expect(types, contains(TokenType.echoOpen));
+      expect(types, contains(TokenType.echoClose));
+    });
+
+    test('quote state persists across Blade expression in script', () {
+      // The </script> inside the string should NOT close the script block
+      final lexer = BladeLexer(
+        "<script>\nconst str = '{{ \$val }}</script>still inside';\n</script>",
       );
+      final tokens = lexer.tokenize();
+
+      // Should have exactly one closing script tag token
+      final closingTags =
+          tokens.where((t) => t.type == TokenType.htmlClosingTagStart).toList();
+      expect(closingTags.length, equals(1));
+
+      // The text after the echo should include the fake </script> as content
+      final textAfterEcho = tokens.where(
+        (t) => t.type == TokenType.text && t.value.contains('still inside'),
+      );
+      expect(textAfterEcho.length, equals(1));
     });
   });
 }

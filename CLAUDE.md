@@ -26,6 +26,7 @@ This file contains notes and guidelines for AI assistants working on this projec
 - Follow Dart conventions and use `dart format`
 - Use conventional commits for all commit messages
 - Keep commits atomic - one logical change per commit
+- Separate `dart format` whitespace changes from logic changes into distinct commits
 
 ## Testing
 

@@ -367,6 +367,8 @@ class FormatterVisitor implements AstVisitor<String> {
   }
 
   /// Check if an attribute name is a Blade attribute directive.
+  // TODO: Consolidate with the duplicate lists in lexer.dart (_directiveNameToType)
+  // and parser.dart (_isBladeAttributeDirective) into a single shared source of truth.
   bool _isBladeAttributeDirectiveName(String name) {
     const bladeAttrDirectives = {
       '@class',

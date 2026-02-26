@@ -771,19 +771,20 @@ class BladeLexer {
     _advance(); // -
     _advance(); // -
 
-    final contentStart = _position;
+    final commentStart = _position - 4; // Back to the opening {{--
 
     while (!_isAtEnd()) {
       if (_peek() == '-' &&
           _peekNext() == '-' &&
           _peekAhead(2) == '}' &&
           _peekAhead(3) == '}') {
-        final content = input.substring(contentStart, _position);
         _advance(); // -
         _advance(); // -
         _advance(); // }
         _advance(); // }
-        _emitToken(TokenType.bladeComment, '{{-- $content --}}');
+        // Emit the exact source text to preserve original whitespace
+        _emitToken(
+            TokenType.bladeComment, input.substring(commentStart, _position));
         return _textOrRawTextState();
       }
       _advance();

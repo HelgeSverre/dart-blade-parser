@@ -10,35 +10,26 @@ void main() {
         () {
       final lexer = BladeLexer('<html @class([\'dark\' => true])>');
       final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
 
-      // Should have a directiveClass token, NOT alpineShorthandOn
-      expect(
-        tokens.any((t) => t.type == TokenType.directiveClass),
-        isTrue,
-        reason: '@class in HTML tag should be recognized as Blade directive',
-      );
-      expect(
-        tokens.any((t) => t.type == TokenType.alpineShorthandOn),
-        isFalse,
-        reason: '@class should not be treated as Alpine.js shorthand',
-      );
+      expect(types, contains(TokenType.directiveClass));
+      expect(types, isNot(contains(TokenType.alpineShorthandOn)));
     });
 
-    test('@class expression is properly captured', () {
+    test('@class expression is properly captured with correct value', () {
       final lexer = BladeLexer('<div @class([\'active\' => \$isActive])>');
       final tokens = lexer.tokenize();
 
+      final classIdx =
+          tokens.indexWhere((t) => t.type == TokenType.directiveClass);
+      expect(classIdx, greaterThanOrEqualTo(0));
+      expect(tokens[classIdx].value, equals('@class'));
+
+      // Expression token should immediately follow the directive
+      expect(tokens[classIdx + 1].type, equals(TokenType.expression));
       expect(
-        tokens.any((t) => t.type == TokenType.directiveClass),
-        isTrue,
-      );
-      // The expression should be captured
-      expect(
-        tokens.any(
-          (t) => t.type == TokenType.expression && t.value.contains('active'),
-        ),
-        isTrue,
-        reason: '@class expression should be captured',
+        tokens[classIdx + 1].value,
+        equals("(['active' => \$isActive])"),
       );
     });
 
@@ -47,16 +38,14 @@ void main() {
         '<div @style([\'color: red\' => \$isError])>',
       );
       final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.directiveStyle),
-        isTrue,
-        reason: '@style should be recognized as Blade directive',
-      );
-      expect(
-        tokens.any((t) => t.type == TokenType.alpineShorthandOn),
-        isFalse,
-      );
+      expect(types, contains(TokenType.directiveStyle));
+      expect(types, isNot(contains(TokenType.alpineShorthandOn)));
+
+      final styleToken =
+          tokens.firstWhere((t) => t.type == TokenType.directiveStyle);
+      expect(styleToken.value, equals('@style'));
     });
 
     test('@checked inside HTML tag is lexed as directive', () {
@@ -65,11 +54,13 @@ void main() {
       );
       final tokens = lexer.tokenize();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.directiveChecked),
-        isTrue,
-        reason: '@checked should be recognized as Blade directive',
-      );
+      final checkedToken =
+          tokens.firstWhere((t) => t.type == TokenType.directiveChecked);
+      expect(checkedToken.value, equals('@checked'));
+
+      final checkedIdx = tokens.indexOf(checkedToken);
+      expect(tokens[checkedIdx + 1].type, equals(TokenType.expression));
+      expect(tokens[checkedIdx + 1].value, equals('(\$isChecked)'));
     });
 
     test('@disabled inside HTML tag is lexed as directive', () {
@@ -78,11 +69,9 @@ void main() {
       );
       final tokens = lexer.tokenize();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.directiveDisabled),
-        isTrue,
-        reason: '@disabled should be recognized as Blade directive',
-      );
+      final token =
+          tokens.firstWhere((t) => t.type == TokenType.directiveDisabled);
+      expect(token.value, equals('@disabled'));
     });
 
     test('@selected inside HTML tag is lexed as directive', () {
@@ -91,57 +80,45 @@ void main() {
       );
       final tokens = lexer.tokenize();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.directiveSelected),
-        isTrue,
-        reason: '@selected should be recognized as Blade directive',
-      );
+      final token =
+          tokens.firstWhere((t) => t.type == TokenType.directiveSelected);
+      expect(token.value, equals('@selected'));
     });
 
     test('@readonly inside HTML tag is lexed as directive', () {
-      final lexer = BladeLexer(
-        '<input @readonly(\$isReadonly)>',
-      );
+      final lexer = BladeLexer('<input @readonly(\$isReadonly)>');
       final tokens = lexer.tokenize();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.directiveReadonly),
-        isTrue,
-        reason: '@readonly should be recognized as Blade directive',
-      );
+      final token =
+          tokens.firstWhere((t) => t.type == TokenType.directiveReadonly);
+      expect(token.value, equals('@readonly'));
     });
 
     test('@required inside HTML tag is lexed as directive', () {
-      final lexer = BladeLexer(
-        '<input @required(\$isRequired)>',
-      );
+      final lexer = BladeLexer('<input @required(\$isRequired)>');
       final tokens = lexer.tokenize();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.directiveRequired),
-        isTrue,
-        reason: '@required should be recognized as Blade directive',
-      );
+      final token =
+          tokens.firstWhere((t) => t.type == TokenType.directiveRequired);
+      expect(token.value, equals('@required'));
     });
 
-    test('@class with complex expression preserves content', () {
+    test('@class with complex expression preserves full value', () {
       final lexer = BladeLexer(
         '<html lang="en" @class([\'dark\' => (\$appearance ?? \'system\') == \'dark\'])>',
       );
       final tokens = lexer.tokenize();
 
+      final classIdx =
+          tokens.indexWhere((t) => t.type == TokenType.directiveClass);
+      expect(classIdx, greaterThanOrEqualTo(0));
+
+      final expr = tokens[classIdx + 1];
+      expect(expr.type, equals(TokenType.expression));
       expect(
-        tokens.any((t) => t.type == TokenType.directiveClass),
-        isTrue,
-        reason: '@class should be a directive',
+        expr.value,
+        equals("(['dark' => (\$appearance ?? 'system') == 'dark'])"),
       );
-      // Expression should contain the full conditional
-      final expr = tokens.firstWhere(
-        (t) => t.type == TokenType.expression && t.value.contains('appearance'),
-        orElse: () => throw StateError('No expression token found'),
-      );
-      expect(expr.value, contains('dark'));
-      expect(expr.value, contains('system'));
     });
 
     test(
@@ -150,11 +127,9 @@ void main() {
       final lexer = BladeLexer('<button @click="toggle">Save</button>');
       final tokens = lexer.tokenize();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.alpineShorthandOn),
-        isTrue,
-        reason: '@click should still be treated as Alpine.js shorthand',
-      );
+      final clickToken =
+          tokens.firstWhere((t) => t.type == TokenType.alpineShorthandOn);
+      expect(clickToken.value, equals('@click'));
     });
 
     test('@class and Alpine @click coexist in same tag', () {
@@ -162,17 +137,17 @@ void main() {
         '<div @class([\'active\']) @click="toggle">',
       );
       final tokens = lexer.tokenize();
+      final types = tokens.map((t) => t.type).toList();
 
-      expect(
-        tokens.any((t) => t.type == TokenType.directiveClass),
-        isTrue,
-        reason: '@class should be a Blade directive',
-      );
-      expect(
-        tokens.any((t) => t.type == TokenType.alpineShorthandOn),
-        isTrue,
-        reason: '@click should be Alpine.js shorthand',
-      );
+      expect(types, contains(TokenType.directiveClass));
+      expect(types, contains(TokenType.alpineShorthandOn));
+
+      // Verify order: @class comes before @click
+      final classIdx =
+          tokens.indexWhere((t) => t.type == TokenType.directiveClass);
+      final clickIdx =
+          tokens.indexWhere((t) => t.type == TokenType.alpineShorthandOn);
+      expect(classIdx, lessThan(clickIdx));
     });
   });
 }
