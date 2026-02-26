@@ -525,7 +525,7 @@ class BladeLexer {
         // Check for closing tag (only outside quotes and comments)
         if (ch == '<' &&
             _peekNext() == '/' &&
-            input.substring(_position).startsWith(closingTag)) {
+            input.startsWith(closingTag, _position)) {
           // Check if the tag is escaped, e.g., <\/script>
           if (_position > 0 && input[_position - 1] == '\\') {
             // It's escaped, treat as text

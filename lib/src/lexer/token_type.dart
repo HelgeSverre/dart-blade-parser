@@ -265,4 +265,24 @@ enum TokenType {
     'readonly': directiveReadonly,
     'required': directiveRequired,
   };
+
+  /// Maps directive names to their correct closing tag names.
+  ///
+  /// Handles directives where `@end` + name doesn't match the actual syntax
+  /// (e.g., `pushOnce` → `endPushOnce`, not `endpushOnce`).
+  ///
+  /// Single source of truth used by the parser and formatter.
+  static const Map<String, String> closingDirectiveNames = {
+    'pushOnce': 'endPushOnce',
+    'prependOnce': 'endPrependOnce',
+    'pushIf': 'endPushIf',
+    'hasStack': 'endif',
+    'teleport': 'endTeleport',
+    'persist': 'endPersist',
+  };
+
+  /// Returns the closing directive name for a given opening directive name.
+  static String closingDirectiveName(String name) {
+    return closingDirectiveNames[name] ?? 'end$name';
+  }
 }

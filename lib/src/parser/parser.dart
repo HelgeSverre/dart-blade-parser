@@ -33,6 +33,10 @@ class BladeParser {
   /// Tag stack for tracking open HTML elements (T032)
   final List<_TagStackEntry> _tagStack = [];
 
+  String _closingDirectiveName(String name) {
+    return TokenType.closingDirectiveName(name);
+  }
+
   /// Check if a tag name is a void element.
   bool _isVoidElement(String tagName) =>
       _voidElements.contains(tagName.toLowerCase());
@@ -902,7 +906,7 @@ class BladeParser {
         ParseError(
           message: 'Unclosed @$name directive',
           position: startToken.startPosition,
-          hint: 'Add @end$name to close the block',
+          hint: 'Add @${_closingDirectiveName(name)} to close the block',
         ),
       );
     } else {
@@ -1080,7 +1084,7 @@ class BladeParser {
         ParseError(
           message: 'Unclosed @$name directive',
           position: startToken.startPosition,
-          hint: 'Add @end$name to close the block',
+          hint: 'Add @${_closingDirectiveName(name)} to close the block',
         ),
       );
     }

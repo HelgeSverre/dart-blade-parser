@@ -417,5 +417,49 @@ void main() {
         reason: 'Should process > 5K component tags/sec',
       );
     });
+
+    test('Raw text (script/style) block throughput', () {
+      // Generate large script blocks with inline JS (~750KB)
+      final buffer = StringBuffer();
+      for (var i = 0; i < 5000; i++) {
+        buffer.writeln(
+            '    const variable$i = { key$i: "value$i", count: $i, nested: { a: 1, b: 2 } };');
+        buffer.writeln(
+            '    function handler$i(event) { return event.target.value + "$i"; }');
+      }
+      final template = '<div>\n<script>\n$buffer</script>\n</div>';
+      final sizeKB = template.length / 1024;
+
+      // Warm-up
+      for (var i = 0; i < 5; i++) {
+        BladeLexer(template).tokenize();
+      }
+
+      // Benchmark
+      final stopwatch = Stopwatch()..start();
+      const iterations = 10;
+      for (var i = 0; i < iterations; i++) {
+        BladeLexer(template).tokenize();
+      }
+      stopwatch.stop();
+
+      final totalChars = template.length * iterations;
+      final seconds = stopwatch.elapsedMilliseconds / 1000;
+      final mbPerSec = (totalChars / 1024 / 1024) / seconds;
+
+      BenchmarkFormatter.printResult(
+        label: 'Raw text (script) block',
+        metric: '${mbPerSec.toStringAsFixed(2)} MB/sec',
+        context:
+            'Template size: ${sizeKB.toStringAsFixed(1)}KB, processed $iterations times in ${seconds.toStringAsFixed(3)}s',
+      );
+
+      // Assert reasonable performance: > 50 MB/sec for raw text scanning
+      expect(
+        mbPerSec,
+        greaterThan(50),
+        reason: 'Should process raw text blocks at > 50 MB/sec',
+      );
+    });
   });
 }

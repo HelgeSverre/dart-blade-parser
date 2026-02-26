@@ -700,7 +700,11 @@ class FormatterVisitor implements AstVisitor<String> {
       return '';
     }
 
-    _output.write(_indent.current);
+    // Only write indentation if we're at the start of a line
+    // (not continuing inline after text like "Deadline: {{ $date }}")
+    if (_output.endsWithNewline()) {
+      _output.write(_indent.current);
+    }
 
     if (node.isRaw) {
       _output.write('{!! ${node.expression} !!}');
@@ -749,7 +753,10 @@ class FormatterVisitor implements AstVisitor<String> {
 
     for (var i = 0; i < lines.length; i++) {
       final line = lines[i];
-      final trimmedLine = line.trim();
+      final isLastLine = i == lines.length - 1;
+      // On the last line, preserve trailing whitespace — it may separate
+      // this text from a following inline echo (e.g., "Deadline: {{ $date }}").
+      final trimmedLine = isLastLine ? line.trimLeft() : line.trim();
 
       if (trimmedLine.isNotEmpty) {
         // Check if this line should be indented
@@ -761,7 +768,7 @@ class FormatterVisitor implements AstVisitor<String> {
           _output.write(trimmedLine);
         }
 
-        if (i < lines.length - 1) {
+        if (!isLastLine) {
           _output.writeln();
         }
       }
@@ -985,20 +992,34 @@ class FormatterVisitor implements AstVisitor<String> {
 
       if (canKeepInline) {
         // Keep simple content inline
-        // Build the inline content, preserving spaces between elements
+        // Build the inline content, preserving spaces between elements.
+        // Iterate all children (not just meaningful ones) to preserve
+        // whitespace-only text nodes like the space in "{{ $a }} {{ $b }}".
+        final firstMeaningful = meaningfulChildren.first;
+        final lastMeaningful = meaningfulChildren.last;
         final inlineContent = StringBuffer();
-        for (var i = 0; i < meaningfulChildren.length; i++) {
-          final child = meaningfulChildren[i];
+        var seenFirstMeaningful = false;
+        var pastLastMeaningful = false;
+        for (final child in node.children) {
+          if (child == firstMeaningful) seenFirstMeaningful = true;
+          if (pastLastMeaningful) break;
           if (child is TextNode) {
-            // For text nodes, trim leading space on first, trailing on last
             var text = child.content;
-            if (i == 0) {
+            if (child == firstMeaningful) {
               text = text.trimLeft();
             }
-            if (i == meaningfulChildren.length - 1) {
+            if (child == lastMeaningful) {
               text = text.trimRight();
             }
-            inlineContent.write(text);
+            // Whitespace-only text: skip if outside meaningful range,
+            // collapse to single space if between meaningful children.
+            if (text.trim().isEmpty) {
+              if (seenFirstMeaningful && text.isNotEmpty) {
+                inlineContent.write(' ');
+              }
+            } else {
+              inlineContent.write(text);
+            }
           } else if (child is EchoNode) {
             if (child.isRaw) {
               inlineContent.write('{!! ${child.expression} !!}');
@@ -1006,6 +1027,7 @@ class FormatterVisitor implements AstVisitor<String> {
               inlineContent.write('{{ ${child.expression} }}');
             }
           }
+          if (child == lastMeaningful) pastLastMeaningful = true;
         }
         _output.write(inlineContent.toString());
         _output.write('</${node.tagName}>');
@@ -1554,20 +1576,8 @@ class FormatterVisitor implements AstVisitor<String> {
     return node.name == 'empty' && node.expression == null;
   }
 
-  /// Returns the closing directive name for a given opening directive name.
-  /// Handles directives where `@end` + name doesn't match the actual syntax
-  /// (e.g., `pushOnce` → `endPushOnce`, not `endpushOnce`).
-  static const Map<String, String> _closingDirectiveNames = {
-    'pushOnce': 'endPushOnce',
-    'prependOnce': 'endPrependOnce',
-    'pushIf': 'endPushIf',
-    'hasStack': 'endif',
-    'teleport': 'endTeleport',
-    'persist': 'endPersist',
-  };
-
   String _closingDirectiveName(String name) {
-    return _closingDirectiveNames[name] ?? 'end$name';
+    return TokenType.closingDirectiveName(name);
   }
 
   /// Checks if a directive has a closing tag.
