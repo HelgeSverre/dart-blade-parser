@@ -70,14 +70,51 @@ class BladeLexer {
       }
     }
 
-    // Scan until ?> or EOF
+    // Scan until ?> or EOF, tracking string context so we don't
+    // close on ?> inside quoted strings.
+    bool inSingleQuote = false;
+    bool inDoubleQuote = false;
+
     while (!_isAtEnd()) {
-      if (_peek() == '?' && _peekNext() == '>') {
+      final ch = _peek();
+
+      if (inSingleQuote) {
+        if (ch == '\\') {
+          _advance(); // skip backslash
+          if (!_isAtEnd()) _advance(); // skip escaped char
+          continue;
+        }
+        if (ch == "'") inSingleQuote = false;
+        _advance();
+        continue;
+      }
+
+      if (inDoubleQuote) {
+        if (ch == '\\') {
+          _advance(); // skip backslash
+          if (!_isAtEnd()) _advance(); // skip escaped char
+          continue;
+        }
+        if (ch == '"') inDoubleQuote = false;
+        _advance();
+        continue;
+      }
+
+      // Not inside a string — check for ?> close
+      if (ch == '?' && _peekNext() == '>') {
         _advance(); // ?
         _advance(); // >
         _emitToken(TokenType.phpBlock, input.substring(_start, _position));
         return _textOrRawTextState();
       }
+
+      // Enter string context
+      if (ch == "'") {
+        inSingleQuote = true;
+      } else if (ch == '"') {
+        inDoubleQuote = true;
+      }
+
       _advance();
     }
 
