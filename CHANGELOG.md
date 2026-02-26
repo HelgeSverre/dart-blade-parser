@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stress test suite:** 826 real-world Blade fixtures from Filament (v2/v3/v4) and FluxUI with 99.9% error-free parse rate
 
 ### Fixed
+- **`:$var` shorthand attributes:** Blade `:$attributes`, `:$name`, `:$icon` shorthand syntax is now correctly preserved as a single attribute instead of being split into `:` + `var`
+- **Echo attributes dropped with directives:** `{{ $attributes->class([...]) }}` in tag attribute lists was silently dropped when structural directives (`@if`, `@endif`) were also present in the same tag
 - **`@unless` / `@endif` compatibility:** `@unless` blocks can now be closed with `@endif`, matching real-world Laravel template conventions
 - **`@php` block raw content mode:** `@php` blocks (without expressions) scan to `@endphp` as raw text, preventing PHP comments and strings containing HTML-like tags from breaking the parser
 - **Component closing tag simplification:** Unified closing tag scanning for `</x-slot:name>` and `</x-package::component>` using consistent colon support
