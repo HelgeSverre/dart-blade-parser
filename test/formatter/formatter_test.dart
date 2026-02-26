@@ -889,9 +889,8 @@ void main() {
 
       test('formats empty slot', () {
         const input = '<x-card><x-slot:empty></x-slot></x-card>';
-        // Note: Empty slots currently don't output closing tags
         const expected = '<x-card>\n'
-            '    <x-slot:empty>\n'
+            '    <x-slot:empty></x-slot>\n'
             '</x-card>\n';
 
         final result = formatter.format(input);

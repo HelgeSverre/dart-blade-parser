@@ -1014,7 +1014,12 @@ class FormatterVisitor implements AstVisitor<String> {
       // Allow inline if: all meaningful children are inline-renderable
       // (simple text, echo, or inline HTML elements with simple content)
       // BUT: if there are newlines in whitespace between meaningful children, don't inline
-      var canKeepInline = meaningfulChildren.isNotEmpty &&
+      // Also: if the tag head is not empty (opening tag spans multiple lines due
+      // to structural directives), always use block formatting for children.
+      // The totalLineLength calculation assumes a single-line opening tag and
+      // would produce unstable results when attributes are wrapped.
+      var canKeepInline = node.tagHead.isEmpty &&
+          meaningfulChildren.isNotEmpty &&
           meaningfulChildren.every(_isInlineRenderableNode);
 
       // Check for newlines between meaningful children
@@ -1427,6 +1432,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Format children
     if (node.children.isEmpty) {
+      _output.write('</x-slot>');
       _output.writeln();
       return '';
     }
