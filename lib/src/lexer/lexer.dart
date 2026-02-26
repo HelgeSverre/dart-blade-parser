@@ -1135,7 +1135,6 @@ class BladeLexer {
     // Check for @ in attribute position: Blade directive or Alpine.js shorthand
     if (_peek() == '@') {
       // Look ahead to get the name after @
-      final atStart = _position;
       _advance(); // consume '@'
       final nameStart = _position;
       while (_isAlphaNumeric(_peek())) {
@@ -1409,11 +1408,6 @@ class BladeLexer {
 
   String _peekAhead(int n) =>
       _position + n >= input.length ? '\x00' : input[_position + n];
-
-  String _previousChar() {
-    if (_position == 0) return '\x00';
-    return input[_position - 1];
-  }
 
   void _advance() {
     if (_isAtEnd()) return;

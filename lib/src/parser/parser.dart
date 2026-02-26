@@ -1238,42 +1238,6 @@ class BladeParser {
     return TokenType.attributeDirectives.contains(type);
   }
 
-  /// Parse attributes from current token position into a map.
-  /// Handles Alpine.js, Livewire, and standard HTML attributes.
-  Map<String, AttributeNode> _parseAttributeMap() {
-    final attributes = <String, AttributeNode>{};
-    while (_isAttributeToken(_peek().type)) {
-      final attrToken = _advance();
-      final attrName = attrToken.value;
-      final attrStartPos = attrToken.startPosition;
-      Position attrEndPos = attrToken.endPosition;
-
-      String? attrValue;
-
-      // Blade attribute directives use expression tokens, not attributeValue
-      if (_isBladeAttributeDirective(attrToken.type)) {
-        if (_check(TokenType.expression)) {
-          final exprToken = _advance();
-          attrValue = exprToken.value;
-          attrEndPos = exprToken.endPosition;
-        }
-      } else if (_check(TokenType.attributeValue)) {
-        final valueToken = _advance();
-        attrValue = valueToken.value;
-        attrEndPos = valueToken.endPosition;
-      }
-
-      attributes[attrName] = _classifyAttribute(
-        attrToken,
-        attrName,
-        attrValue,
-        attrStartPos,
-        attrEndPos,
-      );
-    }
-    return attributes;
-  }
-
   /// Check if a token type is a Blade structural directive that can appear in tag heads.
   bool _isStructuralDirectiveToken(TokenType type) {
     // This covers @if, @elseif, @else, @endif, @foreach, @endforeach,

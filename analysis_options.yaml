@@ -70,5 +70,5 @@ linter:
     - secure_pubspec_urls
 
     # Documentation
-    - public_member_api_docs
+    # - public_member_api_docs
     - comment_references
