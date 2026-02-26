@@ -23,7 +23,7 @@ void main() {
     test('parses @pushIf directive', () {
       final parser = BladeParser();
       final result = parser.parse(
-          '@pushIf(\$shouldPush, "scripts") <script></script> @endPushOnce');
+          '@pushIf(\$shouldPush, "scripts") <script></script> @endPushIf');
       final directives = result.ast!.children.whereType<DirectiveNode>();
       expect(directives.any((d) => d.name == 'pushIf'), isTrue);
     });
