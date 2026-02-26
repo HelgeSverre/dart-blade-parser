@@ -9,7 +9,9 @@ void main() {
 
       expect(result.isSuccess, isTrue);
       expect(result.ast, isNotNull);
-      expect(result.ast!.children.length, greaterThan(0));
+      expect(result.ast!.children.length, equals(1));
+      expect(result.ast!.children.first, isA<TextNode>());
+      expect((result.ast!.children.first as TextNode).content, equals('Hello World'));
     });
 
     test('Parse simple echo', () {
@@ -46,6 +48,8 @@ void main() {
       final directives = result.ast!.children.whereType<DirectiveNode>();
       expect(directives.length, equals(1));
       expect(directives.first.name, equals('if'));
+      expect(directives.first.expression, contains('\$test'));
+      expect(directives.first.children, isNotEmpty);
     });
 
     test('Detect unclosed @if directive', () {
@@ -62,7 +66,11 @@ void main() {
       final result = parser.parse('Hello {{ \$name }}, welcome!');
 
       expect(result.isSuccess, isTrue);
-      expect(result.ast!.children.length, greaterThan(1));
+      expect(result.ast!.children.length, equals(3));
+      expect(result.ast!.children[0], isA<TextNode>());
+      expect(result.ast!.children[1], isA<EchoNode>());
+      expect((result.ast!.children[1] as EchoNode).expression, contains('\$name'));
+      expect(result.ast!.children[2], isA<TextNode>());
     });
 
     test('JSON serialization works', () {

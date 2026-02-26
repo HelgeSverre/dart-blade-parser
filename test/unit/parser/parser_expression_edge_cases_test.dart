@@ -63,11 +63,6 @@ void main() {
       test('Unbalanced parentheses detection', () {
         final result = parser.parse('@if((\$x + \$y){{ \$result }}@endif');
 
-        // Parser should handle gracefully - might be success with partial parse
-        // or error depending on implementation
-        // The key is that it doesn't crash
-        expect(() => result, returnsNormally);
-
         // If it succeeds, expression should at least contain the partial content
         if (result.isSuccess) {
           final ifNode = result.ast!.children
