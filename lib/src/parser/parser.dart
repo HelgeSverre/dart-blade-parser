@@ -1355,12 +1355,14 @@ class BladeParser {
           }
           // Store as a special attribute with the expression as name
           final attrName = '{{ ${expr.trim()} }}';
-          attributes[attrName] = StandardAttribute(
+          final attrNode = StandardAttribute(
             name: attrName,
             value: null,
             startPosition: _previous().startPosition,
             endPosition: _previous().endPosition,
           );
+          attributes[attrName] = attrNode;
+          tagHead.add(TagHeadAttribute(attrName, attrNode));
         } else if (type == TokenType.rawEchoOpen) {
           _advance(); // rawEchoOpen
           String expr = '';
@@ -1371,12 +1373,14 @@ class BladeParser {
             _advance(); // rawEchoClose
           }
           final attrName = '{!! ${expr.trim()} !!}';
-          attributes[attrName] = StandardAttribute(
+          final attrNode = StandardAttribute(
             name: attrName,
             value: null,
             startPosition: _previous().startPosition,
             endPosition: _previous().endPosition,
           );
+          attributes[attrName] = attrNode;
+          tagHead.add(TagHeadAttribute(attrName, attrNode));
         } else {
           // Blade comment - skip it
           _advance();
