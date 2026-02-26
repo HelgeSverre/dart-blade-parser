@@ -52,7 +52,7 @@
       // HTML tags <...>
       else if (code[i] === '<' && i + 1 < code.length && (code[i+1] === '/' || code[i+1] === '!' || /[a-zA-Z]/.test(code[i+1]))) {
         const start = i;
-        // Simple tag scan — find closing >
+        // Tag scan — find closing >, skipping quoted values and @directive(...) expressions
         let inQuote = null;
         i++;
         while (i < code.length) {
@@ -61,6 +61,24 @@
             else if (code[i] === '\\') i++;
           } else {
             if (code[i] === '"' || code[i] === "'") inQuote = code[i];
+            // Skip @directive(...) — expression may contain > (PHP => or ->)
+            else if (code[i] === '@' && i + 1 < code.length && /[a-zA-Z]/.test(code[i + 1])) {
+              i++;
+              while (i < code.length && /[a-zA-Z_]/.test(code[i])) i++;
+              if (i < code.length && code[i] === '(') {
+                let depth = 1; i++;
+                while (i < code.length && depth > 0) {
+                  if (code[i] === '(') depth++;
+                  else if (code[i] === ')') depth--;
+                  if (code[i] === "'" || code[i] === '"') {
+                    const q = code[i]; i++;
+                    while (i < code.length && code[i] !== q) { if (code[i] === '\\') i++; i++; }
+                  }
+                  i++;
+                }
+              }
+              continue;
+            }
             else if (code[i] === '>') { i++; break; }
           }
           i++;
@@ -104,10 +122,31 @@
         tokens.push({ type: 'tag', text: rest.slice(j) });
         break;
       }
+      // Blade directive as attribute: @class(...), @style(...), etc.
+      else if (rest[j] === '@' && j + 1 < rest.length && /[a-zA-Z]/.test(rest[j + 1])) {
+        const ds = j;
+        j++;
+        while (j < rest.length && /[a-zA-Z_]/.test(rest[j])) j++;
+        tokens.push({ type: 'directive', text: rest.slice(ds, j) });
+        if (j < rest.length && rest[j] === '(') {
+          const es = j;
+          let depth = 1; j++;
+          while (j < rest.length && depth > 0) {
+            if (rest[j] === '(') depth++;
+            else if (rest[j] === ')') depth--;
+            if (rest[j] === "'" || rest[j] === '"') {
+              const q = rest[j]; j++;
+              while (j < rest.length && rest[j] !== q) { if (rest[j] === '\\') j++; j++; }
+            }
+            j++;
+          }
+          tokens.push({ type: 'directive-expr', text: rest.slice(es, j) });
+        }
+      }
       // Attribute name
-      else if (/[\w@:.x-]/.test(rest[j])) {
+      else if (/[\w:.x-]/.test(rest[j])) {
         const s = j;
-        while (j < rest.length && /[\w@:.\-]/.test(rest[j])) j++;
+        while (j < rest.length && /[\w:.\-]/.test(rest[j])) j++;
         const attrName = rest.slice(s, j);
         tokens.push({ type: 'attr', text: attrName });
         // = and value

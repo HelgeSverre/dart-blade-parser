@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-02-26
+
+### Fixed
+- **Lexer performance:** Fix O(n²) bottleneck in directive context detection — reorder checks so cheap whitespace/newline conditions are evaluated before expensive backward-scanning methods. Directive-heavy benchmark improved from ~4.2K to ~1.49M directives/sec.
+- **Syntax highlighter:** Fix `@directive(...)` inside HTML tags breaking highlighting. The `>` in PHP `=>` arrows and `->` method calls no longer prematurely closes the tag scan. `@class([...])`, `@style([...])` etc. are now properly tokenized as directive + expression.
+
+### Prettier Plugin (v0.3.1)
+- Rebuilt with latest lexer performance fix and highlighter improvements.
+
 ## [1.1.0] - 2025-02-25
 
 ### Added
