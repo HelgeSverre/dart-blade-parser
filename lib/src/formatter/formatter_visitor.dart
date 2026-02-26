@@ -1610,14 +1610,22 @@ class FormatterVisitor implements AstVisitor<String> {
     if (meaningful.isEmpty) return true;
     if (!meaningful.every(_isInlineRenderableNode)) return false;
 
-    // Reject if there are newlines between meaningful children
-    for (var i = 0; i < node.children.length; i++) {
-      final child = node.children[i];
-      if (child is TextNode &&
-          child.content.trim().isEmpty &&
-          child.content.contains('\n') &&
-          meaningful.contains(i > 0 ? node.children[i - 1] : null)) {
-        return false;
+    // Reject if there are newlines between meaningful children.
+    // Only check when there are multiple meaningful children, matching
+    // the inline decision in visitHtmlElement (which also skips newline
+    // checks for single meaningful children). This prevents the
+    // _isInlineRenderableElement prediction from disagreeing with the
+    // actual formatting, which would cause idempotency failures
+    // (e.g., <td><a>...</a></td> collapsing on the second pass).
+    if (meaningful.length > 1) {
+      for (var i = 0; i < node.children.length; i++) {
+        final child = node.children[i];
+        if (child is TextNode &&
+            child.content.trim().isEmpty &&
+            child.content.contains('\n') &&
+            meaningful.contains(i > 0 ? node.children[i - 1] : null)) {
+          return false;
+        }
       }
     }
 
