@@ -162,6 +162,14 @@
         <script src="/once.js"></script>
     @endPushOnce
 
+    @pushIf($shouldPush, 'scripts')
+        <script src="/conditional.js"></script>
+    @endPushIf
+
+    @hasStack('scripts')
+        <div class="has-scripts">Scripts loaded</div>
+    @endif
+
     {{-- 16. Verbatim --}}
     @verbatim
         <div>{{ This is not parsed }}</div>
@@ -180,7 +188,11 @@
         <link href="/once-style.css" rel="stylesheet">
     @endonce
 
-    {{-- 19. Fragment --}}
+    {{-- 19. Fragment + Context --}}
+    @context('canonical')
+        <link href="{{ $value }}" rel="canonical">
+    @endcontext
+
     @fragment('user-list')
         <ul>
             @foreach($users as $user)
@@ -243,3 +255,23 @@
         }
     </script>
 @endsection
+
+{{-- 24. Livewire directives: @teleport, @persist --}}
+@teleport('body')
+    <div class="modal-overlay">
+        <div class="modal">Modal content</div>
+    </div>
+@endTeleport
+
+@persist('audio-player')
+    <audio src="{{ $track->url }}" controls></audio>
+@endPersist
+
+{{-- 25. Section closers: @stop and @append --}}
+@section('extra-sidebar')
+    <nav>Extra sidebar</nav>
+@stop
+
+@section('appended-scripts')
+    <script src="/appended.js"></script>
+@append

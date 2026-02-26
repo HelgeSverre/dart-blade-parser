@@ -120,6 +120,8 @@ class BladeParser {
           'component',
           TokenType.directiveEndcomponent,
         );
+      case TokenType.directiveSlot:
+        return _parseGenericDirective('slot', TokenType.directiveEndslot);
 
       // Control flow - paired directives
       case TokenType.directiveUnless:
@@ -160,7 +162,7 @@ class BladeParser {
         return _parseGenericDirective(
             'prependOnce', TokenType.directiveEndPrependOnce);
       case TokenType.directivePushIf:
-        return _parseGenericDirective('pushIf', TokenType.directiveEndPushOnce);
+        return _parseGenericDirective('pushIf', TokenType.directiveEndPushIf);
       case TokenType.directiveFragment:
         return _parseGenericDirective(
           'fragment',
@@ -168,12 +170,24 @@ class BladeParser {
         );
       case TokenType.directiveSession:
         return _parseGenericDirective('session', TokenType.directiveEndsession);
+      case TokenType.directiveContext:
+        return _parseGenericDirective('context', TokenType.directiveEndcontext);
+
+      // Stacks - conditional
+      case TokenType.directiveHasStack:
+        return _parseGenericDirective('hasStack', TokenType.directiveEndif);
 
       // Livewire - paired directives
       case TokenType.directiveScript:
         return _parseGenericDirective('script', TokenType.directiveEndscript);
       case TokenType.directiveAssets:
         return _parseGenericDirective('assets', TokenType.directiveEndassets);
+      case TokenType.directiveTeleport:
+        return _parseGenericDirective(
+            'teleport', TokenType.directiveEndTeleport);
+      case TokenType.directivePersist:
+        return _parseGenericDirective(
+            'persist', TokenType.directiveEndPersist);
 
       // Other directives (inline, no closing tag)
       case TokenType.directiveExtends:
@@ -926,31 +940,30 @@ class BladeParser {
         children: [],
       );
     } else {
-      // Block syntax - requires @endsection, @show, or @overwrite (legacy)
+      // Block syntax - requires @endsection, @show, @stop, @append, or @overwrite (legacy)
       final children = <AstNode>[];
 
-      while (!_checkAny([
-            TokenType.directiveEndsection,
-            TokenType.directiveShow,
-            TokenType.directiveOverwrite, // Legacy Laravel 4.x/5.x support
-          ]) &&
-          !_check(TokenType.eof)) {
+      final sectionClosers = [
+        TokenType.directiveEndsection,
+        TokenType.directiveShow,
+        TokenType.directiveStop,
+        TokenType.directiveAppend,
+        TokenType.directiveOverwrite, // Legacy Laravel 4.x/5.x support
+      ];
+
+      while (!_checkAny(sectionClosers) && !_check(TokenType.eof)) {
         final node = _parseNode();
         if (node != null) children.add(node);
       }
 
       String? closedBy;
-      if (!_checkAny([
-        TokenType.directiveEndsection,
-        TokenType.directiveShow,
-        TokenType.directiveOverwrite,
-      ])) {
+      if (!_checkAny(sectionClosers)) {
         _errors.add(
           ParseError(
             message: 'Unclosed @section directive',
             position: startToken.startPosition,
             hint:
-                'Add @endsection, @show, or @overwrite (deprecated) to close the block',
+                'Add @endsection, @show, @stop, or @append to close the block',
           ),
         );
       } else {

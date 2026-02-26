@@ -1546,10 +1546,14 @@ class BladeLexer {
         return TokenType.directiveEndPushOnce;
       case 'pushIf':
         return TokenType.directivePushIf;
+      case 'endPushIf':
+        return TokenType.directiveEndPushIf;
       case 'prependOnce':
         return TokenType.directivePrependOnce;
       case 'endPrependOnce':
         return TokenType.directiveEndPrependOnce;
+      case 'hasStack':
+        return TokenType.directiveHasStack;
 
       // Components
       case 'component':
@@ -1564,6 +1568,12 @@ class BladeLexer {
         return TokenType.directiveProps;
       case 'aware':
         return TokenType.directiveAware;
+
+      // Section Closers
+      case 'stop':
+        return TokenType.directiveStop;
+      case 'append':
+        return TokenType.directiveAppend;
 
       // Includes
       case 'include':
@@ -1628,6 +1638,10 @@ class BladeLexer {
         return TokenType.directiveSession;
       case 'endsession':
         return TokenType.directiveEndsession;
+      case 'context':
+        return TokenType.directiveContext;
+      case 'endcontext':
+        return TokenType.directiveEndcontext;
 
       // Debugging
       case 'dd':
@@ -1686,6 +1700,14 @@ class BladeLexer {
         return TokenType.directiveUse;
 
       // Livewire Directives
+      case 'teleport':
+        return TokenType.directiveTeleport;
+      case 'endTeleport':
+        return TokenType.directiveEndTeleport;
+      case 'persist':
+        return TokenType.directivePersist;
+      case 'endPersist':
+        return TokenType.directiveEndPersist;
       case 'entangle':
         return TokenType.directiveEntangle;
       case 'this':

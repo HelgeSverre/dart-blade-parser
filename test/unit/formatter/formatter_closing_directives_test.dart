@@ -29,8 +29,19 @@ void main() {
     });
 
     test('pushIf directive preserves closing tag', () {
-      final output = format('@pushIf(true, "scripts")\n<script></script>\n@endPushOnce');
-      expect(output, contains('@endPushOnce'));
+      final output = format('@pushIf(true, "scripts")\n<script></script>\n@endPushIf');
+      expect(output, contains('@endPushIf'));
+    });
+
+    test('pushIf round-trips idempotently with @endPushIf', () {
+      final input = '@pushIf(true, "scripts")\n    <script></script>\n@endPushIf';
+      final first = format(input);
+      final second = format(first);
+      expect(first, equals(second),
+          reason: '@pushIf/@endPushIf should be idempotent');
+      expect(first, contains('@pushIf'));
+      expect(first, contains('@endPushIf'));
+      expect(first, isNot(contains('@endPushOnce')));
     });
 
     test('fragment directive preserves closing tag', () {
@@ -104,6 +115,88 @@ void main() {
       expect(output, contains('@isset'));
       expect(output, contains('@else'));
       expect(output, contains('@endisset'));
+    });
+
+    // Issue #1: @slot/@endslot parsed as block directive
+    test('slot directive preserves closing tag', () {
+      final output = format('@slot("header")\n<h1>Title</h1>\n@endslot');
+      expect(output, contains('@slot'));
+      expect(output, contains('@endslot'));
+    });
+
+    test('slot round-trips idempotently', () {
+      final input = '@slot("header")\n    <h1>Title</h1>\n@endslot';
+      final first = format(input);
+      final second = format(first);
+      expect(first, equals(second),
+          reason: '@slot/@endslot should be idempotent');
+    });
+
+    // Issue #2: @context/@endcontext (Laravel 12.x)
+    test('context directive preserves closing tag', () {
+      final output = format('@context("canonical")\n<link href="{{ \$value }}" rel="canonical">\n@endcontext');
+      expect(output, contains('@context'));
+      expect(output, contains('@endcontext'));
+    });
+
+    test('context round-trips idempotently', () {
+      final input = '@context("canonical")\n    <link href="{{ \$value }}" rel="canonical">\n@endcontext';
+      final first = format(input);
+      final second = format(first);
+      expect(first, equals(second),
+          reason: '@context/@endcontext should be idempotent');
+    });
+
+    // Issue #3: @hasstack (closes with @endif)
+    test('hasStack directive closes with @endif', () {
+      final output = format('@hasStack("scripts")\n<ul>@stack("scripts")</ul>\n@endif');
+      expect(output, contains('@hasStack'));
+      expect(output, contains('@endif'));
+      expect(output, isNot(contains('@endhasStack')));
+    });
+
+    // Issue #4: @teleport/@endTeleport (Livewire)
+    test('teleport directive preserves closing tag', () {
+      final output = format('@teleport("body")\n<div>Modal</div>\n@endTeleport');
+      expect(output, contains('@teleport'));
+      expect(output, contains('@endTeleport'));
+    });
+
+    test('teleport round-trips idempotently', () {
+      final input = '@teleport("body")\n    <div>Modal</div>\n@endTeleport';
+      final first = format(input);
+      final second = format(first);
+      expect(first, equals(second),
+          reason: '@teleport/@endTeleport should be idempotent');
+    });
+
+    // Issue #5: @persist/@endPersist (Livewire)
+    test('persist directive preserves closing tag', () {
+      final output = format('@persist("player")\n<div>Player</div>\n@endPersist');
+      expect(output, contains('@persist'));
+      expect(output, contains('@endPersist'));
+    });
+
+    test('persist round-trips idempotently', () {
+      final input = '@persist("player")\n    <div>Player</div>\n@endPersist';
+      final first = format(input);
+      final second = format(first);
+      expect(first, equals(second),
+          reason: '@persist/@endPersist should be idempotent');
+    });
+
+    // Issue #6: @stop (section alias)
+    test('section closed by @stop', () {
+      final output = format('@section("content")\n<p>Content</p>\n@stop');
+      expect(output, contains('@section'));
+      expect(output, contains('@stop'));
+    });
+
+    // Issue #7: @append (section closer)
+    test('section closed by @append', () {
+      final output = format('@section("sidebar")\n<nav>Nav</nav>\n@append');
+      expect(output, contains('@section'));
+      expect(output, contains('@append'));
     });
   });
 }

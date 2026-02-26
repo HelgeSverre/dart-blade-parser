@@ -236,7 +236,7 @@ void main() {
       expect(error.message, contains('Unclosed @section directive'));
       expect(
         error.hint,
-        contains('@endsection, @show, or @overwrite'),
+        contains('@endsection, @show, @stop, or @append'),
         reason: 'Error hint should mention all closing tag options',
       );
     });

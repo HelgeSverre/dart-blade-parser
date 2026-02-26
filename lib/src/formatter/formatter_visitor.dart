@@ -171,6 +171,11 @@ class FormatterVisitor implements AstVisitor<String> {
     'assets',
     'isset',
     'empty',
+    'slot',
+    'context',
+    'hasStack',
+    'teleport',
+    'persist',
   };
 
   /// Blade directives that are inline (no children, single line).
@@ -178,6 +183,7 @@ class FormatterVisitor implements AstVisitor<String> {
     'yield',
     'show',
     'stop',
+    'append',
     'endsection',
     'extends',
     'include',
@@ -188,12 +194,28 @@ class FormatterVisitor implements AstVisitor<String> {
     'each',
     'csrf',
     'method',
+    'vite',
+    'json',
+    'inject',
+    'use',
+    'dd',
+    'dump',
     'props',
     'aware',
     'stack',
+    'hasSection',
+    'sectionMissing',
     'break',
     'continue',
     'empty', // Can be both, but often inline in context
+    'entangle',
+    'this',
+    'js',
+    'livewireStyles',
+    'livewireScripts',
+    'livewireScriptConfig',
+    'filamentStyles',
+    'filamentScripts',
   };
 
   /// Standard HTML attributes that should appear first when sorting by type.
@@ -1538,7 +1560,10 @@ class FormatterVisitor implements AstVisitor<String> {
   static const Map<String, String> _closingDirectiveNames = {
     'pushOnce': 'endPushOnce',
     'prependOnce': 'endPrependOnce',
-    'pushIf': 'endPushOnce', // Laravel uses @endPushIf but parser reuses EndPushOnce token
+    'pushIf': 'endPushIf',
+    'hasStack': 'endif',
+    'teleport': 'endTeleport',
+    'persist': 'endPersist',
   };
 
   String _closingDirectiveName(String name) {

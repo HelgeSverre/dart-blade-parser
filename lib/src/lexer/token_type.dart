@@ -46,8 +46,10 @@ enum TokenType {
   directivePushOnce,
   directiveEndPushOnce,
   directivePushIf,
+  directiveEndPushIf,
   directivePrependOnce,
   directiveEndPrependOnce,
+  directiveHasStack,
 
   // Blade Directives - Components
   directiveComponent,
@@ -64,6 +66,10 @@ enum TokenType {
   directiveIncludeUnless,
   directiveIncludeFirst,
   directiveEach,
+
+  // Blade Directives - Section Closers
+  directiveStop,
+  directiveAppend,
 
   // Blade Directives - Special
   directiveOnce,
@@ -92,6 +98,8 @@ enum TokenType {
   directiveEndproduction,
   directiveSession,
   directiveEndsession,
+  directiveContext,
+  directiveEndcontext,
 
   // Blade Directives - Debugging
   directiveDd,
@@ -129,6 +137,10 @@ enum TokenType {
   directiveUse,
 
   // Livewire Directives
+  directiveTeleport,
+  directiveEndTeleport,
+  directivePersist,
+  directiveEndPersist,
   directiveEntangle,
   directiveThis,
   directiveJs,
