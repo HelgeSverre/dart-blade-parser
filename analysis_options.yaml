@@ -4,7 +4,6 @@ include: package:lints/recommended.yaml
 analyzer:
   exclude:
     - archive/**
-    - specs/**
     - doc/api/**
     - "**/*.g.dart"
     - "**/*.freezed.dart"
