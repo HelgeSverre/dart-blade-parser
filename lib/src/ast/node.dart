@@ -77,6 +77,9 @@ abstract class AstVisitor<T> {
 
   /// Visit a slot node (component slot definition).
   T visitSlot(SlotNode node);
+
+  /// Visit a PHP block node (<?php ?>, <?= ?>, <? ?>, @php/@endphp).
+  T visitPhpBlock(PhpBlockNode node);
 }
 
 /// Root document node representing the entire Blade template.
@@ -478,6 +481,12 @@ final class ComponentNode extends AstNode {
   /// Map of attributes passed to the component.
   final Map<String, AttributeNode> attributes;
 
+  /// Ordered list of items in the opening tag head.
+  /// Preserves the source order of attributes and structural directives
+  /// (e.g., `@if`/`@endif` wrapping conditional attributes).
+  /// Empty when no structural directives appear in the tag head.
+  final List<TagHeadItem> tagHead;
+
   /// Named slots defined within the component.
   final Map<String, SlotNode> slots;
 
@@ -488,6 +497,7 @@ final class ComponentNode extends AstNode {
   ///
   /// [name] is the component name without the x- prefix.
   /// [attributes] are the component attributes.
+  /// [tagHead] preserves ordered tag head items when directives are present.
   /// [slots] are named slot definitions.
   /// [isSelfClosing] indicates if this is a self-closing tag.
   /// [children] contains the component's content.
@@ -496,6 +506,7 @@ final class ComponentNode extends AstNode {
     required this.endPosition,
     required this.name,
     this.attributes = const {},
+    this.tagHead = const [],
     this.slots = const {},
     this.isSelfClosing = false,
     required this.children,
@@ -732,6 +743,64 @@ final class ErrorNode extends AstNode {
         'type': 'error',
         'error': error,
         if (partialContent != null) 'partialContent': partialContent,
+        'position': {
+          'start': startPosition.toJson(),
+          'end': endPosition.toJson(),
+        },
+      };
+}
+
+/// The syntax variant used for a PHP block.
+enum PhpBlockSyntax {
+  /// Standard PHP tag: `<?php ... ?>`
+  phpTag,
+
+  /// Short echo tag: `<?= ... ?>`
+  shortEcho,
+
+  /// Short open tag: `<? ... ?>` (deprecated in PHP 7.4, requires short_open_tag)
+  shortTag,
+
+  /// Blade directive: `@php ... @endphp`
+  bladeDirective,
+}
+
+/// A block of raw PHP code in the template.
+///
+/// Represents PHP code regions that should be preserved verbatim.
+/// The [code] field contains the PHP source between the delimiters
+/// (not including the opening/closing tags themselves).
+final class PhpBlockNode extends AstNode {
+  @override
+  final Position startPosition;
+  @override
+  final Position endPosition;
+  @override
+  AstNode? parent;
+  @override
+  final List<AstNode> children = const [];
+
+  /// The raw PHP source code between the delimiters.
+  final String code;
+
+  /// Which PHP tag syntax was used.
+  final PhpBlockSyntax syntax;
+
+  PhpBlockNode({
+    required this.startPosition,
+    required this.endPosition,
+    required this.code,
+    required this.syntax,
+  });
+
+  @override
+  T accept<T>(AstVisitor<T> visitor) => visitor.visitPhpBlock(this);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'phpBlock',
+        'syntax': syntax.name,
+        'code': code,
         'position': {
           'start': startPosition.toJson(),
           'end': endPosition.toJson(),

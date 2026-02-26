@@ -151,7 +151,13 @@ class BladeParser {
       case TokenType.directiveOnce:
         return _parseGenericDirective('once', TokenType.directiveEndonce);
       case TokenType.directivePhp:
-        return _parseGenericDirective('php', TokenType.directiveEndphp);
+        // Inline @php($expr) has an expression token following;
+        // block @php has raw text content until @endphp
+        if (_current < _tokens.length - 1 &&
+            _tokens[_current + 1].type == TokenType.expression) {
+          return _parseInlineDirective();
+        }
+        return _parsePhpDirectiveBlock();
       case TokenType.directiveVerbatim:
         return _parseGenericDirective(
           'verbatim',
@@ -296,6 +302,8 @@ class BladeParser {
           content: token.value,
           isBladeComment: false,
         );
+      case TokenType.phpBlock:
+        return _parsePhpTagBlock();
       case TokenType.eof:
         _advance(); // Advance past EOF to terminate loop
         return null;
@@ -636,6 +644,74 @@ class BladeParser {
     );
   }
 
+  /// Parse a `<?php ... ?>`, `<?= ... ?>`, or `<? ... ?>` block.
+  PhpBlockNode _parsePhpTagBlock() {
+    final token = _advance();
+    final value = token.value;
+
+    PhpBlockSyntax syntax;
+    String code;
+
+    if (value.startsWith('<?=')) {
+      syntax = PhpBlockSyntax.shortEcho;
+      code = _extractPhpCode(value, 3);
+    } else if (value.startsWith('<?php')) {
+      syntax = PhpBlockSyntax.phpTag;
+      code = _extractPhpCode(value, 5);
+    } else {
+      syntax = PhpBlockSyntax.shortTag;
+      code = _extractPhpCode(value, 2);
+    }
+
+    return PhpBlockNode(
+      startPosition: token.startPosition,
+      endPosition: token.endPosition,
+      code: code,
+      syntax: syntax,
+    );
+  }
+
+  /// Extract PHP code from a token value, stripping opening tag prefix
+  /// and optional closing `?>`.
+  String _extractPhpCode(String value, int prefixLength) {
+    var code = value.substring(prefixLength);
+    if (code.endsWith('?>')) {
+      code = code.substring(0, code.length - 2);
+    }
+    return code;
+  }
+
+  /// Parse `@php ... @endphp` as a [PhpBlockNode].
+  PhpBlockNode _parsePhpDirectiveBlock() {
+    final startToken = _advance();
+
+    // Collect raw text content until @endphp
+    final codeBuffer = StringBuffer();
+    while (!_check(TokenType.directiveEndphp) && !_check(TokenType.eof)) {
+      final token = _advance();
+      codeBuffer.write(token.value);
+    }
+
+    if (_check(TokenType.directiveEndphp)) {
+      _advance();
+    } else {
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @php directive',
+          position: startToken.startPosition,
+          hint: 'Add @endphp to close the block',
+        ),
+      );
+    }
+
+    return PhpBlockNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      code: codeBuffer.toString(),
+      syntax: PhpBlockSyntax.bladeDirective,
+    );
+  }
+
   String? _extractExpression() {
     if (_check(TokenType.expression)) {
       return _advance().value.trim();
@@ -800,6 +876,7 @@ class BladeParser {
     // Parse tag head: attributes and structural directives
     final tagHeadResult = _parseTagHead();
     final attributes = tagHeadResult.attributes;
+    final tagHead = tagHeadResult.tagHead;
 
     // Check for self-closing
     bool isSelfClosing = false;
@@ -873,6 +950,7 @@ class BladeParser {
       endPosition: _previous().endPosition,
       name: componentName,
       attributes: attributes,
+      tagHead: tagHead,
       slots: slots,
       isSelfClosing: isSelfClosing,
       children: children,

@@ -132,6 +132,19 @@ class JsonSerializerVisitor extends RecursiveAstVisitor<Map<String, dynamic>> {
   }
 
   @override
+  Map<String, dynamic> visitPhpBlock(PhpBlockNode node) {
+    return {
+      'type': 'phpBlock',
+      'syntax': node.syntax.name,
+      'code': node.code,
+      'position': {
+        'start': node.startPosition.toJson(),
+        'end': node.endPosition.toJson(),
+      },
+    };
+  }
+
+  @override
   Map<String, dynamic> defaultVisit(AstNode node) {
     // This should not be called for known node types
     throw UnimplementedError('Unknown node type: ${node.runtimeType}');

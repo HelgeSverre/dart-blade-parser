@@ -323,15 +323,14 @@ void main() {
         );
 
         expect(result.isSuccess, isTrue);
-        // The parser should capture the directive
-        final phpNode = result.ast!.children
-            .whereType<DirectiveNode>()
-            .firstWhere((n) => n.name == 'php');
+        // @php blocks are now PhpBlockNode
+        final phpBlocks = result.ast!.children
+            .whereType<PhpBlockNode>()
+            .toList();
 
-        expect(phpNode.name, equals('php'));
-        // @php blocks typically don't have expressions - they have children
-        // The content is in the children as text nodes
-        expect(phpNode.children.isNotEmpty, isTrue);
+        expect(phpBlocks, hasLength(1));
+        expect(phpBlocks.first.syntax, PhpBlockSyntax.bladeDirective);
+        expect(phpBlocks.first.code, contains('function'));
       });
 
       test('Closure with use clause', () {
@@ -342,13 +341,13 @@ void main() {
         );
 
         expect(result.isSuccess, isTrue);
-        final phpNode = result.ast!.children
-            .whereType<DirectiveNode>()
-            .firstWhere((n) => n.name == 'php');
+        final phpBlocks = result.ast!.children
+            .whereType<PhpBlockNode>()
+            .toList();
 
-        expect(phpNode.name, equals('php'));
-        // @php blocks have their content as children
-        expect(phpNode.children.isNotEmpty, isTrue);
+        expect(phpBlocks, hasLength(1));
+        expect(phpBlocks.first.syntax, PhpBlockSyntax.bladeDirective);
+        expect(phpBlocks.first.code, contains('use'));
       });
     });
 

@@ -84,7 +84,10 @@ void main() {
           result.ast!.children.whereType<DirectiveNode>().toList();
       expect(directives.where((d) => d.name == 'blaze'), hasLength(1));
       expect(directives.where((d) => d.name == 'props'), hasLength(1));
-      expect(directives.where((d) => d.name == 'php'), hasLength(1));
+      // @php is now a PhpBlockNode, not a DirectiveNode
+      final phpBlocks =
+          result.ast!.children.whereType<PhpBlockNode>().toList();
+      expect(phpBlocks, hasLength(1));
     });
 
     test('@blaze at top of component file (real-world FluxUI pattern)', () {

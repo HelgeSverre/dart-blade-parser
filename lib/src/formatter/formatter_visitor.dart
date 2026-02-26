@@ -195,7 +195,6 @@ class FormatterVisitor implements AstVisitor<String> {
     'push',
     'prepend',
     'once',
-    'php',
     'verbatim',
     'error',
     'component',
@@ -1170,35 +1169,54 @@ class FormatterVisitor implements AstVisitor<String> {
     _beginLine();
     _output.write('<x-${node.name}');
 
-    // Determine if we should wrap attributes
-    final shouldWrap = _shouldWrapAttributes(
-      node.name,
-      attributes,
-      isComponent: true,
-      isSelfClosing: shouldSelfClose,
-    );
+    // If tag head contains structural directives, use ordered tag head
+    if (node.tagHead.isNotEmpty) {
+      final closingBracket = shouldSelfClose ? ' />' : '>';
+      _writeTagHead(node.tagHead, closingBracket: closingBracket);
 
-    // Handle self-closing components
-    if (shouldSelfClose) {
-      _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
-      _output.writeln();
-      return '';
-    }
+      if (shouldSelfClose) {
+        _output.writeln();
+        return '';
+      }
 
-    // For empty components with selfClosingStyle.never, output explicit close
-    if (!hasContent) {
+      if (!hasContent) {
+        _output.write('</x-${node.name}>');
+        _output.writeln();
+        return '';
+      }
+    } else {
+      // Normal attribute-only formatting
+      final shouldWrap = _shouldWrapAttributes(
+        node.name,
+        attributes,
+        isComponent: true,
+        isSelfClosing: shouldSelfClose,
+      );
+
+      // Handle self-closing components
+      if (shouldSelfClose) {
+        _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
+        _output.writeln();
+        return '';
+      }
+
+      // For empty components with selfClosingStyle.never, output explicit close
+      if (!hasContent) {
+        _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
+        _output.write('</x-${node.name}>');
+        _output.writeln();
+        return '';
+      }
+
       _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
-      _output.write('</x-${node.name}>');
-      _output.writeln();
-      return '';
     }
-
-    _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
 
     // Format children
     // Check if we can keep content inline
     // If there's only a default slot with simple text, render it inline without slot tags
-    final hasOnlyDefaultSlot = node.slots.length == 1 &&
+    // Skip inline optimization when tag head has directives (unstable line length)
+    final hasOnlyDefaultSlot = node.tagHead.isEmpty &&
+        node.slots.length == 1 &&
         node.slots.containsKey('default') &&
         node.slots['default']!.children.length == 1 &&
         node.slots['default']!.children.first is TextNode &&
@@ -1541,6 +1559,29 @@ class FormatterVisitor implements AstVisitor<String> {
     // Preserve error nodes as-is (shouldn't happen in well-formed input)
     _beginLine();
     _output.write('<!-- ERROR: ${node.error} -->');
+    _output.writeln();
+    return '';
+  }
+
+  @override
+  String visitPhpBlock(PhpBlockNode node) {
+    // If formatting is disabled, output raw
+    if (!_formattingEnabled) {
+      _outputRaw(node);
+      return '';
+    }
+
+    _beginLine();
+    switch (node.syntax) {
+      case PhpBlockSyntax.phpTag:
+        _output.write('<?php${node.code}?>');
+      case PhpBlockSyntax.shortEcho:
+        _output.write('<?=${node.code}?>');
+      case PhpBlockSyntax.shortTag:
+        _output.write('<?${node.code}?>');
+      case PhpBlockSyntax.bladeDirective:
+        _output.write('@php${node.code}@endphp');
+    }
     _output.writeln();
     return '';
   }

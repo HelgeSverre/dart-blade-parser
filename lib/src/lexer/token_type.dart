@@ -247,6 +247,7 @@ enum TokenType {
   // Structural
   bladeComment, // {{-- --}}
   htmlComment, // <!-- -->
+  phpBlock, // <?php ... ?>, <?= ... ?>, <? ... ?>
   eof,
   error;
 

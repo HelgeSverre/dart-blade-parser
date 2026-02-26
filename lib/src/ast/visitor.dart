@@ -84,4 +84,10 @@ abstract class RecursiveAstVisitor<T> implements AstVisitor<T> {
     // Error nodes are typically leaf nodes
     return defaultValue;
   }
+
+  @override
+  T visitPhpBlock(PhpBlockNode node) {
+    // PHP block nodes are leaf nodes (no children)
+    return defaultValue;
+  }
 }

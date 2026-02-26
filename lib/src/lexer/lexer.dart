@@ -49,6 +49,44 @@ class BladeLexer {
     return _rawTextTagName != null ? _LexerState.rawText : _LexerState.text;
   }
 
+  /// Scans a PHP block: `<?php ... ?>`, `<?= ... ?>`, or `<? ... ?>`.
+  /// Emits a single [TokenType.phpBlock] token with the full source
+  /// including delimiters. Handles unclosed blocks (scans to EOF).
+  _LexerState _lexPhpBlock() {
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
+    _advance(); // <
+    _advance(); // ?
+
+    // Determine variant and advance past the marker
+    if (!_isAtEnd() && _peek() == '=') {
+      _advance(); // = (for <?=)
+    } else {
+      // Scan identifier like "php" in <?php
+      while (!_isAtEnd() && _isAlpha(_peek())) {
+        _advance();
+      }
+    }
+
+    // Scan until ?> or EOF
+    while (!_isAtEnd()) {
+      if (_peek() == '?' && _peekNext() == '>') {
+        _advance(); // ?
+        _advance(); // >
+        _emitToken(TokenType.phpBlock, input.substring(_start, _position));
+        return _textOrRawTextState();
+      }
+      _advance();
+    }
+
+    // Unclosed — emit to EOF
+    _emitToken(TokenType.phpBlock, input.substring(_start, _position));
+    _emitToken(TokenType.eof, '');
+    return _LexerState.done;
+  }
+
   /// Tokenize the input string into a list of tokens.
   List<Token> tokenize() {
     _tokens.clear();
@@ -228,6 +266,20 @@ class BladeLexer {
           _emitToken(TokenType.text, buffer.toString());
         }
         return _LexerState.rawEcho;
+      }
+
+      // Check for PHP opening tags: <?php, <?=, <? (but not <?xml)
+      if (ch == '<' && _peekNext() == '?') {
+        final afterQ = _peekAhead(2);
+        // <?xml is NOT a PHP tag — let it fall through as text
+        if (!(afterQ == 'x' &&
+            _peekAhead(3) == 'm' &&
+            _peekAhead(4) == 'l')) {
+          if (buffer.isNotEmpty) {
+            _emitToken(TokenType.text, buffer.toString());
+          }
+          return _lexPhpBlock();
+        }
       }
 
       // Check for </x- component closing tag

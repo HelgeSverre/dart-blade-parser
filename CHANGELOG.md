@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Component `tagHead` support:** `ComponentNode` now has a `tagHead` field (like `HtmlElementNode`) that preserves structural directives (`@if`/`@endif`, `@class`, etc.) inside component opening tags. The formatter correctly renders these using `_writeTagHead`.
+- **Contoso real-world stress fixtures:** 3 anonymized production Blade templates (settings layout, contact detail, ticket detail) covering `@class` in component tags, deep nesting, Livewire/Alpine patterns, and complex slots.
+- **`PhpBlockNode` AST node:** Dedicated node for PHP code regions (`<?php ?>`, `<?= ?>`, `<? ?>`, `@php/@endphp`) with `PhpBlockSyntax` enum. PHP blocks are now structurally represented in the AST instead of being treated as raw text or generic directives. Inline `@php($expr)` remains a `DirectiveNode`.
 - **Livewire v4 compatibility:** Correctly handles single-file components (SFC) containing inline PHP classes without breaking the parser, and advanced `wire:*` attributes (`wire:navigate`, `wire:confirm`, `wire:stream`, etc.)
 - **Volt directive support:** `@volt` / `@endvolt` paired directives for Laravel Volt single-file components
 - **Blaze directive support:** `@blaze` (inline marker), `@unblaze` / `@endunblaze` (paired block) for Livewire Blaze component optimization
@@ -31,6 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stress suite idempotency:** 99.9% (825/826 files), up from 98.1% (810/826)
 
 ## [1.2.1] - 2026-02-26
+
+### Breaking Changes
+- **`AstVisitor` interface:** New required method `visitPhpBlock(PhpBlockNode node)`. Any code implementing `AstVisitor` must add this method.
+- **`@php` blocks:** Previously parsed as `DirectiveNode(name: 'php')`, now parsed as `PhpBlockNode(syntax: bladeDirective)`. Code matching on `DirectiveNode` with `name == 'php'` must be updated.
 
 ### Fixed
 - **Formatter idempotency:** Fix 14 cases where whitespace between inline text and HTML elements or Blade directives expanded on each re-format pass. Introduced `_beginLine()` helper to centralize indentation logic and made `visitText` sibling-aware.

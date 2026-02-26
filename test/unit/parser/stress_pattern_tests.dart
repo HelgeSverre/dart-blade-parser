@@ -176,10 +176,10 @@ void main() {
       expect(blazeDirective.first.children, isEmpty,
           reason: '@blaze should have no children (inline)');
 
-      // @php should be separate from @blaze
-      final phpDirective =
-          directives.where((d) => d.name == 'php').toList();
-      expect(phpDirective, hasLength(1),
+      // @php should be separate from @blaze (now a PhpBlockNode)
+      final phpBlocks =
+          result.ast!.children.whereType<PhpBlockNode>().toList();
+      expect(phpBlocks, hasLength(1),
           reason: '@php/@endphp should still parse correctly');
     });
 
@@ -218,9 +218,9 @@ void main() {
           reason: '<div> in PHP comment should not break parsing');
       expect(result.errors, isEmpty);
 
-      final directives =
-          result.ast!.children.whereType<DirectiveNode>().toList();
-      expect(directives.where((d) => d.name == 'php'), hasLength(1));
+      final phpBlocks =
+          result.ast!.children.whereType<PhpBlockNode>().toList();
+      expect(phpBlocks, hasLength(1));
 
       final htmlElements =
           result.ast!.children.whereType<HtmlElementNode>().toList();

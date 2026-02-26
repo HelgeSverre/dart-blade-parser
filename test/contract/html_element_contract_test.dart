@@ -35,6 +35,9 @@ class TestVisitor extends AstVisitor<String> {
 
   @override
   String visitSlot(SlotNode node) => 'slot';
+
+  @override
+  String visitPhpBlock(PhpBlockNode node) => 'phpBlock';
 }
 
 void main() {
