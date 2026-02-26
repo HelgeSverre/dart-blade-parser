@@ -1102,8 +1102,10 @@ class BladeLexer {
       final name = input.substring(nameStart, _position);
 
       // Check if this is a known Blade attribute directive (@class, @style, etc.)
-      final directiveType = _directiveNameToType(name);
-      if (directiveType != TokenType.identifier) {
+      // Only match attribute-specific directives, NOT general ones like @if, @foreach
+      // which can legitimately appear inside HTML tags for conditional attributes.
+      final directiveType = _bladeAttributeDirectiveType(name);
+      if (directiveType != null) {
         // It's a Blade directive - emit directive token
         _emitToken(directiveType, '@$name');
 
@@ -1362,6 +1364,31 @@ class BladeLexer {
         endOffset: _position,
       ),
     );
+  }
+
+  /// Map a Blade attribute directive name to its token type.
+  /// Returns null if the name is not a known attribute directive.
+  // TODO: Consolidate with the duplicate lists in formatter_visitor.dart
+  // (_isBladeAttributeDirectiveName) and parser.dart (_isBladeAttributeDirective).
+  TokenType? _bladeAttributeDirectiveType(String name) {
+    switch (name) {
+      case 'class':
+        return TokenType.directiveClass;
+      case 'style':
+        return TokenType.directiveStyle;
+      case 'checked':
+        return TokenType.directiveChecked;
+      case 'selected':
+        return TokenType.directiveSelected;
+      case 'disabled':
+        return TokenType.directiveDisabled;
+      case 'readonly':
+        return TokenType.directiveReadonly;
+      case 'required':
+        return TokenType.directiveRequired;
+      default:
+        return null;
+    }
   }
 
   /// Map directive name to token type - ALL 75+ DIRECTIVES
