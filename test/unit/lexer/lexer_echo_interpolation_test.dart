@@ -6,7 +6,7 @@ void main() {
     late BladeLexer lexer;
 
     test(r'handles {$var} inside double-quoted string', () {
-      // This is the specific bug from TODO.md:
+      // This is the specific bug from docs/todo.md:
       // {{ Arr::get($foo, "key.{$bar}") }}
       lexer = BladeLexer('{{ Arr::get(\$foo, "key.{\$bar}") }}');
       final tokens = lexer.tokenize();
