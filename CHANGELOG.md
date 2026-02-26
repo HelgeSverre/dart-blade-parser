@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.3.0] - 2026-02-26
-
 ### Added
 - **Livewire v4 support:** Full support for single-file components (SFC), functional API, and advanced attributes (`wire:navigate`, `wire:confirm`, `wire:stream`, etc.)
 - **Volt directive support:** `@volt` / `@endvolt` paired directives for Laravel Volt single-file components
