@@ -129,7 +129,9 @@ class BladeParser {
 
       // Control flow - paired directives
       case TokenType.directiveUnless:
-        return _parseGenericDirective('unless', TokenType.directiveEndunless);
+        return _parseGenericDirective('unless', TokenType.directiveEndunless,
+            supportsElse: true,
+            alternateClosingTypes: [TokenType.directiveEndif]);
       case TokenType.directiveIsset:
         return _parseGenericDirective('isset', TokenType.directiveEndisset,
             supportsElse: true);
@@ -193,6 +195,18 @@ class BladeParser {
         return _parseGenericDirective(
             'persist', TokenType.directiveEndPersist);
 
+      // Volt - paired directive
+      case TokenType.directiveVolt:
+        return _parseGenericDirective('volt', TokenType.directiveEndvolt);
+
+      // Blaze - inline (no closing tag)
+      case TokenType.directiveBlaze:
+        return _parseInlineDirective();
+      // Blaze - paired block directive
+      case TokenType.directiveUnblaze:
+        return _parseGenericDirective(
+            'unblaze', TokenType.directiveEndunblaze);
+
       // Other directives (inline, no closing tag)
       case TokenType.directiveExtends:
       case TokenType.directiveYield:
@@ -225,6 +239,7 @@ class BladeParser {
       case TokenType.directiveRequired:
       case TokenType.directiveInject:
       case TokenType.directiveUse:
+      case TokenType.directiveLivewire:
       case TokenType.directiveEntangle:
       case TokenType.directiveThis:
       case TokenType.directiveJs:
@@ -865,16 +880,23 @@ class BladeParser {
   }
 
   /// Parse generic directive with opening/closing tags.
+  ///
+  /// [alternateClosingTypes] allows additional token types to close the
+  /// directive (e.g., @endif can close @unless in real-world Blade).
   DirectiveNode _parseGenericDirective(
     String name,
     TokenType closingType, {
     bool supportsElse = false,
+    List<TokenType> alternateClosingTypes = const [],
   }) {
     final startToken = _advance();
     final expression = _extractExpression();
     final children = <AstNode>[];
 
-    while (!_check(closingType) &&
+    bool _isCloser() =>
+        _check(closingType) || alternateClosingTypes.any(_check);
+
+    while (!_isCloser() &&
         !_check(TokenType.eof) &&
         !(supportsElse && _check(TokenType.directiveElse))) {
       final node = _parseNode();
@@ -886,7 +908,7 @@ class BladeParser {
       final elseToken = _advance();
       final elseChildren = <AstNode>[];
 
-      while (!_check(closingType) && !_check(TokenType.eof)) {
+      while (!_isCloser() && !_check(TokenType.eof)) {
         final node = _parseNode();
         if (node != null) elseChildren.add(node);
       }
@@ -901,7 +923,7 @@ class BladeParser {
       );
     }
 
-    if (!_check(closingType)) {
+    if (!_isCloser()) {
       _errors.add(
         ParseError(
           message: 'Unclosed @$name directive',
@@ -1317,6 +1339,48 @@ class BladeParser {
           expression = _advance().value.trim();
         }
         tagHead.add(TagHeadDirective(directiveName, expression: expression));
+      } else if (type == TokenType.echoOpen ||
+          type == TokenType.rawEchoOpen ||
+          type == TokenType.bladeComment) {
+        // Blade echo/raw-echo/comment inside tag attributes (e.g., {{ $attributes->class([...]) }})
+        // Consume the echo tokens without creating an attribute node
+        if (type == TokenType.echoOpen) {
+          _advance(); // echoOpen
+          String expr = '';
+          if (_check(TokenType.expression)) {
+            expr = _advance().value;
+          }
+          if (_check(TokenType.echoClose)) {
+            _advance(); // echoClose
+          }
+          // Store as a special attribute with the expression as name
+          final attrName = '{{ ${expr.trim()} }}';
+          attributes[attrName] = StandardAttribute(
+            name: attrName,
+            value: null,
+            startPosition: _previous().startPosition,
+            endPosition: _previous().endPosition,
+          );
+        } else if (type == TokenType.rawEchoOpen) {
+          _advance(); // rawEchoOpen
+          String expr = '';
+          if (_check(TokenType.expression)) {
+            expr = _advance().value;
+          }
+          if (_check(TokenType.rawEchoClose)) {
+            _advance(); // rawEchoClose
+          }
+          final attrName = '{!! ${expr.trim()} !!}';
+          attributes[attrName] = StandardAttribute(
+            name: attrName,
+            value: null,
+            startPosition: _previous().startPosition,
+            endPosition: _previous().endPosition,
+          );
+        } else {
+          // Blade comment - skip it
+          _advance();
+        }
       } else {
         // Skip unexpected tokens (whitespace, text between directives)
         _advance();
@@ -1389,13 +1453,26 @@ class BladeParser {
       );
     } else if (isLivewireToken || attrName.startsWith('wire:')) {
       final parts = attrName.split('.');
-      final action =
+      final head =
           parts[0].startsWith('wire:') ? parts[0].substring(5) : parts[0];
       final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
+
+      // Split head by ':' to extract sub-action (e.g., "sort:item" → "sort", "item")
+      final colonIndex = head.indexOf(':');
+      final String action;
+      final String? subAction;
+      if (colonIndex != -1) {
+        action = head.substring(0, colonIndex);
+        subAction = head.substring(colonIndex + 1);
+      } else {
+        action = head;
+        subAction = null;
+      }
 
       return LivewireAttribute(
         name: attrName,
         action: action,
+        subAction: subAction,
         modifiers: modifiers,
         value: attrValue,
         startPosition: startPos,

@@ -137,6 +137,7 @@ enum TokenType {
   directiveUse,
 
   // Livewire Directives
+  directiveLivewire,
   directiveTeleport,
   directiveEndTeleport,
   directivePersist,
@@ -151,6 +152,15 @@ enum TokenType {
   directiveEndscript,
   directiveAssets,
   directiveEndassets,
+
+  // Volt Directives
+  directiveVolt,
+  directiveEndvolt,
+
+  // Blaze Directives (Livewire Blaze - component optimization)
+  directiveBlaze,
+  directiveUnblaze,
+  directiveEndunblaze,
 
   // Filament Directives
   directiveFilamentStyles,

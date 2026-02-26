@@ -401,26 +401,40 @@ final class AlpineAttribute extends AttributeNode {
       };
 }
 
-/// Livewire attribute (wire:click, wire:model, etc.).
+/// Livewire attribute (wire:click, wire:model, wire:sort:item, etc.).
 ///
 /// Represents Livewire directives for server-side reactive components,
-/// including actions and modifiers.
+/// including actions, sub-actions, and modifiers.
+///
+/// The attribute name `wire:sort:item.foo` is parsed as:
+/// - [action] = `"sort"` (the base action after `wire:`)
+/// - [subAction] = `"item"` (the colon-separated sub-action, if any)
+/// - [modifiers] = `["foo"]` (dot-separated modifiers)
 final class LivewireAttribute extends AttributeNode {
-  /// The Livewire action (e.g., "click", "model", "submit").
+  /// The Livewire action (e.g., "click", "model", "sort", "bind").
   final String action;
 
-  /// Modifiers applied to the action (e.g., "prevent", "debounce").
+  /// The colon-separated sub-action, if any.
+  ///
+  /// For example, in `wire:sort:item` the sub-action is `"item"`.
+  /// In `wire:bind:class` the sub-action is `"class"`.
+  /// For plain attributes like `wire:click` this is `null`.
+  final String? subAction;
+
+  /// Modifiers applied to the action (e.g., "prevent", "debounce", "once").
   final List<String> modifiers;
 
   /// Creates a Livewire attribute.
   ///
-  /// [name] is the full attribute name (e.g., "wire:click").
-  /// [action] is the Livewire action (e.g., "click", "model").
-  /// [modifiers] are optional modifiers (e.g., ["prevent", "debounce"]).
+  /// [name] is the full attribute name (e.g., "wire:click", "wire:sort:item").
+  /// [action] is the Livewire action (e.g., "click", "sort").
+  /// [subAction] is the optional colon sub-action (e.g., "item", "class").
+  /// [modifiers] are optional dot modifiers (e.g., ["prevent", "debounce"]).
   /// [value] is the method name or expression.
   LivewireAttribute({
     required super.name,
     required this.action,
+    this.subAction,
     this.modifiers = const [],
     super.value,
     required super.startPosition,
@@ -432,6 +446,7 @@ final class LivewireAttribute extends AttributeNode {
         'type': 'livewire',
         'name': name,
         'action': action,
+        if (subAction != null) 'subAction': subAction,
         'modifiers': modifiers,
         if (value != null) 'value': value,
         'position': {
