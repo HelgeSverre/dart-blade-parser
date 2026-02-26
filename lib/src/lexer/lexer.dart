@@ -1416,6 +1416,20 @@ class BladeLexer {
 
     if (_peek() == ':') {
       _advance();
+
+      // Blade :$var shorthand (e.g., :$attributes, :$name)
+      // This is equivalent to :var="$var" in component attributes.
+      if (_peek() == '\$') {
+        _advance(); // $
+        final varStart = _position;
+        while (_isAlphaNumeric(_peek()) || _peek() == '_') {
+          _advance();
+        }
+        final varName = input.substring(varStart, _position);
+        _emitToken(TokenType.identifier, ':\$$varName');
+        return;
+      }
+
       // Alpine.js :bind shorthand
       final bindStart = _position;
       while (_isAlphaNumeric(_peek()) || _peek() == '-') {
