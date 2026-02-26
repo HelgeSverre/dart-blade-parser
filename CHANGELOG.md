@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Livewire v4 support:** Full support for single-file components (SFC), functional API, and advanced attributes (`wire:navigate`, `wire:confirm`, `wire:stream`, etc.)
+- **Livewire v4 compatibility:** Correctly handles single-file components (SFC) containing inline PHP classes without breaking the parser, and advanced `wire:*` attributes (`wire:navigate`, `wire:confirm`, `wire:stream`, etc.)
 - **Volt directive support:** `@volt` / `@endvolt` paired directives for Laravel Volt single-file components
 - **Blaze directive support:** `@blaze` (inline marker), `@unblaze` / `@endunblaze` (paired block) for Livewire Blaze component optimization
 - **LivewireAttribute sub-action parsing:** `wire:sort:item` now parses structured `action="sort"` and `subAction="item"` fields
@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`@unless` / `@endif` compatibility:** `@unless` blocks can now be closed with `@endif`, matching real-world Laravel template conventions
 - **`@php` block raw content mode:** `@php` blocks (without expressions) scan to `@endphp` as raw text, preventing PHP comments and strings containing HTML-like tags from breaking the parser
 - **Component closing tag simplification:** Unified closing tag scanning for `</x-slot:name>` and `</x-package::component>` using consistent colon support
+- **Formatter idempotency (15 fixes):** Resolved remaining idempotency failures in real-world stress fixtures:
+  - Empty `<x-slot>` tags now correctly emit closing `</x-slot>` tag (was silently dropped, causing slot to consume subsequent content on re-parse)
+  - Inline content optimization skipped when tag head contains structural directives (wrapped attributes made `totalLineLength` check unstable between passes)
+  - `_isInlineRenderableElement` newline check aligned with `visitHtmlElement` to prevent `<td><a>...</a></td>` collapse on second pass
+- **Stress suite idempotency:** 99.9% (825/826 files), up from 98.1% (810/826)
 
 ## [1.2.1] - 2026-02-26
 
