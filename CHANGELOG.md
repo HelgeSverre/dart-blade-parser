@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-02-26
+
+### Fixed
+- **Formatter idempotency:** Fix 14 cases where whitespace between inline text and HTML elements or Blade directives expanded on each re-format pass. Introduced `_beginLine()` helper to centralize indentation logic and made `visitText` sibling-aware.
+- **Inline element preservation:** Inline HTML elements (`span`, `a`, `strong`, `br`, etc.) now stay on the same line as surrounding text instead of being broken onto separate lines. A `maxLineLength` guard ensures graceful fallback to block formatting.
+
+### Prettier Plugin (v0.3.2)
+- Rebuilt with formatter idempotency fixes.
+
 ## [1.2.0] - 2025-02-26
 
 ### Fixed

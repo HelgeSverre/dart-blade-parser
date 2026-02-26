@@ -756,7 +756,8 @@ Save
         stopwatch.stop();
 
         expect(result, contains('@if(\$level0)'));
-        expect(result, contains('<p>Deep content</p>'));
+        expect(result, contains('Deep content'));
+        expect(result, contains('<p>'));
         expect(stopwatch.elapsedMilliseconds, lessThan(5000));
       });
 

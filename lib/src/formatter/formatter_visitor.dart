@@ -9,6 +9,8 @@ class _TrackedBuffer {
   final StringBuffer _buffer = StringBuffer();
   String _lastTwo = '';
 
+  bool get isEmpty => _buffer.isEmpty;
+
   void write(Object? obj) {
     final s = obj.toString();
     _buffer.write(s);
@@ -103,6 +105,41 @@ class FormatterVisitor implements AstVisitor<String> {
     'style',
     'textarea',
     'pre',
+  };
+
+  /// Inline (phrasing) HTML elements that may stay on the same line as
+  /// surrounding text. Used by the inline-content path to avoid breaking
+  /// prose apart with newlines.
+  static const Set<String> _inlineElements = {
+    'a',
+    'abbr',
+    'b',
+    'bdi',
+    'bdo',
+    'br',
+    'cite',
+    'code',
+    'data',
+    'dfn',
+    'em',
+    'i',
+    'kbd',
+    'mark',
+    'q',
+    'rp',
+    'rt',
+    'ruby',
+    's',
+    'samp',
+    'small',
+    'span',
+    'strong',
+    'sub',
+    'sup',
+    'time',
+    'u',
+    'var',
+    'wbr',
   };
 
   /// HTML void elements that should not have closing tags.
@@ -253,6 +290,18 @@ class FormatterVisitor implements AstVisitor<String> {
   FormatterVisitor(this.config, {String? source})
       : _source = source,
         _indent = IndentTracker(config);
+
+  /// Ensures the output is at the start of a new line, then writes indentation.
+  ///
+  /// This prevents mid-line indentation injection which causes idempotency
+  /// failures: if a text node doesn't write a trailing newline, the next
+  /// block-level node must not append indentation on the same line.
+  void _beginLine() {
+    if (!_output.endsWithNewline() && !_output.isEmpty) {
+      _output.writeln();
+    }
+    _output.write(_indent.current);
+  }
 
   /// Formats the AST and returns the formatted string.
   String format(AstNode node) {
@@ -615,7 +664,7 @@ class FormatterVisitor implements AstVisitor<String> {
         _blockDirectives.contains(node.name) || node.children.isNotEmpty;
 
     // Write the directive opening
-    _output.write(_indent.current);
+    _beginLine();
     _output.write('@${node.name}');
 
     // Add expression if present (already includes parentheses from parser)
@@ -664,7 +713,7 @@ class FormatterVisitor implements AstVisitor<String> {
     if (isBlock &&
         node.children.isNotEmpty &&
         _hasClosingDirective(node.name, expression: node.expression)) {
-      _output.write(_indent.current);
+      _beginLine();
       if (node.closedBy != null) {
         _output.write('@${node.closedBy}');
       } else {
@@ -751,12 +800,18 @@ class FormatterVisitor implements AstVisitor<String> {
     // Split text by lines to handle multi-line text
     final lines = content.split('\n');
 
+    // On the last line, preserve trailing whitespace only if the next
+    // meaningful sibling is an echo node (for inline continuation like
+    // "Deadline: {{ $date }}"). For all other siblings (HTML elements,
+    // directives, etc.), they start on their own line via _beginLine(),
+    // so trailing space would create idempotency issues.
+    final preserveTrailing = _nextMeaningSiblingIsEcho(node);
+
     for (var i = 0; i < lines.length; i++) {
       final line = lines[i];
       final isLastLine = i == lines.length - 1;
-      // On the last line, preserve trailing whitespace — it may separate
-      // this text from a following inline echo (e.g., "Deadline: {{ $date }}").
-      final trimmedLine = isLastLine ? line.trimLeft() : line.trim();
+      final trimmedLine =
+          (isLastLine && preserveTrailing) ? line.trimLeft() : line.trim();
 
       if (trimmedLine.isNotEmpty) {
         // Check if this line should be indented
@@ -869,7 +924,7 @@ class FormatterVisitor implements AstVisitor<String> {
         !isVoid && !hasContent && _shouldSelfClose(node.isSelfClosing);
 
     // Write opening tag
-    _output.write(_indent.current);
+    _beginLine();
     _output.write('<${node.tagName}');
 
     // If tag head contains structural directives, use the ordered tag head
@@ -941,10 +996,7 @@ class FormatterVisitor implements AstVisitor<String> {
         _indent.decrease();
 
         // Write closing tag
-        if (!_output.endsWithNewline()) {
-          _output.writeln();
-        }
-        _output.write(_indent.current);
+        _beginLine();
         _output.write('</${node.tagName}>');
         _output.writeln();
         return '';
@@ -959,12 +1011,11 @@ class FormatterVisitor implements AstVisitor<String> {
           .toList();
 
       // Check if we can keep content inline
-      // Allow inline if: single simple child, or multiple children that are all inline-safe
+      // Allow inline if: all meaningful children are inline-renderable
+      // (simple text, echo, or inline HTML elements with simple content)
       // BUT: if there are newlines in whitespace between meaningful children, don't inline
       var canKeepInline = meaningfulChildren.isNotEmpty &&
-          meaningfulChildren.every(
-            (child) => _isSimpleTextNode(child) || _isSimpleEchoNode(child),
-          );
+          meaningfulChildren.every(_isInlineRenderableNode);
 
       // Check for newlines between meaningful children
       if (canKeepInline && meaningfulChildren.length > 1) {
@@ -1020,19 +1071,31 @@ class FormatterVisitor implements AstVisitor<String> {
             } else {
               inlineContent.write(text);
             }
-          } else if (child is EchoNode) {
-            if (child.isRaw) {
-              inlineContent.write('{!! ${child.expression} !!}');
-            } else {
-              inlineContent.write('{{ ${child.expression} }}');
-            }
+          } else {
+            inlineContent.write(_renderInlineNode(child));
           }
           if (child == lastMeaningful) pastLastMeaningful = true;
         }
-        _output.write(inlineContent.toString());
-        _output.write('</${node.tagName}>');
-        _output.writeln();
-        return '';
+
+        // Check if the complete line fits within maxLineLength.
+        // If not, fall through to block formatting to avoid unstable
+        // toggling between inline/block across formatting passes.
+        final closingTag = '</${node.tagName}>';
+        final totalLineLength = _indent.current.length +
+            '<${node.tagName}'.length +
+            attributes.fold<int>(
+                0, (sum, a) => sum + 1 + _formatAttribute(a).length) +
+            '>'.length +
+            inlineContent.length +
+            closingTag.length;
+
+        if (totalLineLength <= config.maxLineLength) {
+          _output.write(inlineContent.toString());
+          _output.write(closingTag);
+          _output.writeln();
+          return '';
+        }
+        // Line too long — fall through to block formatting
       }
 
       // Block formatting: children on new lines with indentation
@@ -1069,7 +1132,7 @@ class FormatterVisitor implements AstVisitor<String> {
       }
 
       _indent.decrease();
-      _output.write(_indent.current);
+      _beginLine();
     }
 
     // Write closing tag
@@ -1099,7 +1162,7 @@ class FormatterVisitor implements AstVisitor<String> {
     final shouldSelfClose = !hasContent && _shouldSelfClose(node.isSelfClosing);
 
     // Write opening tag
-    _output.write(_indent.current);
+    _beginLine();
     _output.write('<x-${node.name}');
 
     // Determine if we should wrap attributes
@@ -1233,7 +1296,7 @@ class FormatterVisitor implements AstVisitor<String> {
     _indent.decrease();
 
     // Write closing tag
-    _output.write(_indent.current);
+    _beginLine();
     _output.write('</x-${node.name}>');
     _output.writeln();
 
@@ -1249,7 +1312,7 @@ class FormatterVisitor implements AstVisitor<String> {
       // Disable formatting and output the comment
       // Don't add trailing newline - the following raw text will preserve spacing
       _formattingEnabled = false;
-      _output.write(_indent.current);
+      _beginLine();
       _formatComment(node);
       return '';
     }
@@ -1257,7 +1320,7 @@ class FormatterVisitor implements AstVisitor<String> {
     if (control == 'on') {
       // Re-enable formatting and output the comment
       _formattingEnabled = true;
-      _output.write(_indent.current);
+      _beginLine();
       _formatComment(node);
       _output.writeln();
       return '';
@@ -1278,7 +1341,7 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     // Normal comment formatting
-    _output.write(_indent.current);
+    _beginLine();
     _formatComment(node);
     _output.writeln();
     return '';
@@ -1346,7 +1409,7 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     // Write opening slot tag
-    _output.write(_indent.current);
+    _beginLine();
     if (useColon) {
       _output.write('<x-slot:${node.name}');
     } else {
@@ -1397,7 +1460,7 @@ class FormatterVisitor implements AstVisitor<String> {
         }
 
         _indent.decrease();
-        _output.write(_indent.current);
+        _beginLine();
         _output.write('</x-slot>');
         _output.writeln();
         return '';
@@ -1454,7 +1517,7 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     // Write closing tag
-    _output.write(_indent.current);
+    _beginLine();
     _output.write('</x-slot>');
     _output.writeln();
 
@@ -1470,10 +1533,28 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     // Preserve error nodes as-is (shouldn't happen in well-formed input)
-    _output.write(_indent.current);
+    _beginLine();
     _output.write('<!-- ERROR: ${node.error} -->');
     _output.writeln();
     return '';
+  }
+
+  /// Checks if the next meaningful sibling of [node] is an echo node.
+  ///
+  /// Used by [visitText] to decide whether trailing whitespace on the last
+  /// line should be preserved for inline continuation (e.g., "Deadline: {{ $date }}").
+  bool _nextMeaningSiblingIsEcho(AstNode node) {
+    final parent = node.parent;
+    if (parent == null) return false;
+    final siblings = parent.children;
+    final idx = siblings.indexOf(node);
+    if (idx < 0) return false;
+    for (var i = idx + 1; i < siblings.length; i++) {
+      final sibling = siblings[i];
+      if (sibling is TextNode && sibling.content.trim().isEmpty) continue;
+      return sibling is EchoNode;
+    }
+    return false;
   }
 
   /// Checks if a node is simple text (no newlines).
@@ -1484,6 +1565,135 @@ class FormatterVisitor implements AstVisitor<String> {
   /// Checks if a node is a simple echo statement.
   bool _isSimpleEchoNode(AstNode node) {
     return node is EchoNode;
+  }
+
+  /// Checks if a node can be rendered inline (on the same line as text).
+  ///
+  /// Includes simple text, echo nodes, and inline HTML elements whose
+  /// attributes don't need wrapping and whose children are also inline.
+  bool _isInlineRenderableNode(AstNode node) {
+    if (_isSimpleTextNode(node) || _isSimpleEchoNode(node)) return true;
+    if (node is HtmlElementNode) return _isInlineRenderableElement(node);
+    return false;
+  }
+
+  /// Checks if an HTML element can be rendered inline.
+  ///
+  /// An element is inline-renderable when it uses a whitelisted inline tag,
+  /// has no structural directives in its tag head, would not wrap its
+  /// attributes, and all its children are themselves inline-renderable.
+  bool _isInlineRenderableElement(HtmlElementNode node) {
+    final tag = node.tagName.toLowerCase();
+
+    // Must be a known inline element
+    if (!_inlineElements.contains(tag)) return false;
+
+    // Structural directives in the tag head force block formatting
+    if (node.tagHead.isNotEmpty) return false;
+
+    final attrs = node.attributes.values.toList();
+    final isVoid = _voidElements.contains(tag);
+
+    // If attributes would wrap, force block formatting
+    if (_shouldWrapAttributes(node.tagName, attrs,
+        isSelfClosing: isVoid || node.isSelfClosing)) {
+      return false;
+    }
+
+    // Void elements with no children are always inline-renderable
+    if (isVoid) return true;
+
+    // All children must be inline-renderable (recursive check)
+    final meaningful = node.children
+        .where((c) => c is! TextNode || c.content.trim().isNotEmpty)
+        .toList();
+    if (meaningful.isEmpty) return true;
+    if (!meaningful.every(_isInlineRenderableNode)) return false;
+
+    // Reject if there are newlines between meaningful children
+    for (var i = 0; i < node.children.length; i++) {
+      final child = node.children[i];
+      if (child is TextNode &&
+          child.content.trim().isEmpty &&
+          child.content.contains('\n') &&
+          meaningful.contains(i > 0 ? node.children[i - 1] : null)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /// Renders a node inline (no indentation, no trailing newline).
+  ///
+  /// Used by the inline content builder for inline HTML elements.
+  String _renderInlineNode(AstNode node) {
+    if (node is TextNode) return node.content;
+    if (node is EchoNode) {
+      return node.isRaw
+          ? '{!! ${node.expression} !!}'
+          : '{{ ${node.expression} }}';
+    }
+    if (node is HtmlElementNode) return _renderInlineElement(node);
+    return '';
+  }
+
+  /// Renders an HTML element inline (no indentation, no trailing newline).
+  String _renderInlineElement(HtmlElementNode node) {
+    final buf = StringBuffer();
+    final tag = node.tagName;
+    final isVoid = _voidElements.contains(tag.toLowerCase());
+    final attrs = _sortAttributes(node.attributes.values);
+
+    buf.write('<$tag');
+    for (final attr in attrs) {
+      buf.write(' ');
+      buf.write(_formatAttribute(attr));
+    }
+
+    if (isVoid) {
+      buf.write('>');
+      return buf.toString();
+    }
+
+    if (node.children.isEmpty ||
+        !node.children.any(
+            (c) => c is! TextNode || c.content.trim().isNotEmpty)) {
+      buf.write('></$tag>');
+      return buf.toString();
+    }
+
+    buf.write('>');
+
+    // Render children inline
+    final meaningful = node.children
+        .where((c) => c is! TextNode || c.content.trim().isNotEmpty)
+        .toList();
+    final first = meaningful.first;
+    final last = meaningful.last;
+
+    var seenFirst = false;
+    var pastLast = false;
+    for (final child in node.children) {
+      if (child == first) seenFirst = true;
+      if (pastLast) break;
+      if (child is TextNode) {
+        var text = child.content;
+        if (child == first) text = text.trimLeft();
+        if (child == last) text = text.trimRight();
+        if (text.trim().isEmpty) {
+          if (seenFirst && text.isNotEmpty) buf.write(' ');
+        } else {
+          buf.write(text);
+        }
+      } else {
+        buf.write(_renderInlineNode(child));
+      }
+      if (child == last) pastLast = true;
+    }
+
+    buf.write('</$tag>');
+    return buf.toString();
   }
 
   /// Determines if spacing is needed between two nodes.

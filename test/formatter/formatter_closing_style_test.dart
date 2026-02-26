@@ -71,9 +71,8 @@ void main() {
         expect(lines[0], equals('<div'));
         expect(lines[1], equals('    class="foo"'));
         expect(lines[2], equals('    id="bar"'));
-        expect(lines[3], equals('>'));
-        // Content on next line
-        expect(lines[4], contains('span'));
+        // Inline content follows the closing bracket on the same line
+        expect(lines[3], equals('><span>Content</span></div>'));
       });
 
       test('works with components', () {
