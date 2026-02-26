@@ -21,6 +21,17 @@ test-file FILE:
 test-name NAME:
     dart test --name "{{ NAME }}"
 
+# Run performance benchmarks (Dart unit tests)
+[group('testing')]
+test-perf:
+    dart test test/performance/
+
+# Run the acid test suite
+[group('testing')]
+acid:
+    @echo "🧪 Running acid tests..."
+    @cd tool/acid && dart acid_test.dart --format=both --open
+
 # Generate coverage report and show summary
 [group('testing')]
 coverage:
@@ -39,22 +50,6 @@ coverage-html: coverage
     @echo "✅ HTML report generated: coverage/html/index.html"
     @open coverage/html/index.html
 
-# Run site tests (Playwright e2e + unit)
-[group('testing')]
-site-test:
-    node --test site/tests/*.mjs
-
-# Run benchmarks
-[group('testing')]
-bench:
-    dart test test/performance/
-
-# Run the acid test suite
-[group('testing')]
-acid:
-    @echo "🧪 Running acid tests..."
-    @cd tool/acid && dart acid_test.dart --format=both --open
-
 # Code Quality
 
 # Run linter
@@ -68,65 +63,64 @@ fix:
     dart fix --apply
     dart format .
 
-# Run all checks (lint + format + tests)
+# Run all checks (lint + tests)
 [group('quality')]
 check: lint test
     @echo "\n✅ All checks passed!"
 
-# Formatting
-
-# Format templates using blade CLI
-[group('formatting')]
-format-templates PATH:
+# Format Blade templates
+[group('quality')]
+format PATH:
     @echo "🎨 Formatting Blade templates..."
     dart run bin/blade.dart format {{ PATH }} --write --verbose
 
 # Check if templates need formatting (for CI)
-[group('formatting')]
-check-templates PATH:
+[group('quality')]
+format-check PATH:
     @echo "🔍 Checking Blade template formatting..."
     dart run bin/blade.dart format {{ PATH }} --check
 
 # Format test fixtures (for testing the formatter)
-[group('formatting')]
+[group('quality')]
 format-fixtures:
     @echo "🎨 Formatting test fixtures..."
     dart run bin/blade.dart format "test/fixtures/format/*.blade.php" --write --verbose
 
 # Reset test fixtures to their original messy state
-[group('formatting')]
+[group('quality')]
 reset-fixtures:
     @echo "🔄 Resetting test fixtures to original state..."
     @git checkout -- test/fixtures/format/
     @echo "✅ Test fixtures reset"
 
-# Show diff of formatting changes (without writing)
-[group('formatting')]
-show-format-diff:
-    @echo "📊 Showing formatting changes..."
-    @echo "\n=== 01-basic-messy.blade.php ==="
-    @dart run bin/blade.dart format test/fixtures/format/01-basic-messy.blade.php | diff -u test/fixtures/format/01-basic-messy.blade.php - || true
-    @echo "\n=== 02-indentation-chaos.blade.php ==="
-    @dart run bin/blade.dart format test/fixtures/format/02-indentation-chaos.blade.php | diff -u test/fixtures/format/02-indentation-chaos.blade.php - || true
-    @echo "\n=== 03-whitespace-hell.blade.php ==="
-    @dart run bin/blade.dart format test/fixtures/format/03-whitespace-hell.blade.php | diff -u test/fixtures/format/03-whitespace-hell.blade.php - || true
-
-# Dependencies
+# Dependencies & Setup
 
 # Get dependencies
-[group('dependencies')]
+[group('dev')]
 deps:
     dart pub get
 
 # Upgrade dependencies
-[group('dependencies')]
+[group('dev')]
 deps-upgrade:
     dart pub upgrade
 
 # Show outdated dependencies
-[group('dependencies')]
+[group('dev')]
 deps-outdated:
     dart pub outdated
+
+# Generate API documentation
+[group('dev')]
+docs:
+    @echo "📚 Generating API documentation..."
+    @dart doc
+    @echo "✅ Documentation generated in doc/api/"
+
+# Clean build artifacts
+[group('dev')]
+clean:
+    @rm -rf .dart_tool/ build/ coverage/ *.html
 
 # Build & Compile
 
@@ -148,20 +142,6 @@ cross-compile:
     @dart compile exe bin/blade.dart -o build/blade-macos-arm64 --target-os macos --target-arch arm64
     @echo "✅ Cross-compilation completed. Binaries are in the build/ directory."
 
-# Clean build artifacts
-[group('build')]
-clean:
-    @rm -rf .dart_tool/ build/ coverage/ *.html
-
-# Documentation
-
-# Generate API documentation
-[group('docs')]
-docs:
-    @echo "📚 Generating API documentation..."
-    @dart doc
-    @echo "✅ Documentation generated in doc/api/"
-
 # Publishing
 
 # Publish dry-run (check what would be published)
@@ -174,17 +154,17 @@ publish-check:
 pre-publish: clean deps lint test publish-check
     @echo "\n✅ All pre-publish checks passed! Ready to publish."
 
-# Development Tools
+# Playground
 
 # Run the playground demo
-[group('dev')]
+[group('playground')]
 playground:
     @echo "🎮 Running playground..."
     @cd tool/playground && fvm flutter pub get && fvm flutter run -d chrome
 
 # Build playground for web
-[group('dev')]
-build-playground:
+[group('playground')]
+playground-build:
     @echo "🔨 Building playground for web..."
     @cd tool/playground && fvm flutter build web --release --wasm && cd ../..
     @echo "📋 Copying vercel.json to build output..."
@@ -192,8 +172,8 @@ build-playground:
     @echo "✅ Playground built: tool/playground/build/web/"
 
 # Deploy playground to Vercel
-[group('dev')]
-deploy-playground: build-playground
+[group('playground')]
+playground-deploy: playground-build
     @echo "🚀 Deploying playground to Vercel..."
     @cd tool/playground/build/web && vercel --prod
     @echo "✅ Playground deployed!"
@@ -201,23 +181,23 @@ deploy-playground: build-playground
 # Prettier Plugin
 
 # Build the Prettier plugin (compile Dart to JS)
-[group('prettier')]
-prettier-build:
+[group('plugin')]
+plugin-build:
     @bash prettier-plugin-laravel-blade/scripts/build.sh
 
 # Run Prettier plugin tests
-[group('prettier')]
-prettier-test: prettier-build
+[group('plugin')]
+plugin-test: plugin-build
     @cd prettier-plugin-laravel-blade && npm test
 
 # Install Prettier plugin dependencies
-[group('prettier')]
-prettier-install:
+[group('plugin')]
+plugin-install:
     @cd prettier-plugin-laravel-blade && npm install
 
 # Publish the Prettier plugin to npm (builds, tests, then publishes)
-[group('prettier')]
-prettier-publish: prettier-test
+[group('plugin')]
+plugin-publish: plugin-test
     @cd prettier-plugin-laravel-blade && npm publish
 
 # Benchmark
@@ -236,25 +216,30 @@ bench-install:
 
 # Run the full benchmark comparison
 [group('benchmark')]
-bench-plugins: bench-install
+bench: bench-install bench-sync
     @cd benchmark && node run.mjs --full --json
 
 # Run performance benchmark only
 [group('benchmark')]
-bench-plugins-perf: bench-install
+bench-perf: bench-install bench-sync
     @cd benchmark && node run.mjs --perf-only
 
 # Run idempotency check only
 [group('benchmark')]
-bench-plugins-idempotency: bench-install
+bench-idempotency: bench-install bench-sync
     @cd benchmark && node run.mjs --idempotency-only
 
 # Quick benchmark (fewer runs, faster feedback)
 [group('benchmark')]
-bench-quick: bench-install
+bench-quick: bench-install bench-sync
     @cd benchmark && node run.mjs --perf-only --runs 5 --warmup 1
 
 # Site
+
+# Full pipeline: build plugin, run benchmarks, build site, serve locally
+[group('site')]
+site-dev: plugin-build bench site-build
+    @cd site && npx -y serve .
 
 # Build site (copy benchmark data for pages to consume)
 [group('site')]
@@ -263,19 +248,14 @@ site-build:
     @mkdir -p site/data site/dist
     @cp benchmark/results/benchmark.json site/data/benchmark.json
     @cp prettier-plugin-laravel-blade/dist/blade-formatter.js site/dist/blade-formatter.js
-    @echo "Site built. Serve with: just site-serve"
+    @echo "Site built."
 
-# Serve site locally
+# Run site tests
 [group('site')]
-site-serve: site-build
-    @cd site && npx -y serve .
+site-test:
+    node --test site/tests/*.mjs
 
-# Open site in browser
-[group('site')]
-site-open:
-    @open site/index.html
-
-# Deploy site to Vercel (builds benchmark data, then deploys)
+# Deploy site to Vercel
 [group('site')]
 site-deploy: site-build
     @echo "Deploying site to Vercel..."

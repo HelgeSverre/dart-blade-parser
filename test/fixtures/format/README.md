@@ -25,12 +25,6 @@ just format-fixtures
 just reset-fixtures
 ```
 
-### View formatting changes without writing:
-
-```bash
-just show-format-diff
-```
-
 ## Files
 
 - **01-basic-messy.blade.php** - Basic whitespace/spacing issues

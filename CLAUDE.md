@@ -39,6 +39,6 @@ This file contains notes and guidelines for AI assistants working on this projec
 ### Playground Deployment
 
 The playground is a Flutter web app deployed to Vercel:
-- Build locally with `just build-playground`
-- Deploy with `just deploy-playground`
+- Build locally with `just playground-build`
+- Deploy with `just playground-deploy`
 - Vercel doesn't have Flutter pre-installed, so we build and deploy static files

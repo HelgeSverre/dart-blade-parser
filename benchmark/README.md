@@ -37,29 +37,26 @@ indicate the fixture is invalid.
 ## Prerequisites
 
 - Node.js >= 18
-- The prettier plugin must be built first: `just prettier-build` (from project root)
+- The prettier plugin must be built first: `just plugin-build` (from project root)
 
 ## Setup
 
 ```bash
-# Sync fixtures from test/fixtures/ (excludes invalid/malformed, skips files >100KB)
-just bench-sync
-
-# Install benchmark dependencies
+# Install benchmark dependencies (done automatically by bench commands)
 just bench-install
 ```
 
 ## Running
 
 ```bash
-# Full benchmark (performance + idempotency)
-just bench-plugins
+# Full benchmark (performance + idempotency, syncs fixtures automatically)
+just bench
 
 # Performance only
-just bench-plugins-perf
+just bench-perf
 
 # Idempotency only
-just bench-plugins-idempotency
+just bench-idempotency
 
 # Quick run (fewer iterations, useful during development)
 just bench-quick
@@ -82,7 +79,7 @@ The benchmark runner (`run.mjs`) accepts the following arguments:
 
 ## Fixtures
 
-The `fixtures/` directory is gitignored — run `just bench-sync` to populate it
+The `fixtures/` directory is gitignored — bench commands auto-sync it via `just bench-sync`
 from `test/fixtures/`. The sync excludes `invalid/`, `malformed/`, `index.md`,
 and `README.md`. One fixture exceeding 100KB is skipped at runtime.
 

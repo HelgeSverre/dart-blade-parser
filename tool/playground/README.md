@@ -49,5 +49,5 @@ Or use the provided script:
 
 ```bash
 # From project root
-just deploy-playground
+just playground-deploy
 ```

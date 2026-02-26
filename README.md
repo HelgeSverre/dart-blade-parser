@@ -129,7 +129,7 @@ just check
 
 ```shell
 # Run performance benchmarks
-just bench
+just test-perf
 # Measures throughput, memory usage, and nesting depth
 ```
 
@@ -141,9 +141,6 @@ just format-fixtures
 
 # Reset test fixtures to messy state
 just reset-fixtures
-
-# Show formatting changes without writing
-just show-format-diff
 ```
 
 **Documentation:**
@@ -174,10 +171,8 @@ just playground
 just acid
 
 # Get/upgrade dependencies
-just deps
-just deps-upgrade
-
-# Check for outdated dependencies
+just deps        # dart pub get
+just deps-upgrade # dart pub upgrade
 just deps-outdated
 
 # Dry-run publish to pub.dev
@@ -752,7 +747,7 @@ Measured on typical hardware with the benchmark suite. All claims verified by au
 - Successfully parses 1,000+ nested levels in <2 seconds
 - Iterative lexer avoids stack overflow issues
 
-**Benchmarks are verified in CI**: Run `just bench` to measure performance on your hardware. See [test/performance/](test/performance/) for benchmark source code.
+**Benchmarks are verified in CI**: Run `just test-perf` to measure performance on your hardware. See [test/performance/](test/performance/) for benchmark source code.
 
 ## Test Fixtures
 
