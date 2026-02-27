@@ -540,7 +540,7 @@ async function benchOutput(workers) {
     console.log(dim(`--- ${fixture.name} ---`));
 
     for (const plugin of activePlugins) {
-      const child = workers.get(plugin.short);
+      const child = await ensureWorker(workers, plugin);
       const c = colors[plugin.short];
       if (!child || child.killed || !child.connected) {
         console.log(`  ${c(plugin.short)} ${dim('SKIPPED')}`);

@@ -3,8 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('SlotSpacing', () {
-    const input =
-        '<x-card>'
+    const input = '<x-card>'
         '<x-slot:header><h2>Title</h2></x-slot>'
         '<p>Content</p>'
         '<x-slot:footer><button>Action</button></x-slot>'
@@ -115,8 +114,7 @@ void main() {
       );
 
       test('blank line between sibling slots', () {
-        const siblingSlots =
-            '<x-card>'
+        const siblingSlots = '<x-card>'
             '<x-slot:header><h2>Title</h2></x-slot>'
             '<x-slot:footer><button>OK</button></x-slot>'
             '</x-card>';
@@ -132,8 +130,7 @@ void main() {
       );
 
       test('blank line between slot and directive', () {
-        const slotDirective =
-            '<x-card>'
+        const slotDirective = '<x-card>'
             '<x-slot:header><h2>Title</h2></x-slot>'
             '@if(true)<p>Yes</p>@endif'
             '</x-card>';
@@ -148,8 +145,7 @@ void main() {
       );
 
       test('blank line between slot and HTML element', () {
-        const slotHtml =
-            '<x-card>'
+        const slotHtml = '<x-card>'
             '<x-slot:header><h2>Title</h2></x-slot>'
             '<div>Content</div>'
             '</x-card>';

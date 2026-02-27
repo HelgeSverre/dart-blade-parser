@@ -351,4 +351,7 @@ class HtmlElementCounter extends AstVisitor<void> {
 
   @override
   void visitSlot(SlotNode node) {}
+
+  @override
+  void visitPhpBlock(PhpBlockNode node) {}
 }

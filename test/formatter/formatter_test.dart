@@ -521,22 +521,21 @@ void main() {
         expect(result, contains('class="container"'));
       });
 
-      test('normalizes single quotes to double quotes (default behavior)', () {
+      test('preserves single quotes (default QuoteStyle.preserve)', () {
         const input = "<div class='container'>Content</div>";
         final result = formatter.format(input);
 
-        // Default QuoteStyle.preserve normalizes to double quotes
-        // (AST doesn't store original quote char)
-        expect(result, contains('class="container"'));
+        // Default QuoteStyle.preserve now correctly preserves original quotes
+        expect(result, contains("class='container'"));
       });
 
-      test('normalizes mixed quotes to double quotes (default behavior)', () {
+      test('preserves mixed quotes (default QuoteStyle.preserve)', () {
         const input = '<div class="foo" id=\'bar\'>Content</div>';
         final result = formatter.format(input);
 
-        // Both normalized to double quotes
+        // Preserve keeps original quote style per attribute
         expect(result, contains('class="foo"'));
-        expect(result, contains('id="bar"'));
+        expect(result, contains("id='bar'"));
       });
 
       test('converts to single quotes with QuoteStyle.single config', () {
@@ -559,11 +558,86 @@ void main() {
         expect(result, contains('class="container"'));
       });
 
+      test('preserves single quotes with QuoteStyle.preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(quoteStyle: QuoteStyle.preserve),
+        );
+        const input = "<div class='foo'></div>";
+        final result = preserveFormatter.format(input);
+        expect(result, contains("class='foo'"));
+      });
+
+      test('preserves double quotes with QuoteStyle.preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(quoteStyle: QuoteStyle.preserve),
+        );
+        const input = '<div class="foo"></div>';
+        final result = preserveFormatter.format(input);
+        expect(result, contains('class="foo"'));
+      });
+
+      test('preserves mixed quotes on different attributes', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(quoteStyle: QuoteStyle.preserve),
+        );
+        const input = "<div class='foo' id=\"bar\"></div>";
+        final result = preserveFormatter.format(input);
+        expect(result, contains("class='foo'"));
+        expect(result, contains('id="bar"'));
+      });
+
       test('handles escaped quotes in attribute values', () {
         const input = '<div title="He said \\"hello\\"">Content</div>';
         final result = formatter.format(input);
 
         expect(result, contains('title='));
+      });
+
+      test('switches to single quotes when echo contains double quotes (default config)', () {
+        final result = formatter.format(
+            '<a href="{{ route("users.edit", \$user) }}">Link</a>');
+        // Default config uses double quotes, but echo content has double quotes
+        // so formatter should switch to single quotes for this attribute
+        expect(result, contains("href='{{ route("));
+        expect(result, contains("}}'>"));
+      });
+
+      test('switches to double quotes when echo contains single quotes (single config)', () {
+        final singleFormatter = BladeFormatter(
+          config: const FormatterConfig(quoteStyle: QuoteStyle.single),
+        );
+        final result = singleFormatter.format(
+            "<a href=\"{{ route('users.edit', \$user) }}\">Link</a>");
+        // Single config, but echo has single quotes — switch to double
+        expect(result, contains('href="{{ route('));
+      });
+
+      test('keeps preferred quotes when echo has no conflicting quotes', () {
+        final result = formatter.format(
+            '<div class="{{ \$classes }}">Content</div>');
+        // No conflicting quotes in echo, so keep default double quotes
+        expect(result, contains('class="{{ \$classes }}"'));
+      });
+
+      test('keeps preferred quotes when value has no echo expressions', () {
+        final result = formatter.format(
+            '<div class="container">Content</div>');
+        expect(result, contains('class="container"'));
+      });
+
+      test('handles raw echo with conflicting quotes', () {
+        final result = formatter.format(
+            '<div data-html="{!! \$items->map("fn") !!}">Content</div>');
+        expect(result, contains("data-html='{!! "));
+      });
+
+      test('echo attribute value is idempotent', () {
+        const source =
+            '<a href="{{ route("users.edit", \$user) }}">Link</a>';
+        final pass1 = formatter.format(source);
+        final pass2 = formatter.format(pass1);
+        expect(pass2, equals(pass1),
+            reason: 'Formatting with echo in attribute should be idempotent');
       });
     });
 
@@ -647,7 +721,8 @@ void main() {
         final result = formatter.format(input);
 
         // Should preserve blank lines between top-level directives
-        expect(result, contains('@extends(\'layouts.app\')\n\n@section(\'title\','));
+        expect(result,
+            contains('@extends(\'layouts.app\')\n\n@section(\'title\','));
         expect(result, contains('Page Title\')\n\n@section(\'content\')'));
         expect(result, contains('@endsection\n\n@section(\'footer\')'));
       });
@@ -700,7 +775,8 @@ void main() {
     });
 
     group('directive spacing', () {
-      test('adds blank line between ending and opening directives (default)', () {
+      test('adds blank line between ending and opening directives (default)',
+          () {
         const input = '''
 @foreach(\$items as \$item)
     <p>{{ \$item }}</p>
@@ -744,7 +820,8 @@ void main() {
 
       test('no blank line with DirectiveSpacing.none config', () {
         final compactFormatter = BladeFormatter(
-          config: const FormatterConfig(directiveSpacing: DirectiveSpacing.none),
+          config:
+              const FormatterConfig(directiveSpacing: DirectiveSpacing.none),
         );
 
         const input = '''
@@ -764,6 +841,91 @@ void main() {
 
         final result = compactFormatter.format(input);
         expect(result, expected);
+      });
+
+      test('preserves blank lines with DirectiveSpacing.preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(
+            directiveSpacing: DirectiveSpacing.preserve,
+          ),
+        );
+
+        const input = '''
+@foreach(\$items as \$item)
+    <p>{{ \$item }}</p>
+@endforeach
+
+@while(\$count > 0)
+    <p>Count: {{ \$count }}</p>
+@endwhile
+''';
+        // Should preserve the blank line between directives
+        final result = preserveFormatter.format(input);
+        expect(result, contains('@endforeach\n\n@while'));
+      });
+
+      test('does not insert blank lines with DirectiveSpacing.preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(
+            directiveSpacing: DirectiveSpacing.preserve,
+          ),
+        );
+
+        const input = '''
+@foreach(\$items as \$item)
+    <p>{{ \$item }}</p>
+@endforeach
+@while(\$count > 0)
+    <p>Count: {{ \$count }}</p>
+@endwhile
+''';
+        // Should NOT insert a blank line where there wasn't one
+        final result = preserveFormatter.format(input);
+        expect(result, contains('@endforeach\n@while'));
+      });
+
+      test('preserves blank lines in nested directives with preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(
+            directiveSpacing: DirectiveSpacing.preserve,
+          ),
+        );
+
+        const input = '''
+<div>
+    @foreach(\$items as \$item)
+        <p>{{ \$item }}</p>
+    @endforeach
+
+    @while(\$count > 0)
+        <p>Count: {{ \$count }}</p>
+    @endwhile
+</div>
+''';
+        final result = preserveFormatter.format(input);
+        expect(result, contains('@endforeach\n\n    @while'));
+      });
+
+      test('does not insert blank lines in nested directives with preserve',
+          () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(
+            directiveSpacing: DirectiveSpacing.preserve,
+          ),
+        );
+
+        const input = '''
+<div>
+    @foreach(\$items as \$item)
+        <p>{{ \$item }}</p>
+    @endforeach
+    @while(\$count > 0)
+        <p>Count: {{ \$count }}</p>
+    @endwhile
+</div>
+''';
+        final result = preserveFormatter.format(input);
+        expect(result, contains('@endforeach\n    @while'));
       });
 
       test('no blank line between opening directive and its content', () {
@@ -889,9 +1051,8 @@ void main() {
 
       test('formats empty slot', () {
         const input = '<x-card><x-slot:empty></x-slot></x-card>';
-        // Note: Empty slots currently don't output closing tags
         const expected = '<x-card>\n'
-            '    <x-slot:empty>\n'
+            '    <x-slot:empty></x-slot>\n'
             '</x-card>\n';
 
         final result = formatter.format(input);

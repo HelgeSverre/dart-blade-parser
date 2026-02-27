@@ -9,9 +9,19 @@ void main() {
 
         expect(config.indentSize, 4);
         expect(config.indentStyle, IndentStyle.spaces);
-        expect(config.formatPhpExpressions, false);
         expect(config.maxLineLength, 120);
         expect(config.quoteStyle, QuoteStyle.preserve);
+        expect(config.directiveSpacing, DirectiveSpacing.betweenBlocks);
+        expect(config.slotFormatting, SlotFormatting.compact);
+        expect(config.slotNameStyle, SlotNameStyle.colon);
+        expect(config.slotSpacing, SlotSpacing.after);
+        expect(config.wrapAttributes, WrapAttributes.auto);
+        expect(config.attributeSort, AttributeSort.none);
+        expect(config.closingBracketStyle, ClosingBracketStyle.sameLine);
+        expect(config.selfClosingStyle, SelfClosingStyle.preserve);
+        expect(config.htmlBlockSpacing, HtmlBlockSpacing.betweenBlocks);
+        expect(config.echoSpacing, EchoSpacing.spaced);
+        expect(config.trailingNewline, true);
       });
 
       test('allows custom indent size', () {
@@ -38,24 +48,16 @@ void main() {
         expect(config.maxLineLength, 80);
       });
 
-      test('allows custom formatPhpExpressions', () {
-        const config = FormatterConfig(formatPhpExpressions: true);
-
-        expect(config.formatPhpExpressions, true);
-      });
-
       test('allows all custom values together', () {
         const config = FormatterConfig(
           indentSize: 2,
           indentStyle: IndentStyle.tabs,
-          formatPhpExpressions: true,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.double,
         );
 
         expect(config.indentSize, 2);
         expect(config.indentStyle, IndentStyle.tabs);
-        expect(config.formatPhpExpressions, true);
         expect(config.maxLineLength, 80);
         expect(config.quoteStyle, QuoteStyle.double);
       });
@@ -67,9 +69,19 @@ void main() {
 
         expect(config.indentSize, 4);
         expect(config.indentStyle, IndentStyle.spaces);
-        expect(config.formatPhpExpressions, false);
         expect(config.maxLineLength, 120);
         expect(config.quoteStyle, QuoteStyle.preserve);
+        expect(config.directiveSpacing, DirectiveSpacing.betweenBlocks);
+        expect(config.slotFormatting, SlotFormatting.compact);
+        expect(config.slotNameStyle, SlotNameStyle.colon);
+        expect(config.slotSpacing, SlotSpacing.after);
+        expect(config.wrapAttributes, WrapAttributes.auto);
+        expect(config.attributeSort, AttributeSort.none);
+        expect(config.closingBracketStyle, ClosingBracketStyle.sameLine);
+        expect(config.selfClosingStyle, SelfClosingStyle.preserve);
+        expect(config.htmlBlockSpacing, HtmlBlockSpacing.betweenBlocks);
+        expect(config.echoSpacing, EchoSpacing.spaced);
+        expect(config.trailingNewline, true);
       });
 
       test('compact() creates config with 2-space indentation', () {
@@ -85,14 +97,12 @@ void main() {
         final config = FormatterConfig.fromMap({
           'indent_size': 2,
           'indent_style': 'tabs',
-          'format_php_expressions': true,
           'max_line_length': 80,
           'quote_style': 'single',
         });
 
         expect(config.indentSize, 2);
         expect(config.indentStyle, IndentStyle.tabs);
-        expect(config.formatPhpExpressions, true);
         expect(config.maxLineLength, 80);
         expect(config.quoteStyle, QuoteStyle.single);
       });
@@ -144,7 +154,6 @@ void main() {
 
         expect(config.indentSize, 4);
         expect(config.indentStyle, IndentStyle.spaces);
-        expect(config.formatPhpExpressions, false);
         expect(config.maxLineLength, 120);
         expect(config.quoteStyle, QuoteStyle.preserve);
       });
@@ -171,14 +180,6 @@ void main() {
         });
 
         expect(config.quoteStyle, QuoteStyle.preserve);
-      });
-
-      test('uses default format_php_expressions when null', () {
-        final config = FormatterConfig.fromMap({
-          'format_php_expressions': null,
-        });
-
-        expect(config.formatPhpExpressions, false);
       });
 
       test('uses default max_line_length when null', () {
@@ -230,22 +231,6 @@ void main() {
 
         expect(config.maxLineLength, 1000);
       });
-
-      test('handles format_php_expressions as false', () {
-        final config = FormatterConfig.fromMap({
-          'format_php_expressions': false,
-        });
-
-        expect(config.formatPhpExpressions, false);
-      });
-
-      test('handles format_php_expressions as true', () {
-        final config = FormatterConfig.fromMap({
-          'format_php_expressions': true,
-        });
-
-        expect(config.formatPhpExpressions, true);
-      });
     });
 
     group('toMap() - Serialization', () {
@@ -253,18 +238,38 @@ void main() {
         const config = FormatterConfig(
           indentSize: 2,
           indentStyle: IndentStyle.tabs,
-          formatPhpExpressions: true,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.single,
+          directiveSpacing: DirectiveSpacing.none,
+          slotFormatting: SlotFormatting.block,
+          slotNameStyle: SlotNameStyle.attribute,
+          slotSpacing: SlotSpacing.around,
+          wrapAttributes: WrapAttributes.always,
+          attributeSort: AttributeSort.alphabetical,
+          closingBracketStyle: ClosingBracketStyle.newLine,
+          selfClosingStyle: SelfClosingStyle.always,
+          htmlBlockSpacing: HtmlBlockSpacing.none,
+          echoSpacing: EchoSpacing.compact,
+          trailingNewline: false,
         );
 
         final map = config.toMap();
 
         expect(map['indent_size'], 2);
         expect(map['indent_style'], 'tabs');
-        expect(map['format_php_expressions'], true);
         expect(map['max_line_length'], 80);
         expect(map['quote_style'], 'single');
+        expect(map['directive_spacing'], 'none');
+        expect(map['slot_formatting'], 'block');
+        expect(map['slot_name_style'], 'attribute');
+        expect(map['slot_spacing'], 'around');
+        expect(map['wrap_attributes'], 'always');
+        expect(map['attribute_sort'], 'alphabetical');
+        expect(map['closing_bracket_style'], 'new_line');
+        expect(map['self_closing_style'], 'always');
+        expect(map['html_block_spacing'], 'none');
+        expect(map['echo_spacing'], 'compact');
+        expect(map['trailing_newline'], false);
       });
 
       test('serializes spaces indent style', () {
@@ -308,9 +313,19 @@ void main() {
         const original = FormatterConfig(
           indentSize: 2,
           indentStyle: IndentStyle.tabs,
-          formatPhpExpressions: true,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.single,
+          directiveSpacing: DirectiveSpacing.none,
+          slotFormatting: SlotFormatting.block,
+          slotNameStyle: SlotNameStyle.attribute,
+          slotSpacing: SlotSpacing.around,
+          wrapAttributes: WrapAttributes.always,
+          attributeSort: AttributeSort.alphabetical,
+          closingBracketStyle: ClosingBracketStyle.newLine,
+          selfClosingStyle: SelfClosingStyle.always,
+          htmlBlockSpacing: HtmlBlockSpacing.none,
+          echoSpacing: EchoSpacing.compact,
+          trailingNewline: false,
         );
 
         final map = original.toMap();
@@ -318,9 +333,19 @@ void main() {
 
         expect(restored.indentSize, original.indentSize);
         expect(restored.indentStyle, original.indentStyle);
-        expect(restored.formatPhpExpressions, original.formatPhpExpressions);
         expect(restored.maxLineLength, original.maxLineLength);
         expect(restored.quoteStyle, original.quoteStyle);
+        expect(restored.directiveSpacing, original.directiveSpacing);
+        expect(restored.slotFormatting, original.slotFormatting);
+        expect(restored.slotNameStyle, original.slotNameStyle);
+        expect(restored.slotSpacing, original.slotSpacing);
+        expect(restored.wrapAttributes, original.wrapAttributes);
+        expect(restored.attributeSort, original.attributeSort);
+        expect(restored.closingBracketStyle, original.closingBracketStyle);
+        expect(restored.selfClosingStyle, original.selfClosingStyle);
+        expect(restored.htmlBlockSpacing, original.htmlBlockSpacing);
+        expect(restored.echoSpacing, original.echoSpacing);
+        expect(restored.trailingNewline, original.trailingNewline);
       });
 
       test('fromMap(toMap()) preserves default values', () {
@@ -331,9 +356,19 @@ void main() {
 
         expect(restored.indentSize, original.indentSize);
         expect(restored.indentStyle, original.indentStyle);
-        expect(restored.formatPhpExpressions, original.formatPhpExpressions);
         expect(restored.maxLineLength, original.maxLineLength);
         expect(restored.quoteStyle, original.quoteStyle);
+        expect(restored.directiveSpacing, original.directiveSpacing);
+        expect(restored.slotFormatting, original.slotFormatting);
+        expect(restored.slotNameStyle, original.slotNameStyle);
+        expect(restored.slotSpacing, original.slotSpacing);
+        expect(restored.wrapAttributes, original.wrapAttributes);
+        expect(restored.attributeSort, original.attributeSort);
+        expect(restored.closingBracketStyle, original.closingBracketStyle);
+        expect(restored.selfClosingStyle, original.selfClosingStyle);
+        expect(restored.htmlBlockSpacing, original.htmlBlockSpacing);
+        expect(restored.echoSpacing, original.echoSpacing);
+        expect(restored.trailingNewline, original.trailingNewline);
       });
 
       test('fromMap(toMap()) works for compact config', () {
@@ -352,7 +387,6 @@ void main() {
         const config = FormatterConfig(
           indentSize: 2,
           indentStyle: IndentStyle.tabs,
-          formatPhpExpressions: true,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.single,
         );
@@ -361,7 +395,6 @@ void main() {
 
         expect(str, contains('indentSize: 2'));
         expect(str, contains('indentStyle: IndentStyle.tabs'));
-        expect(str, contains('formatPhpExpressions: true'));
         expect(str, contains('maxLineLength: 80'));
         expect(str, contains('quoteStyle: QuoteStyle.single'));
       });
@@ -434,7 +467,6 @@ void main() {
         final jsonData = <String, dynamic>{
           'indent_size': 4,
           'indent_style': 'spaces',
-          'format_php_expressions': false,
           'max_line_length': 120,
           'quote_style': 'preserve',
         };
@@ -443,7 +475,6 @@ void main() {
 
         expect(config.indentSize, 4);
         expect(config.indentStyle, IndentStyle.spaces);
-        expect(config.formatPhpExpressions, false);
       });
     });
   });

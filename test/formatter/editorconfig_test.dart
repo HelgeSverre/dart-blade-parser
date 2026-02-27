@@ -146,7 +146,8 @@ indent_size = 2
 ''');
         final props = config.getProperties('test.blade.php');
         expect(props['indent_style'], equals('space'));
-        expect(props['indent_size'], equals('2')); // Overridden by more specific section
+        expect(props['indent_size'],
+            equals('2')); // Overridden by more specific section
       });
 
       test('returns empty map for non-matching file', () {
@@ -259,7 +260,8 @@ indent_size = 2
         final bladeProps = config.getProperties('welcome.blade.php');
         expect(bladeProps['charset'], equals('utf-8'));
         expect(bladeProps['indent_style'], equals('space'));
-        expect(bladeProps['indent_size'], equals('2')); // Override from *.blade.php
+        expect(bladeProps['indent_size'],
+            equals('2')); // Override from *.blade.php
 
         final mdProps = config.getProperties('README.md');
         expect(mdProps['indent_size'], equals('4'));

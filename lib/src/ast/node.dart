@@ -77,6 +77,9 @@ abstract class AstVisitor<T> {
 
   /// Visit a slot node (component slot definition).
   T visitSlot(SlotNode node);
+
+  /// Visit a PHP block node (<?php ?>, <?= ?>, <? ?>, @php/@endphp).
+  T visitPhpBlock(PhpBlockNode node);
 }
 
 /// Root document node representing the entire Blade template.
@@ -203,10 +206,13 @@ final class EchoNode extends AstNode {
   @override
   final List<AstNode> children = const [];
 
-  /// The PHP expression to be echoed.
+  /// The PHP expression to be echoed (trimmed).
   ///
   /// For example, in `{{ $user->name }}`, this would be `$user->name`.
   final String expression;
+
+  /// The raw expression as it appeared in source (untrimmed, preserves spacing).
+  final String rawExpression;
 
   /// Whether this is a raw (unescaped) echo.
   ///
@@ -221,8 +227,9 @@ final class EchoNode extends AstNode {
     required this.startPosition,
     required this.endPosition,
     required this.expression,
+    String? rawExpression,
     required this.isRaw,
-  });
+  }) : rawExpression = rawExpression ?? expression;
 
   @override
   T accept<T>(AstVisitor<T> visitor) => visitor.visitEcho(this);
@@ -309,6 +316,22 @@ final class TagHeadDirective extends TagHeadItem {
   TagHeadDirective(this.name, {this.expression});
 }
 
+/// A Blade comment in the tag head (e.g., `{{-- description --}}`).
+final class TagHeadComment extends TagHeadItem {
+  /// The comment content (including delimiters).
+  final String content;
+
+  TagHeadComment(this.content);
+}
+
+/// A PHP block in the tag head (e.g., `<?php if (...): ?>`, `<?php endif; ?>`).
+final class TagHeadPhpBlock extends TagHeadItem {
+  /// The full PHP block source (including delimiters).
+  final String content;
+
+  TagHeadPhpBlock(this.content);
+}
+
 /// Base class for HTML/component attribute nodes.
 ///
 /// Represents different types of attributes: standard HTML, Alpine.js,
@@ -321,6 +344,10 @@ sealed class AttributeNode {
   /// The attribute value, if any.
   final String? value;
 
+  /// The original quote character used in source (' or "), or null for
+  /// boolean/unquoted attributes.
+  final String? quoteChar;
+
   /// The source position where this attribute starts.
   final Position startPosition;
 
@@ -331,6 +358,7 @@ sealed class AttributeNode {
   AttributeNode({
     required this.name,
     this.value,
+    this.quoteChar,
     required this.startPosition,
     required this.endPosition,
   });
@@ -351,6 +379,7 @@ final class StandardAttribute extends AttributeNode {
   StandardAttribute({
     required super.name,
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
@@ -384,6 +413,7 @@ final class AlpineAttribute extends AttributeNode {
     required super.name,
     required this.directive,
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
@@ -401,28 +431,43 @@ final class AlpineAttribute extends AttributeNode {
       };
 }
 
-/// Livewire attribute (wire:click, wire:model, etc.).
+/// Livewire attribute (wire:click, wire:model, wire:sort:item, etc.).
 ///
 /// Represents Livewire directives for server-side reactive components,
-/// including actions and modifiers.
+/// including actions, sub-actions, and modifiers.
+///
+/// The attribute name `wire:sort:item.foo` is parsed as:
+/// - [action] = `"sort"` (the base action after `wire:`)
+/// - [subAction] = `"item"` (the colon-separated sub-action, if any)
+/// - [modifiers] = `["foo"]` (dot-separated modifiers)
 final class LivewireAttribute extends AttributeNode {
-  /// The Livewire action (e.g., "click", "model", "submit").
+  /// The Livewire action (e.g., "click", "model", "sort", "bind").
   final String action;
 
-  /// Modifiers applied to the action (e.g., "prevent", "debounce").
+  /// The colon-separated sub-action, if any.
+  ///
+  /// For example, in `wire:sort:item` the sub-action is `"item"`.
+  /// In `wire:bind:class` the sub-action is `"class"`.
+  /// For plain attributes like `wire:click` this is `null`.
+  final String? subAction;
+
+  /// Modifiers applied to the action (e.g., "prevent", "debounce", "once").
   final List<String> modifiers;
 
   /// Creates a Livewire attribute.
   ///
-  /// [name] is the full attribute name (e.g., "wire:click").
-  /// [action] is the Livewire action (e.g., "click", "model").
-  /// [modifiers] are optional modifiers (e.g., ["prevent", "debounce"]).
+  /// [name] is the full attribute name (e.g., "wire:click", "wire:sort:item").
+  /// [action] is the Livewire action (e.g., "click", "sort").
+  /// [subAction] is the optional colon sub-action (e.g., "item", "class").
+  /// [modifiers] are optional dot modifiers (e.g., ["prevent", "debounce"]).
   /// [value] is the method name or expression.
   LivewireAttribute({
     required super.name,
     required this.action,
+    this.subAction,
     this.modifiers = const [],
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
@@ -432,6 +477,7 @@ final class LivewireAttribute extends AttributeNode {
         'type': 'livewire',
         'name': name,
         'action': action,
+        if (subAction != null) 'subAction': subAction,
         'modifiers': modifiers,
         if (value != null) 'value': value,
         'position': {
@@ -463,6 +509,12 @@ final class ComponentNode extends AstNode {
   /// Map of attributes passed to the component.
   final Map<String, AttributeNode> attributes;
 
+  /// Ordered list of items in the opening tag head.
+  /// Preserves the source order of attributes and structural directives
+  /// (e.g., `@if`/`@endif` wrapping conditional attributes).
+  /// Empty when no structural directives appear in the tag head.
+  final List<TagHeadItem> tagHead;
+
   /// Named slots defined within the component.
   final Map<String, SlotNode> slots;
 
@@ -473,6 +525,7 @@ final class ComponentNode extends AstNode {
   ///
   /// [name] is the component name without the x- prefix.
   /// [attributes] are the component attributes.
+  /// [tagHead] preserves ordered tag head items when directives are present.
   /// [slots] are named slot definitions.
   /// [isSelfClosing] indicates if this is a self-closing tag.
   /// [children] contains the component's content.
@@ -481,6 +534,7 @@ final class ComponentNode extends AstNode {
     required this.endPosition,
     required this.name,
     this.attributes = const {},
+    this.tagHead = const [],
     this.slots = const {},
     this.isSelfClosing = false,
     required this.children,
@@ -717,6 +771,64 @@ final class ErrorNode extends AstNode {
         'type': 'error',
         'error': error,
         if (partialContent != null) 'partialContent': partialContent,
+        'position': {
+          'start': startPosition.toJson(),
+          'end': endPosition.toJson(),
+        },
+      };
+}
+
+/// The syntax variant used for a PHP block.
+enum PhpBlockSyntax {
+  /// Standard PHP tag: `<?php ... ?>`
+  phpTag,
+
+  /// Short echo tag: `<?= ... ?>`
+  shortEcho,
+
+  /// Short open tag: `<? ... ?>` (deprecated in PHP 7.4, requires short_open_tag)
+  shortTag,
+
+  /// Blade directive: `@php ... @endphp`
+  bladeDirective,
+}
+
+/// A block of raw PHP code in the template.
+///
+/// Represents PHP code regions that should be preserved verbatim.
+/// The [code] field contains the PHP source between the delimiters
+/// (not including the opening/closing tags themselves).
+final class PhpBlockNode extends AstNode {
+  @override
+  final Position startPosition;
+  @override
+  final Position endPosition;
+  @override
+  AstNode? parent;
+  @override
+  final List<AstNode> children = const [];
+
+  /// The raw PHP source code between the delimiters.
+  final String code;
+
+  /// Which PHP tag syntax was used.
+  final PhpBlockSyntax syntax;
+
+  PhpBlockNode({
+    required this.startPosition,
+    required this.endPosition,
+    required this.code,
+    required this.syntax,
+  });
+
+  @override
+  T accept<T>(AstVisitor<T> visitor) => visitor.visitPhpBlock(this);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'phpBlock',
+        'syntax': syntax.name,
+        'code': code,
         'position': {
           'start': startPosition.toJson(),
           'end': endPosition.toJson(),

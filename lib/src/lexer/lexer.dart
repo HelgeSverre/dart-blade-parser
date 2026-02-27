@@ -49,6 +49,176 @@ class BladeLexer {
     return _rawTextTagName != null ? _LexerState.rawText : _LexerState.text;
   }
 
+  /// Scans PHP block body until `?>` or EOF, tracking string context
+  /// (single/double quotes with backslash escaping) so `?>` inside
+  /// strings is not treated as a closing delimiter.
+  ///
+  /// Assumes the caller has already consumed the `<?php`/`<?=`/`<?`
+  /// prefix and set `_start`, `_startLine`, `_startColumn`.
+  ///
+  /// Returns `true` if `?>` was found, `false` if EOF was reached.
+  bool _scanPhpBlockBody() {
+    bool inSingleQuote = false;
+    bool inDoubleQuote = false;
+
+    while (!_isAtEnd()) {
+      final ch = _peek();
+
+      if (inSingleQuote) {
+        if (ch == '\\') {
+          _advance(); // skip backslash
+          if (!_isAtEnd()) _advance(); // skip escaped char
+          continue;
+        }
+        if (ch == "'") inSingleQuote = false;
+        _advance();
+        continue;
+      }
+
+      if (inDoubleQuote) {
+        if (ch == '\\') {
+          _advance(); // skip backslash
+          if (!_isAtEnd()) _advance(); // skip escaped char
+          continue;
+        }
+        if (ch == '"') inDoubleQuote = false;
+        _advance();
+        continue;
+      }
+
+      // Not inside a string — check for ?> close
+      if (ch == '?' && _peekNext() == '>') {
+        _advance(); // ?
+        _advance(); // >
+        return true;
+      }
+
+      // Enter string context
+      if (ch == "'") {
+        inSingleQuote = true;
+      } else if (ch == '"') {
+        inDoubleQuote = true;
+      } else if (ch == '<' && _peekNext() == '<' && _peekAhead(2) == '<') {
+        // HEREDOC/NOWDOC: <<<LABEL or <<<'LABEL'
+        _advance(); // <
+        _advance(); // <
+        _advance(); // <
+        _skipHeredocBody();
+        continue;
+      }
+
+      _advance();
+    }
+
+    return false;
+  }
+
+  /// Skips past a PHP HEREDOC or NOWDOC body.
+  ///
+  /// Assumes the `<<<` prefix has already been consumed. Reads the label
+  /// (optionally quoted for NOWDOC: `<<<'EOT'`) then scans until a line
+  /// starting with the label followed by `;` (optional) and a newline/EOF.
+  void _skipHeredocBody() {
+    // Skip optional whitespace after <<<
+    while (!_isAtEnd() && _peek() == ' ') {
+      _advance();
+    }
+
+    // Detect NOWDOC (single-quoted label)
+    final isNowdoc = !_isAtEnd() && _peek() == "'";
+    if (isNowdoc) _advance(); // opening '
+
+    // Read the label
+    final labelBuf = StringBuffer();
+    while (!_isAtEnd() && _peek() != '\n' && _peek() != "'" && _peek() != ';') {
+      labelBuf.write(_peek());
+      _advance();
+    }
+    final label = labelBuf.toString().trim();
+
+    if (isNowdoc && !_isAtEnd() && _peek() == "'") _advance(); // closing '
+
+    // Advance past the rest of the opening line
+    while (!_isAtEnd() && _peek() != '\n') {
+      _advance();
+    }
+    if (!_isAtEnd()) _advance(); // consume the newline
+
+    if (label.isEmpty) return; // malformed, bail out
+
+    // Scan until we find a line that is: optional-whitespace + label + optional-; + newline/EOF
+    while (!_isAtEnd()) {
+      // Check if current line starts with (optional indentation +) the label
+      final lineStart = _position;
+      // Skip leading whitespace (PHP 7.3+ flexible heredoc)
+      while (!_isAtEnd() && (_peek() == ' ' || _peek() == '\t')) {
+        _advance();
+      }
+      // Check if the label matches at this position
+      bool matches = true;
+      for (var i = 0; i < label.length; i++) {
+        if (_position + i >= input.length || input[_position + i] != label[i]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        // Advance past the label
+        for (var i = 0; i < label.length; i++) {
+          _advance();
+        }
+        // Optional semicolon
+        if (!_isAtEnd() && _peek() == ';') _advance();
+        // Must be followed by newline or EOF
+        if (_isAtEnd() || _peek() == '\n') {
+          if (!_isAtEnd()) _advance(); // consume newline
+          return;
+        }
+        // Not a real end marker, continue scanning
+      }
+      // Skip to next line
+      // Reset to lineStart and scan forward to avoid re-checking
+      _position = lineStart;
+      _column = _column; // approximate — _advance will fix it
+      while (!_isAtEnd() && _peek() != '\n') {
+        _advance();
+      }
+      if (!_isAtEnd()) _advance(); // consume newline
+    }
+  }
+
+  /// Scans a PHP block: `<?php ... ?>`, `<?= ... ?>`, or `<? ... ?>`.
+  /// Emits a single [TokenType.phpBlock] token with the full source
+  /// including delimiters. Handles unclosed blocks (scans to EOF).
+  _LexerState _lexPhpBlock() {
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
+    _advance(); // <
+    _advance(); // ?
+
+    // Determine variant and advance past the marker
+    if (!_isAtEnd() && _peek() == '=') {
+      _advance(); // = (for <?=)
+    } else {
+      // Scan identifier like "php" in <?php
+      while (!_isAtEnd() && _isAlpha(_peek())) {
+        _advance();
+      }
+    }
+
+    if (_scanPhpBlockBody()) {
+      _emitToken(TokenType.phpBlock, input.substring(_start, _position));
+      return _textOrRawTextState();
+    }
+
+    // Unclosed — emit to EOF
+    _emitToken(TokenType.phpBlock, input.substring(_start, _position));
+    _emitToken(TokenType.eof, '');
+    return _LexerState.done;
+  }
+
   /// Tokenize the input string into a list of tokens.
   List<Token> tokenize() {
     _tokens.clear();
@@ -230,6 +400,20 @@ class BladeLexer {
         return _LexerState.rawEcho;
       }
 
+      // Check for PHP opening tags: <?php, <?=, <? (but not <?xml)
+      if (ch == '<' && _peekNext() == '?') {
+        final afterQ = _peekAhead(2);
+        // <?xml is NOT a PHP tag — let it fall through as text
+        if (!(afterQ == 'x' &&
+            _peekAhead(3) == 'm' &&
+            _peekAhead(4) == 'l')) {
+          if (buffer.isNotEmpty) {
+            _emitToken(TokenType.text, buffer.toString());
+          }
+          return _lexPhpBlock();
+        }
+      }
+
       // Check for </x- component closing tag
       if (ch == '<' &&
           _peekNext() == '/' &&
@@ -249,27 +433,15 @@ class BladeLexer {
         _advance(); // -
 
         final nameStart = _position;
-        while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == '.') {
+        while (_isAlphaNumeric(_peek()) ||
+            _peek() == '-' ||
+            _peek() == '.' ||
+            _peek() == ':') {
           _advance();
         }
 
         final componentName = input.substring(nameStart, _position);
-
-        // Check for slot closing tag with colon syntax: </x-slot:name>
-        if (componentName == 'slot' && _peek() == ':') {
-          _advance(); // consume ':'
-
-          // Scan slot name after colon
-          final slotNameStart = _position;
-          while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == '_') {
-            _advance();
-          }
-
-          final slotName = input.substring(slotNameStart, _position);
-          _emitToken(TokenType.componentTagClose, '</x-slot:$slotName');
-        } else {
-          _emitToken(TokenType.componentTagClose, '</x-$componentName');
-        }
+        _emitToken(TokenType.componentTagClose, '</x-$componentName');
 
         // Skip to >
         while (!_isAtEnd() && _peek() != '>') {
@@ -756,6 +928,64 @@ class BladeLexer {
     final tokenType = _directiveNameToType(name);
     _emitToken(tokenType, '@$name');
 
+    // Skip optional horizontal whitespace between directive name and expression.
+    // Handles both `@if($x)` and `@if ($x)` styles (PSR-12 uses the space).
+    final posBeforeWhitespace = _position;
+    final lineBeforeWhitespace = _line;
+    final colBeforeWhitespace = _column;
+    while (!_isAtEnd() && (_peek() == ' ' || _peek() == '\t')) {
+      _advance();
+    }
+    // If we didn't find a `(`, restore position (the whitespace is significant
+    // text/separator, not part of the directive).
+    if (_isAtEnd() || _peek() != '(') {
+      _position = posBeforeWhitespace;
+      _line = lineBeforeWhitespace;
+      _column = colBeforeWhitespace;
+    }
+
+    // Handle @php block: if no ( follows, scan to @endphp emitting raw text.
+    // This prevents PHP code containing <tags> or directives from being
+    // mis-parsed as Blade/HTML. Inline @php($expr) is handled below.
+    if (name == 'php' && _peek() != '(') {
+      // Scan for @endphp, emitting content as a single text token
+      final contentStart = _position;
+      while (!_isAtEnd()) {
+        if (_peek() == '@') {
+          final remaining = input.length - _position - 1;
+          if (remaining >= 6 &&
+              input.substring(_position + 1, _position + 7) == 'endphp') {
+            // Check that 'endphp' is followed by a non-alphanumeric char
+            // (to avoid matching @endphpsomething)
+            final afterEnd = _position + 7;
+            if (afterEnd >= input.length || !_isAlphaNumeric(input[afterEnd])) {
+              // Emit content before @endphp
+              if (_position > contentStart) {
+                _emitToken(
+                    TokenType.text, input.substring(contentStart, _position));
+              }
+              // Reset start for @endphp
+              _start = _position;
+              _startLine = _line;
+              _startColumn = _column;
+              // Advance past @endphp
+              _advance(); // @
+              for (int i = 0; i < 6; i++) _advance(); // e, n, d, p, h, p
+              _emitToken(TokenType.directiveEndphp, '@endphp');
+              return _textOrRawTextState();
+            }
+          }
+        }
+        _advance();
+      }
+      // Unclosed @php block - emit remaining as text
+      if (_position > contentStart) {
+        _emitToken(TokenType.text, input.substring(contentStart, _position));
+      }
+      _emitToken(TokenType.eof, '');
+      return _LexerState.done;
+    }
+
     // Check for expression after directive and emit as separate token
     if (_peek() == '(') {
       // Reset position tracking for expression token
@@ -992,36 +1222,39 @@ class BladeLexer {
     _advance(); // x
     _advance(); // -
 
-    // Scan component name
+    // Scan component name (supports alphanumeric, hyphens, dots, and :: namespace separator)
+    // Examples: alert, button, accordion.item, nightshade::calendar, package::nested.component
     final nameStart = _position;
-    while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == '.') {
+    while (_isAlphaNumeric(_peek()) ||
+        _peek() == '-' ||
+        _peek() == '.' ||
+        _peek() == ':') {
       _advance();
     }
 
     final componentName = input.substring(nameStart, _position);
 
     // Check for slot with colon syntax: <x-slot:name>
-    if (componentName == 'slot' && _peek() == ':') {
-      _advance(); // consume ':'
-
-      // Scan slot name after colon
-      final slotNameStart = _position;
-      while (_isAlphaNumeric(_peek()) || _peek() == '-' || _peek() == '_') {
-        _advance();
-      }
-
-      final slotName = input.substring(slotNameStart, _position);
-      _emitToken(TokenType.componentTagOpen, '<x-slot:$slotName');
+    // The colon is now consumed as part of the name scan (since :: namespace is also valid).
+    // Slot names look like "slot:header" (single colon), distinct from namespace "package::component".
+    if (componentName.startsWith('slot:')) {
+      _emitToken(TokenType.componentTagOpen, '<x-$componentName');
     } else {
       _emitToken(TokenType.componentTagOpen, '<x-$componentName');
     }
 
     _skipWhitespace();
 
-    // Parse attributes
-    while (!_isAtEnd() && _peek() != '>' && _peek() != '/') {
+    // Parse attributes (including Blade echo expressions like {{ $attributes }})
+    while (!_isAtEnd() && _peek() != '>' && !(_peek() == '/' && _peekNext() == '>')) {
+      // PHP block inside component tag head: <?php ... ?> or <?= ... ?>
+      if (_peek() == '<' && _peekNext() == '?') {
+        _lexPhpBlockInTag();
+        _skipWhitespace();
+        continue;
+      }
+      if (_lexInlineBladeInTag()) continue;
       _lexAttribute();
-
       _skipWhitespace();
     }
 
@@ -1069,8 +1302,13 @@ class BladeLexer {
       return _LexerState.text;
     }
 
-    // Scan tag name: letters, digits, hyphens
-    while (_isAlphaNumeric(_peek()) || _peek() == '-') {
+    // Scan tag name: letters, digits, hyphens, colons, dots
+    // Colons and dots are needed for <livewire:counter>, <livewire:post.create>,
+    // and <livewire:pages::post.create> syntax.
+    while (_isAlphaNumeric(_peek()) ||
+        _peek() == '-' ||
+        _peek() == ':' ||
+        _peek() == '.') {
       _advance();
     }
 
@@ -1080,11 +1318,16 @@ class BladeLexer {
     // Skip whitespace before attributes or tag close
     _skipWhitespace();
 
-    // Lex attributes (reuse existing _lexAttribute)
-    while (!_isAtEnd() && _peek() != '>' && _peek() != '/') {
+    // Lex attributes (including Blade echo expressions like {{ $attributes }})
+    while (!_isAtEnd() && _peek() != '>' && !(_peek() == '/' && _peekNext() == '>')) {
+      // PHP block inside tag head: <?php ... ?> or <?= ... ?>
+      if (_peek() == '<' && _peekNext() == '?') {
+        _lexPhpBlockInTag();
+        _skipWhitespace();
+        continue;
+      }
+      if (_lexInlineBladeInTag()) continue;
       _lexAttribute();
-
-      // Skip whitespace after attribute
       _skipWhitespace();
     }
 
@@ -1121,6 +1364,155 @@ class BladeLexer {
     return _LexerState.text;
   }
 
+  /// Lex a PHP block (<?php ... ?> or <?= ... ?>) inside an HTML/component tag head.
+  /// Emits a single phpBlock token with the full source including delimiters.
+  void _lexPhpBlockInTag() {
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
+    _advance(); // <
+    _advance(); // ?
+
+    // Determine variant and advance past the marker
+    if (!_isAtEnd() && _peek() == '=') {
+      _advance(); // = (for <?=)
+    } else {
+      while (!_isAtEnd() && _isAlpha(_peek())) {
+        _advance();
+      }
+    }
+
+    _scanPhpBlockBody();
+    _emitToken(TokenType.phpBlock, input.substring(_start, _position));
+  }
+
+  /// Lex Blade echo/raw-echo expressions inside a tag attribute list.
+  /// Returns true if a Blade construct was found and lexed, false otherwise.
+  /// Handles {{ }}, {!! !!}, and {{-- --}} inside tag heads.
+  bool _lexInlineBladeInTag() {
+    final ch = _peek();
+    if (ch != '{') return false;
+
+    // Check for {{-- Blade comment
+    if (_peekNext() == '{' && _peekAhead(2) == '-' && _peekAhead(3) == '-') {
+      // Lex as blade comment inline
+      _start = _position;
+      _startLine = _line;
+      _startColumn = _column;
+      _advance(); // {
+      _advance(); // {
+      _advance(); // -
+      _advance(); // -
+      final commentStart = _position - 4;
+      while (!_isAtEnd()) {
+        if (_peek() == '-' &&
+            _peekNext() == '-' &&
+            _peekAhead(2) == '}' &&
+            _peekAhead(3) == '}') {
+          _advance(); // -
+          _advance(); // -
+          _advance(); // }
+          _advance(); // }
+          _emitToken(
+              TokenType.bladeComment, input.substring(commentStart, _position));
+          _skipWhitespace();
+          return true;
+        }
+        _advance();
+      }
+      return true;
+    }
+
+    // Check for {!! !!} raw echo
+    if (_peekNext() == '!' && _peekAhead(2) == '!') {
+      _start = _position;
+      _startLine = _line;
+      _startColumn = _column;
+      _advance(); // {
+      _advance(); // !
+      _advance(); // !
+      _emitToken(TokenType.rawEchoOpen, '{!!');
+
+      final exprStart = _position;
+      while (!_isAtEnd()) {
+        if (_peek() == '!' && _peekNext() == '!' && _peekAhead(2) == '}') {
+          if (_position > exprStart) {
+            _emitToken(
+              TokenType.expression,
+              input.substring(exprStart, _position),
+            );
+          }
+          _advance(); // !
+          _advance(); // !
+          _advance(); // }
+          _emitToken(TokenType.rawEchoClose, '!!}');
+          _skipWhitespace();
+          return true;
+        }
+        _advance();
+      }
+      return true;
+    }
+
+    // Check for {{ }} echo
+    if (_peekNext() == '{') {
+      _start = _position;
+      _startLine = _line;
+      _startColumn = _column;
+      _advance(); // {
+      _advance(); // {
+      _emitToken(TokenType.echoOpen, '{{');
+
+      _start = _position;
+      _startLine = _line;
+      _startColumn = _column;
+
+      final exprStart = _position;
+      int braceCount = 0;
+      bool inSingleQuote = false;
+      bool inDoubleQuote = false;
+
+      while (!_isAtEnd()) {
+        final c = _peek();
+
+        if (inSingleQuote) {
+          if (c == "'" && _isUnescapedAt(_position)) inSingleQuote = false;
+        } else if (inDoubleQuote) {
+          if (c == '"' && _isUnescapedAt(_position)) inDoubleQuote = false;
+        } else {
+          if (c == "'") {
+            inSingleQuote = true;
+          } else if (c == '"') {
+            inDoubleQuote = true;
+          } else if (c == '{') {
+            braceCount++;
+          } else if (c == '}') {
+            if (braceCount > 0) {
+              braceCount--;
+            } else if (_peekNext() == '}') {
+              if (_position > exprStart) {
+                _emitToken(
+                  TokenType.expression,
+                  input.substring(exprStart, _position),
+                );
+              }
+              _advance(); // }
+              _advance(); // }
+              _emitToken(TokenType.echoClose, '}}');
+              _skipWhitespace();
+              return true;
+            }
+          }
+        }
+        _advance();
+      }
+      return true;
+    }
+
+    return false;
+  }
+
   /// Lex attribute (Standard, Alpine.js, or Livewire)
   void _lexAttribute() {
     // Skip any unexpected characters (like dots in wire:loading.delay)
@@ -1149,6 +1541,19 @@ class BladeLexer {
       if (directiveType != null) {
         // It's a Blade directive - emit directive token
         _emitToken(directiveType, '@$name');
+
+        // Skip optional horizontal whitespace before expression (PSR-12 style)
+        final posBeforeWs2 = _position;
+        final lineBeforeWs2 = _line;
+        final colBeforeWs2 = _column;
+        while (!_isAtEnd() && (_peek() == ' ' || _peek() == '\t')) {
+          _advance();
+        }
+        if (_isAtEnd() || _peek() != '(') {
+          _position = posBeforeWs2;
+          _line = lineBeforeWs2;
+          _column = colBeforeWs2;
+        }
 
         // Check for expression after directive: (...)
         if (_peek() == '(') {
@@ -1199,6 +1604,19 @@ class BladeLexer {
       final structuralType = _directiveNameToType(name);
       if (structuralType != TokenType.identifier) {
         _emitToken(structuralType, '@$name');
+
+        // Skip optional horizontal whitespace before expression (PSR-12 style)
+        final posBeforeWs = _position;
+        final lineBeforeWs = _line;
+        final colBeforeWs = _column;
+        while (!_isAtEnd() && (_peek() == ' ' || _peek() == '\t')) {
+          _advance();
+        }
+        if (_isAtEnd() || _peek() != '(') {
+          _position = posBeforeWs;
+          _line = lineBeforeWs;
+          _column = colBeforeWs;
+        }
 
         // Lex expression if present: (...)
         if (_peek() == '(') {
@@ -1259,9 +1677,26 @@ class BladeLexer {
 
     if (_peek() == ':') {
       _advance();
-      // Alpine.js :bind shorthand
+
+      // Blade :$var shorthand (e.g., :$attributes, :$name)
+      // This is equivalent to :var="$var" in component attributes.
+      if (_peek() == '\$') {
+        _advance(); // $
+        final varStart = _position;
+        while (_isAlphaNumeric(_peek()) || _peek() == '_') {
+          _advance();
+        }
+        final varName = input.substring(varStart, _position);
+        _emitToken(TokenType.identifier, ':\$$varName');
+        return;
+      }
+
+      // Alpine.js :bind shorthand (supports compound names like :wire:click, :wire:model.live)
       final bindStart = _position;
-      while (_isAlphaNumeric(_peek()) || _peek() == '-') {
+      while (_isAlphaNumeric(_peek()) ||
+          _peek() == '-' ||
+          _peek() == ':' ||
+          _peek() == '.') {
         _advance();
       }
       final attr = input.substring(bindStart, _position);
@@ -1322,13 +1757,93 @@ class BladeLexer {
     final quote = _peek();
     if (quote == '"' || quote == "'") {
       _advance(); // Skip opening quote
+      _start = _position;
+      _startLine = _line;
+      _startColumn = _column;
       final valueStart = _position;
 
-      // Handle escaped quotes within the string
+      // Handle escaped quotes and Blade echo boundaries within the string.
+      // Quotes inside {{ }}, {!! !!}, and {{-- --}} must not close the attribute.
       while (!_isAtEnd() && _peek() != quote) {
         if (_peek() == '\\' && _peekNext() == quote) {
           _advance(); // Skip backslash
           _advance(); // Skip escaped quote
+        } else if (_peek() == '{' && _peekNext() == '{') {
+          // Blade echo {{ ... }} or comment {{-- ... --}}
+          _advance(); // {
+          _advance(); // {
+          if (!_isAtEnd() && _peek() == '-' && _peekNext() == '-') {
+            // Blade comment {{-- ... --}}: scan to --}}
+            _advance(); // -
+            _advance(); // -
+            while (!_isAtEnd()) {
+              if (_peek() == '-' && _peekNext() == '-' &&
+                  _peekAhead(2) == '}' && _peekAhead(3) == '}') {
+                _advance(); // -
+                _advance(); // -
+                _advance(); // }
+                _advance(); // }
+                break;
+              }
+              _advance();
+            }
+          } else {
+            // Echo {{ ... }}: scan to }}, tracking nested braces and strings
+            int braceDepth = 0;
+            bool inSQ = false;
+            bool inDQ = false;
+            while (!_isAtEnd()) {
+              final c = _peek();
+              if (inSQ) {
+                if (c == '\\') {
+                  _advance();
+                  if (!_isAtEnd()) _advance();
+                  continue;
+                }
+                if (c == "'") inSQ = false;
+              } else if (inDQ) {
+                if (c == '\\') {
+                  _advance();
+                  if (!_isAtEnd()) _advance();
+                  continue;
+                }
+                if (c == '"') inDQ = false;
+              } else {
+                if (c == "'") {
+                  inSQ = true;
+                } else if (c == '"') {
+                  inDQ = true;
+                } else if (c == '{') {
+                  braceDepth++;
+                } else if (c == '}') {
+                  if (braceDepth > 0) {
+                    braceDepth--;
+                  } else if (_peekNext() == '}') {
+                    _advance(); // }
+                    _advance(); // }
+                    break;
+                  }
+                }
+              }
+              _advance();
+            }
+          }
+        } else if (_peek() == '{' && _peekNext() == '!' &&
+            _peekAhead(2) == '!') {
+          // Raw echo {!! ... !!}: scan to !!}
+          _advance(); // {
+          _advance(); // !
+          _advance(); // !
+          while (!_isAtEnd()) {
+            if (_peek() == '!' && _peekNext() == '!' &&
+                _peekAhead(2) == '}') {
+              _advance(); // !
+              _advance(); // !
+              _advance(); // }
+              break;
+            }
+            _advance();
+          }
         } else {
           _advance();
         }
@@ -1700,13 +2215,17 @@ class BladeLexer {
         return TokenType.directiveUse;
 
       // Livewire Directives
+      case 'livewire':
+        return TokenType.directiveLivewire;
       case 'teleport':
         return TokenType.directiveTeleport;
       case 'endTeleport':
+      case 'endteleport':
         return TokenType.directiveEndTeleport;
       case 'persist':
         return TokenType.directivePersist;
       case 'endPersist':
+      case 'endpersist':
         return TokenType.directiveEndPersist;
       case 'entangle':
         return TokenType.directiveEntangle;
@@ -1728,6 +2247,20 @@ class BladeLexer {
         return TokenType.directiveAssets;
       case 'endassets':
         return TokenType.directiveEndassets;
+
+      // Volt Directives
+      case 'volt':
+        return TokenType.directiveVolt;
+      case 'endvolt':
+        return TokenType.directiveEndvolt;
+
+      // Blaze Directives (Livewire Blaze - component optimization)
+      case 'blaze':
+        return TokenType.directiveBlaze;
+      case 'unblaze':
+        return TokenType.directiveUnblaze;
+      case 'endunblaze':
+        return TokenType.directiveEndunblaze;
 
       // Filament Directives
       case 'filamentStyles':

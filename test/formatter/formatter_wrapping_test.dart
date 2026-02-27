@@ -21,7 +21,8 @@ void main() {
           config: const FormatterConfig(maxLineLength: 60),
         );
 
-        const input = '<div class="very-long-class-name" id="main-container" data-value="123">Content</div>';
+        const input =
+            '<div class="very-long-class-name" id="main-container" data-value="123">Content</div>';
         final result = formatter.format(input);
 
         // Should wrap to multiple lines
@@ -35,7 +36,8 @@ void main() {
           config: const FormatterConfig(maxLineLength: 60),
         );
 
-        const input = '<x-alert type="success" message="Operation completed successfully" dismissible>Content</x-alert>';
+        const input =
+            '<x-alert type="success" message="Operation completed successfully" dismissible>Content</x-alert>';
         final result = formatter.format(input);
 
         // Should wrap to multiple lines
@@ -80,7 +82,8 @@ void main() {
           config: const FormatterConfig(maxLineLength: 50),
         );
 
-        const input = '<x-icon name="check" class="text-green-500" size="lg" />';
+        const input =
+            '<x-icon name="check" class="text-green-500" size="lg" />';
         final result = formatter.format(input);
 
         expect(result, contains('<x-icon\n'));
@@ -137,12 +140,16 @@ void main() {
           ),
         );
 
-        const input = '<div class="very-long-class-name-that-exceeds-max-line-length" id="main" data-value="123">Content</div>';
+        const input =
+            '<div class="very-long-class-name-that-exceeds-max-line-length" id="main" data-value="123">Content</div>';
         final result = formatter.format(input);
 
         // Should stay on single line
         expect(result, isNot(contains('<div\n')));
-        expect(result, contains('<div class="very-long-class-name-that-exceeds-max-line-length" id="main" data-value="123">'));
+        expect(
+            result,
+            contains(
+                '<div class="very-long-class-name-that-exceeds-max-line-length" id="main" data-value="123">'));
       });
     });
 
@@ -220,7 +227,8 @@ void main() {
           ),
         );
 
-        const input = '<div data-config=\'{"key": "value"}\' class="container">Content</div>';
+        const input =
+            '<div data-config=\'{"key": "value"}\' class="container">Content</div>';
         final result = formatter.format(input);
 
         expect(result, isNotEmpty);
@@ -231,7 +239,8 @@ void main() {
           config: const FormatterConfig(wrapAttributes: WrapAttributes.always),
         );
 
-        const input = '<div class="{{ \$class }}" id="item-{{ \$id }}">Content</div>';
+        const input =
+            '<div class="{{ \$class }}" id="item-{{ \$id }}">Content</div>';
         final result = formatter.format(input);
 
         expect(result, contains('class="{{ \$class }}"'));
@@ -243,7 +252,8 @@ void main() {
           config: const FormatterConfig(wrapAttributes: WrapAttributes.always),
         );
 
-        const input = '<div x-data="{ open: false }" @click="toggle" :class="{ active: open }">Content</div>';
+        const input =
+            '<div x-data="{ open: false }" @click="toggle" :class="{ active: open }">Content</div>';
         final result = formatter.format(input);
 
         expect(result, contains('x-data="{ open: false }"'));
@@ -256,7 +266,8 @@ void main() {
           config: const FormatterConfig(wrapAttributes: WrapAttributes.always),
         );
 
-        const input = '<input type="text" wire:model="name" wire:loading.class="opacity-50">';
+        const input =
+            '<input type="text" wire:model="name" wire:loading.class="opacity-50">';
         final result = formatter.format(input);
 
         expect(result, contains('wire:model="name"'));
@@ -276,7 +287,8 @@ void main() {
         expect(shortResult, isNot(contains('<div\n')));
 
         // This should exceed 80 characters with indentation
-        const longInput = '<div class="a-very-long-class-name" id="another-long-id" data-value="some-value">Content</div>';
+        const longInput =
+            '<div class="a-very-long-class-name" id="another-long-id" data-value="some-value">Content</div>';
         final longResult = formatter.format(longInput);
         expect(longResult, contains('<div\n'));
       });
@@ -287,7 +299,8 @@ void main() {
         );
 
         // This should be under 120 characters
-        const input = '<div class="a-very-long-class-name" id="another-long-id" data-value="some-value">Content</div>';
+        const input =
+            '<div class="a-very-long-class-name" id="another-long-id" data-value="some-value">Content</div>';
         final result = formatter.format(input);
 
         expect(result, isNot(contains('<div\n')));
@@ -299,7 +312,8 @@ void main() {
         );
 
         // This input should exceed 40 characters when including tag, attrs, and closing
-        const input = '<div class="container" id="main" data-value="test">Content</div>';
+        const input =
+            '<div class="container" id="main" data-value="test">Content</div>';
         final result = formatter.format(input);
 
         // Should wrap at 40 characters

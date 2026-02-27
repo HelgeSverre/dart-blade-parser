@@ -304,7 +304,7 @@ void main() {
       );
     });
 
-    test('@php block should have children with raw content', () {
+    test('@php block should produce PhpBlockNode with raw content', () {
       final result = parser.parse('''
         @php
           \$x = 1;
@@ -314,33 +314,14 @@ void main() {
 
       expect(result.isSuccess, isTrue);
 
-      // Find the php directive
-      final phpDirective =
-          result.ast!.children.whereType<DirectiveNode>().firstWhere(
-                (n) => n.name == 'php',
-                orElse: () => throw Exception('php directive not found'),
-              );
+      // Find the PhpBlockNode
+      final phpBlocks =
+          result.ast!.children.whereType<PhpBlockNode>().toList();
 
-      expect(phpDirective.name, equals('php'));
-
-      // CRITICAL: @php should be BLOCK directive with children
-      // Content should NOT be parsed as Blade/HTML
-      // Current bug: treated as inline, or content parsed as Blade
-      expect(
-        phpDirective.children.length,
-        greaterThan(0),
-        reason: '@php should be block directive with raw content',
-      );
-
-      // Content should be raw text, not parsed HTML/Blade
-      final hasHtmlChildren = phpDirective.children.any(
-        (c) => c is HtmlElementNode,
-      );
-      expect(
-        hasHtmlChildren,
-        isFalse,
-        reason: '@php content should be raw, not parsed as HTML',
-      );
+      expect(phpBlocks, hasLength(1));
+      expect(phpBlocks.first.syntax, PhpBlockSyntax.bladeDirective);
+      expect(phpBlocks.first.code, contains('\$x = 1;'));
+      expect(phpBlocks.first.children, isEmpty);
     });
 
     test('Missing @endphp should report error', () {

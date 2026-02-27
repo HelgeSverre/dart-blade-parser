@@ -11,6 +11,7 @@ class BladeParser {
   List<Token> _tokens = [];
   int _current = 0;
   final List<ParseError> _errors = [];
+  String _source = '';
 
   /// HTML5 void elements that cannot have children.
   static const Set<String> _voidElements = {
@@ -42,7 +43,16 @@ class BladeParser {
       _voidElements.contains(tagName.toLowerCase());
 
   /// Parse a Blade template string.
+  /// Recovers the quote character used for an attribute value token.
+  String? _inferQuoteChar(Token valueToken) {
+    final i = valueToken.startOffset - 1;
+    if (i < 0 || i >= _source.length) return null;
+    final ch = _source[i];
+    return (ch == '"' || ch == "'") ? ch : null;
+  }
+
   ParseResult parse(String source) {
+    _source = source;
     final lexer = BladeLexer(source);
     _tokens = lexer.tokenize();
     _current = 0;
@@ -97,17 +107,21 @@ class BladeParser {
 
       // Authentication directives
       case TokenType.directiveAuth:
-        return _parseGenericDirective('auth', TokenType.directiveEndauth);
+        return _parseGenericDirective('auth', TokenType.directiveEndauth,
+            supportsElse: true);
       case TokenType.directiveGuest:
-        return _parseGenericDirective('guest', TokenType.directiveEndguest);
+        return _parseGenericDirective('guest', TokenType.directiveEndguest,
+            supportsElse: true);
 
       // Environment directives
       case TokenType.directiveEnv:
-        return _parseGenericDirective('env', TokenType.directiveEndenv);
+        return _parseGenericDirective('env', TokenType.directiveEndenv,
+            supportsElse: true);
       case TokenType.directiveProduction:
         return _parseGenericDirective(
           'production',
           TokenType.directiveEndproduction,
+          supportsElse: true,
         );
 
       // Validation directives
@@ -129,27 +143,40 @@ class BladeParser {
 
       // Control flow - paired directives
       case TokenType.directiveUnless:
-        return _parseGenericDirective('unless', TokenType.directiveEndunless);
+        return _parseGenericDirective('unless', TokenType.directiveEndunless,
+            supportsElse: true,
+            alternateClosingTypes: [TokenType.directiveEndif]);
       case TokenType.directiveIsset:
         return _parseGenericDirective('isset', TokenType.directiveEndisset,
-            supportsElse: true);
+            supportsElse: true,
+            alternateClosingTypes: [TokenType.directiveEndif]);
       case TokenType.directiveEmpty:
         return _parseGenericDirective('empty', TokenType.directiveEndempty,
-            supportsElse: true);
+            supportsElse: true,
+            alternateClosingTypes: [TokenType.directiveEndif]);
 
       // Authorization - paired directives
       case TokenType.directiveCan:
-        return _parseGenericDirective('can', TokenType.directiveEndcan);
+        return _parseGenericDirective('can', TokenType.directiveEndcan,
+            supportsElse: true);
       case TokenType.directiveCannot:
-        return _parseGenericDirective('cannot', TokenType.directiveEndcannot);
+        return _parseGenericDirective('cannot', TokenType.directiveEndcannot,
+            supportsElse: true);
       case TokenType.directiveCanany:
-        return _parseGenericDirective('canany', TokenType.directiveEndcanany);
+        return _parseGenericDirective('canany', TokenType.directiveEndcanany,
+            supportsElse: true);
 
       // Template features - paired directives
       case TokenType.directiveOnce:
         return _parseGenericDirective('once', TokenType.directiveEndonce);
       case TokenType.directivePhp:
-        return _parseGenericDirective('php', TokenType.directiveEndphp);
+        // Inline @php($expr) has an expression token following;
+        // block @php has raw text content until @endphp
+        if (_current < _tokens.length - 1 &&
+            _tokens[_current + 1].type == TokenType.expression) {
+          return _parseInlineDirective();
+        }
+        return _parsePhpDirectiveBlock();
       case TokenType.directiveVerbatim:
         return _parseGenericDirective(
           'verbatim',
@@ -190,8 +217,19 @@ class BladeParser {
         return _parseGenericDirective(
             'teleport', TokenType.directiveEndTeleport);
       case TokenType.directivePersist:
+        return _parseGenericDirective('persist', TokenType.directiveEndPersist);
+
+      // Volt - paired directive
+      case TokenType.directiveVolt:
+        return _parseGenericDirective('volt', TokenType.directiveEndvolt);
+
+      // Blaze - inline (no closing tag)
+      case TokenType.directiveBlaze:
+        return _parseInlineDirective();
+      // Blaze - paired block directive
+      case TokenType.directiveUnblaze:
         return _parseGenericDirective(
-            'persist', TokenType.directiveEndPersist);
+            'unblaze', TokenType.directiveEndunblaze);
 
       // Other directives (inline, no closing tag)
       case TokenType.directiveExtends:
@@ -225,6 +263,7 @@ class BladeParser {
       case TokenType.directiveRequired:
       case TokenType.directiveInject:
       case TokenType.directiveUse:
+      case TokenType.directiveLivewire:
       case TokenType.directiveEntangle:
       case TokenType.directiveThis:
       case TokenType.directiveJs:
@@ -281,6 +320,8 @@ class BladeParser {
           content: token.value,
           isBladeComment: false,
         );
+      case TokenType.phpBlock:
+        return _parsePhpTagBlock();
       case TokenType.eof:
         _advance(); // Advance past EOF to terminate loop
         return null;
@@ -621,6 +662,74 @@ class BladeParser {
     );
   }
 
+  /// Parse a `<?php ... ?>`, `<?= ... ?>`, or `<? ... ?>` block.
+  PhpBlockNode _parsePhpTagBlock() {
+    final token = _advance();
+    final value = token.value;
+
+    PhpBlockSyntax syntax;
+    String code;
+
+    if (value.startsWith('<?=')) {
+      syntax = PhpBlockSyntax.shortEcho;
+      code = _extractPhpCode(value, 3);
+    } else if (value.startsWith('<?php')) {
+      syntax = PhpBlockSyntax.phpTag;
+      code = _extractPhpCode(value, 5);
+    } else {
+      syntax = PhpBlockSyntax.shortTag;
+      code = _extractPhpCode(value, 2);
+    }
+
+    return PhpBlockNode(
+      startPosition: token.startPosition,
+      endPosition: token.endPosition,
+      code: code,
+      syntax: syntax,
+    );
+  }
+
+  /// Extract PHP code from a token value, stripping opening tag prefix
+  /// and optional closing `?>`.
+  String _extractPhpCode(String value, int prefixLength) {
+    var code = value.substring(prefixLength);
+    if (code.endsWith('?>')) {
+      code = code.substring(0, code.length - 2);
+    }
+    return code;
+  }
+
+  /// Parse `@php ... @endphp` as a [PhpBlockNode].
+  PhpBlockNode _parsePhpDirectiveBlock() {
+    final startToken = _advance();
+
+    // Collect raw text content until @endphp
+    final codeBuffer = StringBuffer();
+    while (!_check(TokenType.directiveEndphp) && !_check(TokenType.eof)) {
+      final token = _advance();
+      codeBuffer.write(token.value);
+    }
+
+    if (_check(TokenType.directiveEndphp)) {
+      _advance();
+    } else {
+      _errors.add(
+        ParseError(
+          message: 'Unclosed @php directive',
+          position: startToken.startPosition,
+          hint: 'Add @endphp to close the block',
+        ),
+      );
+    }
+
+    return PhpBlockNode(
+      startPosition: startToken.startPosition,
+      endPosition: _previous().endPosition,
+      code: codeBuffer.toString(),
+      syntax: PhpBlockSyntax.bladeDirective,
+    );
+  }
+
   String? _extractExpression() {
     if (_check(TokenType.expression)) {
       return _advance().value.trim();
@@ -673,6 +782,7 @@ class BladeParser {
       startPosition: openToken.startPosition,
       endPosition: _previous().endPosition,
       expression: expression.trim(),
+      rawExpression: expression,
       isRaw: isRaw,
     );
   }
@@ -785,6 +895,7 @@ class BladeParser {
     // Parse tag head: attributes and structural directives
     final tagHeadResult = _parseTagHead();
     final attributes = tagHeadResult.attributes;
+    final tagHead = tagHeadResult.tagHead;
 
     // Check for self-closing
     bool isSelfClosing = false;
@@ -858,6 +969,7 @@ class BladeParser {
       endPosition: _previous().endPosition,
       name: componentName,
       attributes: attributes,
+      tagHead: tagHead,
       slots: slots,
       isSelfClosing: isSelfClosing,
       children: children,
@@ -865,16 +977,23 @@ class BladeParser {
   }
 
   /// Parse generic directive with opening/closing tags.
+  ///
+  /// [alternateClosingTypes] allows additional token types to close the
+  /// directive (e.g., @endif can close @unless in real-world Blade).
   DirectiveNode _parseGenericDirective(
     String name,
     TokenType closingType, {
     bool supportsElse = false,
+    List<TokenType> alternateClosingTypes = const [],
   }) {
     final startToken = _advance();
     final expression = _extractExpression();
     final children = <AstNode>[];
 
-    while (!_check(closingType) &&
+    bool _isCloser() =>
+        _check(closingType) || alternateClosingTypes.any(_check);
+
+    while (!_isCloser() &&
         !_check(TokenType.eof) &&
         !(supportsElse && _check(TokenType.directiveElse))) {
       final node = _parseNode();
@@ -886,7 +1005,7 @@ class BladeParser {
       final elseToken = _advance();
       final elseChildren = <AstNode>[];
 
-      while (!_check(closingType) && !_check(TokenType.eof)) {
+      while (!_isCloser() && !_check(TokenType.eof)) {
         final node = _parseNode();
         if (node != null) elseChildren.add(node);
       }
@@ -901,7 +1020,7 @@ class BladeParser {
       );
     }
 
-    if (!_check(closingType)) {
+    if (!_isCloser()) {
       _errors.add(
         ParseError(
           message: 'Unclosed @$name directive',
@@ -1288,6 +1407,7 @@ class BladeParser {
         Position attrEndPos = attrToken.endPosition;
 
         String? attrValue;
+        String? quoteChar;
 
         if (_isBladeAttributeDirective(attrToken.type)) {
           if (_check(TokenType.expression)) {
@@ -1299,10 +1419,12 @@ class BladeParser {
           final valueToken = _advance();
           attrValue = valueToken.value;
           attrEndPos = valueToken.endPosition;
+          quoteChar = _inferQuoteChar(valueToken);
         }
 
         final attrNode = _classifyAttribute(
-            attrToken, attrName, attrValue, attrStartPos, attrEndPos);
+            attrToken, attrName, attrValue, attrStartPos, attrEndPos,
+            quoteChar: quoteChar);
         attributes[attrName] = attrNode;
         tagHead.add(TagHeadAttribute(attrName, attrNode));
       } else if (_isStructuralDirectiveToken(type)) {
@@ -1317,6 +1439,60 @@ class BladeParser {
           expression = _advance().value.trim();
         }
         tagHead.add(TagHeadDirective(directiveName, expression: expression));
+      } else if (type == TokenType.echoOpen ||
+          type == TokenType.rawEchoOpen ||
+          type == TokenType.bladeComment) {
+        // Blade echo/raw-echo/comment inside tag attributes (e.g., {{ $attributes->class([...]) }})
+        // Consume the echo tokens without creating an attribute node
+        if (type == TokenType.echoOpen) {
+          hasDirectives = true;
+          _advance(); // echoOpen
+          String expr = '';
+          if (_check(TokenType.expression)) {
+            expr = _advance().value;
+          }
+          if (_check(TokenType.echoClose)) {
+            _advance(); // echoClose
+          }
+          // Store as a special attribute with the expression as name
+          final attrName = '{{ ${expr.trim()} }}';
+          final attrNode = StandardAttribute(
+            name: attrName,
+            value: null,
+            startPosition: _previous().startPosition,
+            endPosition: _previous().endPosition,
+          );
+          attributes[attrName] = attrNode;
+          tagHead.add(TagHeadAttribute(attrName, attrNode));
+        } else if (type == TokenType.rawEchoOpen) {
+          hasDirectives = true;
+          _advance(); // rawEchoOpen
+          String expr = '';
+          if (_check(TokenType.expression)) {
+            expr = _advance().value;
+          }
+          if (_check(TokenType.rawEchoClose)) {
+            _advance(); // rawEchoClose
+          }
+          final attrName = '{!! ${expr.trim()} !!}';
+          final attrNode = StandardAttribute(
+            name: attrName,
+            value: null,
+            startPosition: _previous().startPosition,
+            endPosition: _previous().endPosition,
+          );
+          attributes[attrName] = attrNode;
+          tagHead.add(TagHeadAttribute(attrName, attrNode));
+        } else {
+          // Blade comment - preserve in tag head
+          hasDirectives = true;
+          final commentToken = _advance();
+          tagHead.add(TagHeadComment(commentToken.value));
+        }
+      } else if (type == TokenType.phpBlock) {
+        hasDirectives = true;
+        final phpToken = _advance();
+        tagHead.add(TagHeadPhpBlock(phpToken.value));
       } else {
         // Skip unexpected tokens (whitespace, text between directives)
         _advance();
@@ -1336,13 +1512,15 @@ class BladeParser {
     String attrName,
     String? attrValue,
     Position startPos,
-    Position endPos,
-  ) {
+    Position endPos, {
+    String? quoteChar,
+  }) {
     // Check Blade attribute directives first (before Alpine, since @class starts with @)
     if (_isBladeAttributeDirective(attrToken.type)) {
       return StandardAttribute(
         name: attrName,
         value: attrValue,
+        quoteChar: quoteChar,
         startPosition: startPos,
         endPosition: endPos,
       );
@@ -1384,20 +1562,35 @@ class BladeParser {
         name: attrName,
         directive: directive,
         value: attrValue,
+        quoteChar: quoteChar,
         startPosition: startPos,
         endPosition: endPos,
       );
     } else if (isLivewireToken || attrName.startsWith('wire:')) {
       final parts = attrName.split('.');
-      final action =
+      final head =
           parts[0].startsWith('wire:') ? parts[0].substring(5) : parts[0];
       final modifiers = parts.length > 1 ? parts.sublist(1) : <String>[];
+
+      // Split head by ':' to extract sub-action (e.g., "sort:item" → "sort", "item")
+      final colonIndex = head.indexOf(':');
+      final String action;
+      final String? subAction;
+      if (colonIndex != -1) {
+        action = head.substring(0, colonIndex);
+        subAction = head.substring(colonIndex + 1);
+      } else {
+        action = head;
+        subAction = null;
+      }
 
       return LivewireAttribute(
         name: attrName,
         action: action,
+        subAction: subAction,
         modifiers: modifiers,
         value: attrValue,
+        quoteChar: quoteChar,
         startPosition: startPos,
         endPosition: endPos,
       );
@@ -1405,6 +1598,7 @@ class BladeParser {
       return StandardAttribute(
         name: attrName,
         value: attrValue,
+        quoteChar: quoteChar,
         startPosition: startPos,
         endPosition: endPos,
       );

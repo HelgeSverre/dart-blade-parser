@@ -306,6 +306,11 @@ void _printTree(AstNode node, int indent) {
       for (final child in node.children) {
         _printTree(child, indent + 1);
       }
+    case PhpBlockNode():
+      final preview = node.code.length > 30
+          ? '${node.code.substring(0, 30)}...'
+          : node.code;
+      print('${prefix}PhpBlock(${node.syntax.name}): "$preview"');
   }
 }
 
@@ -481,8 +486,11 @@ Configuration File:
     "indent_size": 4,
     "indent_style": "spaces",
     "quote_style": "preserve",
-    "format_php_expressions": false,
-    "max_line_length": 120
+    "max_line_length": 120,
+    "directive_spacing": "between_blocks",
+    "html_block_spacing": "between_blocks",
+    "echo_spacing": "spaced",
+    "trailing_newline": true
   }
 
 Examples:

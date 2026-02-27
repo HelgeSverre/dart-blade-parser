@@ -17,8 +17,7 @@ void main() {
     });
 
     test('formatter preserves @endsection closing', () {
-      final input =
-          '@section("content")\n  <p>Content</p>\n@endsection';
+      final input = '@section("content")\n  <p>Content</p>\n@endsection';
       final output = formatter.format(input);
       expect(output, contains('@endsection'));
     });
@@ -113,7 +112,8 @@ indent_size = 2
     });
 
     test('@else aligns with @if and @endif', () {
-      final input = '<td>@if(\$user->isVerified())<span class="text-green-600">Verified</span>@else<span class="text-gray-400">Pending</span>@endif</td>';
+      final input =
+          '<td>@if(\$user->isVerified())<span class="text-green-600">Verified</span>@else<span class="text-gray-400">Pending</span>@endif</td>';
       final output = formatter.format(input);
       expect(
         output,
@@ -130,7 +130,8 @@ indent_size = 2
     });
 
     test('@elseif aligns with @if and @endif', () {
-      final input = '<div>@if(\$a)<p>A</p>@elseif(\$b)<p>B</p>@else<p>C</p>@endif</div>';
+      final input =
+          '<div>@if(\$a)<p>A</p>@elseif(\$b)<p>B</p>@else<p>C</p>@endif</div>';
       final output = formatter.format(input);
       expect(
         output,
@@ -238,8 +239,7 @@ indent_size = 2
     });
 
     test('preserves @vite directive (already supported)', () {
-      final output =
-          formatter.format("@vite(['resources/js/app.ts'])");
+      final output = formatter.format("@vite(['resources/js/app.ts'])");
       expect(output, contains('@vite'));
     });
 
@@ -269,7 +269,8 @@ indent_size = 2
     });
 
     test('custom block directive with @endcard is nested properly', () {
-      final input = "@card('primary')\n<h3>Title</h3>\n<p>Content</p>\n@endcard";
+      final input =
+          "@card('primary')\n<h3>Title</h3>\n<p>Content</p>\n@endcard";
       final output = formatter.format(input);
       expect(output, contains("@card('primary')"));
       expect(output, contains('@endcard'));
@@ -279,7 +280,8 @@ indent_size = 2
     test('custom block directive children are indented', () {
       final input = "@card('primary')\n<h3>Title</h3>\n@endcard";
       final output = formatter.format(input);
-      expect(output, equals("@card('primary')\n    <h3>Title</h3>\n@endcard\n"));
+      expect(
+          output, equals("@card('primary')\n    <h3>Title</h3>\n@endcard\n"));
     });
 
     test('nested custom block directives', () {
@@ -301,7 +303,8 @@ indent_size = 2
     });
 
     test('custom block directive with known directives inside', () {
-      final input = "@card('primary')\n@if(\$show)\n<p>Visible</p>\n@endif\n@endcard";
+      final input =
+          "@card('primary')\n@if(\$show)\n<p>Visible</p>\n@endif\n@endcard";
       final output = formatter.format(input);
       expect(output, contains("@card('primary')"));
       expect(output, contains('@if'));
@@ -328,7 +331,8 @@ indent_size = 2
     });
 
     test('custom block directive preserves complex expression', () {
-      final input = "@modal('lg', ['backdrop' => true])\n<p>Modal body</p>\n@endmodal";
+      final input =
+          "@modal('lg', ['backdrop' => true])\n<p>Modal body</p>\n@endmodal";
       final output = formatter.format(input);
       expect(output, contains("@modal('lg', ['backdrop' => true])"));
       expect(output, contains('@endmodal'));
