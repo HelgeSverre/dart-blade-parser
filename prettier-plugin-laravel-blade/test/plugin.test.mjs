@@ -316,6 +316,48 @@ describe("components", () => {
     assert.ok(result.includes("<x-ui.button"));
     assert.ok(result.includes("</x-ui.button>"));
   });
+
+  // Issue #3: Package components with :: namespace separator were being
+  // incorrectly formatted as <x-filament : :button /> instead of <x-filament::button />
+  it("preserves :: namespace in self-closing package component", async () => {
+    const result = await format("<x-filament::button />");
+    assert.ok(result.includes("<x-filament::button"));
+    assert.ok(!result.includes("<x-filament : :button"));
+  });
+
+  it("preserves :: namespace in package component with children", async () => {
+    const result = await format(
+      '<x-filament::button type="submit">Click me</x-filament::button>',
+    );
+    assert.ok(result.includes("<x-filament::button"));
+    assert.ok(result.includes("</x-filament::button>"));
+    assert.ok(!result.includes("<x-filament : :button"));
+  });
+
+  it(":: package component is idempotent", async () => {
+    const input =
+      '<x-filament::button type="submit">Click</x-filament::button>';
+    const first = await format(input);
+    const second = await format(first);
+    assert.equal(first, second);
+  });
+
+  it("preserves :: namespace with nested package components", async () => {
+    const input = `<x-filament::widget>
+<x-filament::stats :columns="3" />
+</x-filament::widget>`;
+    const result = await format(input);
+    assert.ok(result.includes("<x-filament::widget>"));
+    assert.ok(result.includes("<x-filament::stats"));
+    assert.ok(result.includes("</x-filament::widget>"));
+    assert.ok(!result.includes("<x-filament : :"));
+  });
+
+  it("preserves :: namespace combined with dot notation", async () => {
+    const result = await format("<x-package::nested.component />");
+    assert.ok(result.includes("<x-package::nested.component"));
+    assert.ok(!result.includes("<x-package : :nested.component"));
+  });
 });
 
 // ---------------------------------------------------------------------------
