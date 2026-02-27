@@ -107,17 +107,21 @@ class BladeParser {
 
       // Authentication directives
       case TokenType.directiveAuth:
-        return _parseGenericDirective('auth', TokenType.directiveEndauth);
+        return _parseGenericDirective('auth', TokenType.directiveEndauth,
+            supportsElse: true);
       case TokenType.directiveGuest:
-        return _parseGenericDirective('guest', TokenType.directiveEndguest);
+        return _parseGenericDirective('guest', TokenType.directiveEndguest,
+            supportsElse: true);
 
       // Environment directives
       case TokenType.directiveEnv:
-        return _parseGenericDirective('env', TokenType.directiveEndenv);
+        return _parseGenericDirective('env', TokenType.directiveEndenv,
+            supportsElse: true);
       case TokenType.directiveProduction:
         return _parseGenericDirective(
           'production',
           TokenType.directiveEndproduction,
+          supportsElse: true,
         );
 
       // Validation directives
@@ -153,11 +157,14 @@ class BladeParser {
 
       // Authorization - paired directives
       case TokenType.directiveCan:
-        return _parseGenericDirective('can', TokenType.directiveEndcan);
+        return _parseGenericDirective('can', TokenType.directiveEndcan,
+            supportsElse: true);
       case TokenType.directiveCannot:
-        return _parseGenericDirective('cannot', TokenType.directiveEndcannot);
+        return _parseGenericDirective('cannot', TokenType.directiveEndcannot,
+            supportsElse: true);
       case TokenType.directiveCanany:
-        return _parseGenericDirective('canany', TokenType.directiveEndcanany);
+        return _parseGenericDirective('canany', TokenType.directiveEndcanany,
+            supportsElse: true);
 
       // Template features - paired directives
       case TokenType.directiveOnce:
