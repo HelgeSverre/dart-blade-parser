@@ -449,7 +449,7 @@ class FormatterVisitor implements AstVisitor<String> {
         _isBladeAttributeDirectiveName(attr.name)) {
       return '${attr.name}${attr.value}';
     }
-    return '${attr.name}=${_formatAttributeValue(attr.value!)}';
+    return '${attr.name}=${_formatAttributeValue(attr.value!, sourceQuoteChar: attr.quoteChar)}';
   }
 
   /// Check if an attribute name is a Blade attribute directive.
@@ -592,16 +592,19 @@ class FormatterVisitor implements AstVisitor<String> {
   /// Formats an attribute value with the appropriate quote style.
   ///
   /// Handles escaping and quote style conversion based on config.quoteStyle.
-  String _formatAttributeValue(String value) {
-    final quote = config.quoteStyle.quoteChar;
+  String _formatAttributeValue(String value, {String? sourceQuoteChar}) {
+    String quote;
+    if (config.quoteStyle == QuoteStyle.preserve) {
+      quote = sourceQuoteChar ?? '"';
+    } else {
+      quote = config.quoteStyle.quoteChar;
+    }
 
     // Escape quotes in the value if needed
     String escaped = value;
-    if (config.quoteStyle == QuoteStyle.single) {
-      // Escape single quotes, unescape double quotes if they were escaped
+    if (quote == "'") {
       escaped = value.replaceAll(r"\'", "'").replaceAll("'", r"\'");
     } else {
-      // Escape double quotes, unescape single quotes if they were escaped
       escaped = value.replaceAll(r'\"', '"').replaceAll('"', r'\"');
     }
 

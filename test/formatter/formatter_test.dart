@@ -521,22 +521,21 @@ void main() {
         expect(result, contains('class="container"'));
       });
 
-      test('normalizes single quotes to double quotes (default behavior)', () {
+      test('preserves single quotes (default QuoteStyle.preserve)', () {
         const input = "<div class='container'>Content</div>";
         final result = formatter.format(input);
 
-        // Default QuoteStyle.preserve normalizes to double quotes
-        // (AST doesn't store original quote char)
-        expect(result, contains('class="container"'));
+        // Default QuoteStyle.preserve now correctly preserves original quotes
+        expect(result, contains("class='container'"));
       });
 
-      test('normalizes mixed quotes to double quotes (default behavior)', () {
+      test('preserves mixed quotes (default QuoteStyle.preserve)', () {
         const input = '<div class="foo" id=\'bar\'>Content</div>';
         final result = formatter.format(input);
 
-        // Both normalized to double quotes
+        // Preserve keeps original quote style per attribute
         expect(result, contains('class="foo"'));
-        expect(result, contains('id="bar"'));
+        expect(result, contains("id='bar'"));
       });
 
       test('converts to single quotes with QuoteStyle.single config', () {
@@ -557,6 +556,34 @@ void main() {
         final result = doubleQuoteFormatter.format(input);
 
         expect(result, contains('class="container"'));
+      });
+
+      test('preserves single quotes with QuoteStyle.preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(quoteStyle: QuoteStyle.preserve),
+        );
+        const input = "<div class='foo'></div>";
+        final result = preserveFormatter.format(input);
+        expect(result, contains("class='foo'"));
+      });
+
+      test('preserves double quotes with QuoteStyle.preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(quoteStyle: QuoteStyle.preserve),
+        );
+        const input = '<div class="foo"></div>';
+        final result = preserveFormatter.format(input);
+        expect(result, contains('class="foo"'));
+      });
+
+      test('preserves mixed quotes on different attributes', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(quoteStyle: QuoteStyle.preserve),
+        );
+        const input = "<div class='foo' id=\"bar\"></div>";
+        final result = preserveFormatter.format(input);
+        expect(result, contains("class='foo'"));
+        expect(result, contains('id="bar"'));
       });
 
       test('handles escaped quotes in attribute values', () {

@@ -11,6 +11,7 @@ class BladeParser {
   List<Token> _tokens = [];
   int _current = 0;
   final List<ParseError> _errors = [];
+  String _source = '';
 
   /// HTML5 void elements that cannot have children.
   static const Set<String> _voidElements = {
@@ -42,7 +43,16 @@ class BladeParser {
       _voidElements.contains(tagName.toLowerCase());
 
   /// Parse a Blade template string.
+  /// Recovers the quote character used for an attribute value token.
+  String? _inferQuoteChar(Token valueToken) {
+    final i = valueToken.startOffset - 1;
+    if (i < 0 || i >= _source.length) return null;
+    final ch = _source[i];
+    return (ch == '"' || ch == "'") ? ch : null;
+  }
+
   ParseResult parse(String source) {
+    _source = source;
     final lexer = BladeLexer(source);
     _tokens = lexer.tokenize();
     _current = 0;
@@ -1288,6 +1298,7 @@ class BladeParser {
         Position attrEndPos = attrToken.endPosition;
 
         String? attrValue;
+        String? quoteChar;
 
         if (_isBladeAttributeDirective(attrToken.type)) {
           if (_check(TokenType.expression)) {
@@ -1299,10 +1310,12 @@ class BladeParser {
           final valueToken = _advance();
           attrValue = valueToken.value;
           attrEndPos = valueToken.endPosition;
+          quoteChar = _inferQuoteChar(valueToken);
         }
 
         final attrNode = _classifyAttribute(
-            attrToken, attrName, attrValue, attrStartPos, attrEndPos);
+            attrToken, attrName, attrValue, attrStartPos, attrEndPos,
+            quoteChar: quoteChar);
         attributes[attrName] = attrNode;
         tagHead.add(TagHeadAttribute(attrName, attrNode));
       } else if (_isStructuralDirectiveToken(type)) {
@@ -1336,13 +1349,15 @@ class BladeParser {
     String attrName,
     String? attrValue,
     Position startPos,
-    Position endPos,
-  ) {
+    Position endPos, {
+    String? quoteChar,
+  }) {
     // Check Blade attribute directives first (before Alpine, since @class starts with @)
     if (_isBladeAttributeDirective(attrToken.type)) {
       return StandardAttribute(
         name: attrName,
         value: attrValue,
+        quoteChar: quoteChar,
         startPosition: startPos,
         endPosition: endPos,
       );
@@ -1384,6 +1399,7 @@ class BladeParser {
         name: attrName,
         directive: directive,
         value: attrValue,
+        quoteChar: quoteChar,
         startPosition: startPos,
         endPosition: endPos,
       );
@@ -1398,6 +1414,7 @@ class BladeParser {
         action: action,
         modifiers: modifiers,
         value: attrValue,
+        quoteChar: quoteChar,
         startPosition: startPos,
         endPosition: endPos,
       );
@@ -1405,6 +1422,7 @@ class BladeParser {
       return StandardAttribute(
         name: attrName,
         value: attrValue,
+        quoteChar: quoteChar,
         startPosition: startPos,
         endPosition: endPos,
       );

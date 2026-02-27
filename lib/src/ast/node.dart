@@ -321,6 +321,10 @@ sealed class AttributeNode {
   /// The attribute value, if any.
   final String? value;
 
+  /// The original quote character used in source (' or "), or null for
+  /// boolean/unquoted attributes.
+  final String? quoteChar;
+
   /// The source position where this attribute starts.
   final Position startPosition;
 
@@ -331,6 +335,7 @@ sealed class AttributeNode {
   AttributeNode({
     required this.name,
     this.value,
+    this.quoteChar,
     required this.startPosition,
     required this.endPosition,
   });
@@ -351,6 +356,7 @@ final class StandardAttribute extends AttributeNode {
   StandardAttribute({
     required super.name,
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
@@ -384,6 +390,7 @@ final class AlpineAttribute extends AttributeNode {
     required super.name,
     required this.directive,
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
@@ -423,6 +430,7 @@ final class LivewireAttribute extends AttributeNode {
     required this.action,
     this.modifiers = const [],
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
