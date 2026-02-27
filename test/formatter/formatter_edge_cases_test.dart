@@ -49,10 +49,14 @@ void main() {
 
     group('Directive argument edge cases', () {
       test('formats directive with complex expression', () {
-        const input = '@if(\$user && \$user->isActive() && \$user->hasRole("admin"))\n<p>Admin</p>\n@endif';
+        const input =
+            '@if(\$user && \$user->isActive() && \$user->hasRole("admin"))\n<p>Admin</p>\n@endif';
 
         final result = formatter.format(input);
-        expect(result, contains('@if(\$user && \$user->isActive() && \$user->hasRole("admin"))'));
+        expect(
+            result,
+            contains(
+                '@if(\$user && \$user->isActive() && \$user->hasRole("admin"))'));
       });
 
       test('formats directive with array access', () {
@@ -70,10 +74,14 @@ void main() {
       });
 
       test('formats foreach with complex iterator', () {
-        const input = '@foreach(\$users->where("active", true)->get() as \$user)\n<p>{{ \$user->name }}</p>\n@endforeach';
+        const input =
+            '@foreach(\$users->where("active", true)->get() as \$user)\n<p>{{ \$user->name }}</p>\n@endforeach';
 
         final result = formatter.format(input);
-        expect(result, contains('@foreach(\$users->where("active", true)->get() as \$user)'));
+        expect(
+            result,
+            contains(
+                '@foreach(\$users->where("active", true)->get() as \$user)'));
       });
     });
 
@@ -101,7 +109,8 @@ void main() {
       });
 
       test('formats wire: prefixed attributes', () {
-        const input = '<input wire:model.defer="name" wire:loading.class="opacity-50">';
+        const input =
+            '<input wire:model.defer="name" wire:loading.class="opacity-50">';
 
         final result = formatter.format(input);
         expect(result, contains('wire:model.defer'));
@@ -120,8 +129,10 @@ void main() {
       });
 
       test('formats boolean attributes with values', () {
-        const input = '<input type="checkbox" checked="checked" disabled="disabled">';
-        const expected = '<input type="checkbox" checked="checked" disabled="disabled">\n';
+        const input =
+            '<input type="checkbox" checked="checked" disabled="disabled">';
+        const expected =
+            '<input type="checkbox" checked="checked" disabled="disabled">\n';
 
         final result = formatter.format(input);
         expect(result, equals(expected));
@@ -130,7 +141,8 @@ void main() {
 
     group('Multiple attributes formatting', () {
       test('formats element with many attributes', () {
-        const input = '<input type="text" id="name" name="user_name" class="form-control" placeholder="Enter name" required>';
+        const input =
+            '<input type="text" id="name" name="user_name" class="form-control" placeholder="Enter name" required>';
 
         final result = formatter.format(input);
         expect(result, contains('type="text"'));
@@ -139,7 +151,8 @@ void main() {
       });
 
       test('formats element with mixed attribute types', () {
-        const input = '<button type="submit" class="btn" wire:click="save" x-on:click="close" disabled>Submit</button>';
+        const input =
+            '<button type="submit" class="btn" wire:click="save" x-on:click="close" disabled>Submit</button>';
 
         final result = formatter.format(input);
         expect(result, contains('type="submit"'));
@@ -282,7 +295,8 @@ void main() {
       });
 
       test('formats @includeWhen directive', () {
-        const input = '@includeWhen(\$user->isAdmin(), \'partials.admin-menu\')';
+        const input =
+            '@includeWhen(\$user->isAdmin(), \'partials.admin-menu\')';
 
         final result = formatter.format(input);
         expect(result, contains('@includeWhen(\$user->isAdmin()'));
@@ -440,7 +454,8 @@ void main() {
       });
 
       test('formats component with attribute bag', () {
-        const input = '<x-button {{ \$attributes->merge([\'class\' => \'btn\']) }}>Click</x-button>';
+        const input =
+            '<x-button {{ \$attributes->merge([\'class\' => \'btn\']) }}>Click</x-button>';
 
         final result = formatter.format(input);
         expect(result, contains('<x-button'));
@@ -482,7 +497,8 @@ color: {{ \$primaryColor }};
 
     group('Unusual but valid HTML', () {
       test('formats custom elements', () {
-        const input = '<my-custom-element attr="value">Content</my-custom-element>';
+        const input =
+            '<my-custom-element attr="value">Content</my-custom-element>';
 
         final result = formatter.format(input);
         expect(result, contains('<my-custom-element'));
@@ -517,21 +533,25 @@ color: {{ \$primaryColor }};
 
     group('Attribute value edge cases', () {
       test('formats attribute with URL value', () {
-        const input = '<a href="https://example.com/path?query=value&other=123">Link</a>';
+        const input =
+            '<a href="https://example.com/path?query=value&other=123">Link</a>';
 
         final result = formatter.format(input);
-        expect(result, contains('https://example.com/path?query=value&other=123'));
+        expect(
+            result, contains('https://example.com/path?query=value&other=123'));
       });
 
       test('formats attribute with JSON value', () {
-        const input = '<div data-config=\'{"key": "value", "nested": {"a": 1}}\'>Content</div>';
+        const input =
+            '<div data-config=\'{"key": "value", "nested": {"a": 1}}\'>Content</div>';
 
         final result = formatter.format(input);
         expect(result, contains('data-config'));
       });
 
       test('formats attribute with PHP-like expression', () {
-        const input = '<div data-value="{{ \$obj->method()->property }}">Content</div>';
+        const input =
+            '<div data-value="{{ \$obj->method()->property }}">Content</div>';
 
         final result = formatter.format(input);
         expect(result, contains('\$obj->method()->property'));

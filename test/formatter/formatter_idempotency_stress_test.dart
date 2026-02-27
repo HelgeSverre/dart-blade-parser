@@ -46,7 +46,8 @@ void main() {
     }
 
     /// Helper to test idempotency through multiple passes
-    void expectIdempotentMultiPass(String input, {int passes = 5, String? description}) {
+    void expectIdempotentMultiPass(String input,
+        {int passes = 5, String? description}) {
       final String formatted1;
       try {
         formatted1 = formatter.format(input);
@@ -184,7 +185,8 @@ void main() {
       });
 
       test('multiple attributes', () {
-        expectIdempotent('<div class="test" id="main" data-value="123">Content</div>');
+        expectIdempotent(
+            '<div class="test" id="main" data-value="123">Content</div>');
       });
 
       test('boolean attributes', () {
@@ -200,11 +202,13 @@ void main() {
       });
 
       test('Alpine attributes', () {
-        expectIdempotent('<div x-data="{ open: false }" x-show="open" @click="toggle">Content</div>');
+        expectIdempotent(
+            '<div x-data="{ open: false }" x-show="open" @click="toggle">Content</div>');
       });
 
       test('Livewire attributes', () {
-        expectIdempotent('<input wire:model.live="name" wire:loading.class="opacity-50">');
+        expectIdempotent(
+            '<input wire:model.live="name" wire:loading.class="opacity-50">');
       });
 
       test('mixed attribute types', () {
@@ -224,11 +228,13 @@ Save
       });
 
       test('attributes with Blade expressions', () {
-        expectIdempotent('<div class="{{ \$class }}" data-id="{{ \$id }}">Content</div>');
+        expectIdempotent(
+            '<div class="{{ \$class }}" data-id="{{ \$id }}">Content</div>');
       });
 
       test('many attributes', () {
-        final attrs = List.generate(20, (i) => 'data-attr-$i="value$i"').join(' ');
+        final attrs =
+            List.generate(20, (i) => 'data-attr-$i="value$i"').join(' ');
         expectIdempotent('<div $attrs>Content</div>');
       });
     });
@@ -243,7 +249,8 @@ Save
       });
 
       test('echo with complex expression', () {
-        expectIdempotent('{{ \$user->posts()->where("active", true)->count() }}');
+        expectIdempotent(
+            '{{ \$user->posts()->where("active", true)->count() }}');
       });
 
       test('echo with ternary', () {
@@ -251,7 +258,8 @@ Save
       });
 
       test('multiple echos in paragraph', () {
-        expectIdempotent('<p>{{ \$first }} and {{ \$second }} with {{ \$third }}</p>');
+        expectIdempotent(
+            '<p>{{ \$first }} and {{ \$second }} with {{ \$third }}</p>');
       });
 
       test('echo in attribute', () {
@@ -315,7 +323,8 @@ Save
       });
 
       test('component with attributes', () {
-        expectIdempotent('<x-button type="submit" class="btn" :disabled="\$loading">Save</x-button>');
+        expectIdempotent(
+            '<x-button type="submit" class="btn" :disabled="\$loading">Save</x-button>');
       });
 
       test('component with slot', () {
@@ -371,7 +380,8 @@ Save
       });
 
       test('comment between elements', () {
-        expectIdempotent('<div>Before</div>\n{{-- Comment --}}\n<div>After</div>');
+        expectIdempotent(
+            '<div>Before</div>\n{{-- Comment --}}\n<div>After</div>');
       });
 
       test('comment inside element', () {
@@ -519,7 +529,8 @@ You have {{ \$notifications->count() }} new notifications
 
     group('Configuration Variations', () {
       test('2-space indent', () {
-        final fmt = BladeFormatter(config: const FormatterConfig(indentSize: 2));
+        final fmt =
+            BladeFormatter(config: const FormatterConfig(indentSize: 2));
         const input = '@if(\$x)\n<p>Content</p>\n@endif';
         final pass1 = fmt.format(input);
         final pass2 = fmt.format(pass1);
@@ -527,7 +538,8 @@ You have {{ \$notifications->count() }} new notifications
       });
 
       test('tab indent', () {
-        final fmt = BladeFormatter(config: const FormatterConfig(indentStyle: IndentStyle.tabs));
+        final fmt = BladeFormatter(
+            config: const FormatterConfig(indentStyle: IndentStyle.tabs));
         const input = '@if(\$x)\n<p>Content</p>\n@endif';
         final pass1 = fmt.format(input);
         final pass2 = fmt.format(pass1);
@@ -535,7 +547,8 @@ You have {{ \$notifications->count() }} new notifications
       });
 
       test('single quotes', () {
-        final fmt = BladeFormatter(config: const FormatterConfig(quoteStyle: QuoteStyle.single));
+        final fmt = BladeFormatter(
+            config: const FormatterConfig(quoteStyle: QuoteStyle.single));
         const input = '<div class="test" id="main">Content</div>';
         final pass1 = fmt.format(input);
         final pass2 = fmt.format(pass1);
@@ -543,7 +556,8 @@ You have {{ \$notifications->count() }} new notifications
       });
 
       test('double quotes', () {
-        final fmt = BladeFormatter(config: const FormatterConfig(quoteStyle: QuoteStyle.double));
+        final fmt = BladeFormatter(
+            config: const FormatterConfig(quoteStyle: QuoteStyle.double));
         const input = "<div class='test' id='main'>Content</div>";
         final pass1 = fmt.format(input);
         final pass2 = fmt.format(pass1);
@@ -552,7 +566,8 @@ You have {{ \$notifications->count() }} new notifications
 
       test('no directive spacing', () {
         final fmt = BladeFormatter(
-          config: const FormatterConfig(directiveSpacing: DirectiveSpacing.none),
+          config:
+              const FormatterConfig(directiveSpacing: DirectiveSpacing.none),
         );
         const input = '@if(\$a)\n<p>A</p>\n@endif\n@if(\$b)\n<p>B</p>\n@endif';
         final pass1 = fmt.format(input);
@@ -564,7 +579,8 @@ You have {{ \$notifications->count() }} new notifications
         final fmt = BladeFormatter(
           config: const FormatterConfig(wrapAttributes: WrapAttributes.always),
         );
-        const input = '<div class="test" id="main" data-value="123">Content</div>';
+        const input =
+            '<div class="test" id="main" data-value="123">Content</div>';
         final pass1 = fmt.format(input);
         final pass2 = fmt.format(pass1);
         expect(pass1, equals(pass2));
@@ -572,7 +588,8 @@ You have {{ \$notifications->count() }} new notifications
 
       test('attribute sorting alphabetical', () {
         final fmt = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
         const input = '<div z="1" a="2" m="3">Content</div>';
         final pass1 = fmt.format(input);
@@ -584,7 +601,8 @@ You have {{ \$notifications->count() }} new notifications
         final fmt = BladeFormatter(
           config: const FormatterConfig(attributeSort: AttributeSort.byType),
         );
-        const input = '<div wire:click="save" class="btn" @click="handle" id="main">Content</div>';
+        const input =
+            '<div wire:click="save" class="btn" @click="handle" id="main">Content</div>';
         final pass1 = fmt.format(input);
         final pass2 = fmt.format(pass1);
         expect(pass1, equals(pass2));
@@ -605,7 +623,8 @@ You have {{ \$notifications->count() }} new notifications
 
       test('self-closing always', () {
         final fmt = BladeFormatter(
-          config: const FormatterConfig(selfClosingStyle: SelfClosingStyle.always),
+          config:
+              const FormatterConfig(selfClosingStyle: SelfClosingStyle.always),
         );
         const input = '<x-icon></x-icon>';
         final pass1 = fmt.format(input);
@@ -615,7 +634,8 @@ You have {{ \$notifications->count() }} new notifications
 
       test('self-closing never', () {
         final fmt = BladeFormatter(
-          config: const FormatterConfig(selfClosingStyle: SelfClosingStyle.never),
+          config:
+              const FormatterConfig(selfClosingStyle: SelfClosingStyle.never),
         );
         const input = '<x-icon />';
         final pass1 = fmt.format(input);
@@ -643,7 +663,8 @@ You have {{ \$notifications->count() }} new notifications
 @endauth
 </x-layout>
 ''';
-        expectIdempotentMultiPass(input, passes: 5, description: 'Complex 5-pass');
+        expectIdempotentMultiPass(input,
+            passes: 5, description: 'Complex 5-pass');
       });
 
       test('10 passes on deeply nested', () {
@@ -666,7 +687,8 @@ You have {{ \$notifications->count() }} new notifications
 @endif
 </div>
 ''';
-        expectIdempotentMultiPass(input, passes: 10, description: 'Nested 10-pass');
+        expectIdempotentMultiPass(input,
+            passes: 10, description: 'Nested 10-pass');
       });
     });
   });
@@ -676,7 +698,8 @@ You have {{ \$notifications->count() }} new notifications
 void _showDiff(String a, String b) {
   final linesA = a.split('\n');
   final linesB = b.split('\n');
-  final maxLines = linesA.length > linesB.length ? linesA.length : linesB.length;
+  final maxLines =
+      linesA.length > linesB.length ? linesA.length : linesB.length;
 
   for (var i = 0; i < maxLines; i++) {
     final lineA = i < linesA.length ? linesA[i] : '<missing>';

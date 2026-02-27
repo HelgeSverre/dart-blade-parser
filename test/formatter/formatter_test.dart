@@ -674,7 +674,8 @@ void main() {
         final result = formatter.format(input);
 
         // Should preserve blank lines between top-level directives
-        expect(result, contains('@extends(\'layouts.app\')\n\n@section(\'title\','));
+        expect(result,
+            contains('@extends(\'layouts.app\')\n\n@section(\'title\','));
         expect(result, contains('Page Title\')\n\n@section(\'content\')'));
         expect(result, contains('@endsection\n\n@section(\'footer\')'));
       });
@@ -727,7 +728,8 @@ void main() {
     });
 
     group('directive spacing', () {
-      test('adds blank line between ending and opening directives (default)', () {
+      test('adds blank line between ending and opening directives (default)',
+          () {
         const input = '''
 @foreach(\$items as \$item)
     <p>{{ \$item }}</p>
@@ -771,7 +773,8 @@ void main() {
 
       test('no blank line with DirectiveSpacing.none config', () {
         final compactFormatter = BladeFormatter(
-          config: const FormatterConfig(directiveSpacing: DirectiveSpacing.none),
+          config:
+              const FormatterConfig(directiveSpacing: DirectiveSpacing.none),
         );
 
         const input = '''

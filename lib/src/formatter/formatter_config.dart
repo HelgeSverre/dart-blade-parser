@@ -101,13 +101,12 @@ class FormatterConfig {
           SlotFormatting.fromString(map['slot_formatting'] as String?),
       slotNameStyle:
           SlotNameStyle.fromString(map['slot_name_style'] as String?),
-      slotSpacing:
-          SlotSpacing.fromString(map['slot_spacing'] as String?),
+      slotSpacing: SlotSpacing.fromString(map['slot_spacing'] as String?),
       wrapAttributes:
           WrapAttributes.fromString(map['wrap_attributes'] as String?),
       attributeSort: AttributeSort.fromString(map['attribute_sort'] as String?),
-      closingBracketStyle:
-          ClosingBracketStyle.fromString(map['closing_bracket_style'] as String?),
+      closingBracketStyle: ClosingBracketStyle.fromString(
+          map['closing_bracket_style'] as String?),
       selfClosingStyle:
           SelfClosingStyle.fromString(map['self_closing_style'] as String?),
       htmlBlockSpacing:

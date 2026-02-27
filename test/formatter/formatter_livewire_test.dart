@@ -47,7 +47,8 @@ void main() {
       });
 
       test('formats wire:model.live.debounce', () {
-        const input = '<input type="text" wire:model.live.debounce.500ms="search">';
+        const input =
+            '<input type="text" wire:model.live.debounce.500ms="search">';
 
         final result = formatter.format(input);
 
@@ -89,7 +90,8 @@ void main() {
       });
 
       test('formats wire:submit', () {
-        const input = '<form wire:submit.prevent="save"><input type="text"></form>';
+        const input =
+            '<form wire:submit.prevent="save"><input type="text"></form>';
 
         final result = formatter.format(input);
 
@@ -220,7 +222,8 @@ void main() {
 
     group('wire:dirty', () {
       test('formats wire:dirty.class', () {
-        const input = '<input type="text" wire:model="name" wire:dirty.class="border-yellow-500">';
+        const input =
+            '<input type="text" wire:model="name" wire:dirty.class="border-yellow-500">';
 
         final result = formatter.format(input);
 
@@ -228,7 +231,8 @@ void main() {
       });
 
       test('formats wire:dirty.remove', () {
-        const input = '<span wire:dirty.remove class="text-green-500">Saved</span>';
+        const input =
+            '<span wire:dirty.remove class="text-green-500">Saved</span>';
 
         final result = formatter.format(input);
 
@@ -360,7 +364,8 @@ Searching...
       });
 
       test('formats @entangle with modifiers', () {
-        const input = '<div x-data="{ open: @entangle(\'isOpen\').defer }">Content</div>';
+        const input =
+            '<div x-data="{ open: @entangle(\'isOpen\').defer }">Content</div>';
 
         final result = formatter.format(input);
 
@@ -400,7 +405,8 @@ Searching...
       });
 
       test('formats @this.dispatch in attributes', () {
-        const input = '<button wire:click="\$dispatch(\'post-created\')">Create</button>';
+        const input =
+            '<button wire:click="\$dispatch(\'post-created\')">Create</button>';
 
         final result = formatter.format(input);
 

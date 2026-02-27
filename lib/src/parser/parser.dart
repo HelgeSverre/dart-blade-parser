@@ -200,8 +200,7 @@ class BladeParser {
         return _parseGenericDirective(
             'teleport', TokenType.directiveEndTeleport);
       case TokenType.directivePersist:
-        return _parseGenericDirective(
-            'persist', TokenType.directiveEndPersist);
+        return _parseGenericDirective('persist', TokenType.directiveEndPersist);
 
       // Other directives (inline, no closing tag)
       case TokenType.directiveExtends:

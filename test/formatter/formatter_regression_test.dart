@@ -25,7 +25,8 @@ void main() {
         // The paragraph should be at the same indentation level as the component
         expect(result, contains('<x-alert type="info" />'));
         expect(result, contains('<p>This should not be indented</p>'));
-        expect(result, isNot(contains('    <p>This should not be indented</p>')));
+        expect(
+            result, isNot(contains('    <p>This should not be indented</p>')));
       });
 
       test('correctly resets indentation after @endif', () {
@@ -123,7 +124,8 @@ void main() {
       });
 
       test('preserves quotes in Blade expressions within attributes', () {
-        const input = '<div data-value="{{ \$user->getRole(\'admin\') }}">Content</div>';
+        const input =
+            '<div data-value="{{ \$user->getRole(\'admin\') }}">Content</div>';
 
         final result = formatter.format(input);
 
@@ -152,7 +154,8 @@ void main() {
       });
 
       test('preserves slot names with special characters', () {
-        const input = '<x-card><x-slot:header-actions>Actions</x-slot></x-card>';
+        const input =
+            '<x-card><x-slot:header-actions>Actions</x-slot></x-card>';
 
         final result = formatter.format(input);
 
@@ -215,11 +218,13 @@ void main() {
       });
 
       test('preserves complex expressions in echo statements', () {
-        const input = '{{ \$user->posts()->where("published", true)->count() }}';
+        const input =
+            '{{ \$user->posts()->where("published", true)->count() }}';
 
         final result = formatter.format(input);
 
-        expect(result, contains('\$user->posts()->where("published", true)->count()'));
+        expect(result,
+            contains('\$user->posts()->where("published", true)->count()'));
       });
 
       test('handles echo with ternary operator', () {
@@ -305,7 +310,8 @@ multi-line comment
 
     group('Attribute formatting regressions', () {
       test('does not reorder attributes', () {
-        const input = '<div id="main" class="container" data-value="123">Content</div>';
+        const input =
+            '<div id="main" class="container" data-value="123">Content</div>';
 
         final result = formatter.format(input);
 

@@ -10,7 +10,8 @@ void main() {
           config: const FormatterConfig(attributeSort: AttributeSort.none),
         );
 
-        const input = '<div data-value="1" class="container" id="main">Content</div>';
+        const input =
+            '<div data-value="1" class="container" id="main">Content</div>';
         final result = formatter.format(input);
 
         // Order should be preserved: data-value, class, id
@@ -27,7 +28,8 @@ void main() {
           config: const FormatterConfig(attributeSort: AttributeSort.none),
         );
 
-        const input = '<x-alert dismissible type="success" message="Done">Content</x-alert>';
+        const input =
+            '<x-alert dismissible type="success" message="Done">Content</x-alert>';
         final result = formatter.format(input);
 
         final dismissibleIndex = result.indexOf('dismissible');
@@ -42,10 +44,12 @@ void main() {
     group('AttributeSort.alphabetical', () {
       test('sorts attributes alphabetically', () {
         final formatter = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
 
-        const input = '<div data-value="1" class="container" id="main">Content</div>';
+        const input =
+            '<div data-value="1" class="container" id="main">Content</div>';
         final result = formatter.format(input);
 
         // Order should be: class, data-value, id
@@ -59,7 +63,8 @@ void main() {
 
       test('sorts case-insensitively', () {
         final formatter = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
 
         const input = '<div Zebra="z" apple="a" Banana="b">Content</div>';
@@ -76,10 +81,12 @@ void main() {
 
       test('sorts component attributes alphabetically', () {
         final formatter = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
 
-        const input = '<x-button wire:click="save" class="btn" type="submit">Click</x-button>';
+        const input =
+            '<x-button wire:click="save" class="btn" type="submit">Click</x-button>';
         final result = formatter.format(input);
 
         final classIndex = result.indexOf('class=');
@@ -92,10 +99,12 @@ void main() {
 
       test('handles mixed attribute types', () {
         final formatter = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
 
-        const input = '<div x-data="{ open: false }" @click="toggle" :class="active" wire:model="name" data-id="1" id="main">Content</div>';
+        const input =
+            '<div x-data="{ open: false }" @click="toggle" :class="active" wire:model="name" data-id="1" id="main">Content</div>';
         final result = formatter.format(input);
 
         // All should be sorted alphabetically: :class, @click, data-id, id, wire:model, x-data
@@ -120,7 +129,8 @@ void main() {
           config: const FormatterConfig(attributeSort: AttributeSort.byType),
         );
 
-        const input = '<div data-id="1" class="container" wire:model="name" id="main">Content</div>';
+        const input =
+            '<div data-id="1" class="container" wire:model="name" id="main">Content</div>';
         final result = formatter.format(input);
 
         // Order should be: class, id (standard), data-id (data), wire:model (livewire)
@@ -139,7 +149,8 @@ void main() {
           config: const FormatterConfig(attributeSort: AttributeSort.byType),
         );
 
-        const input = '<div x-show="open" data-id="1" id="main" @click="toggle">Content</div>';
+        const input =
+            '<div x-show="open" data-id="1" id="main" @click="toggle">Content</div>';
         final result = formatter.format(input);
 
         // Order: id (standard), data-id (data), @click, x-show (alpine)
@@ -159,7 +170,8 @@ void main() {
           config: const FormatterConfig(attributeSort: AttributeSort.byType),
         );
 
-        const input = '<input wire:model="email" x-data="{ focused: false }" type="email" data-test="input">';
+        const input =
+            '<input wire:model="email" x-data="{ focused: false }" type="email" data-test="input">';
         final result = formatter.format(input);
 
         // Order: type (standard), data-test (data), x-data (alpine), wire:model (livewire)
@@ -178,7 +190,8 @@ void main() {
           config: const FormatterConfig(attributeSort: AttributeSort.byType),
         );
 
-        const input = '<div name="test" type="text" id="main" class="form">Content</div>';
+        const input =
+            '<div name="test" type="text" id="main" class="form">Content</div>';
         final result = formatter.format(input);
 
         // All are standard HTML, should be sorted alphabetically: class, id, name, type
@@ -197,7 +210,8 @@ void main() {
           config: const FormatterConfig(attributeSort: AttributeSort.byType),
         );
 
-        const input = '<div custom-attr="other" wire:loading="true" :bind="value" data-id="1" id="main">Content</div>';
+        const input =
+            '<div custom-attr="other" wire:loading="true" :bind="value" data-id="1" id="main">Content</div>';
         final result = formatter.format(input);
 
         // Order: id (standard), data-id (data), :bind (alpine), wire:loading (livewire), custom-attr (other)
@@ -218,7 +232,8 @@ void main() {
           config: const FormatterConfig(attributeSort: AttributeSort.byType),
         );
 
-        const input = '<input wire:loading disabled type="checkbox" checked required>';
+        const input =
+            '<input wire:loading disabled type="checkbox" checked required>';
         final result = formatter.format(input);
 
         // Standard: checked, disabled, required, type
@@ -303,7 +318,8 @@ Save
           ),
         );
 
-        const input = '<div wire:model="name" class="container" data-id="1" id="main">Content</div>';
+        const input =
+            '<div wire:model="name" class="container" data-id="1" id="main">Content</div>';
         final result = formatter.format(input);
 
         // Should be sorted by type and wrapped
@@ -324,7 +340,8 @@ Save
     group('Edge cases', () {
       test('handles empty attributes', () {
         final formatter = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
 
         const input = '<div>Content</div>';
@@ -335,7 +352,8 @@ Save
 
       test('handles single attribute', () {
         final formatter = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
 
         const input = '<div class="container">Content</div>';
@@ -346,7 +364,8 @@ Save
 
       test('handles void elements', () {
         final formatter = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
 
         const input = '<input type="text" name="email" id="email-input">';
@@ -363,7 +382,8 @@ Save
 
       test('handles slot attributes', () {
         final formatter = BladeFormatter(
-          config: const FormatterConfig(attributeSort: AttributeSort.alphabetical),
+          config:
+              const FormatterConfig(attributeSort: AttributeSort.alphabetical),
         );
 
         const input = '''
@@ -388,10 +408,12 @@ Save
         final configNone = FormatterConfig.fromMap({'attribute_sort': 'none'});
         expect(configNone.attributeSort, AttributeSort.none);
 
-        final configAlpha = FormatterConfig.fromMap({'attribute_sort': 'alphabetical'});
+        final configAlpha =
+            FormatterConfig.fromMap({'attribute_sort': 'alphabetical'});
         expect(configAlpha.attributeSort, AttributeSort.alphabetical);
 
-        final configByType = FormatterConfig.fromMap({'attribute_sort': 'by_type'});
+        final configByType =
+            FormatterConfig.fromMap({'attribute_sort': 'by_type'});
         expect(configByType.attributeSort, AttributeSort.byType);
       });
 

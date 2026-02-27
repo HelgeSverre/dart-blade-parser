@@ -994,8 +994,7 @@ class FormatterVisitor implements AstVisitor<String> {
       }
 
       if (shouldSelfClose) {
-        _writeAttributes(
-            attributes, wrap: shouldWrap, closingBracket: ' />');
+        _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
         _output.writeln();
         return '';
       }
@@ -1690,8 +1689,8 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     if (node.children.isEmpty ||
-        !node.children.any(
-            (c) => c is! TextNode || c.content.trim().isNotEmpty)) {
+        !node.children
+            .any((c) => c is! TextNode || c.content.trim().isNotEmpty)) {
       buf.write('></$tag>');
       return buf.toString();
     }
@@ -1738,8 +1737,9 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Add spacing between block-level HTML elements
     if (current is HtmlElementNode && next is HtmlElementNode) {
-      final bothBlock = _blockElements.contains(current.tagName.toLowerCase()) &&
-          _blockElements.contains(next.tagName.toLowerCase());
+      final bothBlock =
+          _blockElements.contains(current.tagName.toLowerCase()) &&
+              _blockElements.contains(next.tagName.toLowerCase());
       if (!bothBlock) return false;
 
       switch (config.htmlBlockSpacing) {

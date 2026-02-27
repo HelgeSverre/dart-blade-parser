@@ -108,13 +108,15 @@ void main() {
       });
 
       test('handles whitespace around directive arguments', () {
-        const input = '@if(     \$condition     &&     \$other     )\n<p>Yes</p>\n@endif';
+        const input =
+            '@if(     \$condition     &&     \$other     )\n<p>Yes</p>\n@endif';
 
         final result = formatter.format(input);
         expect(result, contains('@if'));
         expect(result, contains('@endif'));
         expect(result, isNot(contains('@endelse')));
-        final lines = result.split('\n').where((l) => l.trim().isNotEmpty).toList();
+        final lines =
+            result.split('\n').where((l) => l.trim().isNotEmpty).toList();
         final ifLine = lines.firstWhere((l) => l.contains('@if'));
         final endifLine = lines.firstWhere((l) => l.contains('@endif'));
         final ifIndent = ifLine.length - ifLine.trimLeft().length;
@@ -153,7 +155,10 @@ void main() {
         expect(result, contains('<p>Deep content</p>'));
         expect(result, contains('</div>'));
         // Should have proper indentation
-        expect(result, contains('                                        <p>Deep content</p>'));
+        expect(
+            result,
+            contains(
+                '                                        <p>Deep content</p>'));
       });
 
       test('handles 10 levels of directive nesting', () {
@@ -494,7 +499,8 @@ wire:click="\$emit('{{ \$eventName }}', {{ \$eventData }})"
       });
 
       test('handles directive at start of attribute value context', () {
-        const input = '<div class="@if(\$active)active @endif base">Content</div>';
+        const input =
+            '<div class="@if(\$active)active @endif base">Content</div>';
 
         final result = formatter.format(input);
         expect(result, contains('class='));
@@ -502,7 +508,8 @@ wire:click="\$emit('{{ \$eventName }}', {{ \$eventData }})"
       });
 
       test('handles multiple @@ escapes', () {
-        const input = '<p>Email: @@test@@example.com and @@another@@domain.org</p>';
+        const input =
+            '<p>Email: @@test@@example.com and @@another@@domain.org</p>';
 
         final result = formatter.format(input);
         // @@ escapes are converted to single @ by the parser/formatter
@@ -511,7 +518,8 @@ wire:click="\$emit('{{ \$eventName }}', {{ \$eventData }})"
       });
 
       test('handles @{{ escaped echo }}', () {
-        const input = '<p>Vue syntax: @{{ message }} and Blade: {{ \$message }}</p>';
+        const input =
+            '<p>Vue syntax: @{{ message }} and Blade: {{ \$message }}</p>';
 
         final result = formatter.format(input);
         expect(result, contains('@{{ message }}'));
@@ -611,7 +619,8 @@ Content
         expect(result, contains('@foreach'));
         expect(result, contains('@guest'));
         // Should have proper indentation now
-        expect(result, isNot(contains('                                </nav>')));
+        expect(
+            result, isNot(contains('                                </nav>')));
       });
 
       test('handles messy Livewire component template', () {
@@ -728,8 +737,9 @@ Save
 
     group('Performance Under Load', () {
       test('handles 100 elements without timeout', () {
-        final elements =
-            List.generate(100, (i) => '<div class="item-$i"><p>Content $i</p></div>').join('\n');
+        final elements = List.generate(
+                100, (i) => '<div class="item-$i"><p>Content $i</p></div>')
+            .join('\n');
         final input = '<div class="container">$elements</div>';
 
         final stopwatch = Stopwatch()..start();
@@ -762,7 +772,8 @@ Save
       });
 
       test('handles element with 100 attributes', () {
-        final attrs = List.generate(100, (i) => 'data-attr-$i="value$i"').join(' ');
+        final attrs =
+            List.generate(100, (i) => 'data-attr-$i="value$i"').join(' ');
         final input = '<div $attrs>Content</div>';
 
         final stopwatch = Stopwatch()..start();

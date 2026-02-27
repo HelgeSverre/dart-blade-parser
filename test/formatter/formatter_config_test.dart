@@ -209,7 +209,6 @@ void main() {
 
         expect(config.maxLineLength, 1000);
       });
-
     });
 
     group('toMap() - Serialization', () {

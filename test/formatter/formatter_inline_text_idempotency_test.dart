@@ -220,8 +220,7 @@ void main() {
       test('text <strong>text</strong> text stays inline', () {
         final formatted =
             formatter.format('<p>Hello <strong>world</strong> goodbye</p>');
-        expect(
-            formatted, contains('Hello <strong>world</strong> goodbye'));
+        expect(formatted, contains('Hello <strong>world</strong> goodbye'));
         expectIdempotent(
           '<p>Hello <strong>world</strong> goodbye</p>',
           description: 'inline strong in prose',
@@ -239,8 +238,7 @@ void main() {
       });
 
       test('text<br>text stays inline', () {
-        final formatted =
-            formatter.format('<p>Line one.<br>Line two.</p>');
+        final formatted = formatter.format('<p>Line one.<br>Line two.</p>');
         expect(formatted, contains('Line one.<br>Line two.'));
         expectIdempotent(
           '<p>Line one.<br>Line two.</p>',
@@ -259,8 +257,8 @@ void main() {
       });
 
       test('text: <span x-text> stays inline', () {
-        final formatted = formatter
-            .format('<p>Selected: <span x-text="item"></span></p>');
+        final formatted =
+            formatter.format('<p>Selected: <span x-text="item"></span></p>');
         expect(formatted, contains('Selected: <span x-text="item"></span>'));
         expectIdempotent(
           '<p>Selected: <span x-text="item"></span></p>',
@@ -271,8 +269,8 @@ void main() {
       test('nested inline: <a><strong>text</strong></a>', () {
         final formatted = formatter
             .format('<p>Click <a href="/"><strong>here</strong></a></p>');
-        expect(formatted,
-            contains('Click <a href="/"><strong>here</strong></a>'));
+        expect(
+            formatted, contains('Click <a href="/"><strong>here</strong></a>'));
         expectIdempotent(
           '<p>Click <a href="/"><strong>here</strong></a></p>',
           description: 'nested inline elements',
@@ -333,8 +331,5 @@ void main() {
 }
 
 String _escapeWhitespace(String s) {
-  return s
-      .replaceAll('\t', '→')
-      .replaceAll(' ', '·')
-      .replaceAll('\r', '↵');
+  return s.replaceAll('\t', '→').replaceAll(' ', '·').replaceAll('\r', '↵');
 }

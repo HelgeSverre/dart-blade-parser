@@ -88,14 +88,12 @@ void main() {
       });
 
       test('fromMap parses preserve', () {
-        final config =
-            FormatterConfig.fromMap({'slot_name_style': 'preserve'});
+        final config = FormatterConfig.fromMap({'slot_name_style': 'preserve'});
         expect(config.slotNameStyle, SlotNameStyle.preserve);
       });
 
       test('fromMap defaults to colon for unknown value', () {
-        final config =
-            FormatterConfig.fromMap({'slot_name_style': 'unknown'});
+        final config = FormatterConfig.fromMap({'slot_name_style': 'unknown'});
         expect(config.slotNameStyle, SlotNameStyle.colon);
       });
 

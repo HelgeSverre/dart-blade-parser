@@ -31,7 +31,8 @@ void main() {
       });
 
       test('works with components', () {
-        const input = '<x-alert type="warning" message="Hello">Content</x-alert>';
+        const input =
+            '<x-alert type="warning" message="Hello">Content</x-alert>';
         final result = formatter.format(input);
 
         expect(result, contains('message="Hello">'));
@@ -76,7 +77,8 @@ void main() {
       });
 
       test('works with components', () {
-        const input = '<x-alert type="warning" message="Hello">Content</x-alert>';
+        const input =
+            '<x-alert type="warning" message="Hello">Content</x-alert>';
         final result = formatter.format(input);
 
         expect(result, contains('message="Hello"\n>'));
@@ -136,7 +138,8 @@ void main() {
 
       test('fromMap defaults to sameLine', () {
         final config = FormatterConfig.fromMap({});
-        expect(config.closingBracketStyle, equals(ClosingBracketStyle.sameLine));
+        expect(
+            config.closingBracketStyle, equals(ClosingBracketStyle.sameLine));
       });
 
       test('toMap serializes closing_bracket_style correctly', () {

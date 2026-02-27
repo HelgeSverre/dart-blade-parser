@@ -92,7 +92,8 @@ void main() {
         // No single run should be more than 10x the average (allows for GC/JIT variance)
         for (final time in times) {
           expect(time, lessThan(average * 10),
-              reason: 'Performance should be reasonably consistent across runs');
+              reason:
+                  'Performance should be reasonably consistent across runs');
         }
       });
 
@@ -323,8 +324,7 @@ void main() {
 
         final configs = [
           BladeFormatter(),
-          BladeFormatter(
-              config: const FormatterConfig(indentSize: 2)),
+          BladeFormatter(config: const FormatterConfig(indentSize: 2)),
           BladeFormatter(
               config: const FormatterConfig(indentStyle: IndentStyle.tabs)),
           BladeFormatter(
@@ -344,7 +344,8 @@ void main() {
         final average = times.reduce((a, b) => a + b) / times.length;
         for (final time in times) {
           expect(time, lessThan(average * 5),
-              reason: 'Configuration should not significantly impact performance');
+              reason:
+                  'Configuration should not significantly impact performance');
         }
       });
     });
