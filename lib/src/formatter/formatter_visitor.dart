@@ -999,6 +999,9 @@ class FormatterVisitor implements AstVisitor<String> {
     final shouldSelfClose =
         !isVoid && !hasContent && _shouldSelfClose(node.isSelfClosing);
 
+    // For void elements, respect selfClosingStyle to preserve/add/remove the slash
+    final voidSelfClose = isVoid && _shouldSelfClose(node.isSelfClosing);
+
     // Write opening tag
     _beginLine();
     _output.write('<${node.tagName}');
@@ -1006,7 +1009,7 @@ class FormatterVisitor implements AstVisitor<String> {
     // If tag head contains structural directives, use the ordered tag head
     if (node.tagHead.isNotEmpty) {
       final closingBracket = isVoid
-          ? '>'
+          ? (voidSelfClose ? ' />' : '>')
           : shouldSelfClose
               ? ' />'
               : '>';
@@ -1025,7 +1028,8 @@ class FormatterVisitor implements AstVisitor<String> {
       );
 
       if (isVoid) {
-        _writeAttributes(attributes, wrap: shouldWrap, closingBracket: '>');
+        final closingBracket = voidSelfClose ? ' />' : '>';
+        _writeAttributes(attributes, wrap: shouldWrap, closingBracket: closingBracket);
         _output.writeln();
         return '';
       }
@@ -1777,7 +1781,7 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     if (isVoid) {
-      buf.write('>');
+      buf.write(_shouldSelfClose(node.isSelfClosing) ? ' />' : '>');
       return buf.toString();
     }
 

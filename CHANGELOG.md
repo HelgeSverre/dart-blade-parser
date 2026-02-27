@@ -52,6 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `_isInlineRenderableElement` newline check aligned with `visitHtmlElement` to prevent `<td><a>...</a></td>` collapse on second pass
 - **Stress suite idempotency:** 99.9% (825/826 files), up from 98.1% (810/826)
 - **`@else` inside authorization/authentication/environment directives:** `@can`, `@cannot`, `@canany`, `@auth`, `@guest`, `@env`, and `@production` now support `@else` as an intermediate directive. Previously `@else` branches were silently dropped from the AST and formatted output.
+- **Void element self-closing slash stripped:** `selfClosingStyle` was not applied to void elements (`<br />`, `<img />`, etc.) — the formatter always output `>` regardless of config. Now `preserve` keeps the original slash, `always` adds it, and `never` strips it. Affected both block formatting (`visitHtmlElement`) and inline rendering (`_renderInlineElement`).
+
+### Prettier Plugin (v0.4.0)
+- Rebuilt with all v1.3.0 fixes and features: echo spacing, HTML block spacing, trailing newline, component `tagHead` support, PHP HEREDOC/NOWDOC, directive expression space handling, echo/comment preservation in tag heads, and 15 idempotency fixes.
 
 ## [1.2.1] - 2026-02-26
 

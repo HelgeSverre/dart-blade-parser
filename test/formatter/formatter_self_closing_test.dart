@@ -39,6 +39,34 @@ void main() {
 
         expect(result.trim(), equals('<x-alert type="info"></x-alert>'));
       });
+
+      test('preserves self-closing slash on void elements', () {
+        const input = '<br />';
+        final result = formatter.format(input);
+
+        expect(result.trim(), equals('<br />'));
+      });
+
+      test('preserves void elements without slash', () {
+        const input = '<img src="image.png" alt="test">';
+        final result = formatter.format(input);
+
+        expect(result.trim(), equals('<img src="image.png" alt="test">'));
+      });
+
+      test('preserves br self-closing inside component slot', () {
+        const input = '''<x-card title="{{ \$title }}">
+    <x-slot:header>
+        <p>this is a<br /> p</p>
+        <h2>{{ \$heading }}</h2>
+    </x-slot>
+
+    <p>{{ \$body }}</p>
+</x-card>''';
+        final result = formatter.format(input);
+
+        expect(result, contains('<br />'));
+      });
     });
 
     group('SelfClosingStyle.always', () {
@@ -76,12 +104,18 @@ void main() {
         expect(result.trim(), equals('<div class="has-content">Hello</div>'));
       });
 
-      test('does not affect void elements', () {
+      test('adds slash to void elements', () {
         const input = '<img src="image.png" alt="test">';
         final result = formatter.format(input);
 
-        // Void elements should stay as-is
-        expect(result.trim(), equals('<img src="image.png" alt="test">'));
+        expect(result.trim(), equals('<img src="image.png" alt="test" />'));
+      });
+
+      test('keeps already self-closing void elements', () {
+        const input = '<br />';
+        final result = formatter.format(input);
+
+        expect(result.trim(), equals('<br />'));
       });
 
       test('converts empty span to self-closing', () {
@@ -127,11 +161,17 @@ void main() {
         expect(result.trim(), equals('<div class="has-content">Hello</div>'));
       });
 
-      test('does not affect void elements', () {
+      test('strips slash from void elements', () {
+        const input = '<br />';
+        final result = formatter.format(input);
+
+        expect(result.trim(), equals('<br>'));
+      });
+
+      test('keeps void elements without slash', () {
         const input = '<img src="image.png" alt="test">';
         final result = formatter.format(input);
 
-        // Void elements should stay as-is (always self-closing)
         expect(result.trim(), equals('<img src="image.png" alt="test">'));
       });
 
