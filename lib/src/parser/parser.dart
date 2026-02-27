@@ -683,6 +683,7 @@ class BladeParser {
       startPosition: openToken.startPosition,
       endPosition: _previous().endPosition,
       expression: expression.trim(),
+      rawExpression: expression,
       isRaw: isRaw,
     );
   }

@@ -374,6 +374,20 @@ class FormatterVisitor implements AstVisitor<String> {
     }
   }
 
+  /// Renders an echo node's delimiters and expression according to echoSpacing config.
+  String _renderEchoString(EchoNode node) {
+    final String inner;
+    switch (config.echoSpacing) {
+      case EchoSpacing.spaced:
+        inner = ' ${node.expression} ';
+      case EchoSpacing.compact:
+        inner = node.expression;
+      case EchoSpacing.preserve:
+        inner = node.rawExpression;
+    }
+    return node.isRaw ? '{!!$inner!!}' : '{{$inner}}';
+  }
+
   /// Checks if the original source has a blank line between two nodes.
   ///
   /// Used by preserve-style spacing configs to detect whether the author
@@ -774,11 +788,7 @@ class FormatterVisitor implements AstVisitor<String> {
         _rawTextElements.contains(parent.tagName.toLowerCase());
 
     if (inRawText) {
-      if (node.isRaw) {
-        _output.write('{!! ${node.expression} !!}');
-      } else {
-        _output.write('{{ ${node.expression} }}');
-      }
+      _output.write(_renderEchoString(node));
       return '';
     }
 
@@ -788,11 +798,7 @@ class FormatterVisitor implements AstVisitor<String> {
       _output.write(_indent.current);
     }
 
-    if (node.isRaw) {
-      _output.write('{!! ${node.expression} !!}');
-    } else {
-      _output.write('{{ ${node.expression} }}');
-    }
+    _output.write(_renderEchoString(node));
 
     _output.writeln();
     return '';
@@ -1013,11 +1019,7 @@ class FormatterVisitor implements AstVisitor<String> {
           if (child is TextNode) {
             rawContent.write(child.content);
           } else if (child is EchoNode) {
-            if (child.isRaw) {
-              rawContent.write('{!! ${child.expression} !!}');
-            } else {
-              rawContent.write('{{ ${child.expression} }}');
-            }
+            rawContent.write(_renderEchoString(child));
           } else if (child is CommentNode) {
             rawContent.write(child.content);
           }
@@ -1663,9 +1665,7 @@ class FormatterVisitor implements AstVisitor<String> {
   String _renderInlineNode(AstNode node) {
     if (node is TextNode) return node.content;
     if (node is EchoNode) {
-      return node.isRaw
-          ? '{!! ${node.expression} !!}'
-          : '{{ ${node.expression} }}';
+      return _renderEchoString(node);
     }
     if (node is HtmlElementNode) return _renderInlineElement(node);
     return '';

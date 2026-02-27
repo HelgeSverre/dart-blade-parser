@@ -45,6 +45,9 @@ class FormatterConfig {
   /// Controls blank lines between block-level HTML element siblings.
   final HtmlBlockSpacing htmlBlockSpacing;
 
+  /// Controls spacing inside echo braces {{ }} and {!! !!}.
+  final EchoSpacing echoSpacing;
+
   /// Whether to add a trailing newline at the end of formatted output.
   final bool trailingNewline;
 
@@ -63,6 +66,7 @@ class FormatterConfig {
     this.closingBracketStyle = ClosingBracketStyle.sameLine,
     this.selfClosingStyle = SelfClosingStyle.preserve,
     this.htmlBlockSpacing = HtmlBlockSpacing.betweenBlocks,
+    this.echoSpacing = EchoSpacing.spaced,
     this.trailingNewline = true,
   });
 
@@ -108,6 +112,7 @@ class FormatterConfig {
           SelfClosingStyle.fromString(map['self_closing_style'] as String?),
       htmlBlockSpacing:
           HtmlBlockSpacing.fromString(map['html_block_spacing'] as String?),
+      echoSpacing: EchoSpacing.fromString(map['echo_spacing'] as String?),
       trailingNewline: map['trailing_newline'] as bool? ?? true,
     );
   }
@@ -128,6 +133,7 @@ class FormatterConfig {
       'closing_bracket_style': closingBracketStyle.value,
       'self_closing_style': selfClosingStyle.value,
       'html_block_spacing': htmlBlockSpacing.value,
+      'echo_spacing': echoSpacing.value,
       'trailing_newline': trailingNewline,
     };
   }
@@ -148,6 +154,7 @@ class FormatterConfig {
         'closingBracketStyle: $closingBracketStyle, '
         'selfClosingStyle: $selfClosingStyle, '
         'htmlBlockSpacing: $htmlBlockSpacing, '
+        'echoSpacing: $echoSpacing, '
         'trailingNewline: $trailingNewline'
         ')';
   }
@@ -513,5 +520,26 @@ enum HtmlBlockSpacing {
         'none' => none,
         'preserve' => preserve,
         _ => betweenBlocks,
+      };
+}
+
+/// Controls spacing inside echo braces {{ }} and {!! !!}.
+enum EchoSpacing {
+  /// Always add spaces inside braces: `{{ $var }}`, `{!! $expr !!}`
+  spaced('spaced'),
+
+  /// No spaces inside braces: `{{$var}}`, `{!!$expr!!}`
+  compact('compact'),
+
+  /// Preserve the original spacing from the source.
+  preserve('preserve');
+
+  final String value;
+  const EchoSpacing(this.value);
+
+  static EchoSpacing fromString(String? s) => switch (s) {
+        'compact' => compact,
+        'preserve' => preserve,
+        _ => spaced,
       };
 }

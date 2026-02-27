@@ -203,10 +203,13 @@ final class EchoNode extends AstNode {
   @override
   final List<AstNode> children = const [];
 
-  /// The PHP expression to be echoed.
+  /// The PHP expression to be echoed (trimmed).
   ///
   /// For example, in `{{ $user->name }}`, this would be `$user->name`.
   final String expression;
+
+  /// The raw expression as it appeared in source (untrimmed, preserves spacing).
+  final String rawExpression;
 
   /// Whether this is a raw (unescaped) echo.
   ///
@@ -221,8 +224,9 @@ final class EchoNode extends AstNode {
     required this.startPosition,
     required this.endPosition,
     required this.expression,
+    String? rawExpression,
     required this.isRaw,
-  });
+  }) : rawExpression = rawExpression ?? expression;
 
   @override
   T accept<T>(AstVisitor<T> visitor) => visitor.visitEcho(this);
