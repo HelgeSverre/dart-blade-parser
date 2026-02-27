@@ -9,13 +9,6 @@ class FormatterConfig {
   /// Whether to use spaces or tabs for indentation.
   final IndentStyle indentStyle;
 
-  /// Whether to format PHP expressions inside Blade syntax.
-  ///
-  /// When `false`, preserves PHP expressions as-is inside:
-  /// - Echo statements: `{{ $expr }}`
-  /// - Directives: `@if($expr)`
-  final bool formatPhpExpressions;
-
   /// Maximum line length before considering wrapping.
   ///
   /// When a line exceeds this length, the formatter will attempt to wrap
@@ -53,7 +46,6 @@ class FormatterConfig {
   const FormatterConfig({
     this.indentSize = 4,
     this.indentStyle = IndentStyle.spaces,
-    this.formatPhpExpressions = false,
     this.maxLineLength = 120,
     this.quoteStyle = QuoteStyle.preserve,
     this.directiveSpacing = DirectiveSpacing.betweenBlocks,
@@ -89,7 +81,6 @@ class FormatterConfig {
     return FormatterConfig(
       indentSize: map['indent_size'] as int? ?? 4,
       indentStyle: IndentStyle.fromString(map['indent_style'] as String?),
-      formatPhpExpressions: map['format_php_expressions'] as bool? ?? false,
       maxLineLength: map['max_line_length'] as int? ?? 120,
       quoteStyle: QuoteStyle.fromString(map['quote_style'] as String?),
       directiveSpacing:
@@ -115,7 +106,6 @@ class FormatterConfig {
     return {
       'indent_size': indentSize,
       'indent_style': indentStyle.value,
-      'format_php_expressions': formatPhpExpressions,
       'max_line_length': maxLineLength,
       'quote_style': quoteStyle.value,
       'directive_spacing': directiveSpacing.value,
@@ -134,7 +124,6 @@ class FormatterConfig {
     return 'FormatterConfig('
         'indentSize: $indentSize, '
         'indentStyle: $indentStyle, '
-        'formatPhpExpressions: $formatPhpExpressions, '
         'maxLineLength: $maxLineLength, '
         'quoteStyle: $quoteStyle, '
         'directiveSpacing: $directiveSpacing, '

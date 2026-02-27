@@ -481,7 +481,6 @@ Configuration File:
     "indent_size": 4,
     "indent_style": "spaces",
     "quote_style": "preserve",
-    "format_php_expressions": false,
     "max_line_length": 120
   }
 

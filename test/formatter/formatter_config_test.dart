@@ -9,7 +9,6 @@ void main() {
 
         expect(config.indentSize, 4);
         expect(config.indentStyle, IndentStyle.spaces);
-        expect(config.formatPhpExpressions, false);
         expect(config.maxLineLength, 120);
         expect(config.quoteStyle, QuoteStyle.preserve);
       });
@@ -38,24 +37,16 @@ void main() {
         expect(config.maxLineLength, 80);
       });
 
-      test('allows custom formatPhpExpressions', () {
-        const config = FormatterConfig(formatPhpExpressions: true);
-
-        expect(config.formatPhpExpressions, true);
-      });
-
       test('allows all custom values together', () {
         const config = FormatterConfig(
           indentSize: 2,
           indentStyle: IndentStyle.tabs,
-          formatPhpExpressions: true,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.double,
         );
 
         expect(config.indentSize, 2);
         expect(config.indentStyle, IndentStyle.tabs);
-        expect(config.formatPhpExpressions, true);
         expect(config.maxLineLength, 80);
         expect(config.quoteStyle, QuoteStyle.double);
       });
@@ -67,7 +58,6 @@ void main() {
 
         expect(config.indentSize, 4);
         expect(config.indentStyle, IndentStyle.spaces);
-        expect(config.formatPhpExpressions, false);
         expect(config.maxLineLength, 120);
         expect(config.quoteStyle, QuoteStyle.preserve);
       });
@@ -85,14 +75,12 @@ void main() {
         final config = FormatterConfig.fromMap({
           'indent_size': 2,
           'indent_style': 'tabs',
-          'format_php_expressions': true,
           'max_line_length': 80,
           'quote_style': 'single',
         });
 
         expect(config.indentSize, 2);
         expect(config.indentStyle, IndentStyle.tabs);
-        expect(config.formatPhpExpressions, true);
         expect(config.maxLineLength, 80);
         expect(config.quoteStyle, QuoteStyle.single);
       });
@@ -144,7 +132,6 @@ void main() {
 
         expect(config.indentSize, 4);
         expect(config.indentStyle, IndentStyle.spaces);
-        expect(config.formatPhpExpressions, false);
         expect(config.maxLineLength, 120);
         expect(config.quoteStyle, QuoteStyle.preserve);
       });
@@ -171,14 +158,6 @@ void main() {
         });
 
         expect(config.quoteStyle, QuoteStyle.preserve);
-      });
-
-      test('uses default format_php_expressions when null', () {
-        final config = FormatterConfig.fromMap({
-          'format_php_expressions': null,
-        });
-
-        expect(config.formatPhpExpressions, false);
       });
 
       test('uses default max_line_length when null', () {
@@ -231,21 +210,6 @@ void main() {
         expect(config.maxLineLength, 1000);
       });
 
-      test('handles format_php_expressions as false', () {
-        final config = FormatterConfig.fromMap({
-          'format_php_expressions': false,
-        });
-
-        expect(config.formatPhpExpressions, false);
-      });
-
-      test('handles format_php_expressions as true', () {
-        final config = FormatterConfig.fromMap({
-          'format_php_expressions': true,
-        });
-
-        expect(config.formatPhpExpressions, true);
-      });
     });
 
     group('toMap() - Serialization', () {
@@ -253,7 +217,6 @@ void main() {
         const config = FormatterConfig(
           indentSize: 2,
           indentStyle: IndentStyle.tabs,
-          formatPhpExpressions: true,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.single,
         );
@@ -262,7 +225,6 @@ void main() {
 
         expect(map['indent_size'], 2);
         expect(map['indent_style'], 'tabs');
-        expect(map['format_php_expressions'], true);
         expect(map['max_line_length'], 80);
         expect(map['quote_style'], 'single');
       });
@@ -308,7 +270,6 @@ void main() {
         const original = FormatterConfig(
           indentSize: 2,
           indentStyle: IndentStyle.tabs,
-          formatPhpExpressions: true,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.single,
         );
@@ -318,7 +279,6 @@ void main() {
 
         expect(restored.indentSize, original.indentSize);
         expect(restored.indentStyle, original.indentStyle);
-        expect(restored.formatPhpExpressions, original.formatPhpExpressions);
         expect(restored.maxLineLength, original.maxLineLength);
         expect(restored.quoteStyle, original.quoteStyle);
       });
@@ -331,7 +291,6 @@ void main() {
 
         expect(restored.indentSize, original.indentSize);
         expect(restored.indentStyle, original.indentStyle);
-        expect(restored.formatPhpExpressions, original.formatPhpExpressions);
         expect(restored.maxLineLength, original.maxLineLength);
         expect(restored.quoteStyle, original.quoteStyle);
       });
@@ -352,7 +311,6 @@ void main() {
         const config = FormatterConfig(
           indentSize: 2,
           indentStyle: IndentStyle.tabs,
-          formatPhpExpressions: true,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.single,
         );
@@ -361,7 +319,6 @@ void main() {
 
         expect(str, contains('indentSize: 2'));
         expect(str, contains('indentStyle: IndentStyle.tabs'));
-        expect(str, contains('formatPhpExpressions: true'));
         expect(str, contains('maxLineLength: 80'));
         expect(str, contains('quoteStyle: QuoteStyle.single'));
       });
@@ -434,7 +391,6 @@ void main() {
         final jsonData = <String, dynamic>{
           'indent_size': 4,
           'indent_style': 'spaces',
-          'format_php_expressions': false,
           'max_line_length': 120,
           'quote_style': 'preserve',
         };
@@ -443,7 +399,6 @@ void main() {
 
         expect(config.indentSize, 4);
         expect(config.indentStyle, IndentStyle.spaces);
-        expect(config.formatPhpExpressions, false);
       });
     });
   });
