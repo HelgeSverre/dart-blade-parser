@@ -486,8 +486,11 @@ Configuration File:
     "indent_size": 4,
     "indent_style": "spaces",
     "quote_style": "preserve",
-    "format_php_expressions": false,
-    "max_line_length": 120
+    "max_line_length": 120,
+    "directive_spacing": "between_blocks",
+    "html_block_spacing": "between_blocks",
+    "echo_spacing": "spaced",
+    "trailing_newline": true
   }
 
 Examples:

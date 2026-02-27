@@ -206,5 +206,65 @@ void main() {
       // Verify slots still work
       expect(component.slots.containsKey('empty'), isTrue);
     });
+
+    test('echo expression triggers tagHead population', () {
+      const input =
+          '<x-alert type="error" {{ \$attributes->class(["mt-4"]) }}>Message</x-alert>';
+      final result = parser.parse(input);
+      final component = result.ast!.children.whereType<ComponentNode>().first;
+
+      expect(component.tagHead, isNotEmpty);
+      expect(component.tagHead.length, equals(2));
+
+      expect(component.tagHead[0], isA<TagHeadAttribute>());
+      expect((component.tagHead[0] as TagHeadAttribute).name, equals('type'));
+
+      expect(component.tagHead[1], isA<TagHeadAttribute>());
+      expect(
+        (component.tagHead[1] as TagHeadAttribute).name,
+        equals('{{ \$attributes->class(["mt-4"]) }}'),
+      );
+    });
+
+    test('raw echo expression triggers tagHead population', () {
+      const input =
+          '<x-alert type="error" {!! \$attributes !!}>Message</x-alert>';
+      final result = parser.parse(input);
+      final component = result.ast!.children.whereType<ComponentNode>().first;
+
+      expect(component.tagHead, isNotEmpty);
+      expect(component.tagHead.length, equals(2));
+
+      expect(component.tagHead[0], isA<TagHeadAttribute>());
+      expect((component.tagHead[0] as TagHeadAttribute).name, equals('type'));
+
+      expect(component.tagHead[1], isA<TagHeadAttribute>());
+      expect(
+        (component.tagHead[1] as TagHeadAttribute).name,
+        equals('{!! \$attributes !!}'),
+      );
+    });
+
+    test('echo without structural directives still preserves order', () {
+      const input = '''<x-button
+    type="submit"
+    {{ \$attributes->merge(['class' => 'btn']) }}
+    disabled
+>Save</x-button>''';
+      final result = parser.parse(input);
+      final component = result.ast!.children.whereType<ComponentNode>().first;
+
+      expect(component.tagHead, isNotEmpty);
+      expect(component.tagHead.length, equals(3));
+
+      // Order is preserved: type, echo, disabled
+      expect((component.tagHead[0] as TagHeadAttribute).name, equals('type'));
+      expect(
+        (component.tagHead[1] as TagHeadAttribute).name,
+        contains('\$attributes'),
+      );
+      expect(
+          (component.tagHead[2] as TagHeadAttribute).name, equals('disabled'));
+    });
   });
 }

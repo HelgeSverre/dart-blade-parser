@@ -51,7 +51,8 @@ void main() {
         expect(result, contains('Tab indented'));
         expect(result, contains('4-space indented'));
         // All should be normalized to consistent indentation
-        final lines = result.split('\n').where((l) => l.contains('<li>')).toList();
+        final lines =
+            result.split('\n').where((l) => l.contains('<li>')).toList();
         expect(lines.length, equals(4));
       });
 
@@ -66,7 +67,8 @@ void main() {
       });
 
       test('handles code with Windows and Unix line endings mixed', () {
-        const input = '<div>\r\n<p>Windows</p>\n<p>Unix</p>\r\n<p>Mixed</p>\n</div>';
+        const input =
+            '<div>\r\n<p>Windows</p>\n<p>Unix</p>\r\n<p>Mixed</p>\n</div>';
 
         final result = formatter.format(input);
         expect(result, contains('<p>Windows</p>'));

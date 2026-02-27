@@ -163,7 +163,8 @@ everything   here   preserved
         final result = formatter.format(input);
 
         // Component preserved with original spacing
-        expect(result, contains('<x-alert    type="warning"    message="Test"   >'));
+        expect(result,
+            contains('<x-alert    type="warning"    message="Test"   >'));
       });
     });
 

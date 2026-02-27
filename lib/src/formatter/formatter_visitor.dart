@@ -373,6 +373,34 @@ class FormatterVisitor implements AstVisitor<String> {
     }
   }
 
+  /// Renders an echo node's delimiters and expression according to echoSpacing config.
+  String _renderEchoString(EchoNode node) {
+    final String inner;
+    switch (config.echoSpacing) {
+      case EchoSpacing.spaced:
+        inner = ' ${node.expression} ';
+      case EchoSpacing.compact:
+        inner = node.expression;
+      case EchoSpacing.preserve:
+        inner = node.rawExpression;
+    }
+    return node.isRaw ? '{!!$inner!!}' : '{{$inner}}';
+  }
+
+  /// Checks if the original source has a blank line between two nodes.
+  ///
+  /// Used by preserve-style spacing configs to detect whether the author
+  /// intended a visual break between elements.
+  bool _sourceHasBlankLineBetween(AstNode a, AstNode b) {
+    final source = _source;
+    if (source == null) return false;
+    final start = a.endPosition.offset;
+    final end = b.startPosition.offset;
+    if (start < 0 || end > source.length || start >= end) return false;
+    final gap = source.substring(start, end);
+    return RegExp(r'\n[ \t]*\n').hasMatch(gap);
+  }
+
   /// Returns the category priority for an attribute (for byType sorting).
   /// Lower numbers come first.
   int _getAttributeCategory(String name) {
@@ -434,7 +462,7 @@ class FormatterVisitor implements AstVisitor<String> {
         _isBladeAttributeDirectiveName(attr.name)) {
       return '${attr.name}${attr.value}';
     }
-    return '${attr.name}=${_formatAttributeValue(attr.value!)}';
+    return '${attr.name}=${_formatAttributeValue(attr.value!, sourceQuoteChar: attr.quoteChar)}';
   }
 
   /// Check if an attribute name is a Blade attribute directive.
@@ -581,8 +609,13 @@ class FormatterVisitor implements AstVisitor<String> {
   /// Formats an attribute value with the appropriate quote style.
   ///
   /// Handles escaping and quote style conversion based on config.quoteStyle.
-  String _formatAttributeValue(String value) {
-    var quote = config.quoteStyle.quoteChar;
+  String _formatAttributeValue(String value, {String? sourceQuoteChar}) {
+    String quote;
+    if (config.quoteStyle == QuoteStyle.preserve) {
+      quote = sourceQuoteChar ?? '"';
+    } else {
+      quote = config.quoteStyle.quoteChar;
+    }
 
     // If the value contains Blade echo expressions ({{ }}, {!! !!}), the echo
     // content may contain quotes that must not be escaped (HTML doesn't support
@@ -609,7 +642,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Plain HTML attribute values: escape quotes normally
     String escaped = value;
-    if (config.quoteStyle == QuoteStyle.single) {
+    if (quote == "'") {
       escaped = value.replaceAll(r"\'", "'").replaceAll("'", r"\'");
     } else {
       escaped = value.replaceAll(r'\"', '"').replaceAll('"', r'\"');
@@ -660,16 +693,23 @@ class FormatterVisitor implements AstVisitor<String> {
       }
     }
 
-    // Ensure file ends with newline
-    final isEmpty = _output.toString().isEmpty;
-    if (isEmpty) {
-      // If document had children (even if just whitespace), add newline
-      // If document was truly empty, keep output empty
-      if (node.children.isNotEmpty) {
+    if (config.trailingNewline) {
+      // Ensure file ends with newline
+      final isEmpty = _output.toString().isEmpty;
+      if (isEmpty) {
+        if (node.children.isNotEmpty) {
+          _output.writeln();
+        }
+      } else if (!_output.endsWithNewline()) {
         _output.writeln();
       }
-    } else if (!_output.endsWithNewline()) {
-      _output.writeln();
+    } else {
+      // Strip trailing newline if present
+      final str = _output.toString();
+      if (str.endsWith('\n')) {
+        _output.clear();
+        _output.write(str.substring(0, str.length - 1));
+      }
     }
 
     return _output.toString();
@@ -722,8 +762,17 @@ class FormatterVisitor implements AstVisitor<String> {
 
         // Add spacing between children if needed
         if (i < node.children.length - 1) {
-          final next = node.children[i + 1];
-          if (_needsSpacingBetween(child, next)) {
+          AstNode? nextMeaningful;
+          for (var j = i + 1; j < node.children.length; j++) {
+            final candidate = node.children[j];
+            if (candidate is! TextNode || candidate.content.trim().isNotEmpty) {
+              nextMeaningful = candidate;
+              break;
+            }
+          }
+
+          if (nextMeaningful != null &&
+              _needsSpacingBetween(child, nextMeaningful)) {
             _output.writeln();
           }
         }
@@ -765,11 +814,7 @@ class FormatterVisitor implements AstVisitor<String> {
         _rawTextElements.contains(parent.tagName.toLowerCase());
 
     if (inRawText) {
-      if (node.isRaw) {
-        _output.write('{!! ${node.expression} !!}');
-      } else {
-        _output.write('{{ ${node.expression} }}');
-      }
+      _output.write(_renderEchoString(node));
       return '';
     }
 
@@ -779,11 +824,7 @@ class FormatterVisitor implements AstVisitor<String> {
       _output.write(_indent.current);
     }
 
-    if (node.isRaw) {
-      _output.write('{!! ${node.expression} !!}');
-    } else {
-      _output.write('{{ ${node.expression} }}');
-    }
+    _output.write(_renderEchoString(node));
 
     _output.writeln();
     return '';
@@ -979,8 +1020,7 @@ class FormatterVisitor implements AstVisitor<String> {
       }
 
       if (shouldSelfClose) {
-        _writeAttributes(
-            attributes, wrap: shouldWrap, closingBracket: ' />');
+        _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
         _output.writeln();
         return '';
       }
@@ -1004,11 +1044,7 @@ class FormatterVisitor implements AstVisitor<String> {
           if (child is TextNode) {
             rawContent.write(child.content);
           } else if (child is EchoNode) {
-            if (child.isRaw) {
-              rawContent.write('{!! ${child.expression} !!}');
-            } else {
-              rawContent.write('{{ ${child.expression} }}');
-            }
+            rawContent.write(_renderEchoString(child));
           } else if (child is CommentNode) {
             rawContent.write(child.content);
           }
@@ -1710,9 +1746,7 @@ class FormatterVisitor implements AstVisitor<String> {
   String _renderInlineNode(AstNode node) {
     if (node is TextNode) return node.content;
     if (node is EchoNode) {
-      return node.isRaw
-          ? '{!! ${node.expression} !!}'
-          : '{{ ${node.expression} }}';
+      return _renderEchoString(node);
     }
     if (node is HtmlElementNode) return _renderInlineElement(node);
     return '';
@@ -1737,8 +1771,8 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     if (node.children.isEmpty ||
-        !node.children.any(
-            (c) => c is! TextNode || c.content.trim().isNotEmpty)) {
+        !node.children
+            .any((c) => c is! TextNode || c.content.trim().isNotEmpty)) {
       buf.write('></$tag>');
       return buf.toString();
     }
@@ -1785,8 +1819,19 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Add spacing between block-level HTML elements
     if (current is HtmlElementNode && next is HtmlElementNode) {
-      return _blockElements.contains(current.tagName.toLowerCase()) &&
-          _blockElements.contains(next.tagName.toLowerCase());
+      final bothBlock =
+          _blockElements.contains(current.tagName.toLowerCase()) &&
+              _blockElements.contains(next.tagName.toLowerCase());
+      if (!bothBlock) return false;
+
+      switch (config.htmlBlockSpacing) {
+        case HtmlBlockSpacing.betweenBlocks:
+          return true;
+        case HtmlBlockSpacing.none:
+          return false;
+        case HtmlBlockSpacing.preserve:
+          return _sourceHasBlankLineBetween(current, next);
+      }
     }
 
     // Add spacing between components
@@ -1802,21 +1847,20 @@ class FormatterVisitor implements AstVisitor<String> {
         return false;
       }
 
-      // Check if we should add spacing between block directives
-      if (config.directiveSpacing == DirectiveSpacing.betweenBlocks) {
-        // Add blank line between two block-level directives
-        // Current directive has just finished (including its @end tag if it has one)
-        // Next directive is about to start
-        final isCurrentBlock = _blockDirectives.contains(current.name);
-        final isNextBlock = _blockDirectives.contains(next.name) ||
-            _inlineDirectives.contains(next.name);
-
-        if (isCurrentBlock && isNextBlock) {
-          return true;
-        }
+      switch (config.directiveSpacing) {
+        case DirectiveSpacing.betweenBlocks:
+          final isCurrentBlock = _blockDirectives.contains(current.name);
+          final isNextBlock = _blockDirectives.contains(next.name) ||
+              _inlineDirectives.contains(next.name);
+          if (isCurrentBlock && isNextBlock) {
+            return true;
+          }
+          return false;
+        case DirectiveSpacing.none:
+          return false;
+        case DirectiveSpacing.preserve:
+          return _sourceHasBlankLineBetween(current, next);
       }
-      // For DirectiveSpacing.none or preserve, don't add spacing
-      return false;
     }
 
     // Add spacing between block directives and non-directives

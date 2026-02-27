@@ -1676,6 +1676,9 @@ class BladeLexer {
     final quote = _peek();
     if (quote == '"' || quote == "'") {
       _advance(); // Skip opening quote
+      _start = _position;
+      _startLine = _line;
+      _startColumn = _column;
       final valueStart = _position;
 
       // Handle escaped quotes and Blade echo boundaries within the string.

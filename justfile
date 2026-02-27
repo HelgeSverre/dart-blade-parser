@@ -32,6 +32,11 @@ acid:
     @echo "🧪 Running acid tests..."
     @cd tool/acid && dart acid_test.dart --format=both --open
 
+# Spot-check stress fixtures (parse, format, idempotency, content)
+[group('testing')]
+spot-check *ARGS:
+    dart run tool/spot_check.dart {{ ARGS }}
+
 # Generate coverage report and show summary
 [group('testing')]
 coverage:

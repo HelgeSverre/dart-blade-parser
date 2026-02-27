@@ -9,13 +9,6 @@ class FormatterConfig {
   /// Whether to use spaces or tabs for indentation.
   final IndentStyle indentStyle;
 
-  /// Whether to format PHP expressions inside Blade syntax.
-  ///
-  /// When `false`, preserves PHP expressions as-is inside:
-  /// - Echo statements: `{{ $expr }}`
-  /// - Directives: `@if($expr)`
-  final bool formatPhpExpressions;
-
   /// Maximum line length before considering wrapping.
   ///
   /// When a line exceeds this length, the formatter will attempt to wrap
@@ -49,11 +42,19 @@ class FormatterConfig {
   /// Controls how empty elements are formatted (self-closing vs explicit close).
   final SelfClosingStyle selfClosingStyle;
 
+  /// Controls blank lines between block-level HTML element siblings.
+  final HtmlBlockSpacing htmlBlockSpacing;
+
+  /// Controls spacing inside echo braces {{ }} and {!! !!}.
+  final EchoSpacing echoSpacing;
+
+  /// Whether to add a trailing newline at the end of formatted output.
+  final bool trailingNewline;
+
   /// Creates a formatter configuration.
   const FormatterConfig({
     this.indentSize = 4,
     this.indentStyle = IndentStyle.spaces,
-    this.formatPhpExpressions = false,
     this.maxLineLength = 120,
     this.quoteStyle = QuoteStyle.preserve,
     this.directiveSpacing = DirectiveSpacing.betweenBlocks,
@@ -64,6 +65,9 @@ class FormatterConfig {
     this.attributeSort = AttributeSort.none,
     this.closingBracketStyle = ClosingBracketStyle.sameLine,
     this.selfClosingStyle = SelfClosingStyle.preserve,
+    this.htmlBlockSpacing = HtmlBlockSpacing.betweenBlocks,
+    this.echoSpacing = EchoSpacing.spaced,
+    this.trailingNewline = true,
   });
 
   /// Creates a default formatter configuration.
@@ -89,7 +93,6 @@ class FormatterConfig {
     return FormatterConfig(
       indentSize: map['indent_size'] as int? ?? 4,
       indentStyle: IndentStyle.fromString(map['indent_style'] as String?),
-      formatPhpExpressions: map['format_php_expressions'] as bool? ?? false,
       maxLineLength: map['max_line_length'] as int? ?? 120,
       quoteStyle: QuoteStyle.fromString(map['quote_style'] as String?),
       directiveSpacing:
@@ -98,15 +101,18 @@ class FormatterConfig {
           SlotFormatting.fromString(map['slot_formatting'] as String?),
       slotNameStyle:
           SlotNameStyle.fromString(map['slot_name_style'] as String?),
-      slotSpacing:
-          SlotSpacing.fromString(map['slot_spacing'] as String?),
+      slotSpacing: SlotSpacing.fromString(map['slot_spacing'] as String?),
       wrapAttributes:
           WrapAttributes.fromString(map['wrap_attributes'] as String?),
       attributeSort: AttributeSort.fromString(map['attribute_sort'] as String?),
-      closingBracketStyle:
-          ClosingBracketStyle.fromString(map['closing_bracket_style'] as String?),
+      closingBracketStyle: ClosingBracketStyle.fromString(
+          map['closing_bracket_style'] as String?),
       selfClosingStyle:
           SelfClosingStyle.fromString(map['self_closing_style'] as String?),
+      htmlBlockSpacing:
+          HtmlBlockSpacing.fromString(map['html_block_spacing'] as String?),
+      echoSpacing: EchoSpacing.fromString(map['echo_spacing'] as String?),
+      trailingNewline: map['trailing_newline'] as bool? ?? true,
     );
   }
 
@@ -115,7 +121,6 @@ class FormatterConfig {
     return {
       'indent_size': indentSize,
       'indent_style': indentStyle.value,
-      'format_php_expressions': formatPhpExpressions,
       'max_line_length': maxLineLength,
       'quote_style': quoteStyle.value,
       'directive_spacing': directiveSpacing.value,
@@ -126,6 +131,9 @@ class FormatterConfig {
       'attribute_sort': attributeSort.value,
       'closing_bracket_style': closingBracketStyle.value,
       'self_closing_style': selfClosingStyle.value,
+      'html_block_spacing': htmlBlockSpacing.value,
+      'echo_spacing': echoSpacing.value,
+      'trailing_newline': trailingNewline,
     };
   }
 
@@ -134,7 +142,6 @@ class FormatterConfig {
     return 'FormatterConfig('
         'indentSize: $indentSize, '
         'indentStyle: $indentStyle, '
-        'formatPhpExpressions: $formatPhpExpressions, '
         'maxLineLength: $maxLineLength, '
         'quoteStyle: $quoteStyle, '
         'directiveSpacing: $directiveSpacing, '
@@ -144,7 +151,10 @@ class FormatterConfig {
         'wrapAttributes: $wrapAttributes, '
         'attributeSort: $attributeSort, '
         'closingBracketStyle: $closingBracketStyle, '
-        'selfClosingStyle: $selfClosingStyle'
+        'selfClosingStyle: $selfClosingStyle, '
+        'htmlBlockSpacing: $htmlBlockSpacing, '
+        'echoSpacing: $echoSpacing, '
+        'trailingNewline: $trailingNewline'
         ')';
   }
 }
@@ -488,5 +498,47 @@ enum SelfClosingStyle {
         'always' => always,
         'never' => never,
         _ => preserve,
+      };
+}
+
+/// Controls blank lines between block-level HTML element siblings.
+enum HtmlBlockSpacing {
+  /// Add blank line between block-level HTML siblings (e.g., consecutive divs).
+  betweenBlocks('between_blocks'),
+
+  /// No blank lines between HTML block elements.
+  none('none'),
+
+  /// Preserve blank lines as written in the source.
+  preserve('preserve');
+
+  final String value;
+  const HtmlBlockSpacing(this.value);
+
+  static HtmlBlockSpacing fromString(String? s) => switch (s) {
+        'none' => none,
+        'preserve' => preserve,
+        _ => betweenBlocks,
+      };
+}
+
+/// Controls spacing inside echo braces {{ }} and {!! !!}.
+enum EchoSpacing {
+  /// Always add spaces inside braces: `{{ $var }}`, `{!! $expr !!}`
+  spaced('spaced'),
+
+  /// No spaces inside braces: `{{$var}}`, `{!!$expr!!}`
+  compact('compact'),
+
+  /// Preserve the original spacing from the source.
+  preserve('preserve');
+
+  final String value;
+  const EchoSpacing(this.value);
+
+  static EchoSpacing fromString(String? s) => switch (s) {
+        'compact' => compact,
+        'preserve' => preserve,
+        _ => spaced,
       };
 }

@@ -9,9 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - **`ExpressionParser` class:** Removed unused Pratt expression parser and its tests. The lexer emits PHP expressions as single opaque tokens, so the parser was never wired into production code. Expressions continue to be captured as raw text.
+- **`formatPhpExpressions`:** Removed dead config option that was declared but never referenced by the formatter
 
 ### Added
 - **Component `tagHead` support:** `ComponentNode` now has a `tagHead` field (like `HtmlElementNode`) that preserves structural directives (`@if`/`@endif`, `@class`, etc.) inside component opening tags. The formatter correctly renders these using `_writeTagHead`.
+- **Echo spacing** (`echoSpacing`): Control spacing inside echo braces — `spaced` (`{{ $var }}`, default), `compact` (`{{$var}}`), or `preserve` original spacing
+- **HTML block spacing** (`htmlBlockSpacing`): Control blank lines between block-level HTML siblings — `betweenBlocks` (default), `none`, or `preserve`
+- **Trailing newline** (`trailingNewline`): Control whether formatted output ends with a newline (default: `true`)
 
 ### Fixed
 - **Directive expression with space (`@if ($x)`):** The lexer now correctly handles the PSR-12 style space between directive name and opening parenthesis. Previously `@if ($x)` was misparsed — the expression was lost and `$x` became a spurious attribute or text node. Affects both standalone directives and structural directives inside tag heads.
@@ -33,8 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`@livewire` directive:** Inline directive for embedding Livewire components
 - **Echo expressions in tag attributes:** `{{ $attributes->class([...]) }}` and `{!! $attributes !!}` inside component and HTML tag attribute lists
 - **Stress test suite:** 826 real-world Blade fixtures from Filament (v2/v3/v4) and FluxUI with 99.9% error-free parse rate
-
-### Fixed
+- **`DirectiveSpacing.preserve`:** Was broken — acted the same as `none`. Now correctly preserves blank lines from source between directives, including inside nested contexts
+- **`QuoteStyle.preserve`:** Was broken — always defaulted to double quotes because the AST didn't store the original quote character. Now threads quote metadata through lexer → parser → AST → formatter
 - **`:$var` shorthand attributes:** Blade `:$attributes`, `:$name`, `:$icon` shorthand syntax is now correctly preserved as a single attribute instead of being split into `:` + `var`
 - **Echo attributes dropped with directives:** `{{ $attributes->class([...]) }}` in tag attribute lists was silently dropped when structural directives (`@if`, `@endif`) were also present in the same tag
 - **`@unless` / `@endif` compatibility:** `@unless` blocks can now be closed with `@endif`, matching real-world Laravel template conventions

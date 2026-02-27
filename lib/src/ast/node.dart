@@ -206,10 +206,13 @@ final class EchoNode extends AstNode {
   @override
   final List<AstNode> children = const [];
 
-  /// The PHP expression to be echoed.
+  /// The PHP expression to be echoed (trimmed).
   ///
   /// For example, in `{{ $user->name }}`, this would be `$user->name`.
   final String expression;
+
+  /// The raw expression as it appeared in source (untrimmed, preserves spacing).
+  final String rawExpression;
 
   /// Whether this is a raw (unescaped) echo.
   ///
@@ -224,8 +227,9 @@ final class EchoNode extends AstNode {
     required this.startPosition,
     required this.endPosition,
     required this.expression,
+    String? rawExpression,
     required this.isRaw,
-  });
+  }) : rawExpression = rawExpression ?? expression;
 
   @override
   T accept<T>(AstVisitor<T> visitor) => visitor.visitEcho(this);
@@ -340,6 +344,10 @@ sealed class AttributeNode {
   /// The attribute value, if any.
   final String? value;
 
+  /// The original quote character used in source (' or "), or null for
+  /// boolean/unquoted attributes.
+  final String? quoteChar;
+
   /// The source position where this attribute starts.
   final Position startPosition;
 
@@ -350,6 +358,7 @@ sealed class AttributeNode {
   AttributeNode({
     required this.name,
     this.value,
+    this.quoteChar,
     required this.startPosition,
     required this.endPosition,
   });
@@ -370,6 +379,7 @@ final class StandardAttribute extends AttributeNode {
   StandardAttribute({
     required super.name,
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
@@ -403,6 +413,7 @@ final class AlpineAttribute extends AttributeNode {
     required super.name,
     required this.directive,
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
@@ -456,6 +467,7 @@ final class LivewireAttribute extends AttributeNode {
     this.subAction,
     this.modifiers = const [],
     super.value,
+    super.quoteChar,
     required super.startPosition,
     required super.endPosition,
   });
