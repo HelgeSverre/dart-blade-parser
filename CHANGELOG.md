@@ -5,7 +5,7 @@ All notable changes to the Blade Parser project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.0] - 2026-02-27
 
 ### Removed
 - **`ExpressionParser` class:** Removed unused Pratt expression parser and its tests. The lexer emits PHP expressions as single opaque tokens, so the parser was never wired into production code. Expressions continue to be captured as raw text.
@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Inline content optimization skipped when tag head contains structural directives (wrapped attributes made `totalLineLength` check unstable between passes)
   - `_isInlineRenderableElement` newline check aligned with `visitHtmlElement` to prevent `<td><a>...</a></td>` collapse on second pass
 - **Stress suite idempotency:** 99.9% (825/826 files), up from 98.1% (810/826)
+- **`@else` inside authorization/authentication/environment directives:** `@can`, `@cannot`, `@canany`, `@auth`, `@guest`, `@env`, and `@production` now support `@else` as an intermediate directive. Previously `@else` branches were silently dropped from the AST and formatted output.
 
 ## [1.2.1] - 2026-02-26
 

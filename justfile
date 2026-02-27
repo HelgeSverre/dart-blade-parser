@@ -204,11 +204,12 @@ plugin-publish: plugin-test
 
 # Benchmark
 
-# Sync test fixtures into benchmark/fixtures/
+# Sync curated fixtures into benchmark/fixtures/ (from benchmark/curated.txt)
 [group('benchmark')]
 bench-sync:
-    @echo "Syncing fixtures from test/fixtures/ to benchmark/fixtures/..."
-    @rsync -a --delete --exclude='invalid/' --exclude='malformed/' --exclude='index.md' --exclude='README.md' test/fixtures/ benchmark/fixtures/
+    @echo "Syncing curated fixtures from test/fixtures/ to benchmark/fixtures/..."
+    @rm -rf benchmark/fixtures
+    @while IFS= read -r f; do mkdir -p "benchmark/fixtures/$(dirname "$f")" && cp "test/fixtures/$f" "benchmark/fixtures/$f"; done < benchmark/curated.txt
     @echo "Synced $(find benchmark/fixtures -name '*.blade.php' | wc -l | tr -d ' ') fixtures."
 
 # Install benchmark dependencies
