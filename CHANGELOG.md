@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Echo spacing** (`echoSpacing`): Control spacing inside echo braces — `spaced` (`{{ $var }}`, default), `compact` (`{{$var}}`), or `preserve` original spacing
+- **HTML block spacing** (`htmlBlockSpacing`): Control blank lines between block-level HTML siblings — `betweenBlocks` (default), `none`, or `preserve`
+- **Trailing newline** (`trailingNewline`): Control whether formatted output ends with a newline (default: `true`)
+
+### Fixed
+- **`DirectiveSpacing.preserve`:** Was broken — acted the same as `none`. Now correctly preserves blank lines from source between directives, including inside nested contexts
+- **`QuoteStyle.preserve`:** Was broken — always defaulted to double quotes because the AST didn't store the original quote character. Now threads quote metadata through lexer → parser → AST → formatter
+
+### Removed
+- **`formatPhpExpressions`:** Removed dead config option that was declared but never referenced by the formatter
+
 ## [1.2.1] - 2026-02-26
 
 ### Fixed
