@@ -43,6 +43,10 @@ JSString _format(JSString source, JSString optionsJson) {
         ClosingBracketStyle.fromString(opts['closingBracketStyle'] as String?),
     selfClosingStyle:
         SelfClosingStyle.fromString(opts['selfClosingStyle'] as String?),
+    htmlBlockSpacing:
+        HtmlBlockSpacing.fromString(opts['htmlBlockSpacing'] as String?),
+    echoSpacing: EchoSpacing.fromString(opts['echoSpacing'] as String?),
+    trailingNewline: opts['trailingNewline'] as bool? ?? true,
   );
 
   final cursorOffset = opts['cursorOffset'] as int? ?? -1;

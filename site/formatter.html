@@ -6,7 +6,7 @@
     <title>prettier-plugin-laravel-blade — Live Formatter</title>
     <meta
       name="description"
-      content="Try the fastest Blade formatter live in your browser. Paste your .blade.php code and see instant formatting with 9 configurable options."
+      content="Try the fastest Blade formatter live in your browser. Paste your .blade.php code and see instant formatting with 15 configurable options."
     />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#050507" />
@@ -651,6 +651,26 @@
                 <option value="never">never</option>
               </select>
             </div>
+            <div class="settings-row">
+              <label>HTML block spacing</label
+              ><select id="opt-htmlBlockSpacing">
+                <option value="between_blocks">between_blocks</option>
+                <option value="none">none</option>
+                <option value="preserve">preserve</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Echo spacing</label
+              ><select id="opt-echoSpacing">
+                <option value="spaced">spaced</option>
+                <option value="compact">compact</option>
+                <option value="preserve">preserve</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Trailing newline</label
+              ><input type="checkbox" id="opt-trailingNewline" checked />
+            </div>
           </div>
         </div>
       </div>
@@ -876,6 +896,11 @@
           ).value,
           selfClosingStyle: document.getElementById("opt-selfClosingStyle")
             .value,
+          htmlBlockSpacing: document.getElementById("opt-htmlBlockSpacing")
+            .value,
+          echoSpacing: document.getElementById("opt-echoSpacing").value,
+          trailingNewline: document.getElementById("opt-trailingNewline")
+            .checked,
         };
       }
 

@@ -53,6 +53,9 @@ export const parsers = {
         attributeSort: options.bladeAttributeSort,
         closingBracketStyle: options.bladeClosingBracketStyle,
         selfClosingStyle: options.bladeSelfClosingStyle,
+        htmlBlockSpacing: options.bladeHtmlBlockSpacing,
+        echoSpacing: options.bladeEchoSpacing,
+        trailingNewline: options.bladeTrailingNewline,
       };
 
       // Pass cursor offset if set
@@ -232,6 +235,37 @@ export const options = {
       { value: "always", description: "Use self-closing syntax" },
       { value: "never", description: "Use explicit close tags" },
     ],
+  },
+  bladeHtmlBlockSpacing: {
+    type: "choice",
+    category: "Blade",
+    default: "between_blocks",
+    description: "Blank lines between block-level HTML element siblings.",
+    choices: [
+      {
+        value: "between_blocks",
+        description: "Add blank line between block elements",
+      },
+      { value: "none", description: "No blank lines between block elements" },
+      { value: "preserve", description: "Preserve original spacing" },
+    ],
+  },
+  bladeEchoSpacing: {
+    type: "choice",
+    category: "Blade",
+    default: "spaced",
+    description: "Spacing inside echo braces {{ }} and {!! !!}.",
+    choices: [
+      { value: "spaced", description: "Always add spaces: {{ $var }}" },
+      { value: "compact", description: "No spaces: {{$var}}" },
+      { value: "preserve", description: "Preserve original spacing" },
+    ],
+  },
+  bladeTrailingNewline: {
+    type: "boolean",
+    category: "Blade",
+    default: true,
+    description: "Add a trailing newline at the end of formatted output.",
   },
 };
 

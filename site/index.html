@@ -1369,6 +1369,24 @@
                   tags
                 </td>
               </tr>
+              <tr>
+                <td class="m">bladeHtmlBlockSpacing</td>
+                <td class="m">"between_blocks"</td>
+                <td class="m">between_blocks, none, preserve</td>
+                <td>Blank lines between block-level HTML siblings</td>
+              </tr>
+              <tr>
+                <td class="m">bladeEchoSpacing</td>
+                <td class="m">"spaced"</td>
+                <td class="m">spaced, compact, preserve</td>
+                <td>Spacing inside {{ }} and {!! !!} braces</td>
+              </tr>
+              <tr>
+                <td class="m">bladeTrailingNewline</td>
+                <td class="m">true</td>
+                <td class="m">true, false</td>
+                <td>Add trailing newline at end of output</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -1398,7 +1416,10 @@
       "bladeSlotSpacing": "after",
       "bladeWrapAttributes": "auto",
       "bladeAttributeSort": "by_type",
-      "bladeSelfClosingStyle": "preserve"
+      "bladeSelfClosingStyle": "preserve",
+      "bladeHtmlBlockSpacing": "between_blocks",
+      "bladeEchoSpacing": "spaced",
+      "bladeTrailingNewline": true
     }
   }]
 }</pre
@@ -1416,7 +1437,10 @@
   "slot_spacing": "after",
   "wrap_attributes": "auto",
   "attribute_sort": "by_type",
-  "self_closing_style": "preserve"
+  "self_closing_style": "preserve",
+  "html_block_spacing": "between_blocks",
+  "echo_spacing": "spaced",
+  "trailing_newline": true
 }</pre
             >
           </div>
@@ -1482,6 +1506,9 @@ npx prettier --check "**/*.blade.php"</pre>
           attributeSort: "none",
           closingBracketStyle: "same_line",
           selfClosingStyle: "preserve",
+          htmlBlockSpacing: "between_blocks",
+          echoSpacing: "spaced",
+          trailingNewline: true,
         });
 
         // Apply saved theme
