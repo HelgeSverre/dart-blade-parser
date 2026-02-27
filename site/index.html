@@ -8,7 +8,7 @@
     </title>
     <meta
       name="description"
-      content="The fastest Prettier plugin for Laravel Blade. 19–23× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser."
+      content="The fastest Prettier plugin for Laravel Blade. 20–25× faster, ~160 KB, 100% idempotent. Powered by a real recursive-descent parser."
     />
     <meta
       name="keywords"
@@ -27,7 +27,7 @@
     />
     <meta
       property="og:description"
-      content="The fastest Prettier plugin for Laravel Blade. 19–23× faster, ~140 KB, 100% idempotent. Powered by a real recursive-descent parser."
+      content="The fastest Prettier plugin for Laravel Blade. 20–25× faster, ~160 KB, 100% idempotent. Powered by a real recursive-descent parser."
     />
     <meta property="og:image" content="og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -46,7 +46,7 @@
     />
     <meta
       name="twitter:description"
-      content="19–23× faster than alternatives. ~140 KB, 0 dependencies, 100% idempotent. A real recursive-descent Dart parser compiled to JS."
+      content="20–25× faster than alternatives. ~160 KB, 0 dependencies, 100% idempotent. A real recursive-descent Dart parser compiled to JS."
     />
     <meta name="twitter:image" content="og-image.png" />
     <meta
@@ -403,12 +403,6 @@
         height: 7px;
         border-radius: 1px;
         min-width: 2px;
-        transform-origin: left;
-        transform: scaleX(0);
-        transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .speed-bar.anim {
-        transform: scaleX(1);
       }
       .speed-bar.ours {
         background: var(--accent);
@@ -849,18 +843,7 @@
         }
       }
 
-      /* ── ANIM ── */
-      .reveal {
-        opacity: 0;
-        transform: translateY(12px);
-        transition:
-          opacity 0.5s ease,
-          transform 0.5s ease;
-      }
-      .reveal.vis {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      
       * {
         scrollbar-width: thin;
         scrollbar-color: var(--border) transparent;
@@ -953,22 +936,22 @@
           <div
             class="metric-val accent"
             id="metric-avg-time"
-            data-count="0.33"
+            data-count="0.66"
             data-suffix="ms"
           >
-            0.33ms
+            0.66ms
           </div>
           <div class="metric-label">Avg format time</div>
         </div>
         <div class="metric">
-          <div class="metric-val" data-count="140" data-suffix="KB">
-            ~140 KB
+          <div class="metric-val" data-count="160" data-suffix="KB">
+            ~160 KB
           </div>
           <div class="metric-label">Package size</div>
         </div>
         <div class="metric">
-          <div class="metric-val" id="metric-fixture-count" data-count="109">
-            109
+          <div class="metric-val" id="metric-fixture-count" data-count="228">
+            228
           </div>
           <div class="metric-label">Fixtures tested</div>
         </div>
@@ -992,7 +975,7 @@
         <div class="stag">Performance</div>
         <div class="sh">Measured, not claimed</div>
         <div class="sd">
-          Average format time across 110 fixtures. 100 timed runs after warmup.
+          Average format time across 228 fixtures. 100 timed runs after warmup.
           <a
             href="https://github.com/HelgeSverre/dart-blade-parser/tree/main/benchmark"
             >Run it yourself →</a
@@ -1024,7 +1007,7 @@
                 <strong>No regex</strong> Real recursive-descent, no
                 backtracking
               </li>
-              <li><strong>~140 KB</strong> vs 777 KB vs 12+ MB</li>
+              <li><strong>~160 KB</strong> vs 777 KB vs 12+ MB</li>
               <li><strong>0 deps</strong> No blade-formatter or php-parser</li>
             </ul>
           </div>
@@ -1044,7 +1027,7 @@
         <div class="cards">
           <div class="card reveal">
             <div class="card-icon">@</div>
-            <h3>108 Directives</h3>
+            <h3>120+ Directives</h3>
             <p>
               Every built-in: @if, @foreach, @forelse, @auth, @guest, @switch,
               @push, @section, @extends, @yield, @component, and more.
@@ -1085,11 +1068,11 @@
           </div>
           <div class="card reveal">
             <div class="card-icon">*</div>
-            <h3>9 Custom Options</h3>
+            <h3>12 Custom Options</h3>
             <p>
               Quote style, directive spacing, slot formatting, slot name style,
               slot spacing, wrap attributes, attribute sorting, closing bracket,
-              self-closing control.
+              self-closing, echo spacing, HTML block spacing, trailing newline.
             </p>
           </div>
         </div>
@@ -1185,15 +1168,15 @@
             <tbody>
               <tr>
                 <td class="lbl">Package size</td>
-                <td class="win m">~140 KB</td>
+                <td class="win m">~160 KB</td>
                 <td class="m">777 KB</td>
                 <td class="m">12+ MB</td>
               </tr>
               <tr>
                 <td class="lbl">Avg format time</td>
-                <td class="win m" id="cmp-avg-a">0.48 ms</td>
-                <td class="m" id="cmp-avg-b">9.03 ms</td>
-                <td class="m" id="cmp-avg-c">10.76 ms</td>
+                <td class="win m" id="cmp-avg-a">0.66 ms</td>
+                <td class="m" id="cmp-avg-b">13.23 ms</td>
+                <td class="m" id="cmp-avg-c">16.55 ms</td>
               </tr>
               <tr>
                 <td class="lbl">Parser</td>
@@ -1203,9 +1186,9 @@
               </tr>
               <tr>
                 <td class="lbl">Idempotent</td>
-                <td class="ok" id="cmp-idem-a">✓ 110/110</td>
-                <td class="no" id="cmp-idem-b">✗ 10 failures</td>
-                <td class="no" id="cmp-idem-c">✗ 3 failures</td>
+                <td class="ok" id="cmp-idem-a">✓ 228/228</td>
+                <td class="no" id="cmp-idem-b">✗ 28 failures</td>
+                <td class="no" id="cmp-idem-c">✗ 4 failures</td>
               </tr>
               <tr>
                 <td class="lbl">Dependencies</td>
@@ -1298,7 +1281,7 @@
         <div class="stag">Configuration</div>
         <div class="sh">Fine-grained control</div>
         <div class="sd">
-          9 Blade-specific options alongside Prettier's standard tabWidth,
+          12 Blade-specific options alongside Prettier's standard tabWidth,
           useTabs, and printWidth.
         </div>
         <div style="overflow-x: auto">
@@ -1627,8 +1610,6 @@ npx prettier --check "**/*.blade.php"</pre>
         avg.className = "speed-row speed-avg";
         avg.innerHTML = `<span class="speed-fixture" style="font-weight:600;color:var(--text)">Average</span><div class="speed-bars"><div class="speed-bar ours" style="width:${((avgA / mx) * 100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${((avgB / mx) * 100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${((avgC / mx) * 100).toFixed(1)}%"></div></div><span class="speed-ms" style="font-weight:600;color:var(--accent)">${avgA.toFixed(2)}ms</span>`;
         ch.appendChild(avg);
-        // Observe after bars exist so the IntersectionObserver can animate them
-        speedObs.observe(ch);
       }
 
       function updateMetrics(avgA, fixtureCount, idemPct) {
@@ -1748,52 +1729,20 @@ npx prettier --check "**/*.blade.php"</pre>
           // Fallback to hardcoded defaults
           const data = [
             { f: "pagination", a: 0.83, b: 84.44, c: 47.1 },
+            { f: "admin panel", a: 1.76, b: 37.5, c: 42.1 },
             { f: "billing", a: 1.15, b: 29.5, c: 40.93 },
             { f: "billing", a: 0.87, b: 15.18, c: 19.25 },
             { f: "auth login", a: 0.42, b: 9.93, c: 14.21 },
             { f: "layout", a: 0.36, b: 8.03, c: 10.02 },
-            {
-              f: "malformed dashboard",
-              a: 0.26,
-              b: 3.79,
-              c: 15.65,
-            },
             { f: "real world mess", a: 0.23, b: 2.91, c: 8.33 },
             { f: "mixed content", a: 0.18, b: 2.95, c: 7.9 },
           ];
-          renderChart(data, 0.48, 9.03, 10.76);
+          renderChart(data, 0.66, 13.23, 16.55);
         }
       }
       loadBenchmarkData();
 
-      // Animate bars on scroll
-      const speedObs = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) {
-              e.target.querySelectorAll(".speed-bar").forEach((b, i) => {
-                setTimeout(() => b.classList.add("anim"), i * 60);
-              });
-              speedObs.unobserve(e.target);
-            }
-          });
-        },
-        { threshold: 0.2 },
-      );
-
-      // Reveal on scroll
-      const revObs = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) {
-              e.target.classList.add("vis");
-              revObs.unobserve(e.target);
-            }
-          });
-        },
-        { threshold: 0.12 },
-      );
-      document.querySelectorAll(".reveal").forEach((el) => revObs.observe(el));
+      
 
       // Copy install command
       function copyCmd(el) {
