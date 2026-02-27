@@ -357,6 +357,9 @@ final config = FormatterConfig(
   attributeSort: AttributeSort.none,          // Default: none
   closingBracketStyle: ClosingBracketStyle.sameLine,  // Default: sameLine
   selfClosingStyle: SelfClosingStyle.preserve,        // Default: preserve
+  htmlBlockSpacing: HtmlBlockSpacing.betweenBlocks,   // Default: betweenBlocks
+  echoSpacing: EchoSpacing.spaced,            // Default: spaced
+  trailingNewline: true,                      // Default: true
 );
 
 final formatter = BladeFormatter(config: config);
@@ -402,6 +405,15 @@ final formatter = BladeFormatter(config: config);
   - `SelfClosingStyle.preserve`: Keep original style (default)
   - `SelfClosingStyle.always`: Convert empty elements to self-closing (`<div />`)
   - `SelfClosingStyle.never`: Convert self-closing to explicit close (`<div></div>`)
+- `htmlBlockSpacing`: Control blank lines between block-level HTML siblings
+  - `HtmlBlockSpacing.betweenBlocks`: Add blank line between block elements (default)
+  - `HtmlBlockSpacing.none`: No blank lines between block elements
+  - `HtmlBlockSpacing.preserve`: Preserve blank lines as written
+- `echoSpacing`: Control spacing inside echo braces
+  - `EchoSpacing.spaced`: Always add spaces: `{{ $var }}` (default)
+  - `EchoSpacing.compact`: No spaces: `{{$var}}`
+  - `EchoSpacing.preserve`: Preserve original spacing
+- `trailingNewline`: Whether to add a trailing newline (default: true)
 
 ### API
 
