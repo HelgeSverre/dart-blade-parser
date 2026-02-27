@@ -11,6 +11,17 @@ void main() {
         expect(config.indentStyle, IndentStyle.spaces);
         expect(config.maxLineLength, 120);
         expect(config.quoteStyle, QuoteStyle.preserve);
+        expect(config.directiveSpacing, DirectiveSpacing.betweenBlocks);
+        expect(config.slotFormatting, SlotFormatting.compact);
+        expect(config.slotNameStyle, SlotNameStyle.colon);
+        expect(config.slotSpacing, SlotSpacing.after);
+        expect(config.wrapAttributes, WrapAttributes.auto);
+        expect(config.attributeSort, AttributeSort.none);
+        expect(config.closingBracketStyle, ClosingBracketStyle.sameLine);
+        expect(config.selfClosingStyle, SelfClosingStyle.preserve);
+        expect(config.htmlBlockSpacing, HtmlBlockSpacing.betweenBlocks);
+        expect(config.echoSpacing, EchoSpacing.spaced);
+        expect(config.trailingNewline, true);
       });
 
       test('allows custom indent size', () {
@@ -60,6 +71,17 @@ void main() {
         expect(config.indentStyle, IndentStyle.spaces);
         expect(config.maxLineLength, 120);
         expect(config.quoteStyle, QuoteStyle.preserve);
+        expect(config.directiveSpacing, DirectiveSpacing.betweenBlocks);
+        expect(config.slotFormatting, SlotFormatting.compact);
+        expect(config.slotNameStyle, SlotNameStyle.colon);
+        expect(config.slotSpacing, SlotSpacing.after);
+        expect(config.wrapAttributes, WrapAttributes.auto);
+        expect(config.attributeSort, AttributeSort.none);
+        expect(config.closingBracketStyle, ClosingBracketStyle.sameLine);
+        expect(config.selfClosingStyle, SelfClosingStyle.preserve);
+        expect(config.htmlBlockSpacing, HtmlBlockSpacing.betweenBlocks);
+        expect(config.echoSpacing, EchoSpacing.spaced);
+        expect(config.trailingNewline, true);
       });
 
       test('compact() creates config with 2-space indentation', () {
@@ -218,6 +240,17 @@ void main() {
           indentStyle: IndentStyle.tabs,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.single,
+          directiveSpacing: DirectiveSpacing.none,
+          slotFormatting: SlotFormatting.block,
+          slotNameStyle: SlotNameStyle.attribute,
+          slotSpacing: SlotSpacing.around,
+          wrapAttributes: WrapAttributes.always,
+          attributeSort: AttributeSort.alphabetical,
+          closingBracketStyle: ClosingBracketStyle.newLine,
+          selfClosingStyle: SelfClosingStyle.always,
+          htmlBlockSpacing: HtmlBlockSpacing.none,
+          echoSpacing: EchoSpacing.compact,
+          trailingNewline: false,
         );
 
         final map = config.toMap();
@@ -226,6 +259,17 @@ void main() {
         expect(map['indent_style'], 'tabs');
         expect(map['max_line_length'], 80);
         expect(map['quote_style'], 'single');
+        expect(map['directive_spacing'], 'none');
+        expect(map['slot_formatting'], 'block');
+        expect(map['slot_name_style'], 'attribute');
+        expect(map['slot_spacing'], 'around');
+        expect(map['wrap_attributes'], 'always');
+        expect(map['attribute_sort'], 'alphabetical');
+        expect(map['closing_bracket_style'], 'new_line');
+        expect(map['self_closing_style'], 'always');
+        expect(map['html_block_spacing'], 'none');
+        expect(map['echo_spacing'], 'compact');
+        expect(map['trailing_newline'], false);
       });
 
       test('serializes spaces indent style', () {
@@ -271,6 +315,17 @@ void main() {
           indentStyle: IndentStyle.tabs,
           maxLineLength: 80,
           quoteStyle: QuoteStyle.single,
+          directiveSpacing: DirectiveSpacing.none,
+          slotFormatting: SlotFormatting.block,
+          slotNameStyle: SlotNameStyle.attribute,
+          slotSpacing: SlotSpacing.around,
+          wrapAttributes: WrapAttributes.always,
+          attributeSort: AttributeSort.alphabetical,
+          closingBracketStyle: ClosingBracketStyle.newLine,
+          selfClosingStyle: SelfClosingStyle.always,
+          htmlBlockSpacing: HtmlBlockSpacing.none,
+          echoSpacing: EchoSpacing.compact,
+          trailingNewline: false,
         );
 
         final map = original.toMap();
@@ -280,6 +335,17 @@ void main() {
         expect(restored.indentStyle, original.indentStyle);
         expect(restored.maxLineLength, original.maxLineLength);
         expect(restored.quoteStyle, original.quoteStyle);
+        expect(restored.directiveSpacing, original.directiveSpacing);
+        expect(restored.slotFormatting, original.slotFormatting);
+        expect(restored.slotNameStyle, original.slotNameStyle);
+        expect(restored.slotSpacing, original.slotSpacing);
+        expect(restored.wrapAttributes, original.wrapAttributes);
+        expect(restored.attributeSort, original.attributeSort);
+        expect(restored.closingBracketStyle, original.closingBracketStyle);
+        expect(restored.selfClosingStyle, original.selfClosingStyle);
+        expect(restored.htmlBlockSpacing, original.htmlBlockSpacing);
+        expect(restored.echoSpacing, original.echoSpacing);
+        expect(restored.trailingNewline, original.trailingNewline);
       });
 
       test('fromMap(toMap()) preserves default values', () {
@@ -292,6 +358,17 @@ void main() {
         expect(restored.indentStyle, original.indentStyle);
         expect(restored.maxLineLength, original.maxLineLength);
         expect(restored.quoteStyle, original.quoteStyle);
+        expect(restored.directiveSpacing, original.directiveSpacing);
+        expect(restored.slotFormatting, original.slotFormatting);
+        expect(restored.slotNameStyle, original.slotNameStyle);
+        expect(restored.slotSpacing, original.slotSpacing);
+        expect(restored.wrapAttributes, original.wrapAttributes);
+        expect(restored.attributeSort, original.attributeSort);
+        expect(restored.closingBracketStyle, original.closingBracketStyle);
+        expect(restored.selfClosingStyle, original.selfClosingStyle);
+        expect(restored.htmlBlockSpacing, original.htmlBlockSpacing);
+        expect(restored.echoSpacing, original.echoSpacing);
+        expect(restored.trailingNewline, original.trailingNewline);
       });
 
       test('fromMap(toMap()) works for compact config', () {
