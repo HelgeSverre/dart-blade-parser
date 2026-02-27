@@ -766,6 +766,91 @@ void main() {
         expect(result, expected);
       });
 
+      test('preserves blank lines with DirectiveSpacing.preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(
+            directiveSpacing: DirectiveSpacing.preserve,
+          ),
+        );
+
+        const input = '''
+@foreach(\$items as \$item)
+    <p>{{ \$item }}</p>
+@endforeach
+
+@while(\$count > 0)
+    <p>Count: {{ \$count }}</p>
+@endwhile
+''';
+        // Should preserve the blank line between directives
+        final result = preserveFormatter.format(input);
+        expect(result, contains('@endforeach\n\n@while'));
+      });
+
+      test('does not insert blank lines with DirectiveSpacing.preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(
+            directiveSpacing: DirectiveSpacing.preserve,
+          ),
+        );
+
+        const input = '''
+@foreach(\$items as \$item)
+    <p>{{ \$item }}</p>
+@endforeach
+@while(\$count > 0)
+    <p>Count: {{ \$count }}</p>
+@endwhile
+''';
+        // Should NOT insert a blank line where there wasn't one
+        final result = preserveFormatter.format(input);
+        expect(result, contains('@endforeach\n@while'));
+      });
+
+      test('preserves blank lines in nested directives with preserve', () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(
+            directiveSpacing: DirectiveSpacing.preserve,
+          ),
+        );
+
+        const input = '''
+<div>
+    @foreach(\$items as \$item)
+        <p>{{ \$item }}</p>
+    @endforeach
+
+    @while(\$count > 0)
+        <p>Count: {{ \$count }}</p>
+    @endwhile
+</div>
+''';
+        final result = preserveFormatter.format(input);
+        expect(result, contains('@endforeach\n\n    @while'));
+      });
+
+      test('does not insert blank lines in nested directives with preserve',
+          () {
+        final preserveFormatter = BladeFormatter(
+          config: const FormatterConfig(
+            directiveSpacing: DirectiveSpacing.preserve,
+          ),
+        );
+
+        const input = '''
+<div>
+    @foreach(\$items as \$item)
+        <p>{{ \$item }}</p>
+    @endforeach
+    @while(\$count > 0)
+        <p>Count: {{ \$count }}</p>
+    @endwhile
+</div>
+''';
+        final result = preserveFormatter.format(input);
+        expect(result, contains('@endforeach\n    @while'));
+      });
+
       test('no blank line between opening directive and its content', () {
         const input = '''
 @if(\$user)

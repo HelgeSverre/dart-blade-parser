@@ -374,6 +374,20 @@ class FormatterVisitor implements AstVisitor<String> {
     }
   }
 
+  /// Checks if the original source has a blank line between two nodes.
+  ///
+  /// Used by preserve-style spacing configs to detect whether the author
+  /// intended a visual break between elements.
+  bool _sourceHasBlankLineBetween(AstNode a, AstNode b) {
+    final source = _source;
+    if (source == null) return false;
+    final start = a.endPosition.offset;
+    final end = b.startPosition.offset;
+    if (start < 0 || end > source.length || start >= end) return false;
+    final gap = source.substring(start, end);
+    return RegExp(r'\n[ \t]*\n').hasMatch(gap);
+  }
+
   /// Returns the category priority for an attribute (for byType sorting).
   /// Lower numbers come first.
   int _getAttributeCategory(String name) {
@@ -705,8 +719,17 @@ class FormatterVisitor implements AstVisitor<String> {
 
         // Add spacing between children if needed
         if (i < node.children.length - 1) {
-          final next = node.children[i + 1];
-          if (_needsSpacingBetween(child, next)) {
+          AstNode? nextMeaningful;
+          for (var j = i + 1; j < node.children.length; j++) {
+            final candidate = node.children[j];
+            if (candidate is! TextNode || candidate.content.trim().isNotEmpty) {
+              nextMeaningful = candidate;
+              break;
+            }
+          }
+
+          if (nextMeaningful != null &&
+              _needsSpacingBetween(child, nextMeaningful)) {
             _output.writeln();
           }
         }
@@ -1729,21 +1752,20 @@ class FormatterVisitor implements AstVisitor<String> {
         return false;
       }
 
-      // Check if we should add spacing between block directives
-      if (config.directiveSpacing == DirectiveSpacing.betweenBlocks) {
-        // Add blank line between two block-level directives
-        // Current directive has just finished (including its @end tag if it has one)
-        // Next directive is about to start
-        final isCurrentBlock = _blockDirectives.contains(current.name);
-        final isNextBlock = _blockDirectives.contains(next.name) ||
-            _inlineDirectives.contains(next.name);
-
-        if (isCurrentBlock && isNextBlock) {
-          return true;
-        }
+      switch (config.directiveSpacing) {
+        case DirectiveSpacing.betweenBlocks:
+          final isCurrentBlock = _blockDirectives.contains(current.name);
+          final isNextBlock = _blockDirectives.contains(next.name) ||
+              _inlineDirectives.contains(next.name);
+          if (isCurrentBlock && isNextBlock) {
+            return true;
+          }
+          return false;
+        case DirectiveSpacing.none:
+          return false;
+        case DirectiveSpacing.preserve:
+          return _sourceHasBlankLineBetween(current, next);
       }
-      // For DirectiveSpacing.none or preserve, don't add spacing
-      return false;
     }
 
     // Add spacing between block directives and non-directives
