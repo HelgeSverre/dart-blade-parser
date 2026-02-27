@@ -636,16 +636,23 @@ class FormatterVisitor implements AstVisitor<String> {
       }
     }
 
-    // Ensure file ends with newline
-    final isEmpty = _output.toString().isEmpty;
-    if (isEmpty) {
-      // If document had children (even if just whitespace), add newline
-      // If document was truly empty, keep output empty
-      if (node.children.isNotEmpty) {
+    if (config.trailingNewline) {
+      // Ensure file ends with newline
+      final isEmpty = _output.toString().isEmpty;
+      if (isEmpty) {
+        if (node.children.isNotEmpty) {
+          _output.writeln();
+        }
+      } else if (!_output.endsWithNewline()) {
         _output.writeln();
       }
-    } else if (!_output.endsWithNewline()) {
-      _output.writeln();
+    } else {
+      // Strip trailing newline if present
+      final str = _output.toString();
+      if (str.endsWith('\n')) {
+        _output.clear();
+        _output.write(str.substring(0, str.length - 1));
+      }
     }
 
     return _output.toString();

@@ -42,6 +42,9 @@ class FormatterConfig {
   /// Controls how empty elements are formatted (self-closing vs explicit close).
   final SelfClosingStyle selfClosingStyle;
 
+  /// Whether to add a trailing newline at the end of formatted output.
+  final bool trailingNewline;
+
   /// Creates a formatter configuration.
   const FormatterConfig({
     this.indentSize = 4,
@@ -56,6 +59,7 @@ class FormatterConfig {
     this.attributeSort = AttributeSort.none,
     this.closingBracketStyle = ClosingBracketStyle.sameLine,
     this.selfClosingStyle = SelfClosingStyle.preserve,
+    this.trailingNewline = true,
   });
 
   /// Creates a default formatter configuration.
@@ -98,6 +102,7 @@ class FormatterConfig {
           ClosingBracketStyle.fromString(map['closing_bracket_style'] as String?),
       selfClosingStyle:
           SelfClosingStyle.fromString(map['self_closing_style'] as String?),
+      trailingNewline: map['trailing_newline'] as bool? ?? true,
     );
   }
 
@@ -116,6 +121,7 @@ class FormatterConfig {
       'attribute_sort': attributeSort.value,
       'closing_bracket_style': closingBracketStyle.value,
       'self_closing_style': selfClosingStyle.value,
+      'trailing_newline': trailingNewline,
     };
   }
 
@@ -133,7 +139,8 @@ class FormatterConfig {
         'wrapAttributes: $wrapAttributes, '
         'attributeSort: $attributeSort, '
         'closingBracketStyle: $closingBracketStyle, '
-        'selfClosingStyle: $selfClosingStyle'
+        'selfClosingStyle: $selfClosingStyle, '
+        'trailingNewline: $trailingNewline'
         ')';
   }
 }
