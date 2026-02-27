@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Trailing newline** (`trailingNewline`): Control whether formatted output ends with a newline (default: `true`)
 
 ### Fixed
+- **`_TrackedBuffer` performance:** Replaced `_output.toString().isEmpty` with `_output.isEmpty` to avoid O(N) buffer materialization on every format call; added `removeLast()` method to avoid tripling memory when stripping trailing newlines (`trailingNewline: false`)
+- **PHP HEREDOC/NOWDOC in PHP blocks:** The lexer now correctly scans past `<<<EOT`/`<<<'EOT'` bodies inside `<?php ?>` blocks, so `?>` inside HEREDOC strings no longer prematurely terminates the PHP block. Supports PHP 7.3+ flexible (indented) heredoc syntax.
 - **Directive expression with space (`@if ($x)`):** The lexer now correctly handles the PSR-12 style space between directive name and opening parenthesis. Previously `@if ($x)` was misparsed — the expression was lost and `$x` became a spurious attribute or text node. Affects both standalone directives and structural directives inside tag heads.
 - **Echo expressions in tag heads now trigger `tagHead`:** Blade echo expressions (`{{ $attributes }}`, `{!! $attributes !!}`) inside component/HTML opening tags now populate `tagHead` to preserve attribute order, preventing the formatter's attribute sorting from reordering echoes relative to other attributes (which could alter CSS precedence or attribute merging behavior).
 - **Blade comments in tag heads preserved:** `{{-- comment --}}` inside HTML/component opening tags are no longer silently dropped. They are stored as `TagHeadComment` items and rendered by the formatter.

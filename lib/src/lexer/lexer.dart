@@ -98,12 +98,93 @@ class BladeLexer {
         inSingleQuote = true;
       } else if (ch == '"') {
         inDoubleQuote = true;
+      } else if (ch == '<' && _peekNext() == '<' && _peekAhead(2) == '<') {
+        // HEREDOC/NOWDOC: <<<LABEL or <<<'LABEL'
+        _advance(); // <
+        _advance(); // <
+        _advance(); // <
+        _skipHeredocBody();
+        continue;
       }
 
       _advance();
     }
 
     return false;
+  }
+
+  /// Skips past a PHP HEREDOC or NOWDOC body.
+  ///
+  /// Assumes the `<<<` prefix has already been consumed. Reads the label
+  /// (optionally quoted for NOWDOC: `<<<'EOT'`) then scans until a line
+  /// starting with the label followed by `;` (optional) and a newline/EOF.
+  void _skipHeredocBody() {
+    // Skip optional whitespace after <<<
+    while (!_isAtEnd() && _peek() == ' ') {
+      _advance();
+    }
+
+    // Detect NOWDOC (single-quoted label)
+    final isNowdoc = !_isAtEnd() && _peek() == "'";
+    if (isNowdoc) _advance(); // opening '
+
+    // Read the label
+    final labelBuf = StringBuffer();
+    while (!_isAtEnd() && _peek() != '\n' && _peek() != "'" && _peek() != ';') {
+      labelBuf.write(_peek());
+      _advance();
+    }
+    final label = labelBuf.toString().trim();
+
+    if (isNowdoc && !_isAtEnd() && _peek() == "'") _advance(); // closing '
+
+    // Advance past the rest of the opening line
+    while (!_isAtEnd() && _peek() != '\n') {
+      _advance();
+    }
+    if (!_isAtEnd()) _advance(); // consume the newline
+
+    if (label.isEmpty) return; // malformed, bail out
+
+    // Scan until we find a line that is: optional-whitespace + label + optional-; + newline/EOF
+    while (!_isAtEnd()) {
+      // Check if current line starts with (optional indentation +) the label
+      final lineStart = _position;
+      // Skip leading whitespace (PHP 7.3+ flexible heredoc)
+      while (!_isAtEnd() && (_peek() == ' ' || _peek() == '\t')) {
+        _advance();
+      }
+      // Check if the label matches at this position
+      bool matches = true;
+      for (var i = 0; i < label.length; i++) {
+        if (_position + i >= input.length || input[_position + i] != label[i]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        // Advance past the label
+        for (var i = 0; i < label.length; i++) {
+          _advance();
+        }
+        // Optional semicolon
+        if (!_isAtEnd() && _peek() == ';') _advance();
+        // Must be followed by newline or EOF
+        if (_isAtEnd() || _peek() == '\n') {
+          if (!_isAtEnd()) _advance(); // consume newline
+          return;
+        }
+        // Not a real end marker, continue scanning
+      }
+      // Skip to next line
+      // Reset to lineStart and scan forward to avoid re-checking
+      _position = lineStart;
+      _column = _column; // approximate — _advance will fix it
+      while (!_isAtEnd() && _peek() != '\n') {
+        _advance();
+      }
+      if (!_isAtEnd()) _advance(); // consume newline
+    }
   }
 
   /// Scans a PHP block: `<?php ... ?>`, `<?= ... ?>`, or `<? ... ?>`.

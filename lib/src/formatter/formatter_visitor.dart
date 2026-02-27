@@ -33,12 +33,26 @@ class _TrackedBuffer {
     }
   }
 
+  int get length => _buffer.length;
+
   bool endsWithNewline() => _lastTwo.endsWith('\n');
   bool endsWithDoubleNewline() => _lastTwo == '\n\n';
 
   void clear() {
     _buffer.clear();
     _lastTwo = '';
+  }
+
+  /// Removes the last character from the buffer.
+  /// Only valid when the buffer is non-empty.
+  void removeLast() {
+    final str = _buffer.toString();
+    _buffer.clear();
+    final trimmed = str.substring(0, str.length - 1);
+    _buffer.write(trimmed);
+    _updateTrailing(trimmed.length >= 2
+        ? trimmed.substring(trimmed.length - 2)
+        : trimmed);
   }
 
   @override
@@ -695,8 +709,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
     if (config.trailingNewline) {
       // Ensure file ends with newline
-      final isEmpty = _output.toString().isEmpty;
-      if (isEmpty) {
+      if (_output.isEmpty) {
         if (node.children.isNotEmpty) {
           _output.writeln();
         }
@@ -705,10 +718,8 @@ class FormatterVisitor implements AstVisitor<String> {
       }
     } else {
       // Strip trailing newline if present
-      final str = _output.toString();
-      if (str.endsWith('\n')) {
-        _output.clear();
-        _output.write(str.substring(0, str.length - 1));
+      if (_output.endsWithNewline()) {
+        _output.removeLast();
       }
     }
 
