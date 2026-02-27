@@ -42,6 +42,9 @@ class FormatterConfig {
   /// Controls how empty elements are formatted (self-closing vs explicit close).
   final SelfClosingStyle selfClosingStyle;
 
+  /// Controls blank lines between block-level HTML element siblings.
+  final HtmlBlockSpacing htmlBlockSpacing;
+
   /// Whether to add a trailing newline at the end of formatted output.
   final bool trailingNewline;
 
@@ -59,6 +62,7 @@ class FormatterConfig {
     this.attributeSort = AttributeSort.none,
     this.closingBracketStyle = ClosingBracketStyle.sameLine,
     this.selfClosingStyle = SelfClosingStyle.preserve,
+    this.htmlBlockSpacing = HtmlBlockSpacing.betweenBlocks,
     this.trailingNewline = true,
   });
 
@@ -102,6 +106,8 @@ class FormatterConfig {
           ClosingBracketStyle.fromString(map['closing_bracket_style'] as String?),
       selfClosingStyle:
           SelfClosingStyle.fromString(map['self_closing_style'] as String?),
+      htmlBlockSpacing:
+          HtmlBlockSpacing.fromString(map['html_block_spacing'] as String?),
       trailingNewline: map['trailing_newline'] as bool? ?? true,
     );
   }
@@ -121,6 +127,7 @@ class FormatterConfig {
       'attribute_sort': attributeSort.value,
       'closing_bracket_style': closingBracketStyle.value,
       'self_closing_style': selfClosingStyle.value,
+      'html_block_spacing': htmlBlockSpacing.value,
       'trailing_newline': trailingNewline,
     };
   }
@@ -140,6 +147,7 @@ class FormatterConfig {
         'attributeSort: $attributeSort, '
         'closingBracketStyle: $closingBracketStyle, '
         'selfClosingStyle: $selfClosingStyle, '
+        'htmlBlockSpacing: $htmlBlockSpacing, '
         'trailingNewline: $trailingNewline'
         ')';
   }
@@ -484,5 +492,26 @@ enum SelfClosingStyle {
         'always' => always,
         'never' => never,
         _ => preserve,
+      };
+}
+
+/// Controls blank lines between block-level HTML element siblings.
+enum HtmlBlockSpacing {
+  /// Add blank line between block-level HTML siblings (e.g., consecutive divs).
+  betweenBlocks('between_blocks'),
+
+  /// No blank lines between HTML block elements.
+  none('none'),
+
+  /// Preserve blank lines as written in the source.
+  preserve('preserve');
+
+  final String value;
+  const HtmlBlockSpacing(this.value);
+
+  static HtmlBlockSpacing fromString(String? s) => switch (s) {
+        'none' => none,
+        'preserve' => preserve,
+        _ => betweenBlocks,
       };
 }

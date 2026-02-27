@@ -1735,8 +1735,18 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Add spacing between block-level HTML elements
     if (current is HtmlElementNode && next is HtmlElementNode) {
-      return _blockElements.contains(current.tagName.toLowerCase()) &&
+      final bothBlock = _blockElements.contains(current.tagName.toLowerCase()) &&
           _blockElements.contains(next.tagName.toLowerCase());
+      if (!bothBlock) return false;
+
+      switch (config.htmlBlockSpacing) {
+        case HtmlBlockSpacing.betweenBlocks:
+          return true;
+        case HtmlBlockSpacing.none:
+          return false;
+        case HtmlBlockSpacing.preserve:
+          return _sourceHasBlankLineBetween(current, next);
+      }
     }
 
     // Add spacing between components
