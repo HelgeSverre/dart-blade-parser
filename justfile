@@ -6,10 +6,10 @@ default:
 
 # Testing
 
-# Run all tests
+# Run all tests (optionally filter by tag, e.g. just test livewire)
 [group('testing')]
-test:
-    dart test
+test tags="":
+    dart test {{ if tags != "" { "--tags " + tags } else { "" } }}
 
 # Run tests excluding slow tests (CLI, benchmarks)
 [group('testing')]
