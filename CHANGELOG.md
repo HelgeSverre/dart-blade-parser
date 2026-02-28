@@ -5,6 +5,12 @@ All notable changes to the Blade Parser project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Package component `::` namespace test fixtures:** Exhaustive fixture (`04-package-components-exhaustive.blade.php`) covering 32 unique `::` component variations — self-closing, dotted, deeply dotted, with standard/bound/Alpine/Livewire/mixed attributes, `@class()`, `@style()`, default and named slots, deep nesting, echo expressions, and components inside Blade directives. Verifies Issue #3 fix across all plausible real-world patterns.
+- **Issue #3 regression tests:** 8 Dart formatter tests and 5 Prettier plugin tests ensuring `<x-filament::button />` is never formatted as `<x-filament : :button />`.
+
 ## [1.3.0] - 2026-02-27
 
 ### Removed
