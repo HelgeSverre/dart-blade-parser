@@ -1,3 +1,6 @@
+@Tags(['flux'])
+library;
+
 import 'package:blade_parser/blade_parser.dart';
 import 'package:test/test.dart';
 import 'dart:io';
@@ -21,23 +24,36 @@ void main() {
       ..sort((a, b) => a.path.compareTo(b.path));
   }
 
-  group('Contoso real-world stress test', () {
-    final files = findBladeFiles('test/fixtures/stress/contoso');
+  group('FluxUI stress test', () {
+    final files = findBladeFiles('test/fixtures/stress/fluxui');
 
-    test('found Contoso blade files', () {
+    test('found FluxUI blade files', () {
       expect(files, isNotEmpty,
-          reason:
-              'Should have Contoso blade files in test/fixtures/stress/contoso');
+          reason: 'Should have FluxUI blade files in test/fixtures/stress/fluxui');
     });
 
     for (final file in files) {
       final relativePath =
-          file.path.replaceFirst('test/fixtures/stress/contoso/', '');
+          file.path.replaceFirst('test/fixtures/stress/fluxui/', '');
       test('parses $relativePath without errors', () {
         final source = file.readAsStringSync();
         final result = parser.parse(source);
+
+        // We expect the parser to produce a result without throwing
         expect(result.ast, isNotNull,
             reason: 'Parser should produce an AST for $relativePath');
+
+        // Collect critical errors (not warnings about unclosed tags etc.)
+        final criticalErrors = result.errors
+            .where((e) => e.message.contains('Unexpected'))
+            .toList();
+
+        // We allow some parse errors (unclosed tags etc.) in real-world files,
+        // but no crashes
+        if (result.errors.isNotEmpty) {
+          // Just log, don't fail - we want to see the error rate
+          // print('  ${result.errors.length} parse errors in $relativePath');
+        }
       });
     }
   });

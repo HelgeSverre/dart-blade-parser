@@ -11,3 +11,11 @@ tags:
     description: >-
       Regression and bugfix tests that guard against previously fixed issues.
       Run with: dart test --tags regression
+  flux:
+    description: >-
+      Tests using FluxUI fixture files (parsing and idempotency).
+      Run with: dart test --tags flux
+  filament:
+    description: >-
+      Tests using Filament v2/v3/v4 fixture files (parsing and idempotency).
+      Run with: dart test --tags filament
