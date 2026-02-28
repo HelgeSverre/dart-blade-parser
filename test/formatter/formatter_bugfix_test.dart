@@ -261,6 +261,77 @@ indent_size = 2
     });
   });
 
+  group('Issue #3: Package component namespace (::) formatting', () {
+    late BladeFormatter formatter;
+
+    setUp(() {
+      formatter = BladeFormatter();
+    });
+
+    test('preserves :: namespace in self-closing component', () {
+      const input = '<x-filament::button />';
+      final output = formatter.format(input);
+      expect(output, contains('<x-filament::button />'));
+      expect(output, isNot(contains('<x-filament : :button')));
+      expect(output, isNot(contains('<x-filament ::')));
+    });
+
+    test('preserves :: namespace in component with children', () {
+      const input =
+          '<x-filament::button type="submit">Click me</x-filament::button>';
+      final output = formatter.format(input);
+      expect(output, contains('<x-filament::button'));
+      expect(output, contains('</x-filament::button>'));
+      expect(output, isNot(contains('<x-filament : :button')));
+    });
+
+    test('preserves :: namespace in component with attributes', () {
+      const input = '<x-filament::button type="submit" class="w-full" />';
+      final output = formatter.format(input);
+      expect(output, contains('<x-filament::button'));
+      expect(output, isNot(contains('<x-filament : :button')));
+    });
+
+    test('preserves :: namespace in nested components', () {
+      const input =
+          '<x-filament::widget><x-filament::stats :columns="3" /></x-filament::widget>';
+      final output = formatter.format(input);
+      expect(output, contains('<x-filament::widget>'));
+      expect(output, contains('<x-filament::stats'));
+      expect(output, contains('</x-filament::widget>'));
+    });
+
+    test('self-closing :: component is idempotent', () {
+      const input = '<x-filament::button />\n';
+      final pass1 = formatter.format(input);
+      final pass2 = formatter.format(pass1);
+      expect(pass2, equals(pass1));
+    });
+
+    test(':: component with children is idempotent', () {
+      const input =
+          '<x-filament::button type="submit">Click</x-filament::button>';
+      final pass1 = formatter.format(input);
+      final pass2 = formatter.format(pass1);
+      expect(pass2, equals(pass1));
+    });
+
+    test('nightshade::calendar self-closing', () {
+      const input = '<x-nightshade::calendar />';
+      final output = formatter.format(input);
+      expect(output, contains('<x-nightshade::calendar />'));
+      expect(output, isNot(contains('<x-nightshade : :calendar')));
+    });
+
+    test('mail::button with url attribute', () {
+      const input = '<x-mail::button url="https://example.com">Click</x-mail::button>';
+      final output = formatter.format(input);
+      expect(output, contains('<x-mail::button'));
+      expect(output, contains('</x-mail::button>'));
+      expect(output, isNot(contains('<x-mail : :button')));
+    });
+  });
+
   group('Custom block directives (@foo...@endfoo)', () {
     late BladeFormatter formatter;
 
