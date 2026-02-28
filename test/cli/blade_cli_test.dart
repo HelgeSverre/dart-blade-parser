@@ -1,5 +1,8 @@
 // ignore_for_file: avoid_print
 
+@Tags(['slow'])
+library;
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as path;

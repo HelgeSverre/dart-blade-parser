@@ -1,3 +1,6 @@
+@Tags(['slow'])
+library;
+
 import 'package:test/test.dart';
 import 'package:blade_parser/blade_parser.dart';
 

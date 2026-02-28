@@ -1,3 +1,6 @@
+@Tags(['regression'])
+library;
+
 import 'package:blade_parser/blade_parser.dart';
 import 'package:test/test.dart';
 

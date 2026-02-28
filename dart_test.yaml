@@ -1,0 +1,13 @@
+tags:
+  slow:
+    description: >-
+      Tests that are slow to run (CLI subprocess tests, performance benchmarks).
+      Exclude with: dart test --exclude-tags slow
+  livewire:
+    description: >-
+      Livewire-specific tests (wire: attributes, @livewire directives, <livewire:> tags).
+      Run with: dart test --tags livewire
+  regression:
+    description: >-
+      Regression and bugfix tests that guard against previously fixed issues.
+      Run with: dart test --tags regression

@@ -11,6 +11,16 @@ default:
 test:
     dart test
 
+# Run tests excluding slow tests (CLI, benchmarks)
+[group('testing')]
+test-fast:
+    dart test --exclude-tags slow
+
+# List all test tags used in the project
+[group('testing')]
+test-tags:
+    @grep -rn '@Tags(' test/ --include='*_test.dart' | sed 's/.*@Tags(\[\(.*\)\]).*/\1/' | tr -d "'" | tr ',' '\n' | sort -u | while read tag; do echo "\n[$tag]"; grep -rn "@Tags.*$tag" test/ --include='*_test.dart' | sed 's|^\([^:]*\):.*|\1|'; done
+
 # Run specific test file
 [group('testing')]
 test-file FILE:
