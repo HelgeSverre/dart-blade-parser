@@ -50,9 +50,8 @@ class _TrackedBuffer {
     _buffer.clear();
     final trimmed = str.substring(0, str.length - 1);
     _buffer.write(trimmed);
-    _updateTrailing(trimmed.length >= 2
-        ? trimmed.substring(trimmed.length - 2)
-        : trimmed);
+    _updateTrailing(
+        trimmed.length >= 2 ? trimmed.substring(trimmed.length - 2) : trimmed);
   }
 
   @override
@@ -1029,7 +1028,8 @@ class FormatterVisitor implements AstVisitor<String> {
 
       if (isVoid) {
         final closingBracket = voidSelfClose ? ' />' : '>';
-        _writeAttributes(attributes, wrap: shouldWrap, closingBracket: closingBracket);
+        _writeAttributes(attributes,
+            wrap: shouldWrap, closingBracket: closingBracket);
         _output.writeln();
         return '';
       }

@@ -168,8 +168,7 @@ class BladeFormatter {
       if (formattedContent.isNotEmpty) {
         final pos = formatted.indexOf(formattedContent);
         if (pos >= 0) {
-          final newOffset =
-              (pos + relativeOffset).clamp(0, formatted.length);
+          final newOffset = (pos + relativeOffset).clamp(0, formatted.length);
           return FormatResult(
             formatted: formatted,
             wasChanged: source != formatted,

@@ -228,8 +228,7 @@ class BladeParser {
         return _parseInlineDirective();
       // Blaze - paired block directive
       case TokenType.directiveUnblaze:
-        return _parseGenericDirective(
-            'unblaze', TokenType.directiveEndunblaze);
+        return _parseGenericDirective('unblaze', TokenType.directiveEndunblaze);
 
       // Other directives (inline, no closing tag)
       case TokenType.directiveExtends:

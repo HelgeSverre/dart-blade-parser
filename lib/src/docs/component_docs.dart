@@ -100,17 +100,21 @@ class ComponentDocGenerator {
       if (entry.key != null) {
         // 'name' => defaultValue — optional prop
         final defaultStr = _valueToString(entry.value);
-        props.add(PropInfo(
-          name: entry.key!,
-          defaultValue: defaultStr,
-          type: _inferTypeFromValue(entry.value),
-        ),);
+        props.add(
+          PropInfo(
+            name: entry.key!,
+            defaultValue: defaultStr,
+            type: _inferTypeFromValue(entry.value),
+          ),
+        );
       } else if (entry.value is PhpString) {
         // Standalone 'name' — required prop
-        props.add(PropInfo(
-          name: (entry.value as PhpString).value,
-          required: true,
-        ),);
+        props.add(
+          PropInfo(
+            name: (entry.value as PhpString).value,
+            required: true,
+          ),
+        );
       }
     }
 
@@ -150,7 +154,8 @@ class ComponentDocGenerator {
     buffer.writeln('# Component Reference');
     buffer.writeln();
     buffer.writeln(
-        'This document provides a reference for all Blade components.',);
+      'This document provides a reference for all Blade components.',
+    );
     buffer.writeln();
 
     // Table of contents

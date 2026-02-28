@@ -47,10 +47,12 @@ class EditorConfig {
       if (line.startsWith('[') && line.endsWith(']')) {
         // Save previous section
         if (currentPattern != null) {
-          sections.add(EditorConfigSection(
-            pattern: currentPattern,
-            properties: Map.from(currentProperties),
-          ),);
+          sections.add(
+            EditorConfigSection(
+              pattern: currentPattern,
+              properties: Map.from(currentProperties),
+            ),
+          );
         }
         currentPattern = line.substring(1, line.length - 1);
         currentProperties = {};
@@ -68,10 +70,12 @@ class EditorConfig {
 
     // Save last section
     if (currentPattern != null) {
-      sections.add(EditorConfigSection(
-        pattern: currentPattern,
-        properties: Map.from(currentProperties),
-      ),);
+      sections.add(
+        EditorConfigSection(
+          pattern: currentPattern,
+          properties: Map.from(currentProperties),
+        ),
+      );
     }
 
     return EditorConfig(sections: sections, isRoot: isRoot);
@@ -227,9 +231,7 @@ class EditorConfigSection {
       return pattern == fileName;
     }
 
-    final regexPattern = pattern
-        .replaceAll('.', r'\.')
-        .replaceAll('*', '.*');
+    final regexPattern = pattern.replaceAll('.', r'\.').replaceAll('*', '.*');
     return RegExp('^$regexPattern\$').hasMatch(fileName);
   }
 }

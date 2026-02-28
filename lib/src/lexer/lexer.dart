@@ -404,9 +404,7 @@ class BladeLexer {
       if (ch == '<' && _peekNext() == '?') {
         final afterQ = _peekAhead(2);
         // <?xml is NOT a PHP tag — let it fall through as text
-        if (!(afterQ == 'x' &&
-            _peekAhead(3) == 'm' &&
-            _peekAhead(4) == 'l')) {
+        if (!(afterQ == 'x' && _peekAhead(3) == 'm' && _peekAhead(4) == 'l')) {
           if (buffer.isNotEmpty) {
             _emitToken(TokenType.text, buffer.toString());
           }
@@ -1246,7 +1244,9 @@ class BladeLexer {
     _skipWhitespace();
 
     // Parse attributes (including Blade echo expressions like {{ $attributes }})
-    while (!_isAtEnd() && _peek() != '>' && !(_peek() == '/' && _peekNext() == '>')) {
+    while (!_isAtEnd() &&
+        _peek() != '>' &&
+        !(_peek() == '/' && _peekNext() == '>')) {
       // PHP block inside component tag head: <?php ... ?> or <?= ... ?>
       if (_peek() == '<' && _peekNext() == '?') {
         _lexPhpBlockInTag();
@@ -1319,7 +1319,9 @@ class BladeLexer {
     _skipWhitespace();
 
     // Lex attributes (including Blade echo expressions like {{ $attributes }})
-    while (!_isAtEnd() && _peek() != '>' && !(_peek() == '/' && _peekNext() == '>')) {
+    while (!_isAtEnd() &&
+        _peek() != '>' &&
+        !(_peek() == '/' && _peekNext() == '>')) {
       // PHP block inside tag head: <?php ... ?> or <?= ... ?>
       if (_peek() == '<' && _peekNext() == '?') {
         _lexPhpBlockInTag();
@@ -1777,8 +1779,10 @@ class BladeLexer {
             _advance(); // -
             _advance(); // -
             while (!_isAtEnd()) {
-              if (_peek() == '-' && _peekNext() == '-' &&
-                  _peekAhead(2) == '}' && _peekAhead(3) == '}') {
+              if (_peek() == '-' &&
+                  _peekNext() == '-' &&
+                  _peekAhead(2) == '}' &&
+                  _peekAhead(3) == '}') {
                 _advance(); // -
                 _advance(); // -
                 _advance(); // }
@@ -1828,15 +1832,15 @@ class BladeLexer {
               _advance();
             }
           }
-        } else if (_peek() == '{' && _peekNext() == '!' &&
+        } else if (_peek() == '{' &&
+            _peekNext() == '!' &&
             _peekAhead(2) == '!') {
           // Raw echo {!! ... !!}: scan to !!}
           _advance(); // {
           _advance(); // !
           _advance(); // !
           while (!_isAtEnd()) {
-            if (_peek() == '!' && _peekNext() == '!' &&
-                _peekAhead(2) == '}') {
+            if (_peek() == '!' && _peekNext() == '!' && _peekAhead(2) == '}') {
               _advance(); // !
               _advance(); // !
               _advance(); // }
