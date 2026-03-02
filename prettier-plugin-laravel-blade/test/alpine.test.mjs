@@ -100,4 +100,66 @@ describe("Alpine.js attribute formatting", () => {
     // The Dart formatter preserves attribute values as-is, so {open:false} stays
     assert.ok(result.includes("{open:false}"));
   });
+
+  // --- Edge cases ---
+
+  it("handles Alpine attributes mixed with Blade conditionals", async () => {
+    const input = `<div
+    @if($isCompleted)
+    x-cloak
+    x-show="! showFilters"
+    @endif
+></div>`;
+    const result = await format(input);
+    const second = await format(result);
+    assert.equal(result, second);
+  });
+
+  it("formats x-data with many properties and narrow printWidth", async () => {
+    const input = '<div x-data="{ expanded: false, activeTrack: null, filters: [], currentPage: 1 }"></div>';
+    const result = await format(input, { printWidth: 80 });
+    const second = await format(result, { printWidth: 80 });
+    assert.equal(result, second);
+    // Should have spaces and proper formatting
+    assert.ok(result.includes("expanded"));
+    assert.ok(result.includes("activeTrack"));
+  });
+
+  it("formats x-data with function values", async () => {
+    const input = '<div x-data="{ toggle() { this.open = !this.open } }"></div>';
+    const result = await format(input);
+    const second = await format(result);
+    assert.equal(result, second);
+  });
+
+  it("formats multiple Alpine attributes on same element", async () => {
+    const input = '<div x-data="{ open: false }" x-show="open" @click="open = !open"></div>';
+    const result = await format(input);
+    const second = await format(result);
+    assert.equal(result, second);
+    assert.ok(result.includes("x-data="));
+    assert.ok(result.includes("x-show="));
+  });
+
+  it("does not crash on boolean Alpine attributes", async () => {
+    const input = '<div x-data="{ open: true }" x-show="open" x-transition x-cloak></div>';
+    const result = await format(input);
+    assert.ok(result.includes("x-transition"));
+    assert.ok(result.includes("x-cloak"));
+  });
+
+  it("formats Alpine event with modifiers", async () => {
+    const input = '<form @submit.prevent="save()"></form>';
+    const result = await format(input);
+    assert.ok(result.includes("save()"));
+    const second = await format(result);
+    assert.equal(result, second);
+  });
+
+  it("formats :class with ternary expression", async () => {
+    const input = '<div :class="isActive ? \'bg-blue-500\' : \'bg-gray-500\'"></div>';
+    const result = await format(input);
+    const second = await format(result);
+    assert.equal(result, second);
+  });
 });
