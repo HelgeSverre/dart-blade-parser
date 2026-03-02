@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { formatAlpineValue, isAlpineAttribute } from "./alpine.mjs";
+import { formatAlpineValue, isAlpineAttribute, BLADE_DIRECTIVES } from "./alpine.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -36,8 +36,12 @@ export const languages = [
   },
 ];
 
-const ALPINE_ATTR_RE =
-  /((?:x-(?:data|show|bind|text|html|model|modelable|if|id|init|on|effect)|:[\w][\w.-]*|@(?!if\b|else|foreach|forelse|for\b|while|switch|case|break|default|unless|isset|empty|auth|guest|can|cannot|canany|env|production|php|include|each|once|push|prepend|stack|props|inject|section|yield|extends|component|slot|class|style|checked|selected|disabled|readonly|required|error|csrf|method|dd|dump|vite|livewire|persist|teleport|session|use|end)[\w][\w.-]*))=(["'])([\s\S]*?)\2/g;
+// Built from the shared BLADE_DIRECTIVES list so the exclusion stays in sync with alpine.mjs.
+const bladeNeg = BLADE_DIRECTIVES.map((d) => `${d}\\b`).join("|");
+const ALPINE_ATTR_RE = new RegExp(
+  `((?:x-(?:data|show|bind|text|html|model|modelable|if|id|init|on|effect)|:[\\w][\\w.-]*|@(?!${bladeNeg})[\\w][\\w.-]*))=([\"'])([\\s\\S]*?)\\2`,
+  "g",
+);
 
 async function formatAlpineAttributes(text, options) {
   const matches = [...text.matchAll(ALPINE_ATTR_RE)];

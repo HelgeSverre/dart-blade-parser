@@ -1,5 +1,29 @@
 import prettier from "prettier";
 
+// Blade directives that use @ prefix — must not be treated as Alpine event handlers.
+// Shared between detection regex and the attribute-scanning regex in index.mjs.
+export const BLADE_DIRECTIVES = [
+  "if", "else", "elseif", "unless", "isset", "empty",
+  "auth", "guest", "can", "cannot", "canany", "env", "production",
+  "hasSection", "sectionMissing",
+  "switch", "case", "break", "default",
+  "for", "foreach", "forelse", "while", "continue",
+  "php", "include", "includeIf", "includeWhen", "includeUnless", "includeFirst",
+  "each", "once",
+  "push", "pushOnce", "pushIf", "prepend", "prependOnce", "stack",
+  "props", "aware", "inject",
+  "fragment", "endfragment", "verbatim", "endverbatim",
+  "section", "yield", "extends", "parent",
+  "component", "endcomponent", "slot", "endslot",
+  "class", "style", "checked", "selected", "disabled", "readonly", "required",
+  "error", "csrf", "method", "dd", "dump", "vite",
+  "livewire", "livewireStyles", "livewireScripts",
+  "persist", "teleport", "endteleport", "session", "use",
+  "end",
+];
+
+const bladeNeg = BLADE_DIRECTIVES.map((d) => `${d}\\b`).join("|");
+
 // Expression attributes: value is a JS expression (object, boolean, etc.)
 // These need the arrow-function wrapping trick to become valid JS programs.
 const EXPRESSION_ATTR =
@@ -7,8 +31,9 @@ const EXPRESSION_ATTR =
 
 // Statement attributes: value is JS code (function calls, assignments)
 // These can be formatted directly as JS statements.
-const STATEMENT_ATTR =
-  /^(?:x-(?:init|on|effect)|@(?!if\b|else\b|elseif\b|unless\b|isset\b|empty\b|auth\b|guest\b|can\b|cannot\b|canany\b|env\b|production\b|hasSection\b|sectionMissing\b|switch\b|case\b|break\b|default\b|for\b|foreach\b|forelse\b|while\b|continue\b|php\b|include\b|includeIf\b|includeWhen\b|includeUnless\b|includeFirst\b|each\b|once\b|push\b|pushOnce\b|pushIf\b|prepend\b|prependOnce\b|stack\b|props\b|aware\b|inject\b|fragment\b|endfragment\b|verbatim\b|endverbatim\b|section\b|yield\b|extends\b|parent\b|component\b|endcomponent\b|slot\b|endslot\b|class\b|style\b|checked\b|selected\b|disabled\b|readonly\b|required\b|error\b|csrf\b|method\b|dd\b|dump\b|vite\b|livewire\b|livewireStyles\b|livewireScripts\b|persist\b|teleport\b|endteleport\b|session\b|use\b|end)[\w][\w.-]*)$/;
+const STATEMENT_ATTR = new RegExp(
+  `^(?:x-(?:init|on|effect)|@(?!${bladeNeg})[\\w][\\w.-]*)$`,
+);
 
 /**
  * Check if an attribute name is an Alpine.js directive.

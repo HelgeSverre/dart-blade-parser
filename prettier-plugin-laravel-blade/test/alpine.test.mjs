@@ -162,4 +162,12 @@ describe("Alpine.js attribute formatting", () => {
     const second = await format(result);
     assert.equal(result, second);
   });
+
+  it("formats @cancel event (not confused with Blade @can)", async () => {
+    const input = '<dialog @cancel="handleCancel()"></dialog>';
+    const result = await format(input);
+    assert.ok(result.includes("handleCancel()"));
+    const second = await format(result);
+    assert.equal(result, second);
+  });
 });
