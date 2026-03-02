@@ -1,6 +1,7 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { formatAlpineValue, isAlpineAttribute } from "./alpine.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -35,10 +36,49 @@ export const languages = [
   },
 ];
 
+const ALPINE_ATTR_RE =
+  /((?:x-(?:data|show|bind|text|html|model|modelable|if|id|init|on|effect)|:[\w][\w.-]*|@(?!if\b|else|foreach|forelse|for\b|while|switch|case|break|default|unless|isset|empty|auth|guest|can|cannot|canany|env|production|php|include|each|once|push|prepend|stack|props|inject|section|yield|extends|component|slot|class|style|checked|selected|disabled|readonly|required|error|csrf|method|dd|dump|vite|livewire|persist|teleport|session|use|end)[\w][\w.-]*))=(["'])([\s\S]*?)\2/g;
+
+async function formatAlpineAttributes(text, options) {
+  const matches = [...text.matchAll(ALPINE_ATTR_RE)];
+  if (matches.length === 0) return text;
+
+  // Process replacements from end to start to preserve positions
+  let result = text;
+  for (const match of matches.reverse()) {
+    const [fullMatch, attrName, quote, value] = match;
+    const offset = match.index;
+
+    if (!isAlpineAttribute(attrName)) continue;
+
+    // Calculate indent level from the line this attribute is on
+    const lineStart = result.lastIndexOf("\n", offset) + 1;
+    const lineText = result.slice(lineStart, offset);
+    const leadingSpaces = lineText.match(/^(\s*)/)?.[1] ?? "";
+    const indentLevel = options.useTabs
+      ? leadingSpaces.split("\t").length - 1
+      : Math.floor(leadingSpaces.length / options.tabWidth);
+
+    const formatted = await formatAlpineValue(
+      attrName, value, options, indentLevel + 1
+    );
+
+    if (formatted !== value) {
+      const replacement = `${attrName}=${quote}${formatted}${quote}`;
+      result =
+        result.slice(0, offset) +
+        replacement +
+        result.slice(offset + fullMatch.length);
+    }
+  }
+
+  return result;
+}
+
 /** @type {Record<string, import("prettier").Parser>} */
 export const parsers = {
   blade: {
-    preprocess(text, options) {
+    async preprocess(text, options) {
       const formatOpts = {
         tabWidth: options.tabWidth,
         useTabs: options.useTabs,
@@ -80,7 +120,14 @@ export const parsers = {
         options.__bladeCursorOffset = result.cursorOffset;
       }
 
-      return result.formatted;
+      let formatted = result.formatted;
+
+      // Post-process: format Alpine.js attribute values
+      if (options.bladeFormatAlpine !== false) {
+        formatted = await formatAlpineAttributes(formatted, options);
+      }
+
+      return formatted;
     },
 
     parse(text) {
@@ -266,6 +313,12 @@ export const options = {
     category: "Blade",
     default: true,
     description: "Add a trailing newline at the end of formatted output.",
+  },
+  bladeFormatAlpine: {
+    type: "boolean",
+    category: "Blade",
+    default: true,
+    description: "Format JavaScript expressions inside Alpine.js attribute values.",
   },
 };
 
