@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Package component `::` namespace test fixtures:** Exhaustive fixture (`04-package-components-exhaustive.blade.php`) covering 32 unique `::` component variations — self-closing, dotted, deeply dotted, with standard/bound/Alpine/Livewire/mixed attributes, `@class()`, `@style()`, default and named slots, deep nesting, echo expressions, and components inside Blade directives. Verifies Issue #3 fix across all plausible real-world patterns.
 - **Issue #3 regression tests:** 8 Dart formatter tests and 5 Prettier plugin tests ensuring `<x-filament::button />` is never formatted as `<x-filament : :button />`.
+- **Alpine.js attribute formatting (Prettier plugin):** Post-processing that formats JavaScript expressions inside Alpine.js attribute values (`x-data`, `@click`, `:class`, etc.) using Prettier's TypeScript parser. New `bladeFormatAlpine` option (default: `true`).
+- **Editor setup documentation:** Comprehensive documentation for setting up `prettier-plugin-laravel-blade` in 9 editors (VS Code, Cursor, Windsurf, PHPStorm, Neovim, Vim, Zed, Emacs, Nova, Lapce).
+- **Directive parenthesis spacing:** New `directiveParenthesisSpacing` config option — `spaced` (`@if ($var)`), `compact` (`@if($var)`), or `preserve` (default).
+
+### Fixed
+- **Issue #11 - Anonymous component default slot:** Components with anonymous default slot content now render without `<x-slot:default>` tags.
+- **Issue #10 - Empty HTML element self-closing:** Empty non-void HTML elements (`<span>`, `<div>`) no longer self-close when using `selfClosingStyle:always` (preserves HTML5 validity).
+- **Issue #9 - Directive parenthesis spacing:** New config option to control space between directive and parenthesis.
 
 ## [1.3.0] - 2026-02-27
 
