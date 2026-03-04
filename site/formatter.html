@@ -597,6 +597,14 @@
               </select>
             </div>
             <div class="settings-row">
+              <label>Directive parenthesis spacing</label
+              ><select id="opt-directiveParenthesisSpacing">
+                <option value="preserve">preserve</option>
+                <option value="spaced">spaced</option>
+                <option value="compact">compact</option>
+              </select>
+            </div>
+            <div class="settings-row">
               <label>Slot formatting</label
               ><select id="opt-slotFormatting">
                 <option value="compact">compact</option>
@@ -886,6 +894,9 @@
           quoteStyle: document.getElementById("opt-quoteStyle").value,
           directiveSpacing: document.getElementById("opt-directiveSpacing")
             .value,
+          directiveParenthesisSpacing: document.getElementById(
+            "opt-directiveParenthesisSpacing",
+          ).value,
           slotFormatting: document.getElementById("opt-slotFormatting").value,
           slotNameStyle: document.getElementById("opt-slotNameStyle").value,
           slotSpacing: document.getElementById("opt-slotSpacing").value,

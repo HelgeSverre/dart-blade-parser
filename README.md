@@ -377,6 +377,10 @@ final formatter = BladeFormatter(config: config);
   - `DirectiveSpacing.betweenBlocks`: Add blank line between closing and opening directives (default)
   - `DirectiveSpacing.none`: No blank lines between directives (compact)
   - `DirectiveSpacing.preserve`: Preserve blank lines as written
+- `directiveParenthesisSpacing`: Control space between directive names and parentheses
+  - `DirectiveParenthesisSpacing.spaced`: Add space (`@if ($var)`)
+  - `DirectiveParenthesisSpacing.compact`: No space (`@if($var)`)
+  - `DirectiveParenthesisSpacing.preserve`: Keep original spacing (default)
 - `slotFormatting`: Control formatting style for component slots
   - `SlotFormatting.compact`: Smart detection - compact for simple slots (default)
   - `SlotFormatting.block`: Always use block formatting with extra blank lines
