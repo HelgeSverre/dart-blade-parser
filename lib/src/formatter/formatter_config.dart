@@ -21,6 +21,10 @@ class FormatterConfig {
   /// Controls spacing between Blade directives.
   final DirectiveSpacing directiveSpacing;
 
+  /// Controls spacing between directive names and parentheses.
+  /// Example: `@if ($var)` vs `@if($var)`
+  final DirectiveParenthesisSpacing directiveParenthesisSpacing;
+
   /// Controls formatting style for component slots.
   final SlotFormatting slotFormatting;
 
@@ -58,6 +62,7 @@ class FormatterConfig {
     this.maxLineLength = 120,
     this.quoteStyle = QuoteStyle.preserve,
     this.directiveSpacing = DirectiveSpacing.betweenBlocks,
+    this.directiveParenthesisSpacing = DirectiveParenthesisSpacing.preserve,
     this.slotFormatting = SlotFormatting.compact,
     this.slotNameStyle = SlotNameStyle.colon,
     this.slotSpacing = SlotSpacing.after,
@@ -97,6 +102,8 @@ class FormatterConfig {
       quoteStyle: QuoteStyle.fromString(map['quote_style'] as String?),
       directiveSpacing:
           DirectiveSpacing.fromString(map['directive_spacing'] as String?),
+      directiveParenthesisSpacing: DirectiveParenthesisSpacing.fromString(
+          map['directive_parenthesis_spacing'] as String?),
       slotFormatting:
           SlotFormatting.fromString(map['slot_formatting'] as String?),
       slotNameStyle:
@@ -124,6 +131,7 @@ class FormatterConfig {
       'max_line_length': maxLineLength,
       'quote_style': quoteStyle.value,
       'directive_spacing': directiveSpacing.value,
+      'directive_parenthesis_spacing': directiveParenthesisSpacing.value,
       'slot_formatting': slotFormatting.value,
       'slot_name_style': slotNameStyle.value,
       'slot_spacing': slotSpacing.value,
@@ -145,6 +153,7 @@ class FormatterConfig {
         'maxLineLength: $maxLineLength, '
         'quoteStyle: $quoteStyle, '
         'directiveSpacing: $directiveSpacing, '
+        'directiveParenthesisSpacing: $directiveParenthesisSpacing, '
         'slotFormatting: $slotFormatting, '
         'slotNameStyle: $slotNameStyle, '
         'slotSpacing: $slotSpacing, '
@@ -540,5 +549,27 @@ enum EchoSpacing {
         'compact' => compact,
         'preserve' => preserve,
         _ => spaced,
+      };
+}
+
+/// Controls spacing between directive names and their parentheses.
+/// Example: `@if ($var)` vs `@if($var)`
+enum DirectiveParenthesisSpacing {
+  /// Add space between directive and parenthesis: `@if ($var)`
+  spaced('spaced'),
+
+  /// No space between directive and parenthesis: `@if($var)`
+  compact('compact'),
+
+  /// Preserve original spacing from source.
+  preserve('preserve');
+
+  final String value;
+  const DirectiveParenthesisSpacing(this.value);
+
+  static DirectiveParenthesisSpacing fromString(String? s) => switch (s) {
+        'spaced' => spaced,
+        'compact' => compact,
+        _ => preserve,
       };
 }

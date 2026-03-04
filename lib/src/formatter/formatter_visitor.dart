@@ -184,6 +184,22 @@ class FormatterVisitor implements AstVisitor<String> {
     'default',
   };
 
+  /// Control structure directives that can have parentheses.
+  static const Set<String> _controlStructureDirectives = {
+    'if',
+    'elseif',
+    'unless',
+    'foreach',
+    'forelse',
+    'for',
+    'while',
+    'switch',
+    'case',
+    'empty',
+    'isset',
+    'error',
+  };
+
   /// Blade directives that are block-level (require children).
   static const Set<String> _blockDirectives = {
     'if',
@@ -743,7 +759,7 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Add expression if present (already includes parentheses from parser)
     if (node.expression != null && node.expression!.isNotEmpty) {
-      _output.write(node.expression);
+      _applyDirectiveParenthesisSpacing(node.expression!, node.name);
     }
 
     _output.writeln();
@@ -995,8 +1011,13 @@ class FormatterVisitor implements AstVisitor<String> {
     );
 
     // Determine if we should format as self-closing
-    final shouldSelfClose =
-        !isVoid && !hasContent && _shouldSelfClose(node.isSelfClosing);
+    // For HTML elements (non-void), only self-close if already self-closing in source
+    // Self-closing non-void elements like <span /> are not valid HTML5 and break rendering
+    // Components can be self-closed as they're custom elements
+    final shouldSelfClose = !isVoid &&
+        !hasContent &&
+        _shouldSelfClose(node.isSelfClosing) &&
+        node.isSelfClosing;
 
     // For void elements, respect selfClosingStyle to preserve/add/remove the slash
     final voidSelfClose = isVoid && _shouldSelfClose(node.isSelfClosing);
@@ -1318,15 +1339,55 @@ class FormatterVisitor implements AstVisitor<String> {
     final hasDefaultSlot = node.slots.containsKey('default');
 
     if (hasDefaultSlot) {
-      // Render all named slots (including default)
-      final slotList = node.slots.values.toList();
-      for (var i = 0; i < slotList.length; i++) {
-        final slot = slotList[i];
+      // Separate default slot from named slots
+      final defaultSlot = node.slots['default']!;
+      final namedSlots =
+          node.slots.values.where((s) => s.name != 'default').toList();
+
+      // Render default slot content directly without <x-slot:default> tags
+      for (var i = 0; i < defaultSlot.children.length; i++) {
+        final child = defaultSlot.children[i];
+        if (child is TextNode && child.content.trim().isEmpty) {
+          continue;
+        }
+        child.accept(this);
+
+        // Add spacing between children if needed
+        if (i < defaultSlot.children.length - 1) {
+          AstNode? nextMeaningful;
+          for (var j = i + 1; j < defaultSlot.children.length; j++) {
+            final candidate = defaultSlot.children[j];
+            if (candidate is! TextNode || candidate.content.trim().isNotEmpty) {
+              nextMeaningful = candidate;
+              break;
+            }
+          }
+          if (nextMeaningful != null &&
+              _needsSpacingBetween(child, nextMeaningful)) {
+            _output.writeln();
+          }
+        }
+      }
+
+      // Add spacing between default slot content and named slots
+      if (namedSlots.isNotEmpty) {
+        final meaningfulChildren = defaultSlot.children
+            .where((c) => c is! TextNode || c.content.trim().isNotEmpty)
+            .toList();
+        if (meaningfulChildren.isNotEmpty &&
+            _needsSpacingBetween(meaningfulChildren.last, namedSlots.first)) {
+          _output.writeln();
+        }
+      }
+
+      // Render named slots (non-default) with slot tags
+      for (var i = 0; i < namedSlots.length; i++) {
+        final slot = namedSlots[i];
         slot.accept(this);
 
         // Add spacing between slots if needed
-        if (i < slotList.length - 1) {
-          if (_needsSpacingBetween(slot, slotList[i + 1])) {
+        if (i < namedSlots.length - 1) {
+          if (_needsSpacingBetween(slot, namedSlots[i + 1])) {
             _output.writeln();
           }
         }
@@ -1823,6 +1884,42 @@ class FormatterVisitor implements AstVisitor<String> {
 
     buf.write('</$tag>');
     return buf.toString();
+  }
+
+  /// Applies directive parenthesis spacing based on config.
+  void _applyDirectiveParenthesisSpacing(
+      String expression, String directiveName) {
+    // Only apply to control structure directives
+    if (!_controlStructureDirectives.contains(directiveName)) {
+      _output.write(expression);
+      return;
+    }
+
+    final hasLeadingSpace = expression.startsWith(' ');
+    final startsWithParen = expression.trimLeft().startsWith('(');
+
+    if (!startsWithParen) {
+      _output.write(expression);
+      return;
+    }
+
+    switch (config.directiveParenthesisSpacing) {
+      case DirectiveParenthesisSpacing.spaced:
+        // Always add space: @if ($var)
+        if (!hasLeadingSpace) {
+          _output.write(' ');
+        }
+        _output.write(expression.trimLeft());
+        break;
+      case DirectiveParenthesisSpacing.compact:
+        // Remove space: @if($var)
+        _output.write(expression.trimLeft());
+        break;
+      case DirectiveParenthesisSpacing.preserve:
+        // Keep original: @if ($var) or @if($var)
+        _output.write(expression);
+        break;
+    }
   }
 
   /// Determines if spacing is needed between two nodes.

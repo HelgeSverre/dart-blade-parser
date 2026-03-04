@@ -76,11 +76,13 @@ void main() {
         ),
       );
 
-      test('converts empty div to self-closing', () {
+      test(
+          'preserves explicit close on empty div (self-closing not valid HTML)',
+          () {
         const input = '<div class="empty"></div>';
         final result = formatter.format(input);
 
-        expect(result.trim(), equals('<div class="empty" />'));
+        expect(result.trim(), equals('<div class="empty"></div>'));
       });
 
       test('keeps already self-closing div', () {
@@ -118,11 +120,13 @@ void main() {
         expect(result.trim(), equals('<br />'));
       });
 
-      test('converts empty span to self-closing', () {
+      test(
+          'preserves explicit close on empty span (self-closing not valid HTML)',
+          () {
         const input = '<span></span>';
         final result = formatter.format(input);
 
-        expect(result.trim(), equals('<span />'));
+        expect(result.trim(), equals('<span></span>'));
       });
     });
 
@@ -184,7 +188,7 @@ void main() {
     });
 
     group('combined with other options', () {
-      test('works with attribute wrapping (always style)', () {
+      test('works with attribute wrapping (always style) for components', () {
         final formatter = BladeFormatter(
           config: const FormatterConfig(
             selfClosingStyle: SelfClosingStyle.always,
@@ -192,15 +196,14 @@ void main() {
           ),
         );
 
-        const input = '<div class="empty" id="test"></div>';
+        const input = '<x-alert type="info"></x-alert>';
         final result = formatter.format(input);
 
         expect(result, contains(' />'));
-        expect(result, contains('class="empty"'));
-        expect(result, contains('id="test"'));
+        expect(result, contains('type="info"'));
       });
 
-      test('works with closing bracket newLine style', () {
+      test('works with closing bracket newLine style for components', () {
         final formatter = BladeFormatter(
           config: const FormatterConfig(
             selfClosingStyle: SelfClosingStyle.always,
@@ -209,14 +212,13 @@ void main() {
           ),
         );
 
-        const input = '<div class="empty" id="test"></div>';
+        const input = '<x-alert type="info"></x-alert>';
         final result = formatter.format(input);
 
-        // Should have bracket on new line and be self-closing
-        expect(result, contains('id="test"\n/>'));
+        expect(result, contains('type="info" />'));
       });
 
-      test('works with attribute sorting', () {
+      test('works with attribute sorting for components', () {
         final formatter = BladeFormatter(
           config: const FormatterConfig(
             selfClosingStyle: SelfClosingStyle.always,
@@ -224,11 +226,11 @@ void main() {
           ),
         );
 
-        const input = '<div id="test" class="empty"></div>';
+        const input = '<x-alert id="test" type="info"></x-alert>';
         final result = formatter.format(input);
 
-        // Should sort and be self-closing
-        expect(result.trim(), equals('<div class="empty" id="test" />'));
+        // Alphabetical: id comes before type
+        expect(result.trim(), equals('<x-alert id="test" type="info" />'));
       });
     });
 
@@ -262,7 +264,7 @@ void main() {
     });
 
     group('edge cases', () {
-      test('handles whitespace-only content as empty', () {
+      test('preserves explicit close for whitespace-only div content', () {
         final formatter = BladeFormatter(
           config: const FormatterConfig(
             selfClosingStyle: SelfClosingStyle.always,
@@ -272,8 +274,8 @@ void main() {
         const input = '<div class="test">   </div>';
         final result = formatter.format(input);
 
-        // Whitespace-only content should be treated as empty
-        expect(result.trim(), equals('<div class="test" />'));
+        // Whitespace-only content preserved with newline formatting, not self-closed (not valid HTML)
+        expect(result.trim(), equals('<div class="test">\n</div>'));
       });
 
       test('preserves component with slot content', () {
