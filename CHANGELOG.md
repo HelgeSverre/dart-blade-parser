@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Issue #11 - Anonymous component default slot:** Components with anonymous default slot content now render without `<x-slot:default>` tags.
 - **Issue #10 - Empty HTML element self-closing:** Empty non-void HTML elements (`<span>`, `<div>`) no longer self-close when using `selfClosingStyle:always` (preserves HTML5 validity).
-- **Issue #9 - Directive parenthesis spacing:** New config option to control space between directive and parenthesis.
 
 ## [1.3.0] - 2026-02-27
 
