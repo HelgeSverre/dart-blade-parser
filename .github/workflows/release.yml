@@ -3,11 +3,14 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -48,15 +51,7 @@ jobs:
           npm version --no-git-tag-version "${{ steps.ver.outputs.version }}"
           npm test
 
-      # Publish to npm
+      # Publish to npm (OIDC provenance, no token needed)
       - name: Publish to npm
         working-directory: prettier-plugin-laravel-blade
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
-
-      # Publish to pub.dev
-      - name: Publish to pub.dev
-        run: dart pub publish --force
-        env:
-          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
+        run: npm publish --access public --provenance
