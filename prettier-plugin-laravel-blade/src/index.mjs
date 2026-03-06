@@ -99,6 +99,7 @@ export const parsers = {
         selfClosingStyle: options.bladeSelfClosingStyle,
         htmlBlockSpacing: options.bladeHtmlBlockSpacing,
         echoSpacing: options.bladeEchoSpacing,
+        directiveParenthesisSpacing: options.bladeDirectiveParenthesisSpacing,
         trailingNewline: options.bladeTrailingNewline,
       };
 
@@ -317,6 +318,18 @@ export const options = {
     category: "Blade",
     default: true,
     description: "Add a trailing newline at the end of formatted output.",
+  },
+  bladeDirectiveParenthesisSpacing: {
+    type: "choice",
+    category: "Blade",
+    default: "preserve",
+    description:
+      "Spacing between directive name and parenthesis: @if($var) vs @if ($var).",
+    choices: [
+      { value: "spaced", description: "Add space: @if ($var)" },
+      { value: "compact", description: "No space: @if($var)" },
+      { value: "preserve", description: "Preserve original spacing" },
+    ],
   },
   bladeFormatAlpine: {
     type: "boolean",

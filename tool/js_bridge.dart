@@ -46,6 +46,9 @@ JSString _format(JSString source, JSString optionsJson) {
     htmlBlockSpacing:
         HtmlBlockSpacing.fromString(opts['htmlBlockSpacing'] as String?),
     echoSpacing: EchoSpacing.fromString(opts['echoSpacing'] as String?),
+    directiveParenthesisSpacing:
+        DirectiveParenthesisSpacing.fromString(
+            opts['directiveParenthesisSpacing'] as String?),
     trailingNewline: opts['trailingNewline'] as bool? ?? true,
   );
 
