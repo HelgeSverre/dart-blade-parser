@@ -353,6 +353,15 @@ describe("components", () => {
     assert.ok(!result.includes("<x-filament : :"));
   });
 
+  it("anonymous component renders without x-slot:default wrapper", async () => {
+    const result = await format("<x-card>\n    <p>Hello world</p>\n</x-card>");
+    assert.ok(!result.includes("<x-slot:default>"), "should not wrap in x-slot:default");
+    assert.ok(!result.includes("</x-slot:default>"), "should not have closing x-slot:default");
+    assert.ok(result.includes("Hello world"));
+    assert.ok(result.includes("<x-card>"));
+    assert.ok(result.includes("</x-card>"));
+  });
+
   it("preserves :: namespace combined with dot notation", async () => {
     const result = await format("<x-package::nested.component />");
     assert.ok(result.includes("<x-package::nested.component"));
@@ -482,6 +491,42 @@ describe("bladeAttributeSort", () => {
   });
 });
 
+describe("bladeDirectiveParenthesisSpacing", () => {
+  it("default (preserve) outputs compact since parser strips the space", async () => {
+    // The lexer consumes whitespace between directive name and '(' (lexer.dart:929-936),
+    // so 'preserve' mode effectively produces compact output.
+    const spaced = await format("@if ($user)\n    <p>Hi</p>\n@endif");
+    assert.ok(spaced.includes("@if($user)"));
+
+    const compact = await format("@if($user)\n    <p>Hi</p>\n@endif");
+    assert.ok(compact.includes("@if($user)"));
+  });
+
+  it("forces spaced style", async () => {
+    const result = await format("@if($user)\n    <p>Hi</p>\n@endif", {
+      bladeDirectiveParenthesisSpacing: "spaced",
+    });
+    assert.ok(result.includes("@if ($user)"));
+    assert.ok(!result.includes("@if($user)"));
+  });
+
+  it("forces compact style", async () => {
+    const result = await format("@if ($user)\n    <p>Hi</p>\n@endif", {
+      bladeDirectiveParenthesisSpacing: "compact",
+    });
+    assert.ok(result.includes("@if($user)"));
+    assert.ok(!result.includes("@if ($user)"));
+  });
+
+  it("applies to multiple directive types", async () => {
+    const result = await format(
+      "@foreach ($items as $item)\n    <li>{{ $item }}</li>\n@endforeach",
+      { bladeDirectiveParenthesisSpacing: "compact" },
+    );
+    assert.ok(result.includes("@foreach($items"));
+  });
+});
+
 describe("bladeClosingBracketStyle", () => {
   it("same_line keeps bracket with last attribute", async () => {
     const result = await format(
@@ -519,8 +564,24 @@ describe("bladeSelfClosingStyle", () => {
     assert.ok(explicit.includes("</div>"));
   });
 
-  it("converts to self-closing with 'always'", async () => {
+  it("empty non-void elements stay explicit with 'always'", async () => {
+    const span = await format("<span></span>", {
+      bladeSelfClosingStyle: "always",
+    });
+    assert.ok(span.includes("</span>"), "empty span should keep explicit close");
+    assert.ok(!span.includes("/>"), "empty span should not self-close");
+  });
+
+  it("'always' keeps non-void elements explicit", async () => {
     const result = await format("<div></div>", {
+      bladeSelfClosingStyle: "always",
+    });
+    assert.ok(result.includes("</div>"));
+    assert.ok(!result.includes("/>"));
+  });
+
+  it("'always' self-closes void elements", async () => {
+    const result = await format("<br>", {
       bladeSelfClosingStyle: "always",
     });
     assert.ok(result.includes("/>"));
