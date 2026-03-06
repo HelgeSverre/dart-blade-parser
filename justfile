@@ -207,10 +207,17 @@ plugin-test: plugin-build
 plugin-install:
     @cd prettier-plugin-laravel-blade && npm install
 
-# Publish the Prettier plugin to npm (builds, tests, then publishes)
+# Publish the Prettier plugin to npm (deprecated: CI handles this via release workflow)
 [group('plugin')]
 plugin-publish: plugin-test
     @cd prettier-plugin-laravel-blade && npm publish
+
+# Tag a release (CI publishes automatically to npm + pub.dev)
+[group('publish')]
+release VERSION:
+    @echo "Tagging v{{VERSION}}..."
+    git tag -a "v{{VERSION}}" -m "Release {{VERSION}}"
+    git push origin "v{{VERSION}}"
 
 # Benchmark
 
