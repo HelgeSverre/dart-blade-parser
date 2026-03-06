@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      # Run Dart tests
+      - run: dart pub get
+      - run: dart analyze --fatal-warnings lib/
+      - run: dart test
+
+      # Extract version from tag
+      - name: Extract version
+        id: ver
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      # Guardrail: ensure pubspec.yaml matches the tag
+      - name: Verify pubspec version matches tag
+        run: |
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          if [ "$PUBSPEC_VERSION" != "${{ steps.ver.outputs.version }}" ]; then
+            echo "ERROR: pubspec.yaml version ($PUBSPEC_VERSION) does not match tag (${{ steps.ver.outputs.version }})"
+            exit 1
+          fi
+
+      # Build and test the prettier plugin
+      - name: Build and test plugin
+        working-directory: prettier-plugin-laravel-blade
+        run: |
+          npm ci
+          npm version --no-git-tag-version "${{ steps.ver.outputs.version }}"
+          npm test
+
+      # Publish to npm
+      - name: Publish to npm
+        working-directory: prettier-plugin-laravel-blade
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
+
+      # Publish to pub.dev
+      - name: Publish to pub.dev
+        run: dart pub publish --force
+        env:
+          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
