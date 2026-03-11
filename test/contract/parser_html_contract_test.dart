@@ -201,8 +201,7 @@ void main() {
 
       expect(result.isSuccess, isFalse);
       expect(result.errors, hasLength(greaterThanOrEqualTo(1)));
-      expect(result.errors.first.message, contains('Expected'));
-      expect(result.errors.first.message, contains('</div>'));
+      expect(result.errors.first.message, contains('closing tag'));
       expect(result.errors.first.message, contains('</span>'));
     });
 

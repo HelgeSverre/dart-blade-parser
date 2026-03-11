@@ -56,7 +56,7 @@ void main() {
 
       expect(result.isSuccess, isFalse);
       expect(result.errors, isNotEmpty);
-      expect(result.errors.first.message, contains('Expected'));
+      expect(result.errors.first.message, contains('closing tag'));
     });
 
     test('Nested matching tags', () {
@@ -85,6 +85,66 @@ void main() {
       expect(div.tagName, 'div');
       expect(section.tagName, 'section');
       expect(article.tagName, 'article');
+    });
+
+    test('Ancestor closer auto-closes current element for recovery', () {
+      final parser = BladeParser();
+      final result = parser.parse('<div><span>Text</div>');
+
+      expect(result.isSuccess, isFalse);
+      expect(
+        result.errors.any((e) => e.message.contains('auto-closing <span>')),
+        isTrue,
+      );
+
+      final div = result.ast!.children[0] as HtmlElementNode;
+      expect(div.tagName, 'div');
+      expect(div.children, hasLength(1));
+
+      final span = div.children[0] as HtmlElementNode;
+      expect(span.tagName, 'span');
+      expect(span.children.whereType<TextNode>().single.content, 'Text');
+    });
+
+    test('Stray closer inside element is consumed without collapsing subtree',
+        () {
+      final parser = BladeParser();
+      final result = parser.parse('<div><span>Text</bogus>More</span></div>');
+
+      expect(result.isSuccess, isFalse);
+      expect(
+        result.errors.any(
+          (e) => e.message
+              .contains('Unexpected closing tag </bogus> inside <span>'),
+        ),
+        isTrue,
+      );
+
+      final div = result.ast!.children[0] as HtmlElementNode;
+      final span = div.children[0] as HtmlElementNode;
+      final combinedText =
+          span.children.whereType<TextNode>().map((n) => n.content).join();
+
+      expect(span.tagName, 'span');
+      expect(combinedText, contains('Text'));
+      expect(combinedText, contains('More'));
+    });
+
+    test('Malformed tag-head chunks are preserved for best-effort recovery',
+        () {
+      final parser = BladeParser();
+      final result = parser.parse('<div class="base" ??? data-x="1"></div>');
+
+      expect(result.isSuccess, isTrue);
+
+      final div = result.ast!.children[0] as HtmlElementNode;
+      expect(div.attributes.containsKey('class'), isTrue);
+      expect(div.attributes.containsKey('data-x'), isTrue);
+      expect(div.tagHead, hasLength(3));
+      expect(div.tagHead[0], isA<TagHeadAttribute>());
+      expect(div.tagHead[1], isA<TagHeadRaw>());
+      expect((div.tagHead[1] as TagHeadRaw).content, '???');
+      expect(div.tagHead[2], isA<TagHeadAttribute>());
     });
   });
 

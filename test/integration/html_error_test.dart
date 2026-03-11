@@ -30,9 +30,10 @@ void main() {
       expect(result.isSuccess, isFalse);
       expect(result.errors, isNotEmpty);
 
-      // Check for expected/found mismatch message
+      // Recovery should still surface a closing-tag mismatch.
       final errorMessages = result.errors.map((e) => e.message).join(' ');
-      expect(errorMessages, contains('Expected'));
+      expect(errorMessages, contains('closing tag'));
+      expect(errorMessages, contains('</div>'));
 
       // Partial AST available
       expect(result.ast, isNotNull);
