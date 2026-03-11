@@ -77,12 +77,17 @@ describe('benchmarks.html e2e', () => {
 
   it('renders faster-vs-stillat ratio', { skip: !hasPerformance }, async () => {
     const text = await page.locator('#m-ratio-b').textContent();
-    assert.match(text, /\d+x/, `Expected ratio like "22x", got "${text}"`);
+    assert.match(text, /\d+(\.\d)?x/, `Expected ratio like "5x" or "5.2x", got "${text}"`);
   });
 
   it('renders faster-vs-shufo ratio', { skip: !hasPerformance }, async () => {
     const text = await page.locator('#m-ratio-c').textContent();
-    assert.match(text, /\d+x/, `Expected ratio like "30x", got "${text}"`);
+    assert.match(text, /\d+(\.\d)?x/, `Expected ratio like "6x" or "6.4x", got "${text}"`);
+  });
+
+  it('renders faster-vs-chisel ratio', { skip: !hasPerformance }, async () => {
+    const text = await page.locator('#m-ratio-d').textContent();
+    assert.match(text, /\d+(\.\d)?x/, `Expected ratio like "1.2x", got "${text}"`);
   });
 
   it('renders fixture count', { skip: !hasPerformance }, async () => {
@@ -123,7 +128,7 @@ describe('benchmarks.html e2e', () => {
 
   it('renders resource metric cards', { skip: !hasResources }, async () => {
     const cards = await page.locator('#resourceMetrics > div').count();
-    assert.equal(cards, 3, `Expected 3 resource cards (A, B, C), got ${cards}`);
+    assert.equal(cards, 4, `Expected 4 resource cards (A, B, C, D), got ${cards}`);
   });
 
   it('resource cards contain heap and CPU values', { skip: !hasResources }, async () => {
@@ -158,7 +163,7 @@ describe('benchmarks.html e2e', () => {
   // ── Error catalog section ──
   it('renders error catalog section', { skip: !hasIdempotency }, async () => {
     const plugins = await page.locator('.error-plugin').count();
-    assert.equal(plugins, 3, `Expected 3 error catalog plugin sections, got ${plugins}`);
+    assert.equal(plugins, 4, `Expected 4 error catalog plugin sections, got ${plugins}`);
   });
 
   // ── Generated at ──
@@ -169,7 +174,7 @@ describe('benchmarks.html e2e', () => {
 
   // ── No missing data (only when full data available) ──
   it('no "--" placeholder in metrics bar', { skip: !hasPerformance || !hasIdempotency }, async () => {
-    for (const id of ['m-avg', 'm-ratio-b', 'm-ratio-c', 'm-fixtures', 'm-idem']) {
+    for (const id of ['m-avg', 'm-ratio-b', 'm-ratio-c', 'm-ratio-d', 'm-fixtures', 'm-idem']) {
       const text = await page.locator(`#${id}`).textContent();
       assert.notEqual(text, '--', `Metric ${id} still shows placeholder "--"`);
     }

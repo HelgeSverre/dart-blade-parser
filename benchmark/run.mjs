@@ -12,6 +12,7 @@ const colors = {
   A: chalk.hex('#b5f542'),  // ours — acid green
   B: chalk.hex('#60a5fa'),  // stillat — blue
   C: chalk.hex('#fbbf24'),  // shufo — yellow
+  D: chalk.hex('#f472b6'),  // chisel — pink
 };
 const dim = chalk.dim;
 const bold = chalk.bold;
@@ -36,6 +37,12 @@ const plugins = [
     loadPath: '@shufo/prettier-plugin-blade',
     parser: 'blade',
   },
+  {
+    name: 'prettier-plugin-blade (v3/Chisel)',
+    short: 'D',
+    loadPath: 'prettier-plugin-blade-v3',
+    parser: 'blade',
+  },
 ];
 
 // Directories to skip (invalid/malformed templates that are expected to fail)
@@ -57,7 +64,7 @@ ${bold('Tuning:')}
   --runs <n>          Timed runs per fixture (default: 100)
   --warmup <n>        Warmup runs per fixture (default: 5)
   --filter <pattern>  Only run fixtures whose name contains <pattern>
-  --plugin <A|B|C>    Only benchmark a specific plugin (A=ours, B=stillat, C=shufo)
+  --plugin <A|B|C|D>  Only benchmark a specific plugin (A=ours, B=stillat, C=shufo, D=chisel)
   --timeout <s>       Per-format timeout in seconds (default: 30)
   --max-size <kb>     Skip fixtures larger than <kb> kilobytes (default: 100)
 
@@ -143,7 +150,7 @@ const activePlugins = pluginFilter
   : plugins;
 
 if (pluginFilter && activePlugins.length === 0) {
-  console.error(chalk.red(`Unknown plugin "${pluginFilter}". Use A, B, or C.`));
+  console.error(chalk.red(`Unknown plugin "${pluginFilter}". Use A, B, C, or D.`));
   process.exit(1);
 }
 if (fixtureFilter && fixtures.length === 0) {

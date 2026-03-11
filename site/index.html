@@ -8,7 +8,7 @@
     </title>
     <meta
       name="description"
-      content="The fastest Prettier plugin for Laravel Blade. 20–25× faster, ~160 KB, 100% idempotent. Powered by a real recursive-descent parser."
+      content="The fastest Prettier plugin for Laravel Blade. ~160 KB, zero dependencies, real recursive-descent parser compiled from Dart."
     />
     <meta
       name="keywords"
@@ -27,14 +27,14 @@
     />
     <meta
       property="og:description"
-      content="The fastest Prettier plugin for Laravel Blade. 20–25× faster, ~160 KB, 100% idempotent. Powered by a real recursive-descent parser."
+      content="The fastest Prettier plugin for Laravel Blade. ~160 KB, zero dependencies, real recursive-descent parser compiled from Dart."
     />
     <meta property="og:image" content="og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="prettier-plugin-laravel-blade: Your Blade formatter is 20× too slow. Sub-millisecond formatting with a real recursive-descent parser."
+      content="prettier-plugin-laravel-blade: Stop waiting for your formatter. The fastest Prettier plugin for Blade."
     />
     <meta property="og:site_name" content="prettier-plugin-laravel-blade" />
 
@@ -46,12 +46,12 @@
     />
     <meta
       name="twitter:description"
-      content="20–25× faster than alternatives. ~160 KB, 0 dependencies, 100% idempotent. A real recursive-descent Dart parser compiled to JS."
+      content="The fastest Prettier plugin for Blade. ~160 KB, 0 dependencies. A real recursive-descent Dart parser compiled to JS."
     />
     <meta name="twitter:image" content="og-image.png" />
     <meta
       name="twitter:image:alt"
-      content="prettier-plugin-laravel-blade: Your Blade formatter is 20× too slow."
+      content="prettier-plugin-laravel-blade: Stop waiting for your formatter."
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -415,6 +415,10 @@
         background: var(--yellow);
         opacity: 0.4;
       }
+      .speed-bar.d {
+        background: #f472b6;
+        opacity: 0.6;
+      }
       .speed-ms {
         font-family: var(--mono);
         font-size: 0.68rem;
@@ -453,6 +457,10 @@
       .speed-legend .l-c::before {
         background: var(--yellow);
         opacity: 0.4;
+      }
+      .speed-legend .l-d::before {
+        background: #f472b6;
+        opacity: 0.6;
       }
       .speed-callout {
         background: var(--surface);
@@ -899,12 +907,12 @@
       <div class="w">
         <div class="hero-eyebrow">Prettier Plugin for Blade</div>
         <h1>
-          Your Blade formatter is <br />
-          <em>20× too slow.</em>
+          <em>Stop waiting</em> <br />
+          for your formatter.
         </h1>
         <p class="hero-sub">
           A real recursive-descent parser — compiled from Dart to JavaScript —
-          formats your templates in under a millisecond. No regex. No child
+          formats your Blade templates in milliseconds. No regex. No child
           processes. No compromises.
         </p>
         <div class="hero-cmd" onclick="copyCmd(this)">
@@ -988,10 +996,11 @@
               <span class="l-a">This plugin</span>
               <span class="l-b">stillat</span>
               <span class="l-c">shufo</span>
+              <span class="l-d">chisel</span>
             </div>
           </div>
           <div class="speed-callout">
-            <h3>Why sub-millisecond?</h3>
+            <h3>Why so fast?</h3>
             <ul>
               <li>
                 <strong>0 IPC</strong> Runs in-process, no child processes
@@ -1152,8 +1161,9 @@
         <div class="stag">Comparison</div>
         <div class="sh">Side by side with every alternative</div>
         <div class="sd">
-          Tested against stillat's prettier-plugin-blade (v2.1.21) and shufo's
-          @shufo/prettier-plugin-blade (v1.16.1).
+          Tested against stillat's prettier-plugin-blade (v2.1.21), shufo's
+          @shufo/prettier-plugin-blade (v1.16.1), and Chisel v3
+          (prettier-plugin-blade v3).
         </div>
         <div style="overflow-x: auto">
           <table class="tbl">
@@ -1163,6 +1173,7 @@
                 <th>This plugin</th>
                 <th>stillat</th>
                 <th>shufo</th>
+                <th>chisel</th>
               </tr>
             </thead>
             <tbody>
@@ -1171,60 +1182,98 @@
                 <td class="win m">~160 KB</td>
                 <td class="m">777 KB</td>
                 <td class="m">12+ MB</td>
+                <td class="m">~2.6 MB</td>
               </tr>
               <tr>
                 <td class="lbl">Avg format time</td>
                 <td class="win m" id="cmp-avg-a">0.66 ms</td>
                 <td class="m" id="cmp-avg-b">13.23 ms</td>
                 <td class="m" id="cmp-avg-c">16.55 ms</td>
+                <td class="m" id="cmp-avg-d">-- ms</td>
               </tr>
               <tr>
                 <td class="lbl">Parser</td>
-                <td class="win">Real recursive-descent AST</td>
+                <td>Recursive-descent AST</td>
                 <td>TypeScript AST (Prettier IR)</td>
                 <td>Heuristic-based (no AST)</td>
+                <td>TypeScript AST (Prettier IR)</td>
               </tr>
               <tr>
                 <td class="lbl">Idempotent</td>
-                <td class="ok" id="cmp-idem-a">✓ 228/228</td>
-                <td class="no" id="cmp-idem-b">✗ 28 failures</td>
-                <td class="no" id="cmp-idem-c">✗ 4 failures</td>
+                <td class="ok" id="cmp-idem-a">219/228</td>
+                <td class="no" id="cmp-idem-b">207/228</td>
+                <td class="ok" id="cmp-idem-c">224/228</td>
+                <td class="ok" id="cmp-idem-d">224/228</td>
               </tr>
               <tr>
                 <td class="lbl">Dependencies</td>
                 <td class="win">None</td>
                 <td>None</td>
                 <td>blade-formatter, php-parser</td>
+                <td>3 (html-tags, parse-srcset, html-element-attributes)</td>
               </tr>
               <tr>
                 <td class="lbl">Trailing whitespace</td>
                 <td class="ok">✓ None</td>
                 <td class="no">✗ Present</td>
                 <td class="ok">✓ None</td>
+                <td class="ok">✓ None</td>
               </tr>
               <tr>
-                <td class="lbl">Quote preservation</td>
-                <td class="ok">✓ Preserves</td>
-                <td class="no">✗ Converts ' → "</td>
-                <td class="ok">✓ Preserves</td>
+                <td class="lbl">Quote handling</td>
+                <td class="ok">Dedicated option (preserve/single/double)</td>
+                <td>Uses Prettier's <span class="m">singleQuote</span></td>
+                <td>Uses Prettier's <span class="m">singleQuote</span></td>
+                <td>Uses Prettier's <span class="m">singleQuote</span></td>
               </tr>
               <tr>
                 <td class="lbl">Nested directives</td>
                 <td class="ok">✓ Correct hierarchy</td>
                 <td class="ok">✓ Correct</td>
                 <td class="no">✗ Collapses levels</td>
+                <td class="ok">✓ Correct</td>
               </tr>
               <tr>
                 <td class="lbl">&lt;x-slot&gt; formatting</td>
                 <td class="ok">✓ Fully expanded</td>
                 <td>Keeps inline</td>
                 <td class="no">✗ Misaligned</td>
+                <td class="ok">✓ Fully expanded</td>
+              </tr>
+              <tr>
+                <td class="lbl">PHP formatting</td>
+                <td class="no">✗ Not supported</td>
+                <td>Via Laravel Pint</td>
+                <td>Via blade-formatter</td>
+                <td class="ok">✓ Built-in (safe/aggressive)</td>
+              </tr>
+              <tr>
+                <td class="lbl">Alpine.js value formatting</td>
+                <td class="ok">✓ Via Prettier</td>
+                <td class="no">✗</td>
+                <td>x-data only (via js_beautify)</td>
+                <td class="ok">✓ Via Prettier</td>
+              </tr>
+              <tr>
+                <td class="lbl">Component prefixes</td>
+                <td>x- only</td>
+                <td>x- only</td>
+                <td>x- only</td>
+                <td class="ok">✓ Configurable (x, flux, livewire…)</td>
               </tr>
               <tr>
                 <td class="lbl">Architecture</td>
                 <td>Compiled Dart (dart2js)</td>
                 <td>TypeScript → Prettier IR</td>
                 <td>blade-formatter wrapper</td>
+                <td>TypeScript (ground-up rewrite)</td>
+              </tr>
+              <tr>
+                <td class="lbl">Links</td>
+                <td><a href="https://github.com/HelgeSverre/dart-blade-parser" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.npmjs.com/package/prettier-plugin-laravel-blade" target="_blank" rel="noopener">npm</a></td>
+                <td><a href="https://github.com/stillat/blade-parser-typescript" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.npmjs.com/package/prettier-plugin-blade" target="_blank" rel="noopener">npm</a></td>
+                <td><a href="https://github.com/shufo/prettier-plugin-blade" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.npmjs.com/package/@shufo/prettier-plugin-blade" target="_blank" rel="noopener">npm</a></td>
+                <td><a href="https://github.com/fortephp/chisel" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.npmjs.com/package/prettier-plugin-blade" target="_blank" rel="noopener">npm</a></td>
               </tr>
             </tbody>
           </table>
@@ -1597,18 +1646,18 @@ npx prettier --check "**/*.blade.php"</pre>
         );
       }
 
-      function renderChart(data, avgA, avgB, avgC) {
+      function renderChart(data, avgA, avgB, avgC, avgD) {
         ch.innerHTML = "";
-        const mx = Math.max(...data.map((d) => Math.max(d.a, d.b, d.c)));
+        const mx = Math.max(...data.map((d) => Math.max(d.a, d.b, d.c, d.d)));
         data.forEach((d) => {
           const r = document.createElement("div");
           r.className = "speed-row";
-          r.innerHTML = `<span class="speed-fixture">${d.f}</span><div class="speed-bars"><div class="speed-bar ours" style="width:${((d.a / mx) * 100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${((d.b / mx) * 100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${((d.c / mx) * 100).toFixed(1)}%"></div></div><span class="speed-ms">${d.a}ms</span>`;
+          r.innerHTML = `<span class="speed-fixture">${d.f}</span><div class="speed-bars"><div class="speed-bar ours" style="width:${((d.a / mx) * 100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${((d.b / mx) * 100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${((d.c / mx) * 100).toFixed(1)}%"></div><div class="speed-bar d" style="width:${((d.d / mx) * 100).toFixed(1)}%"></div></div><span class="speed-ms">${d.a}ms</span>`;
           ch.appendChild(r);
         });
         const avg = document.createElement("div");
         avg.className = "speed-row speed-avg";
-        avg.innerHTML = `<span class="speed-fixture" style="font-weight:600;color:var(--text)">Average</span><div class="speed-bars"><div class="speed-bar ours" style="width:${((avgA / mx) * 100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${((avgB / mx) * 100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${((avgC / mx) * 100).toFixed(1)}%"></div></div><span class="speed-ms" style="font-weight:600;color:var(--accent)">${avgA.toFixed(2)}ms</span>`;
+        avg.innerHTML = `<span class="speed-fixture" style="font-weight:600;color:var(--text)">Average</span><div class="speed-bars"><div class="speed-bar ours" style="width:${((avgA / mx) * 100).toFixed(1)}%"></div><div class="speed-bar b" style="width:${((avgB / mx) * 100).toFixed(1)}%"></div><div class="speed-bar c" style="width:${((avgC / mx) * 100).toFixed(1)}%"></div><div class="speed-bar d" style="width:${((avgD / mx) * 100).toFixed(1)}%"></div></div><span class="speed-ms" style="font-weight:600;color:var(--accent)">${avgA.toFixed(2)}ms</span>`;
         ch.appendChild(avg);
       }
 
@@ -1630,39 +1679,27 @@ npx prettier --check "**/*.blade.php"</pre>
         }
       }
 
-      function updateComparison(avgA, avgB, avgC, idemA, idemB, idemC) {
+      function updateComparison(avgA, avgB, avgC, avgD, idemA, idemB, idemC, idemD) {
         const ca = document.getElementById("cmp-avg-a");
         if (ca) ca.textContent = avgA.toFixed(2) + " ms";
         const cb = document.getElementById("cmp-avg-b");
         if (cb) cb.textContent = avgB.toFixed(2) + " ms";
         const cc = document.getElementById("cmp-avg-c");
         if (cc) cc.textContent = avgC.toFixed(2) + " ms";
-        const ia = document.getElementById("cmp-idem-a");
-        const ib = document.getElementById("cmp-idem-b");
-        const ic = document.getElementById("cmp-idem-c");
-        if (ia) {
-          ia.className = "ok";
-          ia.textContent = "\u2713 " + idemA.pass + "/" + idemA.total;
+        const cd = document.getElementById("cmp-avg-d");
+        if (cd) cd.textContent = avgD.toFixed(2) + " ms";
+        function setIdem(elId, data) {
+          const el = document.getElementById(elId);
+          if (!el) return;
+          el.textContent = data.pass + "/" + data.total;
+          el.className = data.pass === data.total ? "ok" : data.pass >= data.total - 5 ? "ok" : "no";
         }
-        if (ib) {
-          const f = idemB.fail + idemB.error;
-          ib.className = f ? "no" : "ok";
-          ib.textContent = f
-            ? "\u2717 " + f + " failure" + (f > 1 ? "s" : "")
-            : "\u2713 " + idemB.pass + "/" + idemB.total;
-        }
-        if (ic) {
-          const f = idemC.fail + idemC.error;
-          ic.className = f ? "no" : "ok";
-          ic.textContent = f
-            ? "\u2717 " + f + " failure" + (f > 1 ? "s" : "")
-            : "\u2713 " + idemC.pass + "/" + idemC.total;
-        }
+        setIdem("cmp-idem-a", idemA);
+        setIdem("cmp-idem-b", idemB);
+        setIdem("cmp-idem-c", idemC);
+        setIdem("cmp-idem-d", idemD);
       }
 
-      function updateHeroSubtitle(ratioB, ratioC) {
-        // Static "20× too slow" — no dynamic update needed
-      }
 
       function countIdem(entries) {
         let pass = 0,
@@ -1691,13 +1728,15 @@ npx prettier --check "**/*.blade.php"</pre>
         try {
           const res = await fetch("data/benchmark.json");
           const json = await res.json();
-          const perf = json.performance || { A: {}, B: {}, C: {} };
+          const perf = json.performance || { A: {}, B: {}, C: {}, D: {} };
           const perfA = perf.A || {},
             perfB = perf.B || {},
-            perfC = perf.C || {};
+            perfC = perf.C || {},
+            perfD = perf.D || {};
           const avgA = computeAvg(perfA),
             avgB = computeAvg(perfB),
-            avgC = computeAvg(perfC);
+            avgC = computeAvg(perfC),
+            avgD = computeAvg(perfD);
           const fixtureCount = Object.keys(perfA).length;
 
           // Build selected fixtures, sorted by A time descending
@@ -1708,36 +1747,37 @@ npx prettier --check "**/*.blade.php"</pre>
               a: perfA[k].avg,
               b: (perfB[k] && perfB[k].avg) || 0,
               c: (perfC[k] && perfC[k].avg) || 0,
+              d: (perfD[k] && perfD[k].avg) || 0,
             }))
             .sort((a, b) => b.a - a.a);
 
-          renderChart(selected, avgA, avgB, avgC);
+          renderChart(selected, avgA, avgB, avgC, avgD);
 
           // Idempotency
-          const idm = json.idempotency || { A: {}, B: {}, C: {} };
+          const idm = json.idempotency || { A: {}, B: {}, C: {}, D: {} };
           const idemA = countIdem(idm.A || {});
           const idemB = countIdem(idm.B || {});
           const idemC = countIdem(idm.C || {});
+          const idemD = countIdem(idm.D || {});
           const idemPct = idemA.total
             ? Math.round((idemA.pass / idemA.total) * 100)
             : 100;
 
           updateMetrics(avgA, fixtureCount, idemPct);
-          updateComparison(avgA, avgB, avgC, idemA, idemB, idemC);
-          updateHeroSubtitle(avgB / avgA, avgC / avgA);
+          updateComparison(avgA, avgB, avgC, avgD, idemA, idemB, idemC, idemD);
         } catch (e) {
           // Fallback to hardcoded defaults
           const data = [
-            { f: "pagination", a: 0.83, b: 84.44, c: 47.1 },
-            { f: "admin panel", a: 1.76, b: 37.5, c: 42.1 },
-            { f: "billing", a: 1.15, b: 29.5, c: 40.93 },
-            { f: "billing", a: 0.87, b: 15.18, c: 19.25 },
-            { f: "auth login", a: 0.42, b: 9.93, c: 14.21 },
-            { f: "layout", a: 0.36, b: 8.03, c: 10.02 },
-            { f: "real world mess", a: 0.23, b: 2.91, c: 8.33 },
-            { f: "mixed content", a: 0.18, b: 2.95, c: 7.9 },
+            { f: "pagination", a: 0.83, b: 84.44, c: 47.1, d: 0 },
+            { f: "admin panel", a: 1.76, b: 37.5, c: 42.1, d: 0 },
+            { f: "billing", a: 1.15, b: 29.5, c: 40.93, d: 0 },
+            { f: "billing", a: 0.87, b: 15.18, c: 19.25, d: 0 },
+            { f: "auth login", a: 0.42, b: 9.93, c: 14.21, d: 0 },
+            { f: "layout", a: 0.36, b: 8.03, c: 10.02, d: 0 },
+            { f: "real world mess", a: 0.23, b: 2.91, c: 8.33, d: 0 },
+            { f: "mixed content", a: 0.18, b: 2.95, c: 7.9, d: 0 },
           ];
-          renderChart(data, 0.66, 13.23, 16.55);
+          renderChart(data, 0.66, 13.23, 16.55, 0);
         }
       }
       loadBenchmarkData();

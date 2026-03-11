@@ -6,7 +6,7 @@
     <title>Benchmarks — prettier-plugin-laravel-blade</title>
     <meta
       name="description"
-      content="Full benchmark results: 109 fixtures, 3 plugins, performance and idempotency data for the fastest Prettier Blade plugin."
+      content="Full benchmark results: 109 fixtures, 4 plugins, performance and idempotency data for the fastest Prettier Blade plugin."
     />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#050507" />
@@ -20,7 +20,7 @@
     />
     <meta
       property="og:description"
-      content="Full benchmark results: 109 fixtures, 3 plugins compared. Performance and idempotency data for the fastest Prettier Blade plugin."
+      content="Full benchmark results: 109 fixtures, 4 plugins compared. Performance and idempotency data for the fastest Prettier Blade plugin."
     />
     <meta property="og:image" content="og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -35,7 +35,7 @@
     />
     <meta
       name="twitter:description"
-      content="109 fixtures, 3 plugins. See the full performance and idempotency comparison."
+      content="109 fixtures, 4 plugins. See the full performance and idempotency comparison."
     />
     <meta name="twitter:image" content="og-image.png" />
 
@@ -216,7 +216,7 @@
       }
       .metrics .w {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         gap: 1.5rem;
       }
       .metric {
@@ -287,6 +287,10 @@
         background: var(--yellow);
         opacity: 0.4;
       }
+      .legend .l-d::before {
+        background: #f472b6;
+        opacity: 0.6;
+      }
 
       /* ── CATEGORY GROUPS ── */
       .bench-group {
@@ -294,7 +298,7 @@
       }
       .bench-group-header {
         display: grid;
-        grid-template-columns: 200px 1fr 80px 80px 80px;
+        grid-template-columns: 200px 1fr 80px 80px 80px 80px;
         align-items: center;
         gap: 0.75rem;
         padding: 0.65rem 0.75rem;
@@ -338,6 +342,7 @@
         font-family: var(--mono);
         font-size: 0.72rem;
         text-align: right;
+        white-space: nowrap;
       }
       .bench-group-body {
         overflow: hidden;
@@ -351,7 +356,7 @@
       /* ── FIXTURE ROWS ── */
       .bench-row {
         display: grid;
-        grid-template-columns: 200px 1fr 80px 80px 80px;
+        grid-template-columns: 200px 1fr 80px 80px 80px 80px;
         align-items: center;
         gap: 0.75rem;
         padding: 0.4rem 0.75rem 0.4rem 1.5rem;
@@ -390,10 +395,15 @@
         background: var(--yellow);
         opacity: 0.4;
       }
+      .bench-bar.d {
+        background: #f472b6;
+        opacity: 0.6;
+      }
       .bench-ms {
         font-family: var(--mono);
         font-size: 0.68rem;
         text-align: right;
+        white-space: nowrap;
         color: var(--text-muted);
       }
       .bench-ms.best {
@@ -408,7 +418,7 @@
       /* ── SUMMARY ROW ── */
       .bench-summary {
         display: grid;
-        grid-template-columns: 200px 1fr 80px 80px 80px;
+        grid-template-columns: 200px 1fr 80px 80px 80px 80px;
         align-items: center;
         gap: 0.75rem;
         padding: 0.75rem;
@@ -458,6 +468,9 @@
         padding: 0.35rem 0.6rem;
         border-bottom: 1px solid var(--border);
         font-family: var(--mono);
+      }
+      .idem-table td:not(.fix) {
+        white-space: nowrap;
         font-size: 0.72rem;
       }
       .idem-table tr:last-child td {
@@ -560,7 +573,7 @@
         .bench-group-header,
         .bench-row,
         .bench-summary {
-          grid-template-columns: 120px 1fr 55px 55px 55px;
+          grid-template-columns: 120px 1fr 55px 55px 55px 55px;
           gap: 0.4rem;
         }
         .bench-fixture {
@@ -663,6 +676,10 @@
           <div class="metric-label">Faster vs shufo</div>
         </div>
         <div class="metric">
+          <div class="metric-val" id="m-ratio-d">--</div>
+          <div class="metric-label">Faster vs chisel</div>
+        </div>
+        <div class="metric">
           <div class="metric-val" id="m-fixtures">--</div>
           <div class="metric-label">Fixtures tested</div>
         </div>
@@ -686,6 +703,7 @@
             <span class="l-a">This plugin (A)</span>
             <span class="l-b">stillat (B)</span>
             <span class="l-c">shufo (C)</span>
+            <span class="l-d">chisel (D)</span>
           </div>
           <div class="legend-meta" id="benchGeneratedAt"></div>
         </div>
@@ -707,7 +725,7 @@
           id="resourceMetrics"
           style="
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
             margin-bottom: 2rem;
           "
@@ -720,9 +738,11 @@
                 <th>A Heap</th>
                 <th>B Heap</th>
                 <th>C Heap</th>
+                <th>D Heap</th>
                 <th>A CPU</th>
                 <th>B CPU</th>
                 <th>C CPU</th>
+                <th>D CPU</th>
               </tr>
             </thead>
             <tbody id="resourceBody"></tbody>
@@ -749,6 +769,7 @@
                 <th>A</th>
                 <th>B</th>
                 <th>C</th>
+                <th>D</th>
               </tr>
             </thead>
             <tbody id="idemBody"></tbody>
@@ -791,8 +812,8 @@
           return;
         }
 
-        const perf = json.performance || { A: {}, B: {}, C: {} };
-        const idem = json.idempotency || { A: {}, B: {}, C: {} };
+        const perf = json.performance || { A: {}, B: {}, C: {}, D: {} };
+        const idem = json.idempotency || { A: {}, B: {}, C: {}, D: {} };
 
         // ── Generated at ──
         if (json.generatedAt) {
@@ -852,25 +873,30 @@
         // ── Compute stats ──
         const avgA = avg(perf.A),
           avgB = avg(perf.B),
-          avgC = avg(perf.C);
-        const ratioB = avgA > 0 ? Math.round(avgB / avgA) : 0;
-        const ratioC = avgA > 0 ? Math.round(avgC / avgA) : 0;
+          avgC = avg(perf.C),
+          avgD = avg(perf.D);
+        const fmtRatio = (r) => r < 5 ? r.toFixed(1) : String(Math.round(r));
+        const rawB = avgA > 0 ? avgB / avgA : 0;
+        const rawC = avgA > 0 ? avgC / avgA : 0;
+        const rawD = avgA > 0 ? avgD / avgA : 0;
         const fixtureCount = Object.keys(perf.A).length;
         const idemA = countIdem(idem.A),
           idemB = countIdem(idem.B),
-          idemC = countIdem(idem.C);
+          idemC = countIdem(idem.C),
+          idemD = countIdem(idem.D);
 
         // ── Metrics bar ──
         document.getElementById("m-avg").textContent = avgA.toFixed(2) + "ms";
-        document.getElementById("m-ratio-b").textContent = ratioB + "x";
-        document.getElementById("m-ratio-c").textContent = ratioC + "x";
+        document.getElementById("m-ratio-b").textContent = fmtRatio(rawB) + "x";
+        document.getElementById("m-ratio-c").textContent = fmtRatio(rawC) + "x";
+        document.getElementById("m-ratio-d").textContent = fmtRatio(rawD) + "x";
         const idemTotal = idemA.pass + idemA.fail;
         document.getElementById("m-fixtures").textContent = idemA.total;
         document.getElementById("m-idem").textContent =
           idemA.pass + "/" + idemTotal;
         document.getElementById("hero-subtitle").textContent =
           idemA.total +
-          " fixtures across 3 plugins. 20 timed runs after 5 warmup.";
+          " fixtures across 4 plugins. 20 timed runs after 5 warmup.";
 
         // ── Performance section ──
         const allFixtures = Object.keys(perf.A).sort();
@@ -879,7 +905,7 @@
         // Global max for bar scaling
         let globalMax = 0;
         for (const f of allFixtures) {
-          for (const p of ["A", "B", "C"]) {
+          for (const p of ["A", "B", "C", "D"]) {
             const v = perf[p]?.[f]?.avg;
             if (v != null && v > globalMax) globalMax = v;
           }
@@ -893,7 +919,7 @@
 
           // Category averages
           const catAvgs = {};
-          for (const p of ["A", "B", "C"]) {
+          for (const p of ["A", "B", "C", "D"]) {
             const vals = fixtures
               .map((f) => perf[p]?.[f]?.avg)
               .filter((v) => v != null);
@@ -924,6 +950,9 @@
             "</div>" +
             '<div class="cat-avg" style="color:var(--yellow);opacity:.6">' +
             catAvgs.C +
+            "</div>" +
+            '<div class="cat-avg" style="color:#f472b6;opacity:.8">' +
+            catAvgs.D +
             "</div>";
 
           header.addEventListener("click", () => {
@@ -939,14 +968,17 @@
             const a = perf.A?.[f]?.avg;
             const b = perf.B?.[f]?.avg;
             const c = perf.C?.[f]?.avg;
+            const d = perf.D?.[f]?.avg;
             const aOk = a != null,
               bOk = b != null,
-              cOk = c != null;
-            const localMax = Math.max(aOk ? a : 0, bOk ? b : 0, cOk ? c : 0);
+              cOk = c != null,
+              dOk = d != null;
+            const localMax = Math.max(aOk ? a : 0, bOk ? b : 0, cOk ? c : 0, dOk ? d : 0);
             const best = Math.min(
               aOk ? a : Infinity,
               bOk ? b : Infinity,
               cOk ? c : Infinity,
+              dOk ? d : Infinity,
             );
 
             const row = document.createElement("div");
@@ -967,6 +999,9 @@
               '<div class="bench-bar c" style="width:' +
               (cOk ? ((c / globalMax) * 100).toFixed(1) : 0) +
               '%"></div>' +
+              '<div class="bench-bar d" style="width:' +
+              (dOk ? ((d / globalMax) * 100).toFixed(1) : 0) +
+              '%"></div>' +
               "</div>" +
               '<span class="bench-ms' +
               (aOk && a === best ? " best" : "") +
@@ -985,6 +1020,12 @@
               (cOk ? "" : " err") +
               '">' +
               (cOk ? c.toFixed(2) : "--") +
+              "</span>" +
+              '<span class="bench-ms' +
+              (dOk && d === best ? " best" : "") +
+              (dOk ? "" : " err") +
+              '">' +
+              (dOk ? d.toFixed(2) : "--") +
               "</span>";
             body.appendChild(row);
           }
@@ -1008,6 +1049,9 @@
           "</span>" +
           '<span class="bench-ms" style="color:var(--yellow);opacity:.6">' +
           avgC.toFixed(2) +
+          "</span>" +
+          '<span class="bench-ms" style="color:#f472b6;opacity:.8">' +
+          avgD.toFixed(2) +
           "</span>";
         container.appendChild(summary);
 
@@ -1032,7 +1076,7 @@
 
         // Aggregate per-plugin stats
         const resStats = {};
-        for (const p of ["A", "B", "C"]) {
+        for (const p of ["A", "B", "C", "D"]) {
           const entries = Object.values(perf[p] || {}).filter(
             (e) => e.cpuUser != null,
           );
@@ -1057,10 +1101,11 @@
           A: "var(--accent)",
           B: "var(--blue)",
           C: "var(--yellow)",
+          D: "#f472b6",
         };
-        const pluginNames = { A: "This plugin", B: "stillat", C: "shufo" };
+        const pluginNames = { A: "This plugin", B: "stillat", C: "shufo", D: "chisel" };
         if (resStats.A.count > 0) {
-          for (const p of ["A", "B", "C"]) {
+          for (const p of ["A", "B", "C", "D"]) {
             const s = resStats[p];
             const card = document.createElement("div");
             card.style.cssText =
@@ -1099,11 +1144,11 @@
         for (const f of resFixtures) {
           const tr = document.createElement("tr");
           const cells = ['<td class="fix">' + shortName(f) + "</td>"];
-          for (const p of ["A", "B", "C"]) {
+          for (const p of ["A", "B", "C", "D"]) {
             const e = perf[p]?.[f];
             const heap = e?.heapUsed;
             const best = Math.min(
-              ...["A", "B", "C"]
+              ...["A", "B", "C", "D"]
                 .map((x) => perf[x]?.[f]?.heapUsed ?? Infinity)
                 .filter((v) => v > 0),
             );
@@ -1113,11 +1158,11 @@
                 : "";
             cells.push("<td" + cls + ">" + fmtBytes(heap) + "</td>");
           }
-          for (const p of ["A", "B", "C"]) {
+          for (const p of ["A", "B", "C", "D"]) {
             const e = perf[p]?.[f];
             const cpu = e ? (e.cpuUser || 0) + (e.cpuSystem || 0) : null;
             const best = Math.min(
-              ...["A", "B", "C"].map((x) => {
+              ...["A", "B", "C", "D"].map((x) => {
                 const v = perf[x]?.[f];
                 return v?.cpuUser != null ? v.cpuUser + v.cpuSystem : Infinity;
               }),
@@ -1166,6 +1211,18 @@
               idemC.error +
               " errors</span>"
             : "") +
+          "</div>" +
+          '<div class="idem-stat"><strong style="color:#f472b6">D:</strong> ' +
+          idemD.pass +
+          " pass" +
+          (idemD.fail
+            ? ', <span style="color:var(--red)">' + idemD.fail + " fail</span>"
+            : "") +
+          (idemD.error
+            ? ', <span style="color:var(--red)">' +
+              idemD.error +
+              " errors</span>"
+            : "") +
           "</div>";
 
         const idemBody = document.getElementById("idemBody");
@@ -1178,13 +1235,13 @@
             prevCat = cat;
             const catRow = document.createElement("tr");
             catRow.className = "cat-row";
-            catRow.innerHTML = '<td colspan="4">' + cat + "</td>";
+            catRow.innerHTML = '<td colspan="5">' + cat + "</td>";
             idemBody.appendChild(catRow);
           }
 
           const tr = document.createElement("tr");
           const cells = [f];
-          for (const p of ["A", "B", "C"]) {
+          for (const p of ["A", "B", "C", "D"]) {
             const entry = idem[p]?.[f];
             if (!entry) {
               cells.push({ cls: "error", text: "--" });
@@ -1213,6 +1270,11 @@
             cells[3].cls +
             '">' +
             cells[3].text +
+            "</td>" +
+            '<td class="' +
+            cells[4].cls +
+            '">' +
+            cells[4].text +
             "</td>";
           idemBody.appendChild(tr);
         }
@@ -1313,6 +1375,26 @@
         if (errorsC.length === 0)
           pluginCDiv.innerHTML += '<div class="no-errors">No errors.</div>';
         errorContainer.appendChild(pluginCDiv);
+
+        // Plugin D
+        const errorsD = collectErrors(idem.D, "D");
+        const pluginDDiv = document.createElement("div");
+        pluginDDiv.className = "error-plugin";
+        pluginDDiv.innerHTML =
+          '<div class="error-plugin-name" style="color:#f472b6">D — prettier-plugin-blade v3 (Chisel)</div>';
+        for (const e of errorsD) {
+          pluginDDiv.innerHTML +=
+            '<div class="error-card"><div class="ec-fixture">' +
+            escHtml(e.fixture) +
+            '</div><div class="ec-type">' +
+            e.type +
+            '</div><div class="ec-detail">' +
+            escHtml(e.detail) +
+            "</div></div>";
+        }
+        if (errorsD.length === 0)
+          pluginDDiv.innerHTML += '<div class="no-errors">No errors.</div>';
+        errorContainer.appendChild(pluginDDiv);
 
       
       })();
