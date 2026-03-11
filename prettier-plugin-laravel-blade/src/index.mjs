@@ -118,6 +118,12 @@ export const parsers = {
         }
       }
 
+      // Pre-format Alpine values so the Dart formatter sees real widths
+      // when making attribute wrapping decisions
+      if (options.bladeFormatAlpine !== false) {
+        text = await formatAlpineAttributes(text, options);
+      }
+
       const result = formatBlade(text, formatOpts);
 
       // Store cursor offset for Prettier to pick up
@@ -127,7 +133,8 @@ export const parsers = {
 
       let formatted = result.formatted;
 
-      // Post-process: format Alpine.js attribute values
+      // Post-format Alpine values again to clean up any values
+      // the Dart formatter may have restructured
       if (options.bladeFormatAlpine !== false) {
         formatted = await formatAlpineAttributes(formatted, options);
       }

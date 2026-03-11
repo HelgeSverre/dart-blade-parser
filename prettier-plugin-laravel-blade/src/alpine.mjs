@@ -76,6 +76,7 @@ export async function formatAlpineValue(attrName, attrValue, options, indentLeve
       ...options,
       parser: "typescript",
       singleQuote: true,
+      trailingComma: "none",
       plugins: [], // Don't load blade plugin recursively
     });
 
