@@ -418,6 +418,13 @@ class BladeParser {
           hint: 'Add @endif to close the conditional block',
         ),
       );
+      final pos = _previous().endPosition;
+      children.add(RecoveryNode(
+        content: '',
+        reason: 'missing @endif',
+        startPosition: pos,
+        endPosition: pos,
+      ));
     } else {
       _advance();
     }
@@ -449,6 +456,13 @@ class BladeParser {
           hint: 'Add @endforeach to close the loop',
         ),
       );
+      final pos = _previous().endPosition;
+      children.add(RecoveryNode(
+        content: '',
+        reason: 'missing @endforeach',
+        startPosition: pos,
+        endPosition: pos,
+      ));
     } else {
       _advance();
     }
@@ -480,6 +494,13 @@ class BladeParser {
           hint: 'Add @endfor to close the loop',
         ),
       );
+      final pos = _previous().endPosition;
+      children.add(RecoveryNode(
+        content: '',
+        reason: 'missing @endfor',
+        startPosition: pos,
+        endPosition: pos,
+      ));
     } else {
       _advance();
     }
@@ -511,6 +532,13 @@ class BladeParser {
           hint: 'Add @endwhile to close the loop',
         ),
       );
+      final pos = _previous().endPosition;
+      children.add(RecoveryNode(
+        content: '',
+        reason: 'missing @endwhile',
+        startPosition: pos,
+        endPosition: pos,
+      ));
     } else {
       _advance();
     }
@@ -589,6 +617,13 @@ class BladeParser {
           position: startToken.startPosition,
         ),
       );
+      final pos = _previous().endPosition;
+      children.add(RecoveryNode(
+        content: '',
+        reason: 'missing @endswitch',
+        startPosition: pos,
+        endPosition: pos,
+      ));
     } else {
       _advance(); // @endswitch
     }
@@ -637,6 +672,13 @@ class BladeParser {
           position: startToken.startPosition,
         ),
       );
+      final pos = _previous().endPosition;
+      loopChildren.add(RecoveryNode(
+        content: '',
+        reason: 'missing @endforelse',
+        startPosition: pos,
+        endPosition: pos,
+      ));
     } else {
       _advance(); // @endforelse
     }
@@ -1028,6 +1070,13 @@ class BladeParser {
           hint: 'Add @${_closingDirectiveName(name)} to close the block',
         ),
       );
+      final pos = _previous().endPosition;
+      children.add(RecoveryNode(
+        content: '',
+        reason: 'missing @${_closingDirectiveName(name)}',
+        startPosition: pos,
+        endPosition: pos,
+      ));
     } else {
       _advance();
     }
@@ -1206,6 +1255,13 @@ class BladeParser {
           hint: 'Add @${_closingDirectiveName(name)} to close the block',
         ),
       );
+      final pos = _previous().endPosition;
+      children.add(RecoveryNode(
+        content: '',
+        reason: 'missing @${_closingDirectiveName(name)}',
+        startPosition: pos,
+        endPosition: pos,
+      ));
     }
 
     return DirectiveNode(
@@ -1609,15 +1665,8 @@ class BladeParser {
     }
   }
 
-  /// Parse HTML element into HtmlElementNode (T031-T037)
-  ///
-  /// Handles:
-  /// - Opening tags: <div>, <p>, etc.
-  /// - Attributes: class, id, data-*, etc.
-  /// - Children: nested elements, text, directives
-  /// - Closing tags: </div>, </p>
-  /// - Self-closing: <br/>, <img/>
-  /// - Void elements: <br>, <img>, <meta>, <input>, <hr>, <link>
+  /// Handles a stray closing tag encountered at the top level or by
+  /// [_parseNode]. Returns a [RecoveryNode] when the tag name is valid.
   AstNode? _parseStrayClosingTag() {
     final closingStartPos = _peek().startPosition;
     final closingTagName = _peekClosingTagName();
@@ -1650,6 +1699,10 @@ class BladeParser {
     return null;
   }
 
+  /// Parse HTML element into HtmlElementNode (T031-T037).
+  ///
+  /// Handles opening tags, attributes, children, closing tags,
+  /// self-closing syntax, and void elements.
   HtmlElementNode? _parseHtmlElement() {
     // Parse opening tag
     if (!_check(TokenType.htmlTagOpen)) {

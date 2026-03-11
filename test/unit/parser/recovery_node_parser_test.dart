@@ -41,5 +41,114 @@ void main() {
         expect(recoveryNodes, hasLength(2));
       });
     });
+
+    group('unclosed directives', () {
+      test('unclosed @if gets RecoveryNode marker', () {
+        final result = parser.parse('@if(\$x)\n<p>Hello</p>');
+
+        expect(result.isSuccess, isFalse);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        expect(directive.name, 'if');
+
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.reason, contains('@endif'));
+      });
+
+      test('unclosed @foreach gets RecoveryNode marker', () {
+        final result =
+            parser.parse('@foreach(\$items as \$item)\n<li>{{ \$item }}</li>');
+
+        expect(result.isSuccess, isFalse);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        expect(directive.name, 'foreach');
+
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.reason, contains('@endforeach'));
+      });
+
+      test('unclosed @while gets RecoveryNode marker', () {
+        final result = parser.parse('@while(true)\n<p>loop</p>');
+
+        expect(result.isSuccess, isFalse);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.reason, contains('@endwhile'));
+      });
+
+      test('unclosed @for gets RecoveryNode marker', () {
+        final result =
+            parser.parse('@for(\$i = 0; \$i < 10; \$i++)\n<p>{{ \$i }}</p>');
+
+        expect(result.isSuccess, isFalse);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.reason, contains('@endfor'));
+      });
+
+      test('unclosed generic directive gets RecoveryNode marker', () {
+        final result = parser.parse('@auth\n<p>Secret</p>');
+
+        expect(result.isSuccess, isFalse);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.reason, contains('@endauth'));
+      });
+
+      test('unclosed @switch gets RecoveryNode marker', () {
+        final result = parser.parse('@switch(\$x)\n@case(1)\n<p>One</p>');
+
+        expect(result.isSuccess, isFalse);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.reason, contains('@endswitch'));
+      });
+
+      test('unclosed @forelse gets RecoveryNode marker', () {
+        final result = parser
+            .parse('@forelse(\$items as \$item)\n<li>{{ \$item }}</li>');
+
+        expect(result.isSuccess, isFalse);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.reason, contains('@endforelse'));
+      });
+
+      test('properly closed directive has no RecoveryNode', () {
+        final result = parser.parse('@if(\$x)\n<p>Hello</p>\n@endif');
+
+        expect(result.isSuccess, isTrue);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, isEmpty);
+      });
+    });
+
+    group('skipped regions', () {
+      test('void element closer becomes RecoveryNode', () {
+        final result = parser.parse('<div></br></div>');
+
+        expect(result.isSuccess, isFalse);
+        final div = result.ast!.children[0] as HtmlElementNode;
+        final recoveryNodes = div.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.content, contains('br'));
+      });
+
+      test('top-level void element closer becomes RecoveryNode', () {
+        final result = parser.parse('</hr>');
+
+        expect(result.isSuccess, isFalse);
+        final recoveryNodes = result.ast!.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.content, '</hr>');
+      });
+    });
   });
 }
