@@ -90,4 +90,10 @@ abstract class RecursiveAstVisitor<T> implements AstVisitor<T> {
     // PHP block nodes are leaf nodes (no children)
     return defaultValue;
   }
+
+  @override
+  T visitRecovery(RecoveryNode node) {
+    // Recovery nodes are leaf nodes (preserved source text)
+    return defaultValue;
+  }
 }

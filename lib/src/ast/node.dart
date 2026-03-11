@@ -80,6 +80,9 @@ abstract class AstVisitor<T> {
 
   /// Visit a PHP block node (<?php ?>, <?= ?>, <? ?>, @php/@endphp).
   T visitPhpBlock(PhpBlockNode node);
+
+  /// Visit a recovery node (preserved source from error recovery).
+  T visitRecovery(RecoveryNode node);
 }
 
 /// Root document node representing the entire Blade template.
@@ -332,6 +335,17 @@ final class TagHeadPhpBlock extends TagHeadItem {
   TagHeadPhpBlock(this.content);
 }
 
+/// Opaque malformed content preserved inside a tag head.
+///
+/// This is used for best-effort recovery when the lexer cannot safely classify
+/// a span as a valid attribute or directive.
+final class TagHeadRaw extends TagHeadItem {
+  /// The raw source content as it appeared in the tag head.
+  final String content;
+
+  TagHeadRaw(this.content);
+}
+
 /// Base class for HTML/component attribute nodes.
 ///
 /// Represents different types of attributes: standard HTML, Alpine.js,
@@ -510,9 +524,9 @@ final class ComponentNode extends AstNode {
   final Map<String, AttributeNode> attributes;
 
   /// Ordered list of items in the opening tag head.
-  /// Preserves the source order of attributes and structural directives
-  /// (e.g., `@if`/`@endif` wrapping conditional attributes).
-  /// Empty when no structural directives appear in the tag head.
+  /// Preserves the source order of attributes, structural directives, and
+  /// recovery-only items such as malformed raw chunks.
+  /// Empty when no non-trivial tag-head structure needs preservation.
   final List<TagHeadItem> tagHead;
 
   /// Named slots defined within the component.
@@ -525,7 +539,8 @@ final class ComponentNode extends AstNode {
   ///
   /// [name] is the component name without the x- prefix.
   /// [attributes] are the component attributes.
-  /// [tagHead] preserves ordered tag head items when directives are present.
+  /// [tagHead] preserves ordered tag head items when source order or recovery
+  /// details need to be retained.
   /// [slots] are named slot definitions.
   /// [isSelfClosing] indicates if this is a self-closing tag.
   /// [children] contains the component's content.
@@ -635,9 +650,9 @@ final class HtmlElementNode extends AstNode {
   final Map<String, AttributeNode> attributes;
 
   /// Ordered list of items in the opening tag head.
-  /// Preserves the source order of attributes and structural directives
-  /// (e.g., `@if`/`@endif` wrapping conditional attributes).
-  /// Empty when no structural directives appear in the tag head.
+  /// Preserves the source order of attributes, structural directives, and
+  /// recovery-only items such as malformed raw chunks.
+  /// Empty when no non-trivial tag-head structure needs preservation.
   final List<TagHeadItem> tagHead;
 
   /// Whether this element uses self-closing syntax (<br />).
@@ -650,7 +665,8 @@ final class HtmlElementNode extends AstNode {
   ///
   /// [tagName] is automatically converted to lowercase.
   /// [attributes] include all types of attributes (standard, Alpine, Livewire).
-  /// [tagHead] preserves ordered tag head items when directives are present.
+  /// [tagHead] preserves ordered tag head items when source order or recovery
+  /// details need to be retained.
   /// [isSelfClosing] indicates self-closing syntax usage.
   /// [isVoid] marks void elements that cannot have closing tags.
   /// [children] contains nested content (empty for void elements).
@@ -771,6 +787,49 @@ final class ErrorNode extends AstNode {
         'type': 'error',
         'error': error,
         if (partialContent != null) 'partialContent': partialContent,
+        'position': {
+          'start': startPosition.toJson(),
+          'end': endPosition.toJson(),
+        },
+      };
+}
+
+/// Preserved source span from a parser recovery point.
+///
+/// Unlike [ErrorNode], which marks a parsing error location,
+/// [RecoveryNode] captures the actual source text that was consumed
+/// during recovery. The formatter outputs this content verbatim.
+final class RecoveryNode extends AstNode {
+  @override
+  final Position startPosition;
+  @override
+  final Position endPosition;
+  @override
+  AstNode? parent;
+  @override
+  final List<AstNode> children = const [];
+
+  /// The verbatim source content consumed during recovery.
+  final String content;
+
+  /// Human-readable reason describing what recovery occurred.
+  final String reason;
+
+  RecoveryNode({
+    required this.content,
+    required this.reason,
+    required this.startPosition,
+    required this.endPosition,
+  });
+
+  @override
+  T accept<T>(AstVisitor<T> visitor) => visitor.visitRecovery(this);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'recovery',
+        'content': content,
+        'reason': reason,
         'position': {
           'start': startPosition.toJson(),
           'end': endPosition.toJson(),

@@ -568,6 +568,8 @@ class FormatterVisitor implements AstVisitor<String> {
         _output.write(item.content);
       } else if (item is TagHeadPhpBlock) {
         _output.write(item.content);
+      } else if (item is TagHeadRaw) {
+        _output.write(item.content);
       }
 
       final isLast = i == items.length - 1;
@@ -1687,16 +1689,18 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitError(ErrorNode node) {
-    // If formatting is disabled, output raw
-    if (!_formattingEnabled) {
-      _outputRaw(node);
+    if (node.partialContent != null && node.partialContent!.isNotEmpty) {
+      _output.write(node.partialContent);
       return '';
     }
 
-    // Preserve error nodes as-is (shouldn't happen in well-formed input)
-    _beginLine();
-    _output.write('<!-- ERROR: ${node.error} -->');
-    _output.writeln();
+    _outputRaw(node);
+    return '';
+  }
+
+  @override
+  String visitRecovery(RecoveryNode node) {
+    _output.write(node.content);
     return '';
   }
 
