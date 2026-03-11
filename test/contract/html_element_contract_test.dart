@@ -38,6 +38,9 @@ class TestVisitor extends AstVisitor<String> {
 
   @override
   String visitPhpBlock(PhpBlockNode node) => 'phpBlock';
+
+  @override
+  String visitRecovery(RecoveryNode node) => 'recovery';
 }
 
 void main() {
