@@ -768,6 +768,19 @@ describe("cursor tracking", () => {
     assert.equal(second.formatted, first.formatted);
     assert.equal(second.cursorOffset, first.cursorOffset);
   });
+
+  it("tracks cursor after Alpine formatting changes text before it", async () => {
+    const input = '<div x-data="{open:false}">X</div>';
+    const cursorOffset = input.indexOf("X");
+    const result = await prettier.formatWithCursor(input, {
+      parser: "blade",
+      plugins: [pluginPath],
+      cursorOffset,
+    });
+
+    assert.equal(result.formatted, '<div x-data="{ open: false }">X</div>\n');
+    assert.equal(result.formatted[result.cursorOffset], "X");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -792,6 +805,16 @@ describe("range formatting", () => {
     });
     const fullResult = await format(input);
     assert.equal(rangeResult, fullResult);
+  });
+
+  it("does not rewrite Alpine attributes outside the selected range", async () => {
+    const input = '<div x-data="{open:false}"></div>\n<p>  hi</p>';
+    const rangeStart = input.indexOf("<p>");
+    const rangeEnd = input.length;
+    const result = await format(input, { rangeStart, rangeEnd });
+
+    assert.equal(result.split("\n")[0], '<div x-data="{open:false}"></div>');
+    assert.ok(result.includes("<p>hi</p>"));
   });
 });
 

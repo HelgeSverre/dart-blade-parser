@@ -43,12 +43,18 @@ const ALPINE_ATTR_RE = new RegExp(
   "g",
 );
 
-async function formatAlpineAttributes(text, options) {
+async function formatAlpineAttributes(text, options, state = {}) {
   const matches = [...text.matchAll(ALPINE_ATTR_RE)];
-  if (matches.length === 0) return text;
+  if (matches.length === 0) {
+    return {
+      text,
+      cursorOffset: state.cursorOffset ?? -1,
+    };
+  }
 
   // Process replacements from end to start to preserve positions
   let result = text;
+  let cursorOffset = state.cursorOffset ?? -1;
   for (const match of matches.reverse()) {
     const [fullMatch, attrName, quote, value] = match;
     const offset = match.index;
@@ -69,6 +75,19 @@ async function formatAlpineAttributes(text, options) {
 
     if (formatted !== value) {
       const replacement = `${attrName}=${quote}${formatted}${quote}`;
+      if (cursorOffset >= 0) {
+        const matchEnd = offset + fullMatch.length;
+        const delta = replacement.length - fullMatch.length;
+
+        if (matchEnd <= cursorOffset) {
+          cursorOffset += delta;
+        } else if (offset < cursorOffset) {
+          const relativeOffset = cursorOffset - offset;
+          cursorOffset =
+            offset + Math.min(relativeOffset, replacement.length);
+        }
+      }
+
       result =
         result.slice(0, offset) +
         replacement +
@@ -76,13 +95,20 @@ async function formatAlpineAttributes(text, options) {
     }
   }
 
-  return result;
+  return {
+    text: result,
+    cursorOffset,
+  };
 }
 
 /** @type {Record<string, import("prettier").Parser>} */
 export const parsers = {
   blade: {
     async preprocess(text, options) {
+      const hasCursor = options.cursorOffset >= 0;
+      const hasRange = options.rangeStart > 0 || options.rangeEnd < text.length;
+      let cursorOffset = hasCursor ? options.cursorOffset : -1;
+
       const formatOpts = {
         tabWidth: options.tabWidth,
         useTabs: options.useTabs,
@@ -103,11 +129,6 @@ export const parsers = {
         trailingNewline: options.bladeTrailingNewline,
       };
 
-      // Pass cursor offset if set
-      if (options.cursorOffset >= 0) {
-        formatOpts.cursorOffset = options.cursorOffset;
-      }
-
       // Pass range if set
       if (options.rangeStart > 0 || options.rangeEnd < text.length) {
         if (options.rangeStart > 0) {
@@ -119,28 +140,38 @@ export const parsers = {
       }
 
       // Pre-format Alpine values so the Dart formatter sees real widths
-      // when making attribute wrapping decisions. Skip when cursor/range
-      // offsets are active since the pre-pass changes text length and
-      // would invalidate those byte positions.
-      const hasCursor = options.cursorOffset >= 0;
-      const hasRange = options.rangeStart > 0 || options.rangeEnd < text.length;
-      if (options.bladeFormatAlpine !== false && !hasCursor && !hasRange) {
-        text = await formatAlpineAttributes(text, options);
+      // when making attribute wrapping decisions. Skip this during partial
+      // range formatting so content outside the selected span is untouched.
+      if (options.bladeFormatAlpine !== false && !hasRange) {
+        const prepass = await formatAlpineAttributes(text, options, {
+          cursorOffset,
+        });
+        text = prepass.text;
+        cursorOffset = prepass.cursorOffset;
+      }
+
+      if (hasCursor) {
+        formatOpts.cursorOffset = cursorOffset;
       }
 
       const result = formatBlade(text, formatOpts);
-
-      // Store cursor offset for Prettier to pick up
-      if (result.cursorOffset >= 0) {
-        options.__bladeCursorOffset = result.cursorOffset;
-      }
+      cursorOffset = result.cursorOffset;
 
       let formatted = result.formatted;
 
       // Post-format Alpine values again to clean up any values
-      // the Dart formatter may have restructured
-      if (options.bladeFormatAlpine !== false) {
-        formatted = await formatAlpineAttributes(formatted, options);
+      // the Dart formatter may have restructured. Skip partial range
+      // formatting so editor selection formatting remains local.
+      if (options.bladeFormatAlpine !== false && !hasRange) {
+        const postpass = await formatAlpineAttributes(formatted, options, {
+          cursorOffset,
+        });
+        formatted = postpass.text;
+        cursorOffset = postpass.cursorOffset;
+      }
+
+      if (hasCursor && cursorOffset >= 0) {
+        options.cursorOffset = cursorOffset;
       }
 
       return formatted;
