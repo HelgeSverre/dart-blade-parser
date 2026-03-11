@@ -10,7 +10,8 @@ void main() {
     });
 
     test('formats only the selected range', () {
-      const source = '<p>First</p>\n<div>@if(\$x) <p>Y</p> @endif</div>\n<p>Last</p>';
+      const source =
+          '<p>First</p>\n<div>@if(\$x) <p>Y</p> @endif</div>\n<p>Last</p>';
       // Range covers the <div>...</div> line
       final rangeStart = source.indexOf('<div>');
       final rangeEnd = source.indexOf('</div>') + '</div>'.length;
@@ -28,8 +29,7 @@ void main() {
       const source = '<!-- header -->\n<div>@if(\$x) <p>Y</p> @endif</div>';
       final rangeStart = source.indexOf('<div>');
 
-      final result =
-          formatter.formatRange(source, rangeStart, source.length);
+      final result = formatter.formatRange(source, rangeStart, source.length);
 
       // Header comment should still be present in the output
       expect(result.formatted, contains('<!-- header -->'));
@@ -74,12 +74,13 @@ void main() {
       expect(result.formatted, contains('<p>'));
     });
 
-    test('throws on parse errors', () {
+    test('best-effort formats malformed ranges and reports errors', () {
       const source = '@if(\$x) <p>Unclosed';
-      expect(
-        () => formatter.formatRange(source, 0, source.length),
-        throwsA(isA<FormatterException>()),
-      );
+      final result = formatter.formatRange(source, 0, source.length);
+
+      expect(result.hasErrors, isTrue);
+      expect(result.errors, isNotEmpty);
+      expect(result.formatted, '@if(\$x)\n    <p>Unclosed</p>\n@endif\n');
     });
 
     test('handles range at start of file', () {

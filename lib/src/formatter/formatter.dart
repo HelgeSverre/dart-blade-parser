@@ -26,7 +26,9 @@ class BladeFormatter {
   ///
   /// Returns the formatted source code as a string.
   ///
-  /// Throws [FormatterException] if the source contains parse errors.
+  /// Best-effort formatting is used when the parser can still produce an AST.
+  /// Throws [FormatterException] only when parsing fails so badly that no AST
+  /// is available for formatting.
   ///
   /// Example:
   /// ```dart
@@ -40,21 +42,8 @@ class BladeFormatter {
   /// ''');
   /// ```
   String format(String source) {
-    final parser = BladeParser();
-    final result = parser.parse(source);
-
-    // If there are parse errors, we cannot format
-    if (!result.isSuccess) {
-      throw FormatterException(
-        'Cannot format source with parse errors',
-        result.errors,
-      );
-    }
-
-    // Use the visitor to format the AST
-    // Pass the original source for ignore comment support
-    final visitor = FormatterVisitor(config, source: source);
-    return visitor.format(result.ast!);
+    final parsed = _parseForFormatting(source);
+    return _formatAst(parsed.ast, source);
   }
 
   /// Checks if a source string needs formatting.
@@ -73,14 +62,8 @@ class BladeFormatter {
   /// }
   /// ```
   bool needsFormatting(String source) {
-    try {
-      final formatted = format(source);
-      return source != formatted;
-    } on FormatterException {
-      // If source has parse errors, consider it as needing formatting
-      // (user should fix the errors)
-      return true;
-    }
+    final result = formatWithResult(source);
+    return result.wasChanged || result.hasErrors;
   }
 
   /// Unique marker used for cursor tracking.
@@ -143,19 +126,9 @@ class BladeFormatter {
   /// Parses without a marker, formats, then maps the cursor offset to the
   /// nearest node boundary in the formatted output.
   FormatResult _formatWithCursorFallback(String source, int cursorOffset) {
-    final parser = BladeParser();
-    final parseResult = parser.parse(source);
-
-    if (!parseResult.isSuccess) {
-      throw FormatterException(
-        'Cannot format source with parse errors',
-        parseResult.errors,
-      );
-    }
-
-    final ast = parseResult.ast!;
-    final visitor = FormatterVisitor(config, source: source);
-    final formatted = visitor.format(ast);
+    final parsed = _parseForFormatting(source);
+    final ast = parsed.ast;
+    final formatted = _formatAst(ast, source);
 
     // Find the node containing the cursor
     final node = _findNodeAtOffset(ast.children, cursorOffset);
@@ -172,8 +145,8 @@ class BladeFormatter {
           return FormatResult(
             formatted: formatted,
             wasChanged: source != formatted,
-            hasErrors: false,
-            errors: const [],
+            hasErrors: parsed.errors.isNotEmpty,
+            errors: parsed.errors,
             cursorOffset: newOffset,
           );
         }
@@ -184,8 +157,8 @@ class BladeFormatter {
     return FormatResult(
       formatted: formatted,
       wasChanged: source != formatted,
-      hasErrors: false,
-      errors: const [],
+      hasErrors: parsed.errors.isNotEmpty,
+      errors: parsed.errors,
       cursorOffset: cursorOffset.clamp(0, formatted.length),
     );
   }
@@ -211,19 +184,10 @@ class BladeFormatter {
   /// [rangeStart]..[rangeEnd], snaps the range to node boundaries, formats
   /// those nodes, and splices the result back into the original source.
   ///
-  /// Throws [FormatterException] if the source contains parse errors.
+  /// Uses best-effort formatting when the parser can still produce an AST.
   FormatResult formatRange(String source, int rangeStart, int rangeEnd) {
-    final parser = BladeParser();
-    final result = parser.parse(source);
-
-    if (!result.isSuccess) {
-      throw FormatterException(
-        'Cannot format source with parse errors',
-        result.errors,
-      );
-    }
-
-    final ast = result.ast!;
+    final parsed = _parseForFormatting(source);
+    final ast = parsed.ast;
     final children = ast.children;
 
     // Find top-level children overlapping [rangeStart, rangeEnd]
@@ -243,8 +207,8 @@ class BladeFormatter {
       return FormatResult(
         formatted: source,
         wasChanged: false,
-        hasErrors: false,
-        errors: const [],
+        hasErrors: parsed.errors.isNotEmpty,
+        errors: parsed.errors,
       );
     }
 
@@ -259,8 +223,7 @@ class BladeFormatter {
       children: overlapping,
     );
 
-    final visitor = FormatterVisitor(config, source: source);
-    final formattedSlice = visitor.format(syntheticDoc);
+    final formattedSlice = _formatAst(syntheticDoc, source);
 
     // Splice back into original source
     final formatted = source.substring(0, snappedStart) +
@@ -270,8 +233,8 @@ class BladeFormatter {
     return FormatResult(
       formatted: formatted,
       wasChanged: source != formatted,
-      hasErrors: false,
-      errors: const [],
+      hasErrors: parsed.errors.isNotEmpty,
+      errors: parsed.errors,
     );
   }
 
@@ -295,14 +258,15 @@ class BladeFormatter {
   /// ```
   FormatResult formatWithResult(String source) {
     try {
-      final formatted = format(source);
+      final parsed = _parseForFormatting(source);
+      final formatted = _formatAst(parsed.ast, source);
       final wasChanged = source != formatted;
 
       return FormatResult(
         formatted: formatted,
         wasChanged: wasChanged,
-        hasErrors: false,
-        errors: const [],
+        hasErrors: parsed.errors.isNotEmpty,
+        errors: parsed.errors,
       );
     } on FormatterException catch (e) {
       return FormatResult(
@@ -313,6 +277,32 @@ class BladeFormatter {
       );
     }
   }
+
+  _ParsedFormattingInput _parseForFormatting(String source) {
+    final parser = BladeParser();
+    final result = parser.parse(source);
+
+    if (result.ast == null) {
+      throw FormatterException(
+        'Cannot format source because parsing did not produce an AST',
+        result.errors,
+      );
+    }
+
+    return _ParsedFormattingInput(result.ast!, result.errors);
+  }
+
+  String _formatAst(DocumentNode ast, String source) {
+    final visitor = FormatterVisitor(config, source: source);
+    return visitor.format(ast);
+  }
+}
+
+class _ParsedFormattingInput {
+  final DocumentNode ast;
+  final List<ParseError> errors;
+
+  const _ParsedFormattingInput(this.ast, this.errors);
 }
 
 /// Result of a formatting operation.
