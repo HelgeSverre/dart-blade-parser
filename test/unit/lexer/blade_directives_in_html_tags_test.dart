@@ -166,8 +166,7 @@ void main() {
       expect(types, contains(TokenType.alpineShorthandOn));
 
       // Verify @if has its expression captured
-      final ifIdx =
-          tokens.indexWhere((t) => t.type == TokenType.directiveIf);
+      final ifIdx = tokens.indexWhere((t) => t.type == TokenType.directiveIf);
       expect(tokens[ifIdx + 1].type, equals(TokenType.expression));
       expect(tokens[ifIdx + 1].value, contains('\$closeable'));
     });
@@ -241,6 +240,22 @@ void main() {
 
       expect(div.tagHead, isEmpty);
       expect(div.attributes, hasLength(2));
+    });
+
+    test('malformed tag-head chunks are preserved and do not smear offsets',
+        () {
+      const input = '<div class="base" ??? data-x="1">';
+      final lexer = BladeLexer(input);
+      final tokens = lexer.tokenize();
+
+      final rawToken = tokens.firstWhere((t) => t.type == TokenType.tagHeadRaw);
+      final dataToken = tokens.firstWhere(
+        (t) => t.type == TokenType.identifier && t.value == 'data-x',
+      );
+
+      expect(rawToken.value, '???');
+      expect(rawToken.startOffset, input.indexOf('???'));
+      expect(dataToken.startOffset, input.indexOf('data-x'));
     });
   });
 }

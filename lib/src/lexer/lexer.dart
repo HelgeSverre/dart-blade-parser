@@ -1254,7 +1254,11 @@ class BladeLexer {
         continue;
       }
       if (_lexInlineBladeInTag()) continue;
-      _lexAttribute();
+      if (_isTagHeadAttributeStart(_peek())) {
+        _lexAttribute();
+      } else {
+        _lexTagHeadRawChunk();
+      }
       _skipWhitespace();
     }
 
@@ -1329,7 +1333,11 @@ class BladeLexer {
         continue;
       }
       if (_lexInlineBladeInTag()) continue;
-      _lexAttribute();
+      if (_isTagHeadAttributeStart(_peek())) {
+        _lexAttribute();
+      } else {
+        _lexTagHeadRawChunk();
+      }
       _skipWhitespace();
     }
 
@@ -1525,6 +1533,10 @@ class BladeLexer {
       _advance(); // Skip the unexpected character
       return;
     }
+
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
 
     // Check for @ in attribute position: Blade directive or Alpine.js shorthand
     if (_peek() == '@') {
@@ -1894,6 +1906,30 @@ class BladeLexer {
     }
   }
 
+  void _lexTagHeadRawChunk() {
+    _start = _position;
+    _startLine = _line;
+    _startColumn = _column;
+
+    while (!_isAtEnd()) {
+      if (_peek() == '>' || (_peek() == '/' && _peekNext() == '>')) break;
+      if (_peek() == '<' && _peekNext() == '?') break;
+      if (_peek() == '{' &&
+          (_peekNext() == '{' ||
+              (_peekNext() == '!' && _peekAhead(2) == '!'))) {
+        break;
+      }
+      if (_isTagHeadRawResyncBoundary()) break;
+      _advance();
+    }
+
+    if (_position == _start) {
+      _advance();
+    }
+
+    _emitToken(TokenType.tagHeadRaw, input.substring(_start, _position));
+  }
+
   // Helper methods
 
   /// Check if the character at [position] is NOT escaped by backslashes.
@@ -1916,6 +1952,45 @@ class BladeLexer {
         _peek() == '\r') {
       _advance();
     }
+  }
+
+  bool _isTagHeadAttributeStart(String ch) =>
+      _isAlpha(ch) || ch == '_' || ch == '@' || ch == ':';
+
+  bool _isTagHeadRawResyncBoundary() {
+    final ch = _peek();
+    if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r') return false;
+
+    var lookahead = _position;
+    while (lookahead < input.length) {
+      final next = input[lookahead];
+      if (next != ' ' && next != '\t' && next != '\n' && next != '\r') {
+        break;
+      }
+      lookahead++;
+    }
+
+    if (lookahead >= input.length) return false;
+
+    final next = input[lookahead];
+    if (next == '>' || next == '@' || next == ':' || next == '_') return true;
+    if (_isAlpha(next)) return true;
+    if (next == '<' &&
+        lookahead + 1 < input.length &&
+        input[lookahead + 1] == '?') {
+      return true;
+    }
+    if (next == '{' && lookahead + 1 < input.length) {
+      final next2 = input[lookahead + 1];
+      if (next2 == '{' ||
+          (next2 == '!' &&
+              lookahead + 2 < input.length &&
+              input[lookahead + 2] == '!')) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   bool _isAtEnd() => _position >= input.length;

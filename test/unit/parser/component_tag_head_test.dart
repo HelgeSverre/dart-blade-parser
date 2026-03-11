@@ -135,6 +135,19 @@ void main() {
       expect(component.attributes, isNotEmpty);
     });
 
+    test('component preserves malformed tag-head chunks', () {
+      const input = '<x-alert type="error" ??? data-x="1" />';
+      final result = parser.parse(input);
+      final component = result.ast!.children.whereType<ComponentNode>().first;
+
+      expect(component.tagHead, hasLength(3));
+      expect(component.tagHead[0], isA<TagHeadAttribute>());
+      expect(component.tagHead[1], isA<TagHeadRaw>());
+      expect((component.tagHead[1] as TagHeadRaw).content, '???');
+      expect(component.tagHead[2], isA<TagHeadAttribute>());
+      expect(component.attributes.containsKey('data-x'), isTrue);
+    });
+
     test('attributes map is populated alongside tagHead', () {
       const input = '''<x-data-table
     :columns="\$columns"

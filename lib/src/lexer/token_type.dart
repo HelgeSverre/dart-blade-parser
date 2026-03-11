@@ -244,6 +244,7 @@ enum TokenType {
   stringLiteral,
   numberLiteral,
   attributeValue, // Attribute value (without quotes)
+  tagHeadRaw, // Opaque malformed content preserved inside a tag head
   // Structural
   bladeComment, // {{-- --}}
   htmlComment, // <!-- -->
