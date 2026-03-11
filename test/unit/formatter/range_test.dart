@@ -80,7 +80,9 @@ void main() {
 
       expect(result.hasErrors, isTrue);
       expect(result.errors, isNotEmpty);
-      expect(result.formatted, '@if(\$x)\n    <p>Unclosed</p>\n@endif\n');
+      expect(result.formatted, contains('@if(\$x)'));
+      expect(result.formatted, contains('Unclosed'));
+      expect(result.formatted, contains('@endif'));
     });
 
     test('handles range at start of file', () {

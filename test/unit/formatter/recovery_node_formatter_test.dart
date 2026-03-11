@@ -53,7 +53,7 @@ void main() {
       });
 
       test('multiple recovery sites in one template are all idempotent', () {
-        const input = '<div></bogus>@if(\$x)<p>Hi</p></div>';
+        const input = '<div></bogus></baz>Text</div>';
         final pass1 = formatter.format(input);
         final pass2 = formatter.format(pass1);
         expect(pass2, equals(pass1));

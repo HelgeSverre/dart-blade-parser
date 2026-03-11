@@ -1103,9 +1103,11 @@ class FormatterVisitor implements AstVisitor<String> {
 
     // Format children
     if (node.children.isNotEmpty) {
-      // Filter out whitespace-only text nodes for inline check
+      // Filter out whitespace-only text nodes and empty recovery markers
       final meaningfulChildren = node.children
-          .where((c) => c is! TextNode || c.content.trim().isNotEmpty)
+          .where((c) =>
+              (c is! TextNode || c.content.trim().isNotEmpty) &&
+              (c is! RecoveryNode || c.content.isNotEmpty))
           .toList();
 
       // Check if we can keep content inline
@@ -1599,9 +1601,11 @@ class FormatterVisitor implements AstVisitor<String> {
         config.slotFormatting == SlotFormatting.compact;
 
     if (useCompactFormatting) {
-      // Filter out whitespace-only text nodes for inline check
+      // Filter out whitespace-only text nodes and empty recovery markers
       final meaningfulChildren = node.children
-          .where((c) => c is! TextNode || c.content.trim().isNotEmpty)
+          .where((c) =>
+              (c is! TextNode || c.content.trim().isNotEmpty) &&
+              (c is! RecoveryNode || c.content.isNotEmpty))
           .toList();
 
       // Check if we can format compactly (single meaningful child without newlines)

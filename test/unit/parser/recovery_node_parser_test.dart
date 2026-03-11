@@ -130,6 +130,38 @@ void main() {
       });
     });
 
+    group('ancestor-close and unclosed HTML', () {
+      test('ancestor closer auto-closes without RecoveryNode child', () {
+        // </div> matches ancestor, so <span> is auto-closed.
+        // No RecoveryNode child — error is in ParseResult.errors only.
+        // HTML elements don't need recovery markers because the formatter
+        // always emits closing tags.
+        final result = parser.parse('<div><span>Text</div>');
+
+        expect(result.isSuccess, isFalse);
+        final div = result.ast!.children[0] as HtmlElementNode;
+        final span = div.children[0] as HtmlElementNode;
+        expect(span.tagName, 'span');
+        expect(span.children.whereType<RecoveryNode>(), isEmpty);
+      });
+
+      test('unclosed HTML at EOF has error but no RecoveryNode child', () {
+        final result = parser.parse('<div><p>Hello');
+
+        expect(result.isSuccess, isFalse);
+        final div = result.ast!.children[0] as HtmlElementNode;
+        expect(div.children.whereType<RecoveryNode>(), isEmpty);
+      });
+
+      test('properly closed HTML has no RecoveryNode', () {
+        final result = parser.parse('<div><span>Text</span></div>');
+
+        expect(result.isSuccess, isTrue);
+        final div = result.ast!.children[0] as HtmlElementNode;
+        expect(div.children.whereType<RecoveryNode>(), isEmpty);
+      });
+    });
+
     group('skipped regions', () {
       test('void element closer becomes RecoveryNode', () {
         final result = parser.parse('<div></br></div>');
