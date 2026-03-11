@@ -200,8 +200,22 @@ Files changed:
 - `test/unit/parser/recovery_node_parser_test.dart` (new)
 - `test/unit/formatter/recovery_node_formatter_test.dart` (new)
 
+### Design Decision: No HTML Recovery Markers
+
+Ancestor-close and unclosed-HTML-at-EOF do **not** get `RecoveryNode` children. Empty recovery markers on HTML elements caused idempotency regressions because:
+
+- The formatter always emits closing tags for HTML elements regardless
+- Empty `RecoveryNode` children changed `meaningfulChildren` filtering, breaking inline vs block layout decisions
+- The recovery information is fully captured in `ParseResult.errors`
+
+Directive blocks **do** get recovery markers because the formatter uses `children.isNotEmpty` to decide whether to emit closing directives like `@endif`.
+
+### `TagHeadRaw` vs `RecoveryNode`
+
+`TagHeadRaw` lives in the `TagHeadItem` sealed hierarchy (not `AstNode`), so unifying it with `RecoveryNode` would require a larger refactor. The two serve the same purpose (opaque source preservation) but in different contexts. Unification deferred — the cost exceeds the benefit.
+
 ### Next Recommended Work
 
-1. Add explicit recovery nodes for ancestor-close auto-repair (currently emits error + returns partial node, but no `RecoveryNode` in the tree marking the implied close).
-2. Promote `TagHeadRaw` malformed chunks to use `RecoveryNode` for consistency.
-3. Add confidence levels to `RecoveryNode` so the formatter can choose between verbatim and conservative reformatting.
+1. Add confidence levels to `RecoveryNode` so the formatter can choose between verbatim output (low confidence) and reindented formatting (high confidence).
+2. Extend recovery to component tag close mismatches (currently only HTML elements).
+3. Add recovery for orphaned intermediate directives (`@else` without `@if`).
