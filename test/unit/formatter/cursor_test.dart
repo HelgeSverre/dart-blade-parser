@@ -102,5 +102,17 @@ void main() {
       expect(secondResult.formatted, equals(firstResult.formatted));
       expect(secondResult.cursorOffset, equals(firstResult.cursorOffset));
     });
+
+    test('best-effort formats malformed input and keeps cursor valid', () {
+      const source = '<div><span>Text</div></span>';
+      final result = formatter.formatWithCursor(source, source.indexOf('Text'));
+
+      expect(
+          result.formatted, equals('<div><span>Text</span></div>\n</span>\n'));
+      expect(result.hasErrors, isTrue);
+      expect(result.errors, isNotEmpty);
+      expect(result.cursorOffset, greaterThanOrEqualTo(0));
+      expect(result.cursorOffset, lessThanOrEqualTo(result.formatted.length));
+    });
   });
 }

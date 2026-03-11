@@ -565,24 +565,47 @@ Content
         expect(result, contains('onclick'));
       });
 
-      test('throws on unclosed tags (expected behavior)', () {
+      test('best-effort formats unclosed tags', () {
         const input = '<div><p>Unclosed paragraph<div>Another unclosed</div>';
 
-        // Formatter throws on parse errors - this is expected behavior
+        const expected = '''
+<div>
+    <p>
+        Unclosed paragraph
+        <div>Another unclosed</div>
+    </p>
+</div>
+''';
+
+        expect(formatter.format(input), expected);
+      });
+
+      test('best-effort repairs mismatched tags', () {
+        const input = '<div><span>Text</div></span>';
+
         expect(
-          () => formatter.format(input),
-          throwsA(isA<FormatterException>()),
+            formatter.format(input), '<div><span>Text</span></div>\n</span>\n');
+      });
+
+      test('best-effort preserves stray closing tags as RecoveryNodes', () {
+        const input = '<div><span>Text</bogus>More</span></div>';
+
+        expect(
+          formatter.format(input),
+          '<div>\n    <span>\n        Text</bogus>More\n    </span>\n</div>\n',
         );
       });
 
-      test('throws on mismatched tags (expected behavior)', () {
-        const input = '<div><span>Text</div></span>';
+      test('best-effort preserves malformed tag-head chunks', () {
+        const input = '<div class="base" ??? data-x="1"></div>';
+        const expected = '''
+<div
+    class="base"
+    ???
+    data-x="1"></div>
+''';
 
-        // Formatter throws on parse errors - this is expected behavior
-        expect(
-          () => formatter.format(input),
-          throwsA(isA<FormatterException>()),
-        );
+        expect(formatter.format(input), expected);
       });
     });
 

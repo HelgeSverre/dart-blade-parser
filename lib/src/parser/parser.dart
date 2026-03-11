@@ -289,8 +289,9 @@ class BladeParser {
 
       // HTML Elements
       case TokenType.htmlTagOpen:
-      case TokenType.htmlClosingTagStart:
         return _parseHtmlElement();
+      case TokenType.htmlClosingTagStart:
+        return _parseStrayClosingTag();
 
       // Error tokens
       case TokenType.error:
@@ -1388,7 +1389,7 @@ class BladeParser {
       _parseTagHead() {
     final attributes = <String, AttributeNode>{};
     final tagHead = <TagHeadItem>[];
-    var hasDirectives = false;
+    var preserveTagHead = false;
 
     while (!_checkAny([
       TokenType.htmlTagClose,
@@ -1427,7 +1428,7 @@ class BladeParser {
         attributes[attrName] = attrNode;
         tagHead.add(TagHeadAttribute(attrName, attrNode));
       } else if (_isStructuralDirectiveToken(type)) {
-        hasDirectives = true;
+        preserveTagHead = true;
         final token = _advance();
         // Extract directive name from token value (e.g., "@if" → "if")
         final directiveName = token.value.startsWith('@')
@@ -1444,7 +1445,7 @@ class BladeParser {
         // Blade echo/raw-echo/comment inside tag attributes (e.g., {{ $attributes->class([...]) }})
         // Consume the echo tokens without creating an attribute node
         if (type == TokenType.echoOpen) {
-          hasDirectives = true;
+          preserveTagHead = true;
           _advance(); // echoOpen
           String expr = '';
           if (_check(TokenType.expression)) {
@@ -1464,7 +1465,7 @@ class BladeParser {
           attributes[attrName] = attrNode;
           tagHead.add(TagHeadAttribute(attrName, attrNode));
         } else if (type == TokenType.rawEchoOpen) {
-          hasDirectives = true;
+          preserveTagHead = true;
           _advance(); // rawEchoOpen
           String expr = '';
           if (_check(TokenType.expression)) {
@@ -1484,24 +1485,28 @@ class BladeParser {
           tagHead.add(TagHeadAttribute(attrName, attrNode));
         } else {
           // Blade comment - preserve in tag head
-          hasDirectives = true;
+          preserveTagHead = true;
           final commentToken = _advance();
           tagHead.add(TagHeadComment(commentToken.value));
         }
       } else if (type == TokenType.phpBlock) {
-        hasDirectives = true;
+        preserveTagHead = true;
         final phpToken = _advance();
         tagHead.add(TagHeadPhpBlock(phpToken.value));
+      } else if (type == TokenType.tagHeadRaw) {
+        preserveTagHead = true;
+        final rawToken = _advance();
+        tagHead.add(TagHeadRaw(rawToken.value));
       } else {
         // Skip unexpected tokens (whitespace, text between directives)
         _advance();
       }
     }
 
-    // Only return tagHead if there are directives (optimization for common case)
+    // Preserve tagHead only when order/recovery details matter.
     return (
       attributes: attributes,
-      tagHead: hasDirectives ? tagHead : const [],
+      tagHead: preserveTagHead ? tagHead : const [],
     );
   }
 
@@ -1613,31 +1618,39 @@ class BladeParser {
   /// - Closing tags: </div>, </p>
   /// - Self-closing: <br/>, <img/>
   /// - Void elements: <br>, <img>, <meta>, <input>, <hr>, <link>
-  HtmlElementNode? _parseHtmlElement() {
-    // Handle closing tag (shouldn't be called directly, but handle gracefully)
-    if (_check(TokenType.htmlClosingTagStart)) {
-      final closingStartPos = _advance().startPosition; // consume '</
+  AstNode? _parseStrayClosingTag() {
+    final closingStartPos = _peek().startPosition;
+    final closingTagName = _peekClosingTagName();
+    final consumed = _consumeClosingTag();
 
-      if (_check(TokenType.htmlTagName)) {
-        final tagNameToken = _advance(); // consume tag name
-        final tagName = tagNameToken.value.toLowerCase();
-
-        // Check if this is a void element closing tag (T035 - error case)
-        if (_isVoidElement(tagName)) {
-          _error(
-            'Void element <$tagName> cannot have closing tag',
-            closingStartPos,
-          );
-        }
-
-        if (_check(TokenType.htmlClosingTagEnd)) {
-          _advance(); // consume '>'
-        }
+    if (closingTagName != null) {
+      if (_isVoidElement(closingTagName)) {
+        _error(
+          'Void element <$closingTagName> cannot have closing tag',
+          closingStartPos,
+        );
+      } else {
+        _error(
+          'Unexpected closing tag </$closingTagName>',
+          closingStartPos,
+        );
       }
-
-      return null; // Closing tags handled by parent
+      return RecoveryNode(
+        content: '</$closingTagName>',
+        reason: 'stray closing tag </$closingTagName>',
+        startPosition: closingStartPos,
+        endPosition: consumed?.endPosition ?? _previous().endPosition,
+      );
     }
 
+    if (consumed == null) {
+      _error('Expected tag name after </', closingStartPos);
+    }
+
+    return null;
+  }
+
+  HtmlElementNode? _parseHtmlElement() {
     // Parse opening tag
     if (!_check(TokenType.htmlTagOpen)) {
       return null;
@@ -1715,40 +1728,66 @@ class BladeParser {
     while (!_isAtEnd()) {
       // Check for closing tag
       if (_check(TokenType.htmlClosingTagStart)) {
-        _advance(); // consume '</
+        final closingStartPos = _peek().startPosition;
+        final closingTagName = _peekClosingTagName();
 
-        if (!_check(TokenType.htmlTagName)) {
+        if (closingTagName == null) {
+          _advance(); // consume '</
           _error('Expected tag name after </', _peek().startPosition);
           break;
         }
 
-        final closingTagName = _advance().value.toLowerCase();
-        final closingEndPos = _peek().endPosition;
+        if (closingTagName == tagName) {
+          final consumedClosingTag = _consumeClosingTag();
+          final closingEndPos =
+              consumedClosingTag?.endPosition ?? _previous().endPosition;
 
-        // Tag matching validation (T033)
-        if (closingTagName != tagName) {
-          _error(
-            'Expected </$tagName>, found </$closingTagName>',
-            _peek().startPosition,
+          _tagStack.removeLast(); // Pop from stack (T032)
+
+          return HtmlElementNode(
+            tagName: tagName,
+            attributes: attributes,
+            tagHead: tagHead,
+            startPosition: openingTagPos,
+            endPosition: closingEndPos,
+            children: children,
           );
-          // Continue parsing for error recovery
         }
 
-        // Consume '>'
-        if (_check(TokenType.htmlClosingTagEnd)) {
-          _advance();
+        if (_hasAncestorTagOnStack(closingTagName)) {
+          _error(
+            'Expected </$tagName>, found </$closingTagName>; auto-closing <$tagName> for recovery',
+            closingStartPos,
+          );
+          _tagStack.removeLast();
+
+          final recoveredEndPos =
+              children.isNotEmpty ? children.last.endPosition : endPosition!;
+
+          return HtmlElementNode(
+            tagName: tagName,
+            attributes: attributes,
+            tagHead: tagHead,
+            startPosition: openingTagPos,
+            endPosition: recoveredEndPos,
+            children: children,
+          );
         }
 
-        _tagStack.removeLast(); // Pop from stack (T032)
-
-        return HtmlElementNode(
-          tagName: tagName,
-          attributes: attributes,
-          tagHead: tagHead,
-          startPosition: openingTagPos,
-          endPosition: closingEndPos,
-          children: children,
+        _error(
+          'Unexpected closing tag </$closingTagName> inside <$tagName>',
+          closingStartPos,
         );
+        final consumed = _consumeClosingTag();
+        if (consumed != null) {
+          children.add(RecoveryNode(
+            content: '</${consumed.name}>',
+            reason: 'stray closing tag </${consumed.name}>',
+            startPosition: closingStartPos,
+            endPosition: consumed.endPosition,
+          ));
+        }
+        continue;
       }
 
       // Parse child node
@@ -1798,6 +1837,52 @@ class BladeParser {
   /// Report an error (T036)
   void _error(String message, Position position) {
     _errors.add(ParseError(message: message, position: position));
+  }
+
+  String? _peekClosingTagName() {
+    if (!_check(TokenType.htmlClosingTagStart)) return null;
+    if (_current + 1 >= _tokens.length) return null;
+
+    final nameToken = _tokens[_current + 1];
+    if (nameToken.type != TokenType.htmlTagName) return null;
+
+    return nameToken.value.toLowerCase();
+  }
+
+  bool _hasAncestorTagOnStack(String tagName) {
+    if (_tagStack.length < 2) return false;
+
+    for (var i = _tagStack.length - 2; i >= 0; i--) {
+      if (_tagStack[i].tagName == tagName) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  ({String name, Position startPosition, Position endPosition})?
+      _consumeClosingTag() {
+    if (!_check(TokenType.htmlClosingTagStart)) return null;
+
+    final startPosition = _advance().startPosition; // consume '</
+
+    if (!_check(TokenType.htmlTagName)) {
+      return null;
+    }
+
+    final tagNameToken = _advance();
+    var endPosition = tagNameToken.endPosition;
+
+    if (_check(TokenType.htmlClosingTagEnd)) {
+      endPosition = _advance().endPosition;
+    }
+
+    return (
+      name: tagNameToken.value.toLowerCase(),
+      startPosition: startPosition,
+      endPosition: endPosition,
+    );
   }
 }
 
