@@ -2,17 +2,14 @@ import 'package:test/test.dart';
 import 'package:blade_parser/blade_parser.dart';
 
 /// Tests for HTML comments (<!-- -->)
-/// These tests EXPOSE bugs - HTML comments not lexed, treated as text
 void main() {
-  group('HTML Comments Lexer Tests (EXPECTED TO FAIL)', () {
+  group('HTML Comments Lexer Tests', () {
     late BladeLexer lexer;
 
     test('Simple HTML comment should be tokenized', () {
       lexer = BladeLexer('<!-- This is a comment -->');
       final tokens = lexer.tokenize();
 
-      // Expected: htmlComment token
-      // Current bug: Treated as text
       final commentTokens =
           tokens.where((t) => t.type == TokenType.htmlComment).toList();
 
@@ -117,7 +114,7 @@ void main() {
     });
   });
 
-  group('HTML Comments Parser Tests (EXPECTED TO FAIL)', () {
+  group('HTML Comments Parser Tests', () {
     late BladeParser parser;
 
     setUp(() {
