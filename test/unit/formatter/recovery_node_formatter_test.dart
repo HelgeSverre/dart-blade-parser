@@ -36,5 +36,51 @@ void main() {
 
       expect(pass2, equals(pass1), reason: 'recovery output must be idempotent');
     });
+
+    group('integration: parse + format with recovery', () {
+      test('stray closer in element formats and re-formats identically', () {
+        const input = '<div>Text</bogus>More</div>';
+        final pass1 = formatter.format(input);
+        final pass2 = formatter.format(pass1);
+        expect(pass2, equals(pass1));
+      });
+
+      test('unclosed @if formats and re-formats identically', () {
+        const input = '@if(\$x)\n    <p>Hello</p>';
+        final pass1 = formatter.format(input);
+        final pass2 = formatter.format(pass1);
+        expect(pass2, equals(pass1));
+      });
+
+      test('multiple recovery sites in one template are all idempotent', () {
+        const input = '<div></bogus>@if(\$x)<p>Hi</p></div>';
+        final pass1 = formatter.format(input);
+        final pass2 = formatter.format(pass1);
+        expect(pass2, equals(pass1));
+      });
+
+      test('ancestor-close recovery is idempotent', () {
+        const input = '<div><span>Text</div>';
+        final pass1 = formatter.format(input);
+        final pass2 = formatter.format(pass1);
+        expect(pass2, equals(pass1));
+      });
+
+      test('stray closer content appears in formatted output', () {
+        const input = '<div>Hello</bogus>World</div>';
+        final result = formatter.formatWithResult(input);
+        expect(result.hasErrors, isTrue);
+        expect(result.formatted, contains('</bogus>'));
+        expect(result.formatted, contains('Hello'));
+        expect(result.formatted, contains('World'));
+      });
+
+      test('unclosed @foreach is idempotent', () {
+        const input = '@foreach(\$items as \$item)\n<li>{{ \$item }}</li>';
+        final pass1 = formatter.format(input);
+        final pass2 = formatter.format(pass1);
+        expect(pass2, equals(pass1));
+      });
+    });
   });
 }

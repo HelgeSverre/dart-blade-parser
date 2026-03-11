@@ -4,6 +4,24 @@ library;
 import 'package:blade_parser/blade_parser.dart';
 import 'package:test/test.dart';
 
+int _averageParseMicros(
+  BladeParser parser,
+  String template, {
+  int iterations = 20,
+}) {
+  final warmup = parser.parse(template);
+  expect(warmup.isSuccess, isTrue);
+
+  final stopwatch = Stopwatch()..start();
+  for (var i = 0; i < iterations; i++) {
+    final result = parser.parse(template);
+    expect(result.isSuccess, isTrue);
+  }
+  stopwatch.stop();
+
+  return stopwatch.elapsedMicroseconds ~/ iterations;
+}
+
 void main() {
   group('HTML Parsing Performance Benchmark Tests', () {
     test('Parser maintains ≥1000 lines/sec throughput for HTML', () {
@@ -174,29 +192,27 @@ void main() {
 
       // Baseline: pure Blade template (no HTML)
       final bladeTemplate = '@if(\$test)\n  {{ \$value }}\n@endif\n' * 500;
-
-      final bladeStopwatch = Stopwatch()..start();
-      final bladeResult = parser.parse(bladeTemplate);
-      bladeStopwatch.stop();
-
-      expect(bladeResult.isSuccess, isTrue);
+      final bladeMicros = _averageParseMicros(
+        parser,
+        bladeTemplate,
+        iterations: 50,
+      );
 
       // HTML template with similar complexity
       final htmlTemplate = '<div>\n  <p>Text</p>\n</div>\n' * 500;
+      final htmlMicros = _averageParseMicros(
+        parser,
+        htmlTemplate,
+        iterations: 50,
+      );
 
-      final htmlStopwatch = Stopwatch()..start();
-      final htmlResult = parser.parse(htmlTemplate);
-      htmlStopwatch.stop();
-
-      expect(htmlResult.isSuccess, isTrue);
-
-      print('Blade template: ${bladeStopwatch.elapsedMilliseconds}ms');
-      print('HTML template: ${htmlStopwatch.elapsedMilliseconds}ms');
+      print('Blade template avg: ${bladeMicros}us');
+      print('HTML template avg: ${htmlMicros}us');
 
       // HTML parsing should be comparable to Blade parsing (within 2x)
       expect(
-        htmlStopwatch.elapsedMilliseconds,
-        lessThan(bladeStopwatch.elapsedMilliseconds * 2),
+        htmlMicros,
+        lessThanOrEqualTo(bladeMicros * 2),
         reason: 'HTML parsing should not significantly slow down the parser',
       );
     });
