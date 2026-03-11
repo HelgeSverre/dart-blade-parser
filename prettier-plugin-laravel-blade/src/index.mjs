@@ -119,8 +119,12 @@ export const parsers = {
       }
 
       // Pre-format Alpine values so the Dart formatter sees real widths
-      // when making attribute wrapping decisions
-      if (options.bladeFormatAlpine !== false) {
+      // when making attribute wrapping decisions. Skip when cursor/range
+      // offsets are active since the pre-pass changes text length and
+      // would invalidate those byte positions.
+      const hasCursor = options.cursorOffset >= 0;
+      const hasRange = options.rangeStart > 0 || options.rangeEnd < text.length;
+      if (options.bladeFormatAlpine !== false && !hasCursor && !hasRange) {
         text = await formatAlpineAttributes(text, options);
       }
 

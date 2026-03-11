@@ -76,7 +76,7 @@ export async function formatAlpineValue(attrName, attrValue, options, indentLeve
       ...options,
       parser: "typescript",
       singleQuote: true,
-      trailingComma: "none",
+      trailingComma: "none", // Prevent trailing comma oscillation between multi-line and collapsed single-line
       plugins: [], // Don't load blade plugin recursively
     });
 
