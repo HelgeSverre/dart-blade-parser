@@ -609,25 +609,18 @@ describe("bladeSlotFormatting", () => {
 // ---------------------------------------------------------------------------
 // Error handling
 // ---------------------------------------------------------------------------
-describe("error handling", () => {
-  it("throws on unclosed directive", async () => {
-    await assert.rejects(
-      () => format("@if($user) <p>Hello</p>"),
-      (err) => {
-        assert.ok(err.message.includes("blade-formatter:"));
-        return true;
-      },
-    );
+describe("error recovery", () => {
+  it("recovers from unclosed directive with best-effort formatting", async () => {
+    const result = await format("@if($user) <p>Hello</p>");
+    assert.ok(result.includes("@if($user)"));
+    assert.ok(result.includes("<p>Hello</p>"));
+    assert.ok(result.includes("@endif"), "should synthesise missing @endif");
   });
 
-  it("error message is descriptive", async () => {
-    await assert.rejects(
-      () => format("@if($user) <p>Hello</p>"),
-      (err) => {
-        assert.ok(err.message.length > 20);
-        return true;
-      },
-    );
+  it("recovered output is idempotent", async () => {
+    const first = await format("@if($user) <p>Hello</p>");
+    const second = await format(first);
+    assert.equal(first, second);
   });
 });
 
