@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:blade_parser/blade_parser.dart';
 import 'package:blade_parser/src/ast/node.dart';
 import 'package:test/test.dart';
+import '../../utils/recovery_nodes.dart';
 
 void main() {
   group('Parser RecoveryNode emission', () {
@@ -19,10 +22,11 @@ void main() {
         final span = div.children[0] as HtmlElementNode;
 
         final recoveryNodes = span.children.whereType<RecoveryNode>();
-        expect(recoveryNodes, hasLength(1));
-        expect(recoveryNodes.first.content, '</bogus>');
-        expect(recoveryNodes.first.reason, contains('stray'));
-      });
+      expect(recoveryNodes, hasLength(1));
+      expect(recoveryNodes.first.content, '</bogus>');
+      expect(recoveryNodes.first.reason, contains('stray'));
+      expect(recoveryNodes.first.confidence, RecoveryConfidence.low);
+    });
 
       test('top-level stray closer becomes RecoveryNode', () {
         final result = parser.parse('Hello</bogus>World');
@@ -128,6 +132,16 @@ void main() {
         final recoveryNodes = directive.children.whereType<RecoveryNode>();
         expect(recoveryNodes, isEmpty);
       });
+
+      test('unclosed @if recovery is high-confidence', () {
+        final result = parser.parse('@if(\$x)\n<p>Hello</p>');
+
+        expect(result.isSuccess, isFalse);
+        final directive = result.ast!.children[0] as DirectiveNode;
+        final recoveryNodes = directive.children.whereType<RecoveryNode>();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.confidence, RecoveryConfidence.high);
+      });
     });
 
     group('ancestor-close and unclosed HTML', () {
@@ -169,9 +183,10 @@ void main() {
         expect(result.isSuccess, isFalse);
         final div = result.ast!.children[0] as HtmlElementNode;
         final recoveryNodes = div.children.whereType<RecoveryNode>();
-        expect(recoveryNodes, hasLength(1));
-        expect(recoveryNodes.first.content, contains('br'));
-      });
+      expect(recoveryNodes, hasLength(1));
+      expect(recoveryNodes.first.content, contains('br'));
+      expect(recoveryNodes.first.confidence, RecoveryConfidence.low);
+    });
 
       test('top-level void element closer becomes RecoveryNode', () {
         final result = parser.parse('</hr>');
@@ -180,6 +195,84 @@ void main() {
         final recoveryNodes = result.ast!.children.whereType<RecoveryNode>();
         expect(recoveryNodes, hasLength(1));
         expect(recoveryNodes.first.content, '</hr>');
+      });
+    });
+
+    group('orphan directives', () {
+      test('@else without @if becomes RecoveryNode', () {
+        final result = parser.parse('@else');
+
+        expect(result.isSuccess, isFalse);
+        final nodes =
+            result.ast!.children.whereType<RecoveryNode>().toList();
+        expect(nodes, hasLength(1));
+        expect(nodes.first.reason, contains('@else'));
+      });
+
+      test('@case without @switch becomes RecoveryNode', () {
+        final result = parser.parse('@case(1)\n<p>One</p>');
+
+        expect(result.isSuccess, isFalse);
+        final nodes =
+            result.ast!.children.whereType<RecoveryNode>().toList();
+        expect(nodes, hasLength(1));
+        expect(nodes.first.reason, contains('@case'));
+      });
+    });
+
+    group('combined recovery fixture', () {
+      test('stress fixture captures multiple recovery nodes', () {
+        final source =
+            File('test/fixtures/stress/recovery-combo.blade.php')
+                .readAsStringSync();
+        final result = parser.parse(source);
+
+        expect(result.isSuccess, isFalse);
+        final recoveries = collectRecoveryNodes(result.ast!);
+        expect(recoveries.length, greaterThanOrEqualTo(3));
+        expect(
+          recoveries.any((node) => node.reason.contains('@endforeach')),
+          isTrue,
+        );
+        expect(
+          recoveries.any((node) => node.reason.contains('@else')),
+          isTrue,
+        );
+        expect(
+          recoveries.any(
+            (node) => node.reason.contains('mismatched component closing'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
+    group('component recovery', () {
+      test('mismatched closing component emits RecoveryNode child', () {
+        final result = parser.parse('<x-widget></x-component>');
+
+        expect(result.isSuccess, isFalse);
+        final component = result.ast!.children[0] as ComponentNode;
+        final recoveryNodes =
+            component.children.whereType<RecoveryNode>().toList();
+        expect(recoveryNodes, hasLength(1));
+        expect(
+          recoveryNodes.first.reason,
+          contains('mismatched component closing'),
+        );
+        expect(recoveryNodes.first.confidence, RecoveryConfidence.low);
+      });
+
+      test('unclosed component emits high-confidence RecoveryNode', () {
+        final result = parser.parse('<x-widget>');
+
+        expect(result.isSuccess, isFalse);
+        final component = result.ast!.children[0] as ComponentNode;
+        final recoveryNodes =
+            component.children.whereType<RecoveryNode>().toList();
+        expect(recoveryNodes, hasLength(1));
+        expect(recoveryNodes.first.reason, contains('missing </x-widget>'));
+        expect(recoveryNodes.first.confidence, RecoveryConfidence.high);
       });
     });
   });

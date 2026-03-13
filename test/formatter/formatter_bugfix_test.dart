@@ -412,4 +412,61 @@ indent_size = 2
       expect(output, contains('@endmodal'));
     });
   });
+
+  group('Issue #13: Default slot content should not be wrapped in x-slot:default', () {
+    late BladeFormatter formatter;
+
+    setUp(() {
+      formatter = BladeFormatter();
+    });
+
+    test('simple component does not add x-slot:default wrapper', () {
+      const input = '<x-app-layout>\n<!-- content -->\n</x-app-layout>';
+      final output = formatter.format(input);
+      expect(output, isNot(contains('<x-slot:default>')));
+      expect(output, isNot(contains('</x-slot>')));
+      expect(output, contains('<x-app-layout>'));
+      expect(output, contains('</x-app-layout>'));
+      expect(output, contains('<!-- content -->'));
+    });
+
+    test('component with HTML children does not add x-slot:default wrapper', () {
+      const input = '''<x-app-layout>
+    <div class="container">
+        <h1>Hello World</h1>
+        <p>Some content here</p>
+    </div>
+</x-app-layout>''';
+      final output = formatter.format(input);
+      expect(output, isNot(contains('<x-slot:default>')));
+      expect(output, isNot(contains('</x-slot:default>')));
+      expect(output, contains('<x-app-layout>'));
+      expect(output, contains('</x-app-layout>'));
+      expect(output, contains('Hello World'));
+    });
+
+    test('component with named slots does not wrap remaining content in x-slot:default', () {
+      const input = '''<x-app-layout>
+    <x-slot:header>
+        <h1>Page Title</h1>
+    </x-slot>
+
+    <div class="content">
+        <p>Main content</p>
+    </div>
+</x-app-layout>''';
+      final output = formatter.format(input);
+      expect(output, isNot(contains('<x-slot:default>')));
+      expect(output, contains('<x-slot:header>'));
+      expect(output, contains('Main content'));
+    });
+
+    test('default slot content formatting is idempotent', () {
+      const input = '<x-app-layout>\n    <p>Hello</p>\n</x-app-layout>';
+      final first = formatter.format(input);
+      final second = formatter.format(first);
+      expect(first, equals(second));
+      expect(first, isNot(contains('<x-slot:default>')));
+    });
+  });
 }

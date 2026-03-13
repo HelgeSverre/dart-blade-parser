@@ -1,5 +1,6 @@
 import 'package:blade_parser/src/ast/node.dart';
 import 'package:blade_parser/src/formatter/formatter_config.dart';
+import 'package:blade_parser/src/formatter/recovery_summary.dart';
 import 'package:blade_parser/src/formatter/indent_tracker.dart';
 import 'package:blade_parser/src/lexer/token_type.dart';
 
@@ -76,6 +77,11 @@ class FormatterVisitor implements AstVisitor<String> {
   /// Set to `false` when encountering a `blade-formatter:off` comment,
   /// and back to `true` when encountering `blade-formatter:on`.
   bool _formattingEnabled = true;
+
+  final List<RecoverySummary> _recoverySummaries = [];
+
+  List<RecoverySummary> get recoverySummaries =>
+      List.unmodifiable(_recoverySummaries);
 
   /// Block-level HTML elements that should get blank line spacing between siblings.
   static const Set<String> _blockElements = {
@@ -336,6 +342,7 @@ class FormatterVisitor implements AstVisitor<String> {
     _output.clear();
     _indent.reset();
     _formattingEnabled = true;
+    _recoverySummaries.clear();
     node.accept(this);
     return _output.toString();
   }
@@ -568,8 +575,8 @@ class FormatterVisitor implements AstVisitor<String> {
         _output.write(item.content);
       } else if (item is TagHeadPhpBlock) {
         _output.write(item.content);
-      } else if (item is TagHeadRaw) {
-        _output.write(item.content);
+      } else if (item is TagHeadRecovery) {
+        _output.write(item.node.content);
       }
 
       final isLast = i == items.length - 1;
@@ -1704,9 +1711,30 @@ class FormatterVisitor implements AstVisitor<String> {
 
   @override
   String visitRecovery(RecoveryNode node) {
-    _output.write(node.content);
+    _recoverySummaries.add(
+      RecoverySummary(
+        content: node.content,
+        reason: node.reason,
+        confidence: node.confidence,
+        startPosition: node.startPosition,
+        endPosition: node.endPosition,
+      ),
+    );
+    if (_formattingEnabled &&
+        node.confidence == RecoveryConfidence.high &&
+        node.content.isEmpty &&
+        node.reason.startsWith('missing ')) {
+      return '';
+    }
+
+    final content = _formattingEnabled
+        ? _resolveRecoveryContent(node)
+        : node.content;
+    _output.write(content);
     return '';
   }
+
+  String _resolveRecoveryContent(RecoveryNode node) => node.content;
 
   @override
   String visitPhpBlock(PhpBlockNode node) {

@@ -142,8 +142,9 @@ void main() {
       expect(div.attributes.containsKey('data-x'), isTrue);
       expect(div.tagHead, hasLength(3));
       expect(div.tagHead[0], isA<TagHeadAttribute>());
-      expect(div.tagHead[1], isA<TagHeadRaw>());
-      expect((div.tagHead[1] as TagHeadRaw).content, '???');
+      expect(div.tagHead[1], isA<TagHeadRecovery>());
+      final recovery = (div.tagHead[1] as TagHeadRecovery).node as RecoveryNode;
+      expect(recovery.content, '???');
       expect(div.tagHead[2], isA<TagHeadAttribute>());
     });
   });

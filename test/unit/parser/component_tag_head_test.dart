@@ -142,8 +142,10 @@ void main() {
 
       expect(component.tagHead, hasLength(3));
       expect(component.tagHead[0], isA<TagHeadAttribute>());
-      expect(component.tagHead[1], isA<TagHeadRaw>());
-      expect((component.tagHead[1] as TagHeadRaw).content, '???');
+      expect(component.tagHead[1], isA<TagHeadRecovery>());
+      final recovery =
+          (component.tagHead[1] as TagHeadRecovery).node as RecoveryNode;
+      expect(recovery.content, '???');
       expect(component.tagHead[2], isA<TagHeadAttribute>());
       expect(component.attributes.containsKey('data-x'), isTrue);
     });

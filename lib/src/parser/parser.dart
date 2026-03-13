@@ -34,6 +34,41 @@ class BladeParser {
   /// Tag stack for tracking open HTML elements (T032)
   final List<_TagStackEntry> _tagStack = [];
 
+  static const _orphanDirectiveTokenTypes = {
+    TokenType.directiveElse,
+    TokenType.directiveElseif,
+    TokenType.directiveCase,
+    TokenType.directiveDefault,
+    TokenType.directiveEmpty,
+    TokenType.directiveStop,
+    TokenType.directiveAppend,
+  };
+
+  bool _isOrphanDirectiveToken(TokenType type) {
+    // @empty with an expression (e.g., @empty($items)) is a standalone block
+    // directive, not an orphan intermediate of @forelse.
+    if (type == TokenType.directiveEmpty &&
+        _current + 1 < _tokens.length &&
+        _tokens[_current + 1].type == TokenType.expression) {
+      return false;
+    }
+    return type.name.startsWith('directiveEnd') ||
+        _orphanDirectiveTokenTypes.contains(type);
+  }
+
+  AstNode _recoverOrphanDirective() {
+    final token = _advance();
+    final message = 'Unexpected orphan directive ${token.value}';
+    _errors.add(ParseError(message: message, position: token.startPosition));
+    return RecoveryNode(
+      content: token.value,
+      reason: 'orphan ${token.value}',
+      startPosition: token.startPosition,
+      endPosition: token.endPosition,
+      confidence: RecoveryConfidence.low,
+    );
+  }
+
   String _closingDirectiveName(String name) {
     return TokenType.closingDirectiveName(name);
   }
@@ -89,6 +124,10 @@ class BladeParser {
 
   AstNode? _parseNode() {
     final token = _peek();
+
+    if (_isOrphanDirectiveToken(token.type)) {
+      return _recoverOrphanDirective();
+    }
 
     switch (token.type) {
       // Control flow directives
@@ -424,6 +463,7 @@ class BladeParser {
         reason: 'missing @endif',
         startPosition: pos,
         endPosition: pos,
+        confidence: RecoveryConfidence.high,
       ));
     } else {
       _advance();
@@ -462,6 +502,7 @@ class BladeParser {
         reason: 'missing @endforeach',
         startPosition: pos,
         endPosition: pos,
+        confidence: RecoveryConfidence.high,
       ));
     } else {
       _advance();
@@ -500,6 +541,7 @@ class BladeParser {
         reason: 'missing @endfor',
         startPosition: pos,
         endPosition: pos,
+        confidence: RecoveryConfidence.high,
       ));
     } else {
       _advance();
@@ -538,6 +580,7 @@ class BladeParser {
         reason: 'missing @endwhile',
         startPosition: pos,
         endPosition: pos,
+        confidence: RecoveryConfidence.high,
       ));
     } else {
       _advance();
@@ -623,6 +666,7 @@ class BladeParser {
         reason: 'missing @endswitch',
         startPosition: pos,
         endPosition: pos,
+        confidence: RecoveryConfidence.high,
       ));
     } else {
       _advance(); // @endswitch
@@ -678,6 +722,7 @@ class BladeParser {
         reason: 'missing @endforelse',
         startPosition: pos,
         endPosition: pos,
+        confidence: RecoveryConfidence.high,
       ));
     } else {
       _advance(); // @endforelse
@@ -973,6 +1018,14 @@ class BladeParser {
             hint: 'Add closing tag </x-$componentName>',
           ),
         );
+        final pos = _previous().endPosition;
+        children.add(RecoveryNode(
+          content: '',
+          reason: 'missing </x-$componentName>',
+          startPosition: pos,
+          endPosition: pos,
+          confidence: RecoveryConfidence.high,
+        ));
       } else {
         // Validate closing tag matches opening tag
         final closingToken = _advance(); // </x-component>
@@ -991,19 +1044,29 @@ class BladeParser {
                   'Change closing tag to </x-$componentName> or fix opening tag to <x-$closingName>',
             ),
           );
+          children.add(RecoveryNode(
+            content: '${closingToken.value}>',
+            reason:
+                'mismatched component closing </x-$closingName> inside <x-$componentName>',
+            startPosition: closingToken.startPosition,
+            endPosition: closingToken.endPosition,
+            confidence: RecoveryConfidence.low,
+          ));
         }
       }
     }
 
     // If children exist and no named slots, create default slot
-    if (children.isNotEmpty && slots.isEmpty) {
+    final nonRecoveryChildren =
+        children.where((child) => child is! RecoveryNode).toList();
+    if (nonRecoveryChildren.isNotEmpty && slots.isEmpty) {
       slots['default'] = SlotNode(
-        startPosition: children.first.startPosition,
-        endPosition: children.last.endPosition,
+        startPosition: nonRecoveryChildren.first.startPosition,
+        endPosition: nonRecoveryChildren.last.endPosition,
         name: 'default',
-        children: List.of(children),
+        children: List.of(nonRecoveryChildren),
       );
-      children.clear();
+      children.removeWhere((child) => child is! RecoveryNode);
     }
 
     return ComponentNode(
@@ -1076,6 +1139,7 @@ class BladeParser {
         reason: 'missing @${_closingDirectiveName(name)}',
         startPosition: pos,
         endPosition: pos,
+        confidence: RecoveryConfidence.high,
       ));
     } else {
       _advance();
@@ -1261,6 +1325,7 @@ class BladeParser {
         reason: 'missing @${_closingDirectiveName(name)}',
         startPosition: pos,
         endPosition: pos,
+        confidence: RecoveryConfidence.high,
       ));
     }
 
@@ -1552,7 +1617,13 @@ class BladeParser {
       } else if (type == TokenType.tagHeadRaw) {
         preserveTagHead = true;
         final rawToken = _advance();
-        tagHead.add(TagHeadRaw(rawToken.value));
+        final node = RecoveryNode(
+          content: rawToken.value,
+          reason: 'malformed tag head',
+          startPosition: rawToken.startPosition,
+          endPosition: rawToken.endPosition,
+        );
+        tagHead.add(TagHeadRecovery(node));
       } else {
         // Skip unexpected tokens (whitespace, text between directives)
         _advance();
@@ -1692,11 +1763,17 @@ class BladeParser {
       );
     }
 
-    if (consumed == null) {
-      _error('Expected tag name after </', closingStartPos);
-    }
+    final malformed = _captureMalformedClosing(closingStartPos);
+    _skipMalformedClosingTag();
+    _error('Expected tag name after </', closingStartPos);
 
-    return null;
+    return RecoveryNode(
+      content: malformed.content,
+      reason: 'malformed closing tag',
+      startPosition: closingStartPos,
+      endPosition: _positionAtOffset(malformed.endOffset),
+      confidence: RecoveryConfidence.low,
+    );
   }
 
   /// Parse HTML element into HtmlElementNode (T031-T037).
@@ -1736,7 +1813,7 @@ class BladeParser {
 
     // Check for self-closing or regular close
     bool isSelfClosing = false;
-    Position? endPosition;
+    late Position endPosition;
 
     if (_check(TokenType.htmlSelfClose)) {
       isSelfClosing = true;
@@ -1814,8 +1891,12 @@ class BladeParser {
           );
           _tagStack.removeLast();
 
-          final recoveredEndPos =
-              children.isNotEmpty ? children.last.endPosition : endPosition!;
+          final Position recoveredEndPos;
+          if (children.isNotEmpty) {
+            recoveredEndPos = children.last.endPosition;
+          } else {
+            recoveredEndPos = endPosition;
+          }
 
           return HtmlElementNode(
             tagName: tagName,
@@ -1838,6 +1919,7 @@ class BladeParser {
             reason: 'stray closing tag </${consumed.name}>',
             startPosition: closingStartPos,
             endPosition: consumed.endPosition,
+            confidence: RecoveryConfidence.low,
           ));
         }
         continue;
@@ -1936,6 +2018,46 @@ class BladeParser {
       startPosition: startPosition,
       endPosition: endPosition,
     );
+  }
+
+  ({String content, int endOffset}) _captureMalformedClosing(
+      Position startPosition) {
+    final offset = startPosition.offset.clamp(0, _source.length);
+    final greaterThan = _source.indexOf('>', offset);
+    final endOffset =
+        greaterThan == -1 ? _source.length : greaterThan + 1;
+    final content = _source.substring(offset, endOffset);
+    return (content: content, endOffset: endOffset);
+  }
+
+  void _skipMalformedClosingTag() {
+    while (!_isAtEnd()) {
+      if (_check(TokenType.htmlClosingTagEnd)) {
+        _advance();
+        break;
+      }
+      if (_check(TokenType.htmlTagClose)) {
+        _advance();
+        break;
+      }
+      _advance();
+    }
+  }
+
+  Position _positionAtOffset(int offset) {
+    var line = 1;
+    var column = 1;
+    final clamped = offset.clamp(0, _source.length);
+    for (var i = 0; i < clamped; i++) {
+      final ch = _source[i];
+      if (ch == '\n') {
+        line++;
+        column = 1;
+      } else {
+        column++;
+      }
+    }
+    return Position(line: line, column: column, offset: clamped);
   }
 }
 

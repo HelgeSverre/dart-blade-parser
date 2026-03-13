@@ -1,5 +1,6 @@
 import 'package:blade_parser/blade_parser.dart';
 import 'package:blade_parser/src/formatter/formatter_visitor.dart';
+import 'package:blade_parser/src/formatter/recovery_summary.dart';
 
 /// Main formatter class for Blade templates.
 ///
@@ -43,7 +44,8 @@ class BladeFormatter {
   /// ```
   String format(String source) {
     final parsed = _parseForFormatting(source);
-    return _formatAst(parsed.ast, source);
+    final output = _formatAst(parsed.ast, source);
+    return output.formatted;
   }
 
   /// Checks if a source string needs formatting.
@@ -101,17 +103,19 @@ class BladeFormatter {
       if (markerPos >= 0) {
         final cleanFormatted = formatted.replaceFirst(_cursorMarker, '');
 
-        // Verify the marker didn't corrupt formatting by comparing
-        // with a clean format (no marker). If they differ, the marker
-        // affected parsing/formatting — fall back to AST approach.
-        final cleanFormat = format(source);
+        // Reformat without the marker to ensure the marker didn't corrupt parsing.
+        final cleanOutput = _formatAst(parseResult.ast!, source);
+        final cleanFormat = cleanOutput.formatted;
+
         if (cleanFormatted == cleanFormat) {
           return FormatResult(
-            formatted: cleanFormatted,
-            wasChanged: source != cleanFormatted,
+            formatted: cleanFormat,
+            wasChanged: source != cleanFormat,
             hasErrors: false,
             errors: const [],
             cursorOffset: markerPos,
+            ast: parseResult.ast,
+            recoveries: cleanOutput.recoveries,
           );
         }
       }
@@ -128,7 +132,9 @@ class BladeFormatter {
   FormatResult _formatWithCursorFallback(String source, int cursorOffset) {
     final parsed = _parseForFormatting(source);
     final ast = parsed.ast;
-    final formatted = _formatAst(ast, source);
+    final output = _formatAst(ast, source);
+    final formatted = output.formatted;
+    final recoveries = output.recoveries;
 
     // Find the node containing the cursor
     final node = _findNodeAtOffset(ast.children, cursorOffset);
@@ -148,6 +154,8 @@ class BladeFormatter {
             hasErrors: parsed.errors.isNotEmpty,
             errors: parsed.errors,
             cursorOffset: newOffset,
+            ast: ast,
+            recoveries: recoveries,
           );
         }
       }
@@ -160,6 +168,8 @@ class BladeFormatter {
       hasErrors: parsed.errors.isNotEmpty,
       errors: parsed.errors,
       cursorOffset: cursorOffset.clamp(0, formatted.length),
+      ast: ast,
+      recoveries: recoveries,
     );
   }
 
@@ -209,6 +219,8 @@ class BladeFormatter {
         wasChanged: false,
         hasErrors: parsed.errors.isNotEmpty,
         errors: parsed.errors,
+        ast: parsed.ast,
+        recoveries: const [],
       );
     }
 
@@ -223,7 +235,9 @@ class BladeFormatter {
       children: overlapping,
     );
 
-    final formattedSlice = _formatAst(syntheticDoc, source);
+    final sliceOutput = _formatAst(syntheticDoc, source);
+    final formattedSlice = sliceOutput.formatted;
+    final sliceRecoveries = sliceOutput.recoveries;
 
     // Splice back into original source
     final formatted = source.substring(0, snappedStart) +
@@ -235,6 +249,8 @@ class BladeFormatter {
       wasChanged: source != formatted,
       hasErrors: parsed.errors.isNotEmpty,
       errors: parsed.errors,
+      ast: parsed.ast,
+      recoveries: sliceRecoveries,
     );
   }
 
@@ -259,7 +275,8 @@ class BladeFormatter {
   FormatResult formatWithResult(String source) {
     try {
       final parsed = _parseForFormatting(source);
-      final formatted = _formatAst(parsed.ast, source);
+      final output = _formatAst(parsed.ast, source);
+      final formatted = output.formatted;
       final wasChanged = source != formatted;
 
       return FormatResult(
@@ -267,6 +284,8 @@ class BladeFormatter {
         wasChanged: wasChanged,
         hasErrors: parsed.errors.isNotEmpty,
         errors: parsed.errors,
+        ast: parsed.ast,
+        recoveries: output.recoveries,
       );
     } on FormatterException catch (e) {
       return FormatResult(
@@ -274,6 +293,8 @@ class BladeFormatter {
         wasChanged: false,
         hasErrors: true,
         errors: e.parseErrors,
+        ast: null,
+        recoveries: const [],
       );
     }
   }
@@ -292,9 +313,13 @@ class BladeFormatter {
     return _ParsedFormattingInput(result.ast!, result.errors);
   }
 
-  String _formatAst(DocumentNode ast, String source) {
+  _FormattingResult _formatAst(DocumentNode ast, String source) {
     final visitor = FormatterVisitor(config, source: source);
-    return visitor.format(ast);
+    final formatted = visitor.format(ast);
+    return _FormattingResult(
+      formatted: formatted,
+      recoveries: visitor.recoverySummaries,
+    );
   }
 }
 
@@ -303,6 +328,16 @@ class _ParsedFormattingInput {
   final List<ParseError> errors;
 
   const _ParsedFormattingInput(this.ast, this.errors);
+}
+
+class _FormattingResult {
+  final String formatted;
+  final List<RecoverySummary> recoveries;
+
+  const _FormattingResult({
+    required this.formatted,
+    required this.recoveries,
+  });
 }
 
 /// Result of a formatting operation.
@@ -324,12 +359,20 @@ class FormatResult {
   /// The cursor offset in the formatted output, or -1 if not tracked.
   final int cursorOffset;
 
+  /// The AST that was produced during formatting, if available.
+  final DocumentNode? ast;
+
+  /// Recovery spans emitted during formatting.
+  final List<RecoverySummary> recoveries;
+
   const FormatResult({
     required this.formatted,
     required this.wasChanged,
     required this.hasErrors,
     required this.errors,
     this.cursorOffset = -1,
+    this.ast,
+    this.recoveries = const [],
   });
 
   /// Whether formatting was successful (no errors).

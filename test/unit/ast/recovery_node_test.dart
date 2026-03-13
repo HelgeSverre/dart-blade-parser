@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('RecoveryNode', () {
-    test('stores content, reason, and positions', () {
+    test('stores content, reason, positions, and default confidence', () {
       final node = RecoveryNode(
         content: '</bogus>',
         reason: 'stray closing tag',
@@ -15,6 +15,7 @@ void main() {
       expect(node.content, '</bogus>');
       expect(node.reason, 'stray closing tag');
       expect(node.children, isEmpty);
+      expect(node.confidence, RecoveryConfidence.low);
     });
 
     test('accepts visitor via visitRecovery', () {
@@ -41,6 +42,20 @@ void main() {
       expect(json['type'], 'recovery');
       expect(json['content'], '</bogus>');
       expect(json['reason'], 'stray closing tag');
+      expect(json['confidence'], 'low');
+    });
+
+    test('serializes high-confidence value', () {
+      final node = RecoveryNode(
+        content: '',
+        reason: 'missing @endif',
+        startPosition: Position(offset: 0, line: 1, column: 1),
+        endPosition: Position(offset: 0, line: 1, column: 1),
+        confidence: RecoveryConfidence.high,
+      );
+
+      final json = node.toJson();
+      expect(json['confidence'], 'high');
     });
   });
 }

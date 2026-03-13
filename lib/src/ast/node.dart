@@ -335,15 +335,11 @@ final class TagHeadPhpBlock extends TagHeadItem {
   TagHeadPhpBlock(this.content);
 }
 
-/// Opaque malformed content preserved inside a tag head.
-///
-/// This is used for best-effort recovery when the lexer cannot safely classify
-/// a span as a valid attribute or directive.
-final class TagHeadRaw extends TagHeadItem {
-  /// The raw source content as it appeared in the tag head.
-  final String content;
+/// Tag-head item that references a recovery node (malformed chunk).
+final class TagHeadRecovery extends TagHeadItem {
+  final RecoveryNode node;
 
-  TagHeadRaw(this.content);
+  TagHeadRecovery(this.node);
 }
 
 /// Base class for HTML/component attribute nodes.
@@ -794,11 +790,22 @@ final class ErrorNode extends AstNode {
       };
 }
 
+/// The confidence level for formatter output when rendering recovery spans.
+enum RecoveryConfidence {
+  /// The parser isn't confident about this span—output verbatim.
+  low,
+
+  /// The parser understands the span (e.g., missing closing directive) and
+  /// formatting can be attempted.
+  high,
+}
+
 /// Preserved source span from a parser recovery point.
 ///
 /// Unlike [ErrorNode], which marks a parsing error location,
 /// [RecoveryNode] captures the actual source text that was consumed
-/// during recovery. The formatter outputs this content verbatim.
+/// during recovery. The formatter outputs this content verbatim unless the
+/// confidence is high.
 final class RecoveryNode extends AstNode {
   @override
   final Position startPosition;
@@ -815,11 +822,15 @@ final class RecoveryNode extends AstNode {
   /// Human-readable reason describing what recovery occurred.
   final String reason;
 
+  /// Parser confidence level for this recovery span.
+  final RecoveryConfidence confidence;
+
   RecoveryNode({
     required this.content,
     required this.reason,
     required this.startPosition,
     required this.endPosition,
+    this.confidence = RecoveryConfidence.low,
   });
 
   @override
@@ -830,6 +841,7 @@ final class RecoveryNode extends AstNode {
         'type': 'recovery',
         'content': content,
         'reason': reason,
+        'confidence': confidence.name,
         'position': {
           'start': startPosition.toJson(),
           'end': endPosition.toJson(),

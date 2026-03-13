@@ -301,6 +301,11 @@ void _printTree(AstNode node, int indent) {
       print('${prefix}Comment: "$preview"');
     case ErrorNode():
       print('${prefix}Error: ${node.error}');
+    case RecoveryNode():
+      final preview = node.content.isNotEmpty
+          ? node.content
+          : node.reason;
+      print('${prefix}Recovery: "$preview"');
     case SlotNode():
       print('${prefix}Slot: ${node.name}');
       for (final child in node.children) {

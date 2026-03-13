@@ -351,6 +351,13 @@ void _printNode(AstNode node, int depth) {
     case ErrorNode():
       print('${indent}ERROR: ${node.error} [${node.startPosition.line}]');
       return;
+    case RecoveryNode():
+      final short = node.content.trim();
+      final preview = short.isNotEmpty
+          ? short.length > 40 ? '${short.substring(0, 37)}...' : short
+          : node.reason;
+      print('${indent}Recovery: $preview [${node.startPosition.line}]');
+      return;
     case SlotNode():
       print('${indent}Slot: ${node.name} [${node.startPosition.line}]');
   }
@@ -373,6 +380,10 @@ void _printTagHead(List<TagHeadItem> items, int depth) {
         print('${indent}TH-Comment: ${item.content}');
       case TagHeadPhpBlock():
         print('${indent}TH-Php: ${item.content}');
+      case TagHeadRecovery():
+        print(
+          '${indent}TH-Recovery: ${item.node.reason} (${item.node.content})',
+        );
     }
   }
 }

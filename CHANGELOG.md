@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-03-13
+
+### Added
+- **Malformed input recovery (Phases 1-3):** The formatter now uses best-effort formatting whenever the parser produces an AST, even with parse errors. Malformed templates that previously threw exceptions now produce formatted output with diagnostics.
+- **`RecoveryNode` AST node:** Explicit recovery spans in the AST for stray closing tags, unclosed directives, and malformed tag heads. Each carries a `RecoveryConfidence` (high/low) indicating parser certainty.
+- **`RecoverySummary` on `FormatResult`:** Formatted output now includes a curated list of recovery spans (position, confidence, reason) so tooling can highlight recovered regions without manual AST traversal.
+- **Tag-head recovery:** Malformed attribute regions in HTML and component tag heads (e.g., `<div ???broken class="ok">`) are captured as `TagHeadRecovery` items and round-tripped verbatim.
+- **High-confidence recovery formatting:** Missing closing directives (e.g., unclosed `@if`) are automatically synthesised by the formatter, producing idempotent output.
+- **Recovery stress test suite:** 9 malformed template fixtures exercising deeply nested components, PHP blocks, void element closers, directive mismatches, and tag-head garbage.
+
+### Fixed
+- **Issue #13 - Default slot `<x-slot:default>` wrapping:** Components with anonymous default slot content no longer wrap children in `<x-slot:default>` tags (same as #11, now with dedicated regression test).
+- **`@empty($var)` incorrectly treated as orphan directive:** Standalone `@empty($items)...@endempty` blocks were being caught by orphan directive recovery instead of parsing as block directives. Fixed by checking for a following expression token.
+- **`@hasSection` / `@sectionMissing` incorrectly treated as orphan directives:** These inline conditional directives were in the orphan set, causing intermittent test failures and incorrect parsing. Removed from orphan list.
+- **Brittle recovery formatter tests:** Replaced exact string equality assertions with structural invariants (startsWith, endsWith, contains, idempotency) so tests survive unrelated formatting changes.
+
 ## [1.3.1] - 2026-03-06
 
 npm plugin versioning is now aligned with `blade_parser` (was 0.5.0, now 1.3.1). Both packages share the same version number going forward, published automatically via CI on tag push.
