@@ -52,7 +52,10 @@ jobs:
           npm version --no-git-tag-version "${{ steps.ver.outputs.version }}"
           npm test
 
-      # Publish to npm (OIDC provenance, no token needed)
+      - name: Install latest npm (required for trusted publishing)
+        run: npm install -g npm@latest
+
+      # Publish to npm via OIDC trusted publishing
       - name: Publish to npm
         working-directory: prettier-plugin-laravel-blade
         run: npm publish --access public --provenance
