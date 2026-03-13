@@ -48,6 +48,7 @@ jobs:
         working-directory: prettier-plugin-laravel-blade
         run: |
           npm ci
+          npm run build
           npm version --no-git-tag-version "${{ steps.ver.outputs.version }}"
           npm test
 
