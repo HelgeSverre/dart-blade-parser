@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **`BladeFormatter.format()` contract:** Clarified docstring to make explicit that `format()` does not throw on recoverable parse errors (this behavior shipped in 1.4.0 but was undocumented). Callers that need error/recovery signal must use `formatWithResult()` instead.
+
 ### Fixed
 - **Component recovery markers dropped on default-slot promotion:** When a component with a mismatched closing tag had a default slot created, its `RecoveryNode` children were silently dropped from both the formatted output and `FormatResult.recoveries`. `visitComponent` now walks recovery children after rendering slots.
 

@@ -27,7 +27,13 @@ class BladeFormatter {
   ///
   /// Returns the formatted source code as a string.
   ///
-  /// Best-effort formatting is used when the parser can still produce an AST.
+  /// Best-effort formatting is used when the parser can still produce an AST:
+  /// recoverable parse errors (unclosed directives, mismatched tags, stray
+  /// closing tags) are silently repaired in the output. This method does NOT
+  /// throw on recoverable errors — callers cannot distinguish a clean format
+  /// from a recovered one. Use [formatWithResult] to inspect parse errors and
+  /// recovery markers when you need that signal.
+  ///
   /// Throws [FormatterException] only when parsing fails so badly that no AST
   /// is available for formatting.
   ///
