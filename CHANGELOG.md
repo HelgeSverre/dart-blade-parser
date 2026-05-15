@@ -7,13 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-05-15
+
+### Added
+- **JS bridge surfaces recovery metadata:** The bridge JSON returned by `__dartBladeFormatter` now includes `recoveries` (array of `"reason (confidence)"` strings) and `errors` (array of `{message, line, column, hint?}`) alongside `formatted`/`cursorOffset`/`error`. Editor integrations, the playground, and other direct bridge consumers can now distinguish clean output from silently-recovered output. Consumers that ignore the new keys are unaffected.
+- **`prettier-ignore-start` / `prettier-ignore-end` block markers (#14):** The formatter now recognizes Prettier's standard ignore-region markers as aliases for `blade-formatter:off` / `blade-formatter:on`. Works in both HTML comments and Blade comments, case-insensitive.
+
 ### Changed
 - **`BladeFormatter.format()` contract:** Clarified docstring to make explicit that `format()` does not throw on recoverable parse errors (this behavior shipped in 1.4.0 but was undocumented). Callers that need error/recovery signal must use `formatWithResult()` instead.
-- **JS bridge surfaces recovery metadata:** The bridge JSON returned by `__dartBladeFormatter` now includes `recoveries` (array of `"reason (confidence)"` strings) and `errors` (array of `{message, line, column, hint?}`) alongside `formatted`/`cursorOffset`/`error`. Consumers that ignore the new keys are unaffected.
-- **`blade format --stdin` exit code:** The CLI now exits non-zero when parse errors occurred and writes parse errors and recovery markers to stderr (formatted output still goes to stdout). Previously, recoverable parse errors silently produced exit 0.
+- **`blade format --stdin` exit code:** The CLI now exits non-zero when parse errors occurred and writes parse errors and recovery markers to stderr (formatted output still goes to stdout). Previously, recoverable parse errors silently produced exit 0 — shell pipelines had no way to detect malformed input.
 
 ### Fixed
-- **Component recovery markers dropped on default-slot promotion:** When a component with a mismatched closing tag had a default slot created, its `RecoveryNode` children were silently dropped from both the formatted output and `FormatResult.recoveries`. `visitComponent` now walks recovery children after rendering slots.
+- **Inline text wraps around echo/component (#17):** `Some text {{ $variable }} more text` and `Click <x-foo /> here` no longer break across multiple lines. `visitEcho` and the self-closing branch of `visitComponent` now suppress their trailing newline (and skip the leading line-break for components) when the next meaningful sibling continues inline.
+- **`@can` / `@auth` / `@env` ignored `directiveParenthesisSpacing` (#16):** Auth, environment, and section guard directives now respect the spacing config (`spaced` / `compact`) the same way control structures do. Previously they always rendered compact regardless of setting.
+- **Component recovery markers dropped on default-slot promotion:** When a component with a mismatched closing tag had a default slot created, its `RecoveryNode` children were silently dropped from both the formatted output and `FormatResult.recoveries`. `visitComponent` now walks recovery children after rendering slots, so the verbatim closing tag round-trips and the summary surfaces.
+
+### Internal
+- Added 73 new tests (2700 → 2773), covering: 1 regression test for the component recovery fix, 37 reflection-based lock-in tests that assert every `directiveEnd*` TokenType produces a RecoveryNode when parsed orphaned, 26 parameterized tests for the parenthesis-spacing fix, and 9 inline-text + prettier-ignore alias regression tests.
+- Benchmark suite bumped: `@shufo/prettier-plugin-blade` 1.16.1→1.16.2, `prettier` 3.8.1→3.8.3, `prettier-plugin-blade-v3` (Chisel) 3.0.0→3.1.6.
+- Generated artifacts (`site/dist/blade-formatter.js`, `site/data/benchmark.json`) marked `linguist-generated=true` so they collapse in GitHub PR diffs.
 
 ## [1.4.0] - 2026-03-13
 
