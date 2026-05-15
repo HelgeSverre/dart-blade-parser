@@ -882,7 +882,11 @@ class FormatterVisitor implements AstVisitor<String> {
 
     _output.write(_renderEchoString(node));
 
-    _output.writeln();
+    // Suppress trailing newline when the next sibling continues inline
+    // (e.g., `Some text {{ $x }} more text` must stay on one line).
+    if (!_nextSiblingContinuesInline(node)) {
+      _output.writeln();
+    }
     return '';
   }
 
@@ -1294,8 +1298,21 @@ class FormatterVisitor implements AstVisitor<String> {
     // Determine if we should format as self-closing
     final shouldSelfClose = !hasContent && _shouldSelfClose(node.isSelfClosing);
 
+    // Detect inline continuation: a self-closing inline-renderable component
+    // sandwiched between text/echo siblings should not force a newline before
+    // or after itself (e.g., `Click <x-foo /> here` must stay one line).
+    final isInlineContinuation = shouldSelfClose &&
+        !_output.isEmpty &&
+        !_output.endsWithNewline() &&
+        _isInlineRenderableNode(node);
+    final suppressTrailingNewline = isInlineContinuation
+        ? _nextSiblingContinuesInline(node)
+        : false;
+
     // Write opening tag
-    _beginLine();
+    if (!isInlineContinuation) {
+      _beginLine();
+    }
     _output.write('<x-${node.name}');
 
     // If tag head contains structural directives, use ordered tag head
@@ -1304,7 +1321,7 @@ class FormatterVisitor implements AstVisitor<String> {
       _writeTagHead(node.tagHead, closingBracket: closingBracket);
 
       if (shouldSelfClose) {
-        _output.writeln();
+        if (!suppressTrailingNewline) _output.writeln();
         return '';
       }
 
@@ -1325,7 +1342,7 @@ class FormatterVisitor implements AstVisitor<String> {
       // Handle self-closing components
       if (shouldSelfClose) {
         _writeAttributes(attributes, wrap: shouldWrap, closingBracket: ' />');
-        _output.writeln();
+        if (!suppressTrailingNewline) _output.writeln();
         return '';
       }
 
@@ -1814,6 +1831,41 @@ class FormatterVisitor implements AstVisitor<String> {
     return false;
   }
 
+  /// Returns true if the next meaningful sibling continues inline on the
+  /// same logical line as [node] (text without leading newline, echo, or
+  /// inline-renderable element/component).
+  ///
+  /// Used by [visitEcho] and the self-closing branch of [visitComponent] to
+  /// decide whether to emit a trailing newline. Without this check,
+  /// `Some text {{ $x }} more text` breaks across three lines because the
+  /// echo always emits a newline.
+  bool _nextSiblingContinuesInline(AstNode node) {
+    final parent = node.parent;
+    if (parent == null) return false;
+    final siblings = parent.children;
+    final idx = siblings.indexOf(node);
+    if (idx < 0) return false;
+    for (var i = idx + 1; i < siblings.length; i++) {
+      final next = siblings[i];
+      if (next is TextNode) {
+        // Pure-whitespace text: a newline ends the inline run; otherwise
+        // it is inline padding — keep scanning for the next real sibling.
+        if (next.content.trim().isEmpty) {
+          if (next.content.contains('\n')) return false;
+          continue;
+        }
+        // Real text continues inline iff it does not start with a newline.
+        return !next.content.startsWith('\n');
+      }
+      if (next is EchoNode) return true;
+      if (next is ComponentNode || next is HtmlElementNode) {
+        return _isInlineRenderableNode(next);
+      }
+      return false;
+    }
+    return false;
+  }
+
   /// Checks if a node is simple text (no newlines).
   bool _isSimpleTextNode(AstNode node) {
     return node is TextNode && !node.content.contains('\n');
@@ -1831,7 +1883,22 @@ class FormatterVisitor implements AstVisitor<String> {
   bool _isInlineRenderableNode(AstNode node) {
     if (_isSimpleTextNode(node) || _isSimpleEchoNode(node)) return true;
     if (node is HtmlElementNode) return _isInlineRenderableElement(node);
+    if (node is ComponentNode) return _isInlineRenderableComponent(node);
     return false;
+  }
+
+  /// A component is inline-renderable when it is self-closing (no children),
+  /// has no structural directives in its tag head, and would not wrap its
+  /// attributes. Used to keep `Click <x-foo /> here` on a single line.
+  bool _isInlineRenderableComponent(ComponentNode node) {
+    if (!node.isSelfClosing) return false;
+    if (node.tagHead.isNotEmpty) return false;
+    final attributes = node.attributes.values.toList();
+    if (_shouldWrapAttributes(node.name, attributes,
+        isComponent: true, isSelfClosing: true)) {
+      return false;
+    }
+    return true;
   }
 
   /// Checks if an HTML element can be rendered inline.

@@ -327,6 +327,62 @@ void main() {
         });
       }
     });
+
+    group('issue #17: inline text around echo and component', () {
+      // Pre-fix, visitEcho and the self-closing branch of visitComponent
+      // always emitted a trailing newline, breaking `text {{ $x }} more text`
+      // across three lines and forcing inline components onto their own line.
+
+      test('text + echo + text stays on one line', () {
+        final formatted =
+            formatter.format('Some text {{ \$variable }} more text');
+        expect(
+          formatted.trim(),
+          equals('Some text {{ \$variable }} more text'),
+        );
+      });
+
+      test('two echoes interleaved with text stay on one line', () {
+        final formatted = formatter
+            .format('Some text {{ \$variable }} to {{ \$otherVariable }}?');
+        expect(
+          formatted.trim(),
+          equals('Some text {{ \$variable }} to {{ \$otherVariable }}?'),
+        );
+      });
+
+      test('text + self-closing component + text stays on one line', () {
+        final formatted =
+            formatter.format('Click <x-foo :bar="\$baz" /> here');
+        expect(
+          formatted.trim(),
+          equals('Click <x-foo :bar="\$baz" /> here'),
+        );
+      });
+
+      test('text + echo + text inside HTML stays on one line', () {
+        final formatted = formatter
+            .format('<p>Some text {{ \$variable }} more text</p>');
+        expect(
+          formatted,
+          contains('Some text {{ \$variable }} more text'),
+        );
+      });
+
+      test('inline echo+text is idempotent', () {
+        expectIdempotent(
+          'Some text {{ \$variable }} more text',
+          description: 'echo between text',
+        );
+      });
+
+      test('inline component+text is idempotent', () {
+        expectIdempotent(
+          'Click <x-foo :bar="\$baz" /> here',
+          description: 'self-closing component between text',
+        );
+      });
+    });
   });
 }
 
