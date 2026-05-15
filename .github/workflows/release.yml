@@ -24,7 +24,7 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: "22"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
       # Run Dart tests
@@ -55,10 +55,11 @@ jobs:
           npm version --no-git-tag-version "${{ steps.ver.outputs.version }}"
           npm test
 
-      - name: Install latest npm (required for trusted publishing)
-        run: npm install -g npm@latest
-
-      # Publish to npm via OIDC trusted publishing
+      # Publish to npm via OIDC trusted publishing.
+      # Node 24 ships with npm 11.x which already supports OIDC provenance,
+      # so we use the bundled npm directly instead of `npm install -g
+      # npm@latest` (that path corrupts the install on hosted runners — the
+      # global upgrade leaves transitive deps like `promise-retry` missing).
       - name: Publish to npm
         working-directory: prettier-plugin-laravel-blade
         run: npm publish --access public --provenance
