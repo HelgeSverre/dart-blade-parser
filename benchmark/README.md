@@ -8,19 +8,23 @@ fixtures synced from the project test suite.
 
 | Label | Plugin | Version |
 |-------|--------|---------|
-| A | `prettier-plugin-laravel-blade` (this project) | 0.1.0 |
-| B | `prettier-plugin-blade` (stillat) | 2.1.21 |
-| C | `@shufo/prettier-plugin-blade` (shufo) | 1.16.1 |
+| A | `prettier-plugin-laravel-blade` (this project) | local build |
+| B | `prettier-plugin-blade` (stillat, v2) | 2.1.21 |
+| C | `@shufo/prettier-plugin-blade` (shufo) | 1.16.2 |
+| D | `prettier-plugin-blade` (stillat, v3 / Chisel) | 3.1.6 |
+
+Prettier: 3.8.3.
 
 ## Latest Results
 
-### Performance (20 runs, 3 warmup)
+### Performance (20 runs, 3 warmup, 226 fixtures)
 
 | Plugin | Avg (ms) | vs A |
 |--------|----------|------|
-| A | 0.33 | -- |
-| B | 7.31 | 22x slower |
-| C | 10.45 | 32x slower |
+| A | 5.24 | -- |
+| B | 31.42 | 6x slower |
+| C | 25.53 | 5x slower |
+| D | 3.68 | 1.4x faster |
 
 ### Idempotency
 
