@@ -149,6 +149,28 @@ void main() {
       );
       });
 
+      test(
+          'mismatched component closing surfaces in FormatResult.recoveries',
+          () {
+        // Regression: before the fix, RecoveryNode children left in
+        // component.children after default-slot promotion were never walked
+        // by visitComponent, so the recovery summary was empty and the
+        // verbatim closing tag disappeared from output.
+        const input = '<x-button>Click</x-other>';
+        final result = formatter.formatWithResult(input);
+
+        expect(result.hasErrors, isTrue);
+        expect(result.recoveries, isNotEmpty,
+            reason: 'mismatched component close must produce a summary');
+        expect(
+          result.recoveries.any(
+            (r) => r.reason.contains('mismatched component closing'),
+          ),
+          isTrue,
+        );
+        expect(result.formatted, contains('</x-other>'),
+            reason: 'verbatim recovery content must appear in output');
+      });
     });
 
     group('RecoveryConfidence metadata', () {

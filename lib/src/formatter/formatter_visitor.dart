@@ -1323,7 +1323,12 @@ class FormatterVisitor implements AstVisitor<String> {
     // Check if we can keep content inline
     // If there's only a default slot with simple text, render it inline without slot tags
     // Skip inline optimization when tag head has directives (unstable line length)
+    // Skip inline optimization when orphan RecoveryNodes live in children;
+    // they need block-formatting to be walked by visitRecovery.
+    final hasOrphanRecoveries =
+        node.children.whereType<RecoveryNode>().isNotEmpty;
     final hasOnlyDefaultSlot = node.tagHead.isEmpty &&
+        !hasOrphanRecoveries &&
         node.slots.length == 1 &&
         node.slots.containsKey('default') &&
         node.slots['default']!.children.length == 1 &&
@@ -1401,6 +1406,17 @@ class FormatterVisitor implements AstVisitor<String> {
           if (_needsSpacingBetween(slot, namedSlots[i + 1])) {
             _output.writeln();
           }
+        }
+      }
+
+      // Walk RecoveryNodes left in node.children after default-slot promotion.
+      // The parser appends recovery markers (e.g. for mismatched closing tags)
+      // to children; promotion moves only non-recovery children into the
+      // default slot, leaving recoveries orphaned here. Walk them so
+      // visitRecovery emits both verbatim content and a RecoverySummary.
+      for (final child in node.children) {
+        if (child is RecoveryNode) {
+          child.accept(this);
         }
       }
     } else {

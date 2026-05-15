@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Component recovery markers dropped on default-slot promotion:** When a component with a mismatched closing tag had a default slot created, its `RecoveryNode` children were silently dropped from both the formatted output and `FormatResult.recoveries`. `visitComponent` now walks recovery children after rendering slots.
+
 ## [1.4.0] - 2026-03-13
 
 ### Added
