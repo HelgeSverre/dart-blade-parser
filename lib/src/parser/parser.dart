@@ -52,6 +52,11 @@ class BladeParser {
         _tokens[_current + 1].type == TokenType.expression) {
       return false;
     }
+    // Naming convention: every TokenType value named `directiveEnd*` is a
+    // closing directive token. Adding a new closer means adding the enum
+    // value — no extra registration needed here. Locked in by the test
+    // `every directiveEnd* token is recognized as an orphan closer`
+    // in test/unit/parser/recovery_node_parser_test.dart.
     return type.name.startsWith('directiveEnd') ||
         _orphanDirectiveTokenTypes.contains(type);
   }

@@ -275,5 +275,36 @@ void main() {
         expect(recoveryNodes.first.confidence, RecoveryConfidence.high);
       });
     });
+
+    group('orphan closing directives — naming convention lock-in', () {
+      // Locks in the naming convention used by _isOrphanDirectiveToken's
+      // startsWith('directiveEnd') check. If a future TokenType value named
+      // directiveEnd* is added that should NOT be recovered as an orphan
+      // closer, this test will fail and force an explicit decision.
+      //
+      // The set of @-tokens whose tokenizer-recognized form starts with
+      // 'directiveEnd' is enumerated via TokenType.values reflection so
+      // adding a new closer enum value automatically extends coverage.
+      for (final type in TokenType.values) {
+        if (!type.name.startsWith('directiveEnd')) continue;
+        // Preserve original case from the enum suffix: most closers are
+        // lowercase (`@endif`) but Laravel ships several PascalCase
+        // variants (`@endPushOnce`, `@endPushIf`, `@endPrependOnce`).
+        final source = '@end${type.name.substring('directiveEnd'.length)}';
+        test('orphan ${type.name} produces a RecoveryNode', () {
+          final result = parser.parse(source);
+          final recoveries =
+              result.ast?.children.whereType<RecoveryNode>().toList() ??
+                  const <RecoveryNode>[];
+          expect(
+            recoveries,
+            isNotEmpty,
+            reason:
+                'expected orphan $source to surface a RecoveryNode '
+                '(type=${type.name})',
+          );
+        });
+      }
+    });
   });
 }
