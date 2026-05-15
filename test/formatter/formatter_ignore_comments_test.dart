@@ -282,5 +282,35 @@ everything   here   preserved
         expect(secondPass, contains('<div    class="messy"   ></div>'));
       });
     });
+
+    group('issue #14: prettier-ignore-start/end alias', () {
+      test('HTML comment prettier-ignore-start/end disables formatting', () {
+        const input = '''<!-- prettier-ignore-start -->
+<div    class="preserve"   >
+    This   content    is   preserved
+</div>
+<!-- prettier-ignore-end -->''';
+        final result = formatter.format(input);
+
+        expect(result, contains('<div    class="preserve"   >'));
+        expect(result, contains('This   content    is   preserved'));
+      });
+
+      test('Blade comment prettier-ignore-start/end works', () {
+        const input = '''{{-- prettier-ignore-start --}}
+<div    class="messy"   ></div>
+{{-- prettier-ignore-end --}}''';
+        final result = formatter.format(input);
+        expect(result, contains('<div    class="messy"   ></div>'));
+      });
+
+      test('case-insensitive', () {
+        const input = '''<!-- PRETTIER-IGNORE-START -->
+<div    class="preserve"   ></div>
+<!-- PRETTIER-IGNORE-END -->''';
+        final result = formatter.format(input);
+        expect(result, contains('<div    class="preserve"   >'));
+      });
+    });
   });
 }

@@ -374,6 +374,7 @@ class FormatterVisitor implements AstVisitor<String> {
   /// - `blade-formatter:off` / `blade-formatter:on`
   /// - `blade-formatter-disable` / `blade-formatter-enable`
   /// - `format:off` / `format:on`
+  /// - `prettier-ignore-start` / `prettier-ignore-end` (Prettier convention)
   String? _getFormatterControl(String content) {
     // Normalize the content by stripping comment delimiters and trimming
     var text = content;
@@ -399,14 +400,16 @@ class FormatterVisitor implements AstVisitor<String> {
     // Check for off commands
     if (text == 'blade-formatter:off' ||
         text == 'blade-formatter-disable' ||
-        text == 'format:off') {
+        text == 'format:off' ||
+        text == 'prettier-ignore-start') {
       return 'off';
     }
 
     // Check for on commands
     if (text == 'blade-formatter:on' ||
         text == 'blade-formatter-enable' ||
-        text == 'format:on') {
+        text == 'format:on' ||
+        text == 'prettier-ignore-end') {
       return 'on';
     }
 
