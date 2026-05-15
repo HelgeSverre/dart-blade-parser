@@ -190,7 +190,10 @@ class FormatterVisitor implements AstVisitor<String> {
     'default',
   };
 
-  /// Control structure directives that can have parentheses.
+  /// Directives that take a parenthesized expression and should respect
+  /// `directiveParenthesisSpacing` config. Includes control structures, auth
+  /// guards, environment guards, and section guards — anything written as
+  /// `@directive(expr)` in user code.
   static const Set<String> _controlStructureDirectives = {
     'if',
     'elseif',
@@ -204,6 +207,21 @@ class FormatterVisitor implements AstVisitor<String> {
     'empty',
     'isset',
     'error',
+    // Auth guards
+    'auth',
+    'guest',
+    'can',
+    'cannot',
+    'canany',
+    // Environment / context guards
+    'env',
+    'production',
+    'session',
+    'context',
+    // Section / fragment guards
+    'hasSection',
+    'sectionMissing',
+    'fragment',
   };
 
   /// Blade directives that are block-level (require children).
