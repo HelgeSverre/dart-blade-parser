@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **`BladeFormatter.format()` contract:** Clarified docstring to make explicit that `format()` does not throw on recoverable parse errors (this behavior shipped in 1.4.0 but was undocumented). Callers that need error/recovery signal must use `formatWithResult()` instead.
+- **JS bridge surfaces recovery metadata:** The bridge JSON returned by `__dartBladeFormatter` now includes `recoveries` (array of `"reason (confidence)"` strings) and `errors` (array of `{message, line, column, hint?}`) alongside `formatted`/`cursorOffset`/`error`. Consumers that ignore the new keys are unaffected.
+- **`blade format --stdin` exit code:** The CLI now exits non-zero when parse errors occurred and writes parse errors and recovery markers to stderr (formatted output still goes to stdout). Previously, recoverable parse errors silently produced exit 0.
 
 ### Fixed
 - **Component recovery markers dropped on default-slot promotion:** When a component with a mismatched closing tag had a default slot created, its `RecoveryNode` children were silently dropped from both the formatted output and `FormatResult.recoveries`. `visitComponent` now walks recovery children after rendering slots.

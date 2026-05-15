@@ -625,6 +625,45 @@ describe("error recovery", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Bridge JSON shape — direct invocation of the Dart bridge to verify it
+// surfaces recovery metadata for downstream consumers (playground, custom
+// editor integrations) even though the prettier plugin itself doesn't
+// expose these fields through prettier.format().
+// ---------------------------------------------------------------------------
+describe("bridge metadata", () => {
+  // Importing the plugin entrypoint installs globalThis.__dartBladeFormatter.
+  it("surfaces recoveries and errors for malformed input", async () => {
+    await import(pluginPath);
+    const raw = globalThis.__dartBladeFormatter(
+      "@if($user) <p>Hello</p>",
+      "{}",
+    );
+    const parsed = JSON.parse(raw);
+    assert.ok(Array.isArray(parsed.recoveries), "recoveries must be array");
+    assert.ok(Array.isArray(parsed.errors), "errors must be array");
+    assert.ok(parsed.recoveries.length > 0, "should surface ≥1 recovery");
+    assert.ok(parsed.errors.length > 0, "should surface ≥1 parse error");
+    assert.ok(
+      parsed.recoveries.some((r) => /@endif/.test(r)),
+      "recovery message must reference missing @endif",
+    );
+    assert.equal(typeof parsed.errors[0].line, "number");
+    assert.equal(typeof parsed.errors[0].column, "number");
+  });
+
+  it("emits empty recoveries/errors arrays for clean input", async () => {
+    await import(pluginPath);
+    const raw = globalThis.__dartBladeFormatter(
+      "<div>{{ $name }}</div>",
+      "{}",
+    );
+    const parsed = JSON.parse(raw);
+    assert.deepEqual(parsed.recoveries, []);
+    assert.deepEqual(parsed.errors, []);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Real-world patterns
 // ---------------------------------------------------------------------------
 describe("real-world patterns", () => {

@@ -15,7 +15,16 @@ void main() {
 
 /// Format Blade template source. Called from JS with:
 ///   bladeFormatter(source, optionsJson)
-/// Returns JSON: { "formatted": "...", "error": null }
+/// Returns JSON:
+///   {
+///     "formatted": "...",
+///     "cursorOffset": -1,
+///     "error": null,
+///     "recoveries": ["reason (confidence)", ...],
+///     "errors": [{"message": "...", "line": N, "column": N}, ...]
+///   }
+/// `recoveries` and `errors` are empty arrays for clean input. Consumers that
+/// ignore them are unaffected.
 JSString _format(JSString source, JSString optionsJson) {
   final text = source.toDart;
   final opts = jsonDecode(optionsJson.toDart) as Map<String, dynamic>;
@@ -61,29 +70,41 @@ JSString _format(JSString source, JSString optionsJson) {
   try {
     if (rangeStart != null && rangeEnd != null) {
       final res = formatter.formatRange(text, rangeStart, rangeEnd);
-      return jsonEncode({
-        'formatted': res.formatted,
-        'cursorOffset': res.cursorOffset,
-        'error': null,
-      }).toJS;
+      return _encodeResult(res).toJS;
     } else if (cursorOffset >= 0) {
       final res = formatter.formatWithCursor(text, cursorOffset);
-      return jsonEncode({
-        'formatted': res.formatted,
-        'cursorOffset': res.cursorOffset,
-        'error': null,
-      }).toJS;
+      return _encodeResult(res).toJS;
     } else {
-      final formatted = formatter.format(text);
-      final result = {
-        'formatted': formatted,
-        'cursorOffset': -1,
-        'error': null,
-      };
-      return jsonEncode(result).toJS;
+      final res = formatter.formatWithResult(text);
+      return _encodeResult(res).toJS;
     }
   } catch (e) {
-    final result = {'formatted': text, 'cursorOffset': -1, 'error': e.toString()};
+    final result = {
+      'formatted': text,
+      'cursorOffset': -1,
+      'error': e.toString(),
+      'recoveries': const <String>[],
+      'errors': const <Map<String, Object?>>[],
+    };
     return jsonEncode(result).toJS;
   }
+}
+
+String _encodeResult(FormatResult res) {
+  return jsonEncode({
+    'formatted': res.formatted,
+    'cursorOffset': res.cursorOffset,
+    'error': null,
+    'recoveries': res.recoveries
+        .map((r) => '${r.reason} (${r.confidence.name})')
+        .toList(),
+    'errors': res.errors
+        .map((e) => {
+              'message': e.message,
+              'line': e.position.line,
+              'column': e.position.column,
+              if (e.hint != null) 'hint': e.hint,
+            })
+        .toList(),
+  });
 }

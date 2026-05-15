@@ -571,9 +571,30 @@ Future<void> _formatStdin(BladeFormatter formatter) async {
     }
 
     final source = buffer.toString();
-    final formatted = formatter.format(source);
-    stdout.write(formatted);
-    exit(0);
+    final result = formatter.formatWithResult(source);
+    stdout.write(result.formatted);
+
+    // Surface parse errors and recovery markers on stderr without affecting
+    // stdout (so pipelines that consume formatted output still work). Exit
+    // non-zero if any parse error occurred — recovered output may still be
+    // wrong, and callers should know.
+    if (result.errors.isNotEmpty) {
+      stderr.writeln('Parse errors:');
+      for (final error in result.errors) {
+        stderr.writeln(
+          '  ${error.position.line}:${error.position.column} - ${error.message}',
+        );
+      }
+    }
+    if (result.recoveries.isNotEmpty) {
+      stderr.writeln('Recoveries:');
+      for (final r in result.recoveries) {
+        stderr.writeln(
+          '  ${r.startPosition.line}:${r.startPosition.column} - ${r.reason} (${r.confidence.name})',
+        );
+      }
+    }
+    exit(result.hasErrors ? 1 : 0);
   } on FormatterException catch (e) {
     stderr.writeln('Parse errors:');
     for (final error in e.parseErrors) {
