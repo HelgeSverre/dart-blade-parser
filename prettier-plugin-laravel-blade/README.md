@@ -83,6 +83,7 @@ prettier --check "**/*.blade.php"
 | `bladeAttributeSort` | `"none"` | `none`, `alphabetical`, `by_type` | Reorder attributes (HTML, Alpine, Livewire) |
 | `bladeClosingBracketStyle` | `"same_line"` | `same_line`, `new_line` | Where `>` sits when attributes wrap |
 | `bladeSelfClosingStyle` | `"preserve"` | `preserve`, `always`, `never` | `<x-icon />` vs `<x-icon></x-icon>` for empty tags |
+| `bladeInlineSelfClosingComponents` | `false` | `true`, `false` | Collapse a standalone self-closing component (`<x-icon />` as an element's only child) onto its parent's line. Default keeps it on its own line; a component in a text flow always stays inline |
 
 ## How It Works
 

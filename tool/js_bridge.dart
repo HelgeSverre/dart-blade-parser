@@ -40,14 +40,11 @@ JSString _format(JSString source, JSString optionsJson) {
         DirectiveSpacing.fromString(opts['directiveSpacing'] as String?),
     slotFormatting:
         SlotFormatting.fromString(opts['slotFormatting'] as String?),
-    slotNameStyle:
-        SlotNameStyle.fromString(opts['slotNameStyle'] as String?),
-    slotSpacing:
-        SlotSpacing.fromString(opts['slotSpacing'] as String?),
+    slotNameStyle: SlotNameStyle.fromString(opts['slotNameStyle'] as String?),
+    slotSpacing: SlotSpacing.fromString(opts['slotSpacing'] as String?),
     wrapAttributes:
         WrapAttributes.fromString(opts['wrapAttributes'] as String?),
-    attributeSort:
-        AttributeSort.fromString(opts['attributeSort'] as String?),
+    attributeSort: AttributeSort.fromString(opts['attributeSort'] as String?),
     closingBracketStyle:
         ClosingBracketStyle.fromString(opts['closingBracketStyle'] as String?),
     selfClosingStyle:
@@ -55,10 +52,11 @@ JSString _format(JSString source, JSString optionsJson) {
     htmlBlockSpacing:
         HtmlBlockSpacing.fromString(opts['htmlBlockSpacing'] as String?),
     echoSpacing: EchoSpacing.fromString(opts['echoSpacing'] as String?),
-    directiveParenthesisSpacing:
-        DirectiveParenthesisSpacing.fromString(
-            opts['directiveParenthesisSpacing'] as String?),
+    directiveParenthesisSpacing: DirectiveParenthesisSpacing.fromString(
+        opts['directiveParenthesisSpacing'] as String?),
     trailingNewline: opts['trailingNewline'] as bool? ?? true,
+    inlineSelfClosingComponents:
+        opts['inlineSelfClosingComponents'] as bool? ?? false,
   );
 
   final cursorOffset = opts['cursorOffset'] as int? ?? -1;

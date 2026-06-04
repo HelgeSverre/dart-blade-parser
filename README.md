@@ -360,6 +360,7 @@ final config = FormatterConfig(
   htmlBlockSpacing: HtmlBlockSpacing.betweenBlocks,   // Default: betweenBlocks
   echoSpacing: EchoSpacing.spaced,            // Default: spaced
   trailingNewline: true,                      // Default: true
+  inlineSelfClosingComponents: false,         // Default: false
 );
 
 final formatter = BladeFormatter(config: config);
@@ -418,6 +419,10 @@ final formatter = BladeFormatter(config: config);
   - `EchoSpacing.compact`: No spaces: `{{$var}}`
   - `EchoSpacing.preserve`: Preserve original spacing
 - `trailingNewline`: Whether to add a trailing newline (default: true)
+- `inlineSelfClosingComponents`: Whether a self-closing component that is the sole child of an element may collapse onto its parent's line
+  - `false`: Standalone components keep the author's block layout, staying on their own line (default)
+  - `true`: Standalone components collapse inline (matches blade-formatter / Prettier defaults)
+  - Components in a text flow (e.g. `Click <x-foo /> here`) always stay inline regardless of this setting
 
 ### API
 

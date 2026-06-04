@@ -127,6 +127,7 @@ export const parsers = {
         echoSpacing: options.bladeEchoSpacing,
         directiveParenthesisSpacing: options.bladeDirectiveParenthesisSpacing,
         trailingNewline: options.bladeTrailingNewline,
+        inlineSelfClosingComponents: options.bladeInlineSelfClosingComponents,
       };
 
       // Pass range if set
@@ -360,6 +361,13 @@ export const options = {
     category: "Blade",
     default: true,
     description: "Add a trailing newline at the end of formatted output.",
+  },
+  bladeInlineSelfClosingComponents: {
+    type: "boolean",
+    category: "Blade",
+    default: false,
+    description:
+      "Collapse a self-closing component that is the sole child of an element onto its parent's line (matches blade-formatter/Prettier). Default keeps the component on its own line. Components in a text flow always stay inline.",
   },
   bladeDirectiveParenthesisSpacing: {
     type: "choice",

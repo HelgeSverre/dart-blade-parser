@@ -302,9 +302,7 @@ void _printTree(AstNode node, int indent) {
     case ErrorNode():
       print('${prefix}Error: ${node.error}');
     case RecoveryNode():
-      final preview = node.content.isNotEmpty
-          ? node.content
-          : node.reason;
+      final preview = node.content.isNotEmpty ? node.content : node.reason;
       print('${prefix}Recovery: "$preview"');
     case SlotNode():
       print('${prefix}Slot: ${node.name}');
@@ -495,7 +493,8 @@ Configuration File:
     "directive_spacing": "between_blocks",
     "html_block_spacing": "between_blocks",
     "echo_spacing": "spaced",
-    "trailing_newline": true
+    "trailing_newline": true,
+    "inline_self_closing_components": false
   }
 
 Examples:
