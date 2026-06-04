@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-06-04
+
+### Added
+- **`inlineSelfClosingComponents` formatter option (#18):** New config option (`.blade.json` key `inline_self_closing_components`, default `false`) controlling whether a self-closing component that is the sole child of an element may collapse onto its parent's line. By default a standalone component keeps the author's block layout (stays on its own indented line, like `<img>`, block elements, and non-self-closing components); set it to `true` to collapse inline, matching the default behavior of `blade-formatter` (js-beautify) and Prettier's HTML printer. A component in a text flow (e.g. `Click <x-foo /> here`) always stays inline regardless of this setting.
+
+### Fixed
+- **Self-closing component dropped as sole child (#18):** A self-closing Blade component that was the only child of an element (e.g. `<a href="…"><x-component :x="$x" /></a>`) was silently deleted from the formatted output — `_renderInlineNode` had no `ComponentNode` branch and returned an empty string. The component is now preserved (kept on its own line by default; see `inlineSelfClosingComponents`).
+- **`blade-formatter:off` / `prettier-ignore` regions corrupted nested content (#14):** Inside a disabled-formatting region nested in an element, component, or slot, the protected content was mangled three ways, all now fixed:
+  - A component's closing tag lost its trailing `>` (the lexer emitted the `componentTagClose` token before consuming `>`, leaving the node's end position one character short and truncating the verbatim slice).
+  - The disable marker collapsed onto the following node's line, because the block-mode child loops skipped whitespace-only text nodes unconditionally instead of emitting them verbatim while formatting is disabled (the document-level loop already handled this correctly).
+  - Re-enabling formatting stacked an extra blank line on each pass (non-idempotent) when the region was indented.
+  - A raw-text element (`<pre>`, `<script>`, `<style>`, `<textarea>`) inside the region folds its leading whitespace into its own node span, overlapping the preceding whitespace text node; emitting both verbatim duplicated that whitespace and grew it on every pass. `_outputRaw` now clamps each verbatim slice past the last byte already written, so overlapping spans are never emitted twice.
+  Ignore regions nested inside elements now round-trip verbatim and idempotently.
+
+### Internal
+- Added regression tests pinned to the verbatim inputs from issues #18 and #14, plus coverage for the new `inlineSelfClosingComponents` option (default vs opt-in, text-adjacency, and config round-tripping).
+
 ## [1.5.0] - 2026-05-15
 
 ### Added
