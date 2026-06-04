@@ -55,6 +55,21 @@ class FormatterConfig {
   /// Whether to add a trailing newline at the end of formatted output.
   final bool trailingNewline;
 
+  /// Whether a self-closing component (`<x-foo />`) that is the sole child of
+  /// an element may collapse onto its parent's line.
+  ///
+  /// When `false` (the default), a standalone component keeps the block layout
+  /// the author wrote (it stays on its own indented line), matching the way
+  /// `<img>`, block elements, and non-self-closing components are treated.
+  /// When `true`, a standalone component collapses inline, matching the
+  /// default behavior of blade-formatter (js-beautify) and Prettier's HTML
+  /// printer for custom elements.
+  ///
+  /// This only affects *standalone* components. A component sitting in a text
+  /// flow (e.g. `Click <x-foo /> here`) always stays inline regardless of this
+  /// setting.
+  final bool inlineSelfClosingComponents;
+
   /// Creates a formatter configuration.
   const FormatterConfig({
     this.indentSize = 4,
@@ -73,6 +88,7 @@ class FormatterConfig {
     this.htmlBlockSpacing = HtmlBlockSpacing.betweenBlocks,
     this.echoSpacing = EchoSpacing.spaced,
     this.trailingNewline = true,
+    this.inlineSelfClosingComponents = false,
   });
 
   /// Creates a default formatter configuration.
@@ -120,6 +136,8 @@ class FormatterConfig {
           HtmlBlockSpacing.fromString(map['html_block_spacing'] as String?),
       echoSpacing: EchoSpacing.fromString(map['echo_spacing'] as String?),
       trailingNewline: map['trailing_newline'] as bool? ?? true,
+      inlineSelfClosingComponents:
+          map['inline_self_closing_components'] as bool? ?? false,
     );
   }
 
@@ -142,6 +160,7 @@ class FormatterConfig {
       'html_block_spacing': htmlBlockSpacing.value,
       'echo_spacing': echoSpacing.value,
       'trailing_newline': trailingNewline,
+      'inline_self_closing_components': inlineSelfClosingComponents,
     };
   }
 
@@ -163,7 +182,8 @@ class FormatterConfig {
         'selfClosingStyle: $selfClosingStyle, '
         'htmlBlockSpacing: $htmlBlockSpacing, '
         'echoSpacing: $echoSpacing, '
-        'trailingNewline: $trailingNewline'
+        'trailingNewline: $trailingNewline, '
+        'inlineSelfClosingComponents: $inlineSelfClosingComponents'
         ')';
   }
 }

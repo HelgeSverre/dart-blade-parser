@@ -55,6 +55,29 @@ class _TrackedBuffer {
         trimmed.length >= 2 ? trimmed.substring(trimmed.length - 2) : trimmed);
   }
 
+  /// Removes trailing spaces and tabs (but not the preceding newline) from the
+  /// buffer. Used to normalise raw indentation left by a disabled-formatting
+  /// region before the formatter re-indents the next line, so passthrough
+  /// whitespace does not stack into blank lines. No-op unless the buffer
+  /// actually ends in inline whitespace, so the O(n) work stays off the hot
+  /// path.
+  void trimTrailingInlineWhitespace() {
+    if (_lastTwo.isEmpty) return;
+    final last = _lastTwo[_lastTwo.length - 1];
+    if (last != ' ' && last != '\t') return;
+    final str = _buffer.toString();
+    var end = str.length;
+    while (end > 0 && (str[end - 1] == ' ' || str[end - 1] == '\t')) {
+      end--;
+    }
+    if (end == str.length) return;
+    final trimmed = str.substring(0, end);
+    _buffer.clear();
+    _buffer.write(trimmed);
+    _lastTwo =
+        trimmed.length >= 2 ? trimmed.substring(trimmed.length - 2) : trimmed;
+  }
+
   @override
   String toString() => _buffer.toString();
 }
@@ -77,6 +100,15 @@ class FormatterVisitor implements AstVisitor<String> {
   /// Set to `false` when encountering a `blade-formatter:off` comment,
   /// and back to `true` when encountering `blade-formatter:on`.
   bool _formattingEnabled = true;
+
+  /// The highest source offset already emitted verbatim by [_outputRaw].
+  ///
+  /// Raw nodes are emitted in document order, but some node spans overlap
+  /// (e.g. a raw-text `<pre>` element folds its leading whitespace into its
+  /// own span, overlapping the preceding whitespace text node). Without this
+  /// guard the overlapping source would be written twice and grow on every
+  /// pass inside a disabled-formatting region.
+  int _lastRawEnd = 0;
 
   final List<RecoverySummary> _recoverySummaries = [];
 
@@ -360,6 +392,7 @@ class FormatterVisitor implements AstVisitor<String> {
     _output.clear();
     _indent.reset();
     _formattingEnabled = true;
+    _lastRawEnd = 0;
     _recoverySummaries.clear();
     node.accept(this);
     return _output.toString();
@@ -422,11 +455,17 @@ class FormatterVisitor implements AstVisitor<String> {
   void _outputRaw(AstNode node) {
     if (_source == null) return;
 
-    final start = node.startPosition.offset;
     final end = node.endPosition.offset;
+    // Clamp the start past anything already emitted so overlapping node spans
+    // (e.g. a <pre> element that absorbed its leading whitespace) are not
+    // written twice.
+    final start = node.startPosition.offset < _lastRawEnd
+        ? _lastRawEnd
+        : node.startPosition.offset;
 
     if (start >= 0 && end <= _source!.length && start < end) {
       _output.write(_source!.substring(start, end));
+      _lastRawEnd = end;
     }
   }
 
@@ -1152,7 +1191,8 @@ class FormatterVisitor implements AstVisitor<String> {
       // would produce unstable results when attributes are wrapped.
       var canKeepInline = node.tagHead.isEmpty &&
           meaningfulChildren.isNotEmpty &&
-          meaningfulChildren.every(_isInlineRenderableNode);
+          meaningfulChildren.every(_isInlineRenderableNode) &&
+          _standaloneComponentInlineAllowed(meaningfulChildren);
 
       // Check for newlines between meaningful children
       if (canKeepInline && meaningfulChildren.length > 1) {
@@ -1242,15 +1282,21 @@ class FormatterVisitor implements AstVisitor<String> {
       for (var i = 0; i < node.children.length; i++) {
         final child = node.children[i];
 
-        // Skip whitespace-only text nodes in block mode
-        if (child is TextNode && child.content.trim().isEmpty) {
+        // Skip whitespace-only text nodes in block mode, but only while
+        // formatting is enabled. When formatting is disabled (inside an
+        // ignore region), whitespace is emitted verbatim so the original
+        // line breaks and indentation are preserved.
+        if (_formattingEnabled &&
+            child is TextNode &&
+            child.content.trim().isEmpty) {
           continue;
         }
 
         child.accept(this);
 
-        // Add spacing between children if needed
-        if (i < node.children.length - 1) {
+        // Add spacing between children if needed (only when formatting is
+        // enabled; raw passthrough manages its own spacing).
+        if (_formattingEnabled && i < node.children.length - 1) {
           // Find the next meaningful (non-whitespace) node
           AstNode? nextMeaningful;
           for (var j = i + 1; j < node.children.length; j++) {
@@ -1305,9 +1351,8 @@ class FormatterVisitor implements AstVisitor<String> {
         !_output.isEmpty &&
         !_output.endsWithNewline() &&
         _isInlineRenderableNode(node);
-    final suppressTrailingNewline = isInlineContinuation
-        ? _nextSiblingContinuesInline(node)
-        : false;
+    final suppressTrailingNewline =
+        isInlineContinuation ? _nextSiblingContinuesInline(node) : false;
 
     // Write opening tag
     if (!isInlineContinuation) {
@@ -1401,13 +1446,17 @@ class FormatterVisitor implements AstVisitor<String> {
       // Render default slot content directly without <x-slot:default> tags
       for (var i = 0; i < defaultSlot.children.length; i++) {
         final child = defaultSlot.children[i];
-        if (child is TextNode && child.content.trim().isEmpty) {
+        // Preserve whitespace verbatim while formatting is disabled (ignore
+        // region); otherwise skip whitespace-only nodes.
+        if (_formattingEnabled &&
+            child is TextNode &&
+            child.content.trim().isEmpty) {
           continue;
         }
         child.accept(this);
 
         // Add spacing between children if needed
-        if (i < defaultSlot.children.length - 1) {
+        if (_formattingEnabled && i < defaultSlot.children.length - 1) {
           AstNode? nextMeaningful;
           for (var j = i + 1; j < defaultSlot.children.length; j++) {
             final candidate = defaultSlot.children[j];
@@ -1489,15 +1538,18 @@ class FormatterVisitor implements AstVisitor<String> {
       // Then format regular children
       for (var i = 0; i < node.children.length; i++) {
         final child = node.children[i];
-        // Skip whitespace-only text nodes
-        if (child is TextNode && child.content.trim().isEmpty) {
+        // Skip whitespace-only text nodes, unless formatting is disabled
+        // (ignore region) where whitespace is emitted verbatim.
+        if (_formattingEnabled &&
+            child is TextNode &&
+            child.content.trim().isEmpty) {
           continue;
         }
 
         child.accept(this);
 
         // Add spacing between children if needed
-        if (i < node.children.length - 1) {
+        if (_formattingEnabled && i < node.children.length - 1) {
           // Find next meaningful node
           AstNode? nextMeaningful;
           for (var j = i + 1; j < node.children.length; j++) {
@@ -1543,8 +1595,13 @@ class FormatterVisitor implements AstVisitor<String> {
     }
 
     if (control == 'on') {
-      // Re-enable formatting and output the comment
+      // Re-enable formatting and output the comment.
       _formattingEnabled = true;
+      // The preceding disabled region was emitted verbatim and may have left
+      // raw indentation on the current line. Drop it so _beginLine re-indents
+      // cleanly instead of stacking a blank line (which would also break
+      // idempotency).
+      _output.trimTrailingInlineWhitespace();
       _beginLine();
       _formatComment(node);
       _output.writeln();
@@ -1680,8 +1737,11 @@ class FormatterVisitor implements AstVisitor<String> {
         _indent.increase();
 
         for (final child in node.children) {
-          // Skip whitespace-only text nodes at start/end
-          if (child is TextNode && child.content.trim().isEmpty) {
+          // Skip whitespace-only text nodes at start/end (unless formatting is
+          // disabled, where whitespace is emitted verbatim).
+          if (_formattingEnabled &&
+              child is TextNode &&
+              child.content.trim().isEmpty) {
             continue;
           }
           child.accept(this);
@@ -1711,15 +1771,18 @@ class FormatterVisitor implements AstVisitor<String> {
     for (var i = 0; i < node.children.length; i++) {
       final child = node.children[i];
 
-      // Skip whitespace-only text nodes in block mode
-      if (child is TextNode && child.content.trim().isEmpty) {
+      // Skip whitespace-only text nodes in block mode, unless formatting is
+      // disabled (ignore region) where whitespace is emitted verbatim.
+      if (_formattingEnabled &&
+          child is TextNode &&
+          child.content.trim().isEmpty) {
         continue;
       }
 
       child.accept(this);
 
       // Add spacing between children if needed
-      if (i < node.children.length - 1) {
+      if (_formattingEnabled && i < node.children.length - 1) {
         // Find the next meaningful (non-whitespace) node
         AstNode? nextMeaningful;
         for (var j = i + 1; j < node.children.length; j++) {
@@ -1781,9 +1844,8 @@ class FormatterVisitor implements AstVisitor<String> {
       return '';
     }
 
-    final content = _formattingEnabled
-        ? _resolveRecoveryContent(node)
-        : node.content;
+    final content =
+        _formattingEnabled ? _resolveRecoveryContent(node) : node.content;
     _output.write(content);
     return '';
   }
@@ -1901,6 +1963,23 @@ class FormatterVisitor implements AstVisitor<String> {
     return true;
   }
 
+  /// Whether a parent with these meaningful children may collapse to a single
+  /// inline line, given the standalone-component policy.
+  ///
+  /// When [FormatterConfig.inlineSelfClosingComponents] is disabled (the
+  /// default), a self-closing component only keeps its parent inline if the
+  /// parent also contains a text or echo node — i.e. the component sits in a
+  /// text flow (`Click <x-foo /> here`). A standalone component (the sole or
+  /// only element-level children) stays on its own line instead of collapsing
+  /// onto the parent's tag. Applied at every inline decision site so the
+  /// prediction stays consistent and idempotent.
+  bool _standaloneComponentInlineAllowed(List<AstNode> meaningfulChildren) {
+    if (config.inlineSelfClosingComponents) return true;
+    final hasComponent = meaningfulChildren.any((c) => c is ComponentNode);
+    if (!hasComponent) return true;
+    return meaningfulChildren.any((c) => c is TextNode || c is EchoNode);
+  }
+
   /// Checks if an HTML element can be rendered inline.
   ///
   /// An element is inline-renderable when it uses a whitelisted inline tag,
@@ -1933,6 +2012,7 @@ class FormatterVisitor implements AstVisitor<String> {
         .toList();
     if (meaningful.isEmpty) return true;
     if (!meaningful.every(_isInlineRenderableNode)) return false;
+    if (!_standaloneComponentInlineAllowed(meaningful)) return false;
 
     // Reject if there are newlines between meaningful children.
     // Only check when there are multiple meaningful children, matching
@@ -1965,7 +2045,25 @@ class FormatterVisitor implements AstVisitor<String> {
       return _renderEchoString(node);
     }
     if (node is HtmlElementNode) return _renderInlineElement(node);
+    if (node is ComponentNode) return _renderInlineComponent(node);
     return '';
+  }
+
+  /// Renders a self-closing Blade component inline (no indentation, no
+  /// trailing newline). Only used for components that
+  /// [_isInlineRenderableComponent] accepts (self-closing, no tag head, and
+  /// attributes that fit on one line), so it mirrors the single-line branch of
+  /// [_writeAttributes].
+  String _renderInlineComponent(ComponentNode node) {
+    final buf = StringBuffer();
+    buf.write('<x-${node.name}');
+    for (final attr in _sortAttributes(node.attributes.values)) {
+      buf.write(' ');
+      buf.write(_formatAttribute(attr));
+    }
+    buf.write(
+        _shouldSelfClose(node.isSelfClosing) ? ' />' : '></x-${node.name}>');
+    return buf.toString();
   }
 
   /// Renders an HTML element inline (no indentation, no trailing newline).

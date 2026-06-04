@@ -312,5 +312,118 @@ everything   here   preserved
         expect(result, contains('<div    class="preserve"   >'));
       });
     });
+
+    group('issue #14: ignore region nested inside an element', () {
+      test('component closing tag keeps its > inside a nested ignore region',
+          () {
+        const input = '''<div class="mt-6 rounded-lg border p-1">
+    {{-- blade-formatter-disable --}}
+    <x-codelight language="shell" >npm install tailwindcss @tailwindcss/vite</x-codelight>
+    {{-- blade-formatter-enable --}}
+</div>''';
+        final result = formatter.format(input);
+
+        // The component's closing tag must not be truncated.
+        expect(result, contains('</x-codelight>'));
+        // Verbatim content is preserved.
+        expect(result, contains('npm install tailwindcss @tailwindcss/vite'));
+      });
+
+      test('disable marker and following node do not collapse onto one line',
+          () {
+        const input = '''<div class="wrap">
+    {{-- blade-formatter-disable --}}
+    <x-codelight language="shell" >npm install foo</x-codelight>
+    {{-- blade-formatter-enable --}}
+</div>''';
+        final result = formatter.format(input);
+
+        // The marker must stay on its own line, not glued to the component.
+        expect(result, isNot(contains('disable --}}<x-codelight')));
+        // And no blank line should be introduced before the enable marker.
+        expect(result, isNot(contains('</x-codelight>\n\n')));
+        expect(result, isNot(contains('</x-codelight>\n    \n')));
+      });
+
+      test('nested ignore region is idempotent', () {
+        const input = '''<div class="wrap">
+    {{-- blade-formatter-disable --}}
+    <x-codelight language="shell" >npm install foo</x-codelight>
+    {{-- blade-formatter-enable --}}
+</div>''';
+        final first = formatter.format(input);
+        final second = formatter.format(first);
+        expect(second, equals(first));
+        expect(first, contains('</x-codelight>'));
+      });
+
+      test('ignore region nested inside a component preserves its content', () {
+        const input = '''<x-card>
+    {{-- blade-formatter-disable --}}
+    <x-codelight language="shell" >npm install foo</x-codelight>
+    {{-- blade-formatter-enable --}}
+</x-card>''';
+        final result = formatter.format(input);
+
+        expect(result, contains('</x-codelight>'));
+        expect(result, isNot(contains('disable --}}<x-codelight')));
+      });
+
+      test('exact example from issue #14 keeps codelight content verbatim', () {
+        // Verbatim input from https://github.com/HelgeSverre/dart-blade-parser/issues/14
+        const input = '<div class="mt-6 rounded-lg border p-1">\n'
+            '        <!-- prettier-ignore-start -->\n'
+            '        <x-codelight language="shell" >npm install tailwindcss @tailwindcss/vite</x-codelight>\n'
+            '        <!-- prettier-ignore-end -->\n'
+            '</div>';
+        final result = formatter.format(input);
+
+        // The bug shattered the inner text across several lines
+        // (`npm install` / `tailwindcss` / `@tailwindcss` / `/vite`) and
+        // truncated the closing tag's `>`. The component must survive
+        // verbatim, on one line, with an intact closing tag.
+        expect(
+          result,
+          contains(
+              '<x-codelight language="shell" >npm install tailwindcss @tailwindcss/vite</x-codelight>'),
+        );
+        // No collapse of the component onto the marker line.
+        expect(
+            result, isNot(contains('prettier-ignore-start --><x-codelight')));
+        expect(
+          result,
+          equals('<div class="mt-6 rounded-lg border p-1">\n'
+              '    <!-- prettier-ignore-start -->\n'
+              '        <x-codelight language="shell" >npm install tailwindcss @tailwindcss/vite</x-codelight>\n'
+              '    <!-- prettier-ignore-end -->\n'
+              '</div>\n'),
+        );
+      });
+
+      test(
+          'off region with a nested <pre> is idempotent (no blank-line growth)',
+          () {
+        // Raw-text elements (<pre>) parse with their leading whitespace folded
+        // into the node span, which overlaps the preceding whitespace text
+        // node. In a disabled region both were emitted verbatim, duplicating
+        // the gap and growing it on every pass.
+        const input = '''<div>
+    <div>
+        {{-- blade-formatter:off --}}
+        <pre class="hidden">
+            Debug
+        </pre>
+        {{-- blade-formatter:on --}}
+    </div>
+</div>''';
+        final first = formatter.format(input);
+        final second = formatter.format(first);
+        expect(second, equals(first),
+            reason: 'off region containing <pre> must be idempotent');
+        expect(first, contains('<pre class="hidden">'));
+        // The marker and <pre> stay one line apart — no growing blank lines.
+        expect(first, isNot(contains('off --}}\n        \n        \n')));
+      });
+    });
   });
 }

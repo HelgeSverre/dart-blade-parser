@@ -327,7 +327,8 @@ indent_size = 2
     });
 
     test('mail::button with url attribute', () {
-      const input = '<x-mail::button url="https://example.com">Click</x-mail::button>';
+      const input =
+          '<x-mail::button url="https://example.com">Click</x-mail::button>';
       final output = formatter.format(input);
       expect(output, contains('<x-mail::button'));
       expect(output, contains('</x-mail::button>'));
@@ -413,7 +414,9 @@ indent_size = 2
     });
   });
 
-  group('Issue #13: Default slot content should not be wrapped in x-slot:default', () {
+  group(
+      'Issue #13: Default slot content should not be wrapped in x-slot:default',
+      () {
     late BladeFormatter formatter;
 
     setUp(() {
@@ -430,7 +433,8 @@ indent_size = 2
       expect(output, contains('<!-- content -->'));
     });
 
-    test('component with HTML children does not add x-slot:default wrapper', () {
+    test('component with HTML children does not add x-slot:default wrapper',
+        () {
       const input = '''<x-app-layout>
     <div class="container">
         <h1>Hello World</h1>
@@ -445,7 +449,9 @@ indent_size = 2
       expect(output, contains('Hello World'));
     });
 
-    test('component with named slots does not wrap remaining content in x-slot:default', () {
+    test(
+        'component with named slots does not wrap remaining content in x-slot:default',
+        () {
       const input = '''<x-app-layout>
     <x-slot:header>
         <h1>Page Title</h1>
@@ -467,6 +473,58 @@ indent_size = 2
       final second = formatter.format(first);
       expect(first, equals(second));
       expect(first, isNot(contains('<x-slot:default>')));
+    });
+  });
+
+  group('Issue #18: self-closing component as sole child is preserved', () {
+    late BladeFormatter formatter;
+
+    setUp(() {
+      formatter = BladeFormatter();
+    });
+
+    test('self-closing component as sole child of anchor is kept', () {
+      const input = '<a href="something" target="_blank">\n'
+          '    <x-component :x="\$x" :y="\$y" />\n'
+          '</a>';
+      final output = formatter.format(input);
+      expect(output, contains('<x-component'));
+      expect(output, contains(':x="\$x"'));
+      expect(output, contains(':y="\$y"'));
+    });
+
+    test('self-closing component as sole child of div is kept', () {
+      const input = '<div>\n    <x-component :x="\$x" />\n</div>';
+      final output = formatter.format(input);
+      expect(output, contains('<x-component'));
+      expect(output, contains(':x="\$x"'));
+    });
+
+    test('self-closing component sole child is idempotent', () {
+      const input = '<a href="something">\n    <x-component :x="\$x" />\n</a>';
+      final first = formatter.format(input);
+      final second = formatter.format(first);
+      expect(first, contains('<x-component'));
+      expect(second, equals(first));
+    });
+
+    test('exact example from issue #18 no longer drops the component', () {
+      // Verbatim input from https://github.com/HelgeSverre/dart-blade-parser/issues/18
+      const input = '   <a href="something" target="_blank">\n'
+          '        <x-component :x="\$x" :y="\$y" />\n'
+          '    </a>';
+      final output = formatter.format(input);
+
+      // The bug turned the above into an empty `<a ...></a>`, losing the
+      // component entirely.
+      expect(output, contains('<x-component :x="\$x" :y="\$y" />'));
+      expect(output, isNot(contains('target="_blank">\n    </a>')));
+      expect(
+        output,
+        equals('<a href="something" target="_blank">\n'
+            '    <x-component :x="\$x" :y="\$y" />\n'
+            '</a>\n'),
+      );
     });
   });
 }
