@@ -439,16 +439,21 @@ class BladeLexer {
         }
 
         final componentName = input.substring(nameStart, _position);
-        _emitToken(TokenType.componentTagClose, '</x-$componentName');
 
-        // Skip to >
+        // Consume up to and including the closing '>' BEFORE emitting the
+        // token, so the token span (and therefore the component node's end
+        // position) covers the entire closing tag. If the '>' is consumed
+        // after emitting, the end position stops one character short and the
+        // closing tag is truncated when the region is emitted verbatim (e.g.
+        // inside a blade-formatter-disable / prettier-ignore block).
         while (!_isAtEnd() && _peek() != '>') {
           _advance();
         }
         if (_peek() == '>') {
           _advance();
-          // Don't emit the > as text - it's part of the component tag structure
+          // The '>' is part of the component tag structure, not text.
         }
+        _emitToken(TokenType.componentTagClose, '</x-$componentName');
 
         _start = _position;
         return _LexerState.text; // Return to text mode with fresh buffer
